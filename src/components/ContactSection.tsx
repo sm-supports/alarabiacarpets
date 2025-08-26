@@ -69,16 +69,29 @@ const ContactSection = memo(function ContactSection() {
 
   // Report Google Ads conversion (calls global gtag if available).
   // If gtag is not available, immediately navigate to the provided URL.
-  const gtagReportConversion = useCallback((url?: string) => {
+  // Accepts an optional sendTo conversion id (e.g. 'AW-.../...').
+  const gtagReportConversion = useCallback((url?: string, sendTo?: string) => {
+    const sendToId = sendTo ?? "AW-16463357836/ePkWCK7M940bEIzPq6o9";
     const callback = () => {
       if (typeof url !== "undefined") {
-        window.location.href = url;
+        // Open http(s) links in a new tab to preserve original behavior for external links
+        if (/^https?:/i.test(url)) {
+          try {
+            window.open(url, "_blank");
+          } catch (err) {
+            // fallback to same-tab navigation
+            window.location.href = url;
+          }
+        } else {
+          // tel: and other schemes navigate in-place
+          window.location.href = url;
+        }
       }
     };
 
     if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
       (window as any).gtag("event", "conversion", {
-        send_to: "AW-16463357836/ePkWCK7M940bEIzPq6o9",
+        send_to: sendToId,
         value: 1.0,
         currency: "INR",
         event_callback: callback,
@@ -98,7 +111,8 @@ const ContactSection = memo(function ContactSection() {
       bgColor: "bg-green-500",
       title: "WhatsApp",
       subtitle: "+974 5551 2858",
-      external: true
+  external: true,
+  conversionId: "AW-16463357836/JdbrCP-KwYwbEIzPq6o9"
     },
     {
       href: "mailto:info@alarabiacarpets.com",
@@ -282,7 +296,16 @@ const ContactSection = memo(function ContactSection() {
           <p className="font-poppins text-white/80 mb-4">Need immediate assistance?</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button asChild className="bg-white text-primary hover:bg-white/90 font-poppins font-medium">
-              <a href="https://wa.me/+97455512858" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+              <a
+                href="https://wa.me/+97455512858"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  gtagReportConversion("https://wa.me/+97455512858", "AW-16463357836/JdbrCP-KwYwbEIzPq6o9");
+                }}
+                className="flex items-center gap-2"
+              >
                 <MessageCircle size={18} />
                 Chat on WhatsApp
                 <ExternalLink size={14} />

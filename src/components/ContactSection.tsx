@@ -108,7 +108,7 @@ const ContactSection = memo(function ContactSection() {
 
     if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
       (window as any).gtag("event", "conversion", {
-        send_to: "AW-16463357836/JdbrCP-KwYwbEIzPq6o9",
+        send_to: "AW-16463357836/n6RiCOKH_I0bEIzPq6o9",
         event_callback: callback,
       });
     } else {
@@ -127,7 +127,7 @@ const ContactSection = memo(function ContactSection() {
       title: "WhatsApp",
       subtitle: "+974 5551 2858",
   external: true,
-  conversionId: "AW-16463357836/JdbrCP-KwYwbEIzPq6o9"
+  conversionId: "AW-16463357836/n6RiCOKH_I0bEIzPq6o9"
     },
     {
       href: "mailto:info@alarabiacarpets.com",

@@ -74,22 +74,13 @@ const ContactSection = memo(function ContactSection() {
     const sendToId = sendTo ?? "AW-16463357836/ePkWCK7M940bEIzPq6o9";
     const callback = () => {
       if (typeof url !== "undefined") {
-        // Open http(s) links in a new tab to preserve original behavior for external links
-        if (/^https?:/i.test(url)) {
-          try {
-            window.open(url, "_blank");
-          } catch (err) {
-            // fallback to same-tab navigation
-            window.location.href = url;
-          }
-        } else {
-          // tel: and other schemes navigate in-place
-          window.location.href = url;
-        }
+        // Use same-tab navigation to avoid popup blockers and ensure navigation after the event
+        window.location.href = url;
       }
     };
 
     if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+      console.debug("gtag found, sending conversion", sendToId);
       (window as any).gtag("event", "conversion", {
         send_to: sendToId,
         value: 1.0,
@@ -97,7 +88,31 @@ const ContactSection = memo(function ContactSection() {
         event_callback: callback,
       });
     } else {
+      console.debug("gtag not found, navigating immediately to", url);
       // Fallback navigation when gtag isn't available
+      callback();
+    }
+
+    return false;
+  }, []);
+
+  // Explicit helper matching the provided snippet for Contact (1) conversion.
+  // Calls Google Ads conversion with the fixed send_to id and navigates in the callback.
+  const gtag_report_conversion = useCallback((url?: string) => {
+    const callback = () => {
+      if (typeof url !== "undefined") {
+        // Use window.location as in the snippet
+        (window as any).location = url;
+      }
+    };
+
+    if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+      (window as any).gtag("event", "conversion", {
+        send_to: "AW-16463357836/JdbrCP-KwYwbEIzPq6o9",
+        event_callback: callback,
+      });
+    } else {
+      // If gtag isn't present, just navigate immediately
       callback();
     }
 
@@ -174,6 +189,13 @@ const ContactSection = memo(function ContactSection() {
                       key={index}
                       href={contact.href}
                       {...(contact.external && { target: "_blank", rel: "noopener noreferrer" })}
+                      onClick={(e) => {
+                        // If this contact has a conversionId, call the snippet-style helper
+                        if ((contact as any).conversionId) {
+                          e.preventDefault();
+                          gtag_report_conversion(contact.href);
+                        }
+                      }}
                       className="flex items-center gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-colors group"
                     >
                       <div className={`${contact.bgColor} p-2 rounded-full group-hover:scale-110 transition-transform`}>
@@ -183,7 +205,12 @@ const ContactSection = memo(function ContactSection() {
                         <p className="font-poppins font-medium text-white">{contact.title}</p>
                         <p className="font-poppins text-sm text-white/70">{contact.subtitle}</p>
                       </div>
-                      {contact.external && <ExternalLink size={16} className="text-white/50" />}
+                            {contact.external && <ExternalLink size={16} className="text-white/50" />}
+                            {/* If this contact has a conversionId (WhatsApp), call gtag_report_conversion */}
+                            {(contact as any).conversionId && (
+                              // Empty span so we don't alter layout; actual click handled on anchor's onClick
+                              <></>
+                            )}
                     </a>
                   );
                 })}
@@ -302,7 +329,7 @@ const ContactSection = memo(function ContactSection() {
                 rel="noopener noreferrer"
                 onClick={(e) => {
                   e.preventDefault();
-                  gtagReportConversion("https://wa.me/+97455512858", "AW-16463357836/JdbrCP-KwYwbEIzPq6o9");
+                  gtag_report_conversion("https://wa.me/+97455512858");
                 }}
                 className="flex items-center gap-2"
               >

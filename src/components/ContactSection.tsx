@@ -67,6 +67,30 @@ const ContactSection = memo(function ContactSection() {
     setNewsletterSignup(checked);
   }, []);
 
+  // Report Google Ads conversion (calls global gtag if available).
+  // If gtag is not available, immediately navigate to the provided URL.
+  const gtagReportConversion = useCallback((url?: string) => {
+    const callback = () => {
+      if (typeof url !== "undefined") {
+        window.location.href = url;
+      }
+    };
+
+    if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+      (window as any).gtag("event", "conversion", {
+        send_to: "AW-16463357836/ePkWCK7M940bEIzPq6o9",
+        value: 1.0,
+        currency: "INR",
+        event_callback: callback,
+      });
+    } else {
+      // Fallback navigation when gtag isn't available
+      callback();
+    }
+
+    return false;
+  }, []);
+
   const contactInfo = useMemo(() => [
     {
       href: "https://wa.me/+97455512858",
@@ -265,7 +289,14 @@ const ContactSection = memo(function ContactSection() {
               </a>
             </Button>
             <Button asChild variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 font-poppins font-medium">
-              <a href="tel:+97455512858" className="flex items-center gap-2">
+              <a
+                href="tel:+97455512858"
+                onClick={(e) => {
+                  e.preventDefault();
+                  gtagReportConversion("tel:+97455512858");
+                }}
+                className="flex items-center gap-2"
+              >
                 <Phone size={18} />
                 Call Now
               </a>

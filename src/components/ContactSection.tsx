@@ -98,11 +98,25 @@ const ContactSection = memo(function ContactSection() {
 
   // Explicit helper matching the provided snippet for Contact (1) conversion.
   // Calls Google Ads conversion with the fixed send_to id and navigates in the callback.
-  const gtag_report_conversion = useCallback((url?: string) => {
+  // gtag_report_conversion follows the provided snippet but accepts an optional
+  // pre-opened window so we can reliably navigate in a new tab without popup blockers.
+  const gtag_report_conversion = useCallback((url?: string, targetWindow?: Window | null) => {
     const callback = () => {
       if (typeof url !== "undefined") {
-        // Use window.location as in the snippet
-        (window as any).location = url;
+        if (targetWindow && !targetWindow.closed) {
+          try {
+            targetWindow.location.href = url;
+            return;
+          } catch (err) {
+            // ignore and fallback to opening normally
+          }
+        }
+        // Fallback: navigate current window (or open new tab)
+        try {
+          window.open(url, "_blank");
+        } catch (err) {
+          (window as any).location = url;
+        }
       }
     };
 
@@ -190,10 +204,12 @@ const ContactSection = memo(function ContactSection() {
                       href={contact.href}
                       {...(contact.external && { target: "_blank", rel: "noopener noreferrer" })}
                       onClick={(e) => {
-                        // If this contact has a conversionId, call the snippet-style helper
+                        // If this contact has a conversionId, open a new tab synchronously
+                        // and pass its window handle to the conversion helper to avoid popup blockers.
                         if ((contact as any).conversionId) {
                           e.preventDefault();
-                          gtag_report_conversion(contact.href);
+                          const newWin = window.open("about:blank", "_blank");
+                          gtag_report_conversion(contact.href, newWin);
                         }
                       }}
                       className="flex items-center gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-colors group"
@@ -322,22 +338,21 @@ const ContactSection = memo(function ContactSection() {
         <div className="text-center mt-12">
           <p className="font-poppins text-white/80 mb-4">Need immediate assistance?</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button asChild className="bg-white text-primary hover:bg-white/90 font-poppins font-medium">
-              <a
-                href="https://wa.me/+97455512858"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => {
-                  e.preventDefault();
-                  gtag_report_conversion("https://wa.me/+97455512858");
-                }}
-                className="flex items-center gap-2"
-              >
-                <MessageCircle size={18} />
-                Chat on WhatsApp
-                <ExternalLink size={14} />
-              </a>
-            </Button>
+            <a
+              href="https://wa.me/+97455512858"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
+                const newWin = window.open("about:blank", "_blank");
+                gtag_report_conversion("https://wa.me/+97455512858", newWin);
+              }}
+              className="bg-white text-primary hover:bg-white/90 font-poppins font-medium inline-flex items-center gap-2 px-4 py-2 rounded-md"
+            >
+              <MessageCircle size={18} />
+              Chat on WhatsApp
+              <ExternalLink size={14} />
+            </a>
             <Button asChild variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 font-poppins font-medium">
               <a
                 href="tel:+97455512858"

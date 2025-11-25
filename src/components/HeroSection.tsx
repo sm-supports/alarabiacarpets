@@ -1,143 +1,168 @@
-
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, Award, Users } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
-
-// framer-motion will be dynamically imported on non-mobile to avoid adding
-// its runtime cost to mobile users. On mobile we render a simpler static hero.
+import { ArrowRight, Play } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 export default function HeroSection() {
-  const [isLogoHovered, setIsLogoHovered] = useState(false);
-  const isMobile = useIsMobile();
-  const [Motion, setMotion] = useState<any | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    let mounted = true;
-    // Only load framer-motion on non-mobile devices. Instead of storing the
-    // raw `motion` proxy we map only the primitives we use to a plain object
-    // (div, p, img). This avoids accidental invocation of the proxy as a
-    // function which can lead to `Component` being null and the
-    // `displayName` read error.
-    if (!isMobile) {
-      import('framer-motion')
-        .then(mod => {
-          if (!mounted) return;
-          setMotion({
-            div: mod.motion.div,
-            p: mod.motion.p,
-            img: mod.motion.img,
-          });
-        })
-        .catch(() => {
-          // ignore
-        });
-    }
-    return () => {
-      mounted = false;
-    };
-  }, [isMobile]);
-
-  const handleLogoMouseEnter = () => {
-    setIsLogoHovered(true);
-  };
-
-  const handleLogoMouseLeave = () => {
-    setIsLogoHovered(false);
-  };
+    // Trigger animations after mount
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({behavior: 'smooth'});
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <section id="home" className="relative bg-gradient-to-br from-primary via-primary/95 to-primary/90 text-white overflow-hidden min-h-screen">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-          backgroundSize: '40px 40px'
-        }}></div>
+    <section
+      ref={heroRef}
+      id="home"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-subtle"
+    >
+      {/* Ambient Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Gradient orbs */}
+        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-gold-200/40 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] bg-teal-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-forest-100/20 rounded-full blur-3xl" />
+        
+        {/* Subtle grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(10, 42, 31, 0.5) 1px, transparent 1px),
+                             linear-gradient(90deg, rgba(10, 42, 31, 0.5) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }}
+        />
       </div>
-      
-      {/* Gradient Overlays */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-accent/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/20 rounded-full blur-3xl"></div>
-      </div>
 
-  <div className="container mx-auto px-4 relative">
-        <div className="flex items-center min-h-screen py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
-            
-            {/* Left Content: animated on desktop, static on mobile */}
-            <div className="text-center lg:text-left space-y-8">
-              {Motion && !isMobile ? (
-                <>
-                  <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-full px-4 py-2 text-sm font-medium shadow-lg">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    Premium Home Furnishings
-                  </Motion.div>
+      {/* Main Content */}
+      <div className="relative z-10 container mx-auto px-5 lg:px-8">
+        <div className="max-w-5xl mx-auto text-center">
+          {/* Badge */}
+          <div
+            className={`inline-flex items-center gap-2 px-4 py-2 mb-8 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-full shadow-subtle transition-all duration-700 ease-out-expo ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
+            <span className="w-2 h-2 bg-gold-500 rounded-full animate-pulse-subtle" />
+            <span className="text-sm font-medium text-gray-700">
+              Premium Home Furnishings in Qatar
+            </span>
+          </div>
 
-                  <Motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
-                    <h1 className="font-playfair text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                      Transform Your
-                      <span className="block text-transparent bg-clip-text bg-gradient-to-r from-accent to-secondary">Living Space</span>
-                    </h1>
-                  </Motion.div>
+          {/* Main Headline */}
+          <h1
+            className={`text-display font-display text-forest-900 mb-6 transition-all duration-1000 ease-out-expo ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: '100ms' }}
+          >
+            Transform Your Space
+            <br />
+            <span className="text-gradient">Into Art</span>
+          </h1>
 
-                  <Motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="font-poppins text-xl text-white/90 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                    Discover premium carpets, elegant sofas, and quality Barkia with free installation and delivery throughout Qatar.
-                  </Motion.p>
+          {/* Subheadline */}
+          <p
+            className={`text-body-large text-gray-600 max-w-2xl mx-auto mb-10 text-balance transition-all duration-1000 ease-out-expo ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: '200ms' }}
+          >
+            Discover handcrafted carpets, elegant majlis sofas, and premium 
+            home furnishings with complimentary delivery and installation 
+            throughout Qatar.
+          </p>
 
-                  <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-wrap gap-8 justify-center lg:justify-start">
-                    <div className="flex items-center gap-2"><Award className="w-5 h-5 text-accent" /><span className="text-sm font-medium">Premium Quality</span></div>
-                    <div className="flex items-center gap-2"><Users className="w-5 h-5 text-accent" /><span className="text-sm font-medium">1000+ Happy Customers</span></div>
-                    <div className="flex items-center gap-2"><Star className="w-5 h-5 text-yellow-400 fill-current" /><span className="text-sm font-medium">Free Installation</span></div>
-                  </Motion.div>
+          {/* CTA Buttons */}
+          <div
+            className={`flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 transition-all duration-1000 ease-out-expo ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: '300ms' }}
+          >
+            <button
+              onClick={() => scrollToSection('products')}
+              className="group inline-flex items-center gap-2 px-8 py-4 bg-forest-900 text-white text-base font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-float hover:scale-[1.02]"
+            >
+              Explore Collection
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </button>
+            <button
+              onClick={() => scrollToSection('about')}
+              className="group inline-flex items-center gap-2 px-8 py-4 bg-white text-forest-900 text-base font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 hover:shadow-subtle"
+            >
+              <Play className="w-4 h-4" />
+              Our Story
+            </button>
+          </div>
 
-                  <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4 w-full max-w-lg">
-                    <Button onClick={() => scrollToSection('products')} size="lg" className="bg-accent hover:bg-accent/90 text-white px-8 py-6 text-lg rounded-xl font-poppins font-semibold group transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full sm:w-auto">Explore Products <ArrowRight className="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" /></Button>
-                    <Button onClick={() => scrollToSection('contact')} size="lg" variant="outline" className="border-2 border-white/40 text-white bg-white/10 backdrop-blur-md hover:bg-white hover:text-primary px-8 py-6 text-lg rounded-xl font-poppins font-semibold transition-all duration-300 hover:scale-105 w-full sm:w-auto">Get Quote</Button>
-                  </Motion.div>
-                </>
-              ) : (
-                // Mobile / fallback static version (no heavy animations)
-                <>
-                  <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1 text-sm font-medium">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" /> Premium Home Furnishings
-                  </div>
-                  <h1 className="font-playfair text-4xl md:text-5xl font-bold leading-tight">Transform Your <span className="block text-transparent bg-clip-text bg-gradient-to-r from-accent to-secondary">Living Space</span></h1>
-                  <p className="font-poppins text-base text-white/90 max-w-lg mx-auto lg:mx-0">Discover premium carpets, elegant sofas, and quality Barkia with free installation and delivery throughout Qatar.</p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-                    <Button onClick={() => scrollToSection('products')} size="lg" className="bg-accent text-white px-6 py-3 rounded-xl w-full sm:w-auto">Explore</Button>
-                    {/* Make Get Quote clearly visible on dark backgrounds: use a subtle translucent white bg and white text */}
-                    <Button onClick={() => scrollToSection('contact')} size="lg" variant="outline" className="w-full sm:w-auto border-2 border-white/30 text-white bg-white/10 backdrop-blur-md px-6 py-3 rounded-xl">Get Quote</Button>
-                  </div>
-                </>
-              )}
+          {/* Trust Indicators */}
+          <div
+            className={`flex flex-wrap items-center justify-center gap-8 md:gap-12 transition-all duration-1000 ease-out-expo ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: '400ms' }}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-forest-100 flex items-center justify-center">
+                <svg className="w-5 h-5 text-forest-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-forest-900">Free Delivery</p>
+                <p className="text-xs text-gray-500">Across Qatar</p>
+              </div>
             </div>
-
-            {/* Right Content - Logo */}
-            <div className="flex justify-center lg:justify-end">
-              {Motion && !isMobile ? (
-                <Motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.4 }} className="relative w-80 h-80 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem]" onMouseEnter={handleLogoMouseEnter} onMouseLeave={handleLogoMouseLeave} onClick={() => scrollToSection('products')} whileHover={{ scale: 1.05 }} style={{ cursor: 'pointer' }}>
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-accent/20 rounded-full blur-2xl"></div>
-                  <div className="relative w-full h-full flex items-center justify-center bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-2xl">
-                    <Motion.img src="/lovable-uploads/tran-golden-logo.webp" alt="Al Arabia Carpets Logo" className="w-3/4 h-3/4 object-contain drop-shadow-2xl" animate={{ rotateY: isLogoHovered ? 0 : [0, 10, 0, -10, 0] }} transition={{ duration: 4, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' }} />
-                    <Motion.div className="absolute inset-0 border-2 border-accent/40 rounded-full" animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} />
-                  </div>
-                </Motion.div>
-              ) : (
-                <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-[28rem] lg:h-[28rem]" onClick={() => scrollToSection('products')}>
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-accent/20 rounded-full blur-2xl"></div>
-                  <div className="relative w-full h-full flex items-center justify-center bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-2xl">
-                    <img src="/lovable-uploads/tran-golden-logo.webp" alt="Al Arabia Carpets Logo" className="w-3/4 h-3/4 object-contain drop-shadow-2xl" />
-                  </div>
-                </div>
-              )}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gold-100 flex items-center justify-center">
+                <svg className="w-5 h-5 text-gold-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-forest-900">Free Installation</p>
+                <p className="text-xs text-gray-500">Professional Team</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center">
+                <svg className="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-forest-900">1000+ Happy</p>
+                <p className="text-xs text-gray-500">Customers</p>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Featured Product Preview */}
+      <div
+        className={`absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent transition-opacity duration-1000 ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{ transitionDelay: '600ms' }}
+      />
+
+      {/* Scroll Indicator */}
+      <div
+        className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-1000 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+        style={{ transitionDelay: '800ms' }}
+      >
+        <span className="text-xs text-gray-400 uppercase tracking-wider">Scroll to explore</span>
+        <div className="w-6 h-10 border-2 border-gray-300 rounded-full flex justify-center pt-2">
+          <div className="w-1.5 h-3 bg-gray-400 rounded-full animate-bounce" />
         </div>
       </div>
     </section>

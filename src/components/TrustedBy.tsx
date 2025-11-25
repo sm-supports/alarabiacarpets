@@ -44,19 +44,19 @@ export default function TrustedBy() {
   return (
     <section 
       ref={sectionRef}
-      className="py-20 lg:py-28 bg-white border-y border-gray-100"
+      className="py-12 sm:py-16 lg:py-24 bg-white border-y border-gray-100"
     >
-      <div className="container mx-auto px-5 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-5 lg:px-8">
         {/* Header */}
         <div 
-          className={`text-center mb-14 transition-all duration-1000 ease-out-expo ${
+          className={`text-center mb-8 sm:mb-12 lg:mb-14 transition-all duration-1000 ease-out-expo ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+          <p className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider mb-2 sm:mb-3">
             Trusted Partners
           </p>
-          <h2 className="text-headline-2 font-display text-forest-900">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900">
             Trusted by Leading Organizations
           </h2>
         </div>
@@ -69,8 +69,8 @@ export default function TrustedBy() {
           style={{ transitionDelay: '200ms' }}
         >
           {/* Gradient Masks */}
-          <div className="absolute left-0 top-0 bottom-0 w-24 lg:w-40 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-24 lg:w-40 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 lg:w-40 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 lg:w-40 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
           
           {/* Scrolling Container */}
           <div className="flex animate-scroll hover:[animation-play-state:paused]">
@@ -80,13 +80,15 @@ export default function TrustedBy() {
               return (
                 <div 
                   key={`${logo.src}-${index}`}
-                  className="flex-shrink-0 w-36 h-20 sm:w-44 sm:h-24 lg:w-52 lg:h-28 flex items-center justify-center mx-4 lg:mx-6"
+                  className="flex-shrink-0 w-28 h-16 sm:w-36 sm:h-20 lg:w-48 lg:h-24 flex items-center justify-center mx-2 sm:mx-4 lg:mx-6"
                 >
                   <img
                     src={logo.src}
                     alt={logo.alt}
                     className={`object-contain transition-all duration-300 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 ${
-                      isLarger ? 'max-h-20 sm:max-h-24 lg:max-h-28' : 'max-h-14 sm:max-h-18 lg:max-h-20'
+                      isLarger 
+                        ? 'max-h-14 sm:max-h-18 lg:max-h-24' 
+                        : 'max-h-10 sm:max-h-14 lg:max-h-18'
                     }`}
                     loading="lazy"
                     decoding="async"
@@ -97,9 +99,9 @@ export default function TrustedBy() {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats - 2x2 grid on mobile, 4 columns on desktop */}
         <div 
-          className={`mt-16 grid grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-1000 ease-out-expo ${
+          className={`mt-10 sm:mt-14 lg:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 transition-all duration-1000 ease-out-expo ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
           style={{ transitionDelay: '400ms' }}
@@ -112,13 +114,12 @@ export default function TrustedBy() {
           ].map((stat, index) => (
             <div 
               key={stat.label}
-              className="text-center"
-              style={{ transitionDelay: `${400 + index * 100}ms` }}
+              className="text-center p-4 sm:p-0"
             >
-              <p className="text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-1">
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-0.5 sm:mb-1">
                 {stat.value}
               </p>
-              <p className="text-sm text-gray-500">{stat.label}</p>
+              <p className="text-xs sm:text-sm text-gray-500">{stat.label}</p>
             </div>
           ))}
         </div>

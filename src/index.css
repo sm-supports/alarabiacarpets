@@ -133,14 +133,14 @@
   * {
     @apply border-border;
   }
-
+  
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
-
+  
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
@@ -162,7 +162,7 @@
     font-weight: 700;
     letter-spacing: -0.02em;
   }
-
+  
   .text-headline-1 {
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 5vw, 3.5rem);
@@ -170,7 +170,7 @@
     font-weight: 700;
     letter-spacing: -0.015em;
   }
-
+  
   .text-headline-2 {
     font-family: var(--font-display);
     font-size: clamp(2rem, 4vw, 3rem);
@@ -178,7 +178,7 @@
     font-weight: 600;
     letter-spacing: -0.01em;
   }
-
+  
   .text-headline-3 {
     font-family: var(--font-display);
     font-size: clamp(1.5rem, 3vw, 2rem);
@@ -186,7 +186,7 @@
     font-weight: 600;
     letter-spacing: -0.005em;
   }
-
+  
   .text-body-large {
     font-family: var(--font-body);
     font-size: 1.3125rem;
@@ -240,7 +240,7 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
   }
-
+  
   .glass-dark {
     background: rgba(10, 42, 31, 0.85);
     backdrop-filter: blur(20px);
@@ -356,11 +356,11 @@
   .animate-fade-in-up {
     animation: fadeInUp 0.8s var(--ease-out-expo) forwards;
   }
-
+  
   .animate-fade-in {
     animation: fadeIn 0.5s var(--ease-out-quart) forwards;
   }
-
+  
   .animate-scale-in {
     animation: scaleIn 0.4s var(--ease-out-expo) forwards;
   }
@@ -368,15 +368,15 @@
   .animate-slide-down {
     animation: slideDown 0.3s var(--ease-out-quart) forwards;
   }
-
+  
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
-
+  
   .animate-scroll {
     animation: scroll 60s linear infinite;
   }
-
+  
   .animate-shimmer {
     background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
     background-size: 200% 100%;
@@ -528,6 +528,130 @@
 }
 
 /* ===================================
+   Mobile-Specific Utilities
+   =================================== */
+@layer utilities {
+  /* Safe area insets for notched devices */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .safe-x {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .safe-y {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-all {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* Minimum touch target size (44x44 as per Apple guidelines) */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent text selection on mobile interactive elements */
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Smooth momentum scrolling on iOS */
+  .scroll-smooth-touch {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Tap highlight removal */
+  .tap-transparent {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Full viewport height accounting for mobile browser chrome */
+  .h-screen-safe {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .min-h-screen-safe {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Overscroll behavior */
+  .overscroll-none {
+    overscroll-behavior: none;
+  }
+
+  /* Snap scrolling for carousels */
+  .snap-x-mandatory {
+    scroll-snap-type: x mandatory;
+  }
+
+  .snap-start {
+    scroll-snap-align: start;
+  }
+
+  .snap-center {
+    scroll-snap-align: center;
+  }
+}
+
+/* ===================================
+   Mobile Animation Optimizations
+   =================================== */
+@media (max-width: 768px) {
+  /* Reduce animation intensity on mobile for performance */
+  .animate-float {
+    animation-duration: 8s;
+  }
+  
+  .animate-scroll {
+    animation-duration: 40s;
+  }
+  
+  /* Shorter fade animations on mobile */
+  .animate-fade-in-up {
+    animation-duration: 0.5s;
+  }
+  
+  /* Reduce blur effects on mobile for performance */
+  .blur-3xl {
+    filter: blur(40px);
+  }
+}
+
+/* Touch device hover state fix */
+@media (hover: none) and (pointer: coarse) {
+  .hover-lift:hover {
+    transform: none;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .hover-scale:hover {
+    transform: none;
+  }
+}
+
+/* ===================================
    Accordion (existing) fix
    =================================== */
 @keyframes accordion-down {
@@ -547,3 +671,4 @@
     height: 0;
   }
 }
+

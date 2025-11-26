@@ -29,7 +29,7 @@ const productShowcases = [
     name: "Premium Barkia",
     tagline: "Elegant Room Dividers",
     description: "High-quality Barkia panels for elegant room separation and decoration. Perfect for creating distinct spaces with style.",
-    imageSrc: "/barkia.webp",
+    imageSrc: "/barkia&pvc/barkia.webp",
     features: ["Multiple Designs", "Easy Installation", "Durable Materials"],
     color: "teal",
     whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Premium%20Barkia"

@@ -20,7 +20,7 @@ const ImagePreloader = ({ images = [] }: ImagePreloaderProps) => {
 
     // Defer background preloads for other images so they don't affect first navigation
     const deferred = [
-      '/barkia.webp',
+      '/barkia&pvc/barkia.webp',
       '/carpet.webp',
       '/majlis-sofa.webp',
       '/sofa.webp',

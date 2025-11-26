@@ -9,12 +9,62 @@ const allProducts = [
   {
     id: "premium-barkia",
     name: "Premium Barkia",
-    imageSrc: "/barkia.webp",
+    imageSrc: "/barkia&pvc/barkia.webp",
   },
   {
     id: "pvc-barkia",
     name: "PVC Barkia",
     imageSrc: "/pvc-barkia.webp",
+  },
+  {
+    id: "al-wakra-white-spc",
+    name: "Al Wakra White SPC",
+    imageSrc: "/barkia&pvc/Al Wakra White – Ultra-Modern Waterproof SPC Flooring.webp",
+  },
+  {
+    id: "arabian-night-espresso-spc",
+    name: "Arabian Night Espresso SPC",
+    imageSrc: "/barkia&pvc/Arabian Night Espresso – High-End Waterproof SPC.webp",
+  },
+  {
+    id: "desert-walnut-classic-spc",
+    name: "Desert Walnut Classic SPC",
+    imageSrc: "/barkia&pvc/Desert Walnut Classic – Luxury SPC Flooring Doha.webp",
+  },
+  {
+    id: "doha-coastal-grey-spc",
+    name: "Doha Coastal Grey SPC",
+    imageSrc: "/barkia&pvc/Doha Coastal Grey – Premium Rigid Core SPC Vinyl.webp",
+  },
+  {
+    id: "pearl-grey-herringbone-spc",
+    name: "Pearl Grey Herringbone SPC",
+    imageSrc: "/barkia&pvc/Pearl Grey Herringbone – 100  Waterproof SPC Qatar.webp",
+  },
+  {
+    id: "qatar-breeze-oak-spc",
+    name: "Qatar Breeze Oak SPC",
+    imageSrc: "/barkia&pvc/Qatar Breeze Oak – Bright & Waterproof SPC Flooring.webp",
+  },
+  {
+    id: "qatar-sand-oak-spc",
+    name: "Qatar Sand Oak SPC",
+    imageSrc: "/barkia&pvc/Qatar Sand Oak – Luxury Waterproof SPC Flooring.webp",
+  },
+  {
+    id: "royal-mahogany-spc",
+    name: "Royal Mahogany SPC",
+    imageSrc: "/barkia&pvc/Royal Mahogany – Luxury Waterproof Vinyl SPC.webp",
+  },
+  {
+    id: "scandinavian-white-oak-spc",
+    name: "Scandinavian White Oak SPC",
+    imageSrc: "/barkia&pvc/Scandinavian White Oak – Modern Waterproof SPC Doha.webp",
+  },
+  {
+    id: "sunset-teak-gold-spc",
+    name: "Sunset Teak Gold SPC",
+    imageSrc: "/barkia&pvc/Sunset Teak Gold – Elegant SPC Vinyl Flooring Qatar.webp",
   },
   {
     id: "luxury-carpets",

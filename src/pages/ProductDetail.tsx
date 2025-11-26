@@ -31,7 +31,7 @@ const ProductDetail = () => {
         id: "premium-barkia",
         name: "Premium Barkia",
         description: "High-quality Barkia panels for elegant room separation and decoration. Our premium Barkia panels are crafted from the finest materials and designed to add a touch of elegance to any space. Perfect for home or office, these panels offer both aesthetic appeal and functionality.",
-        imageSrc: "/barkia.webp",
+        imageSrc: "/barkia&pvc/barkia.webp",
         category: "barkia",
         price: "Starting from 350 QAR/sqm",
         whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Premium%20Barkia"
@@ -44,6 +44,96 @@ const ProductDetail = () => {
         category: "barkia",
         price: "Starting from 250 QAR/sqm",
         whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20PVC%20Barkia"
+      },
+      {
+        id: "al-wakra-white-spc",
+        name: "Al Wakra White SPC",
+        description: "Ultra-modern waterproof SPC flooring with a clean white finish. This premium flooring solution is perfect for contemporary spaces, offering exceptional durability and a sleek aesthetic. Ideal for living rooms, bedrooms, and commercial areas seeking a bright, modern look.",
+        imageSrc: "/barkia&pvc/Al Wakra White – Ultra-Modern Waterproof SPC Flooring.webp",
+        category: "barkia",
+        price: "Starting from 280 QAR/sqm",
+        whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Al%20Wakra%20White%20SPC%20Flooring"
+      },
+      {
+        id: "arabian-night-espresso-spc",
+        name: "Arabian Night Espresso SPC",
+        description: "High-end waterproof SPC flooring with rich espresso tones that add warmth and elegance to any room. This luxurious flooring option combines the beauty of dark wood with the practical benefits of waterproof SPC technology. Perfect for creating sophisticated, inviting interiors.",
+        imageSrc: "/barkia&pvc/Arabian Night Espresso – High-End Waterproof SPC.webp",
+        category: "barkia",
+        price: "Starting from 320 QAR/sqm",
+        whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Arabian%20Night%20Espresso%20SPC"
+      },
+      {
+        id: "desert-walnut-classic-spc",
+        name: "Desert Walnut Classic SPC",
+        description: "Luxury SPC flooring featuring timeless walnut patterns that bring natural beauty to your Doha home. The classic walnut grain provides an elegant foundation for any interior design scheme. Waterproof, durable, and perfect for Qatar's climate.",
+        imageSrc: "/barkia&pvc/Desert Walnut Classic – Luxury SPC Flooring Doha.webp",
+        category: "barkia",
+        price: "Starting from 300 QAR/sqm",
+        whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Desert%20Walnut%20Classic%20SPC"
+      },
+      {
+        id: "doha-coastal-grey-spc",
+        name: "Doha Coastal Grey SPC",
+        description: "Premium rigid core SPC vinyl with sophisticated grey tones inspired by Qatar's beautiful coastal scenery. This elegant flooring offers superior stability and waterproof performance, making it ideal for any room in your home or office.",
+        imageSrc: "/barkia&pvc/Doha Coastal Grey – Premium Rigid Core SPC Vinyl.webp",
+        category: "barkia",
+        price: "Starting from 290 QAR/sqm",
+        whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Doha%20Coastal%20Grey%20SPC"
+      },
+      {
+        id: "pearl-grey-herringbone-spc",
+        name: "Pearl Grey Herringbone SPC",
+        description: "100% waterproof SPC flooring with an elegant herringbone pattern in sophisticated pearl grey. This distinctive design adds architectural interest and timeless style to any space. A premium choice for discerning homeowners in Qatar.",
+        imageSrc: "/barkia&pvc/Pearl Grey Herringbone – 100  Waterproof SPC Qatar.webp",
+        category: "barkia",
+        price: "Starting from 350 QAR/sqm",
+        whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Pearl%20Grey%20Herringbone%20SPC"
+      },
+      {
+        id: "qatar-breeze-oak-spc",
+        name: "Qatar Breeze Oak SPC",
+        description: "Bright and waterproof SPC flooring with a refreshing oak finish that creates an airy, open atmosphere. Perfect for those seeking to maximize natural light and create spacious-feeling interiors. Combines beauty with exceptional durability.",
+        imageSrc: "/barkia&pvc/Qatar Breeze Oak – Bright & Waterproof SPC Flooring.webp",
+        category: "barkia",
+        price: "Starting from 275 QAR/sqm",
+        whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Qatar%20Breeze%20Oak%20SPC"
+      },
+      {
+        id: "qatar-sand-oak-spc",
+        name: "Qatar Sand Oak SPC",
+        description: "Luxury waterproof SPC flooring inspired by Qatar's majestic desert landscapes. The warm sand-toned oak finish creates a welcoming atmosphere while providing the practical benefits of modern SPC technology. Perfect for creating cozy, elegant spaces.",
+        imageSrc: "/barkia&pvc/Qatar Sand Oak – Luxury Waterproof SPC Flooring.webp",
+        category: "barkia",
+        price: "Starting from 285 QAR/sqm",
+        whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Qatar%20Sand%20Oak%20SPC"
+      },
+      {
+        id: "royal-mahogany-spc",
+        name: "Royal Mahogany SPC",
+        description: "Luxury waterproof vinyl SPC with a rich mahogany finish that exudes royal elegance and sophistication. This premium flooring option transforms any space into a showcase of refined taste. The deep, warm tones create an atmosphere of luxury and comfort.",
+        imageSrc: "/barkia&pvc/Royal Mahogany – Luxury Waterproof Vinyl SPC.webp",
+        category: "barkia",
+        price: "Starting from 340 QAR/sqm",
+        whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Royal%20Mahogany%20SPC"
+      },
+      {
+        id: "scandinavian-white-oak-spc",
+        name: "Scandinavian White Oak SPC",
+        description: "Modern waterproof SPC flooring with minimalist Scandinavian design. Clean lines and a bright finish create a fresh, contemporary look that complements any modern interior. Perfect for those who appreciate understated elegance and functional beauty.",
+        imageSrc: "/barkia&pvc/Scandinavian White Oak – Modern Waterproof SPC Doha.webp",
+        category: "barkia",
+        price: "Starting from 295 QAR/sqm",
+        whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Scandinavian%20White%20Oak%20SPC"
+      },
+      {
+        id: "sunset-teak-gold-spc",
+        name: "Sunset Teak Gold SPC",
+        description: "Elegant SPC vinyl flooring with warm golden teak tones that capture the beauty of Qatar sunsets. This stunning flooring option adds warmth and character to any space. The rich golden hues create an inviting atmosphere perfect for family gatherings.",
+        imageSrc: "/barkia&pvc/Sunset Teak Gold – Elegant SPC Vinyl Flooring Qatar.webp",
+        category: "barkia",
+        price: "Starting from 310 QAR/sqm",
+        whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Sunset%20Teak%20Gold%20SPC"
       },
       {
         id: "luxury-carpets",

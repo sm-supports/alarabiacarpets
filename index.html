@@ -21,6 +21,22 @@
   // Configure Google Ads for conversion events
   gtag('config', 'AW-16463357836');
   </script>
+  <script>
+  function gtag_report_conversion(url) {
+    var callback = function () {
+      if (typeof(url) != 'undefined') {
+        window.location = url;
+      }
+    };
+    gtag('event', 'conversion', {
+        'send_to': 'AW-16463357836/vNfLCO7DwcgbEIzPq6o9',
+        'value': 1.0,
+        'currency': 'INR',
+        'event_callback': callback
+    });
+    return false;
+  }
+  </script>
     
     <!-- Geo tags -->
     <meta name="geo.region" content="QA" />

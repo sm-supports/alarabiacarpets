@@ -9,7 +9,7 @@ const productShowcases = [
       name: "Luxury Carpets",
     tagline: "Comfort Beneath Your Feet",
     description: "Soft, durable carpets crafted from premium materials. Transform any room with our extensive collection of patterns and textures.",
-      imageSrc: "/carpet.webp",
+      imageSrc: "/Products/Carpets/carpet.webp",
     features: ["Premium Materials", "Stain Resistant", "Custom Sizes"],
     color: "forest",
       whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Luxury%20Carpets"
@@ -19,7 +19,7 @@ const productShowcases = [
     name: "Majlis Sofas",
     tagline: "Where Tradition Meets Comfort",
     description: "Contemporary majlis seating that honors tradition while embracing modern comfort. Custom designs available.",
-      imageSrc: "/majlis-sofa.webp",
+      imageSrc: "/Products/Furniture/majlis-sofa.webp",
     features: ["Custom Designs", "Premium Fabrics", "Traditional Craftsmanship"],
     color: "gold",
     whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Majlis%20Sofas"
@@ -29,7 +29,7 @@ const productShowcases = [
     name: "Premium Barkia",
     tagline: "Elegant Room Dividers",
     description: "High-quality Barkia panels for elegant room separation and decoration. Perfect for creating distinct spaces with style.",
-    imageSrc: "/barkia&pvc/barkia.webp",
+    imageSrc: "/Products/barkia&pvc/barkia.webp",
     features: ["Multiple Designs", "Easy Installation", "Durable Materials"],
     color: "teal",
     whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Premium%20Barkia"
@@ -38,10 +38,10 @@ const productShowcases = [
 
 // Additional products grid
 const additionalProducts = [
-  { id: "curtains", name: "Curtains", imageSrc: "/curtain.webp", link: "/products/curtains" },
-  { id: "roller-blinds", name: "Roller Blinds", imageSrc: "/roller.webp", link: "/products/roller-blinds" },
-  { id: "grass-carpet", name: "Grass Carpet", imageSrc: "/grass-carpet.webp", link: "/products/grass-carpet" },
-  { id: "sofas", name: "Modern Sofas", imageSrc: "/sofa.webp", link: "/products/sofas" },
+  { id: "curtains", name: "Curtains", imageSrc: "/Products/Curtain/curtain.webp", link: "/products/curtains" },
+  { id: "roller-blinds", name: "Roller Blinds", imageSrc: "/Products/Curtain/roller.webp", link: "/products/roller-blinds" },
+  { id: "grass-carpet", name: "Grass Carpet", imageSrc: "/Products/Carpets/grass-carpet.webp", link: "/products/grass-carpet" },
+  { id: "sofas", name: "Modern Sofas", imageSrc: "/Products/Furniture/sofa.webp", link: "/products/sofas" },
 ];
 
 // Individual product showcase component
@@ -95,6 +95,8 @@ function ProductShowcase({
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "auto"}
+                decoding={index === 0 ? "sync" : "async"}
               />
               {/* Subtle gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

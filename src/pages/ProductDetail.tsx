@@ -108,6 +108,8 @@ const ProductDetail = () => {
                     autoPlay
                     muted
                     loop
+                    preload="auto"
+                    poster={product.imageSrc.endsWith('.mp4') ? undefined : product.imageSrc}
                   />
                 ) : (
                   <img 

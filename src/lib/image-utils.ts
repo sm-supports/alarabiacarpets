@@ -9,12 +9,12 @@
  */
 export const normalizeImagePath = (imagePath: string): string => {
   if (!imagePath) return '';
-  
+
   // Ensure path starts with /
   if (!imagePath.startsWith('/')) {
     return `/${imagePath}`;
   }
-  
+
   return imagePath;
 };
 
@@ -26,25 +26,25 @@ export const normalizeImagePath = (imagePath: string): string => {
 export const checkImageExists = (imagePath: string): Promise<boolean> => {
   return new Promise((resolve) => {
     const img = new Image();
-    
+
     img.onload = () => resolve(true);
     img.onerror = () => resolve(false);
-    
+
     // Set a timeout to avoid hanging
     const timeout = setTimeout(() => {
       resolve(false);
     }, 5000);
-    
+
     img.onload = () => {
       clearTimeout(timeout);
       resolve(true);
     };
-    
+
     img.onerror = () => {
       clearTimeout(timeout);
       resolve(false);
     };
-    
+
     img.src = normalizeImagePath(imagePath);
   });
 };
@@ -109,4 +109,65 @@ export const logImageError = (imagePath: string, error?: Error): void => {
   if (process.env.NODE_ENV === 'development') {
     console.warn(`Image loading failed for: ${imagePath}`, error);
   }
+};
+
+/**
+ * Preload multiple videos
+ * @param videoPaths - Array of video paths to preload
+ * @returns Promise that resolves when all videos are preloaded
+ */
+export const preloadVideos = (videoPaths: string[]): Promise<void[]> => {
+  const promises = videoPaths.map((p) =>
+    new Promise<void>((resolve) => {
+      const path = normalizeImagePath(p);
+      try {
+        const video = document.createElement('video');
+        let settled = false;
+
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          resolve();
+        };
+
+        video.oncanplaythrough = finish;
+        video.onerror = finish;
+
+        // Safety timeout
+        setTimeout(finish, 10000);
+
+        video.preload = 'auto';
+        video.src = path;
+      } catch (e) {
+        resolve();
+      }
+    })
+  );
+
+  return Promise.all(promises);
+};
+
+/**
+ * Create a preload link element for an asset
+ * @param href - The URL to preload
+ * @param as - The asset type (image, video, font, etc.)
+ * @param priority - Optional fetch priority
+ */
+export const createPreloadLink = (
+  href: string,
+  as: 'image' | 'video' | 'font' | 'script' | 'style',
+  priority?: 'high' | 'low' | 'auto'
+): void => {
+  // Check if link already exists
+  const existing = document.querySelector(`link[href="${href}"]`);
+  if (existing) return;
+
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.href = href;
+  link.as = as;
+  if (priority) {
+    link.setAttribute('fetchpriority', priority);
+  }
+  document.head.appendChild(link);
 };

@@ -90,8 +90,9 @@ export default function TrustedBy() {
                         ? 'max-h-14 sm:max-h-18 lg:max-h-24' 
                         : 'max-h-10 sm:max-h-14 lg:max-h-18'
                     }`}
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
+                    fetchPriority="low"
                   />
                 </div>
               );

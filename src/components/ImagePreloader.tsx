@@ -10,24 +10,44 @@ interface ImagePreloaderProps {
  */
 const ImagePreloader = ({ images = [] }: ImagePreloaderProps) => {
   useEffect(() => {
-    // Only preload the truly critical (logo / hero) images eagerly.
-    // Defer the rest to idle time so we don't block navigation or main thread.
-    const eager = ['/lovable-uploads/green-white-logo.webp', '/interior.webp', ...images];
+    // Critical images that should load immediately (logo + homepage above-fold)
+    const eager = [
+      '/lovable-uploads/green-white-logo.webp',
+      // ProductsSection showcase images (homepage)
+      '/Products/Carpets/carpet.webp',
+      '/Products/Furniture/majlis-sofa.webp',
+      '/Products/barkia&pvc/barkia.webp',
+      // About page
+      '/About Al Arabia Carpets.webp',
+      ...images
+    ];
     const uniqueEager = [...new Set(eager)];
 
-    // Start small, non-blocking preload for very small set
+    // Start preload for critical images immediately
     preloadImages(uniqueEager).catch(() => {});
 
-    // Defer background preloads for other images so they don't affect first navigation
+    // Defer background preloads for secondary images
     const deferred = [
-      '/barkia&pvc/barkia.webp',
-      '/carpet.webp',
-      '/majlis-sofa.webp',
-      '/sofa.webp',
-      '/curtain.webp',
-      '/roller.webp',
-      '/pvc-barkia.webp',
-      '/grass-carpet.webp'
+      // Additional product images
+      '/Products/Curtain/curtain.webp',
+      '/Products/Curtain/roller.webp',
+      '/Products/Carpets/grass-carpet.webp',
+      '/Products/Furniture/sofa.webp',
+      // TrustedBy partner logos
+      '/logos/logo1.webp',
+      '/logos/logo2.webp',
+      '/logos/logo3.webp',
+      '/logos/logo4.webp',
+      '/logos/logo5.webp',
+      '/logos/logo6.webp',
+      '/logos/logo7.webp',
+      '/logos/logo8.webp',
+      '/logos/logo9.webp',
+      '/logos/logo10.webp',
+      '/logos/logo11.webp',
+      '/logos/logo12.webp',
+      '/logos/logo13.webp',
+      '/logos/logo14.webp'
     ].filter(p => !uniqueEager.includes(p));
 
   let idleId: number | null = null;

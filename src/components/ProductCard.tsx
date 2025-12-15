@@ -103,7 +103,7 @@ const ProductCard = memo(function ProductCard({
                   src={item.src}
                   className="w-full h-full object-cover"
                   controls
-                  preload="metadata"
+                  preload="auto"
                   onClick={(e) => e.stopPropagation()} // Allow controls to work
                 />
               ) : (
@@ -128,6 +128,7 @@ const ProductCard = memo(function ProductCard({
                     alt={`${name} - ${index + 1}`}
                     loading={priority && index === 0 ? "eager" : "lazy"}
                     decoding="async"
+                    fetchPriority={priority && index === 0 ? "high" : "auto"}
                     onLoad={index === 0 ? handleImageLoad : undefined}
                     onError={index === 0 ? handleImageError : undefined}
                     className="h-full w-full object-cover"

@@ -47,6 +47,9 @@ const About = () => {
                         src="/About Al Arabia Carpets.webp" 
                         alt="Al Arabia Carpets shopfront" 
                         className="w-full h-full object-cover"
+                        loading="eager"
+                        fetchPriority="high"
+                        decoding="sync"
                       />
                     </AspectRatio>
                   </div>

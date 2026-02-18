@@ -4,18 +4,23 @@ interface Env {
   RESEND_API_KEY: string;
 }
 
-const headers = {
+interface CFContext {
+  request: Request;
+  env: Env;
+}
+
+const headers: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json",
 };
 
-export const onRequestOptions: PagesFunction<Env> = async () => {
+export async function onRequestOptions(): Promise<Response> {
   return new Response(null, { status: 204, headers });
-};
+}
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+export async function onRequestPost(context: CFContext): Promise<Response> {
   try {
     const { name, email, message } = await context.request.json() as {
       name?: string;
@@ -23,9 +28,18 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       message?: string;
     };
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!name || !email || !message) {
       return new Response(
         JSON.stringify({ error: "Name, email, and message are required" }),
+        { status: 400, headers }
+      );
+    }
+
+    if (!emailRegex.test(email)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid email format" }),
         { status: 400, headers }
       );
     }
@@ -57,7 +71,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       { status: 500, headers }
     );
   }
-};
+}
 
 function escapeHtml(text: string): string {
   return text

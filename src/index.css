@@ -654,6 +654,33 @@
 /* ===================================
    Accordion (existing) fix
    =================================== */
+/* ===================================
+   Product Card Styles
+   =================================== */
+.product-card {
+  transform: translateY(0);
+  transition: transform var(--duration-normal) var(--ease-out-expo),
+              box-shadow var(--duration-normal) var(--ease-out-expo);
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Ensure uniform video display inside product cards */
+.product-card video {
+  object-fit: cover;
+  background: rgb(var(--color-near-black));
+}
+
+/* Smooth image zoom on hover */
+.product-card:hover img {
+  transform: scale(1.05);
+}
+
+/* ===================================
+   Accordion (existing) fix
+   =================================== */
 @keyframes accordion-down {
   from {
     height: 0;

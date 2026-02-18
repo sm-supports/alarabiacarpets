@@ -2,7 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ExternalLink, ImageIcon, Video, ChevronLeft, ChevronRight } from "lucide-react";
-import { memo, useCallback, useState, useRef } from "react";
+import { memo, useCallback, useState, useRef, useEffect } from "react";
 import { ProductMedia } from "@/data/products";
 
 interface ProductCardProps {
@@ -15,17 +15,18 @@ interface ProductCardProps {
   priority?: boolean;
 }
 
-const ProductCard = memo(function ProductCard({ 
-  name, 
-  description, 
-  imageSrc, 
+const ProductCard = memo(function ProductCard({
+  name,
+  description,
+  imageSrc,
   media = [],
-  whatsappLink, 
+  whatsappLink,
   onClick,
   priority = false
 }: ProductCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // If no media array is provided, create one from imageSrc for backward compatibility
@@ -49,6 +50,22 @@ const ProductCard = memo(function ProductCard({
     setIsLoaded(true);
   }, []);
 
+  // Track active slide on scroll
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const scrollLeft = container.scrollLeft;
+      const width = container.clientWidth;
+      const newIndex = Math.round(scrollLeft / width);
+      setActiveIndex(newIndex);
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = scrollContainerRef.current.clientWidth;
@@ -59,43 +76,74 @@ const ProductCard = memo(function ProductCard({
     }
   };
 
+  const goToSlide = (index: number) => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = scrollContainerRef.current.clientWidth * index;
+      scrollContainerRef.current.scrollTo({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-2xl h-full flex flex-col group">
-      <div className="relative aspect-square bg-secondary">
-        {/* Scroll Controls (only if multiple items) */}
+    <Card className="product-card overflow-hidden h-full flex flex-col group border-0 shadow-md hover:shadow-xl transition-all duration-500 rounded-2xl bg-white">
+      {/* Media Container - Fixed 4:3 aspect ratio for uniformity */}
+      <div className="relative aspect-[4/3] bg-neutral-100 overflow-hidden rounded-t-2xl">
+        {/* Navigation Arrows (only if multiple items) */}
         {displayMedia.length > 1 && (
           <>
-            <button 
+            <button
               onClick={(e) => { e.stopPropagation(); scroll('left'); }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              aria-label="Previous image"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={18} />
             </button>
-            <button 
+            <button
               onClick={(e) => { e.stopPropagation(); scroll('right'); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              aria-label="Next image"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={18} />
             </button>
-            
-            {/* Page Indicators */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex gap-1">
+
+            {/* Dot Indicators */}
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
               {displayMedia.map((_, idx) => (
-                <div key={idx} className="w-1.5 h-1.5 rounded-full bg-white/50" />
+                <button
+                  key={idx}
+                  onClick={(e) => { e.stopPropagation(); goToSlide(idx); }}
+                  className={`rounded-full transition-all duration-300 ${
+                    idx === activeIndex
+                      ? 'w-5 h-1.5 bg-white shadow-md'
+                      : 'w-1.5 h-1.5 bg-white/60 hover:bg-white/80'
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
               ))}
             </div>
           </>
         )}
 
-        <div 
+        {/* Media Count Badge */}
+        {displayMedia.length > 1 && (
+          <div className="absolute top-3 right-3 z-10 bg-black/40 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium">
+            {displayMedia[activeIndex]?.type === 'video' ? <Video size={11} /> : <ImageIcon size={11} />}
+            <span>{activeIndex + 1}/{displayMedia.length}</span>
+          </div>
+        )}
+
+        {/* Scrollable Media Container */}
+        <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide h-full w-full"
+          className="flex overflow-x-auto snap-x snap-mandatory h-full w-full scrollbar-hide"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {displayMedia.map((item, index) => (
-            <div 
-              key={`${item.src}-${index}`} 
-              className="flex-shrink-0 w-full h-full snap-center relative"
+            <div
+              key={`${item.src}-${index}`}
+              className="flex-shrink-0 w-full h-full snap-center relative cursor-pointer"
               onClick={handleCardClick}
             >
               {item.type === 'video' ? (
@@ -103,73 +151,69 @@ const ProductCard = memo(function ProductCard({
                   src={item.src}
                   className="w-full h-full object-cover"
                   controls
-                  preload="auto"
-                  onClick={(e) => e.stopPropagation()} // Allow controls to work
+                  preload="metadata"
+                  playsInline
+                  onClick={(e) => e.stopPropagation()}
                 />
               ) : (
                 <>
                   {(!isLoaded && !hasError && index === 0) && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse flex items-center justify-center">
-                      <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-neutral-100 to-neutral-200 animate-pulse flex items-center justify-center">
+                      <div className="w-10 h-10 border-3 border-neutral-200 border-t-primary rounded-full animate-spin"></div>
                     </div>
                   )}
-                  
+
                   {hasError && index === 0 && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                      <div className="text-gray-500 text-center p-4">
-                        <ImageIcon size={48} className="mx-auto mb-3 text-gray-400" />
-                        <div className="text-sm font-medium mb-1">Image not available</div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center">
+                      <div className="text-neutral-400 text-center p-4">
+                        <ImageIcon size={40} className="mx-auto mb-2" />
+                        <div className="text-xs font-medium">Image unavailable</div>
                       </div>
                     </div>
                   )}
 
-                  <img 
-                    src={item.src} 
+                  <img
+                    src={item.src}
                     alt={`${name} - ${index + 1}`}
                     loading={priority && index === 0 ? "eager" : "lazy"}
                     decoding="async"
                     fetchPriority={priority && index === 0 ? "high" : "auto"}
                     onLoad={index === 0 ? handleImageLoad : undefined}
                     onError={index === 0 ? handleImageError : undefined}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                 </>
               )}
-              
-              {/* Type Indicator */}
-              <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                {item.type === 'video' ? <Video size={12} /> : <ImageIcon size={12} />}
-                <span>{index + 1}/{displayMedia.length}</span>
-              </div>
             </div>
           ))}
         </div>
       </div>
 
-      <CardContent className="p-4 flex flex-col flex-grow">
-        <h3 
-          className="font-playfair text-lg font-semibold mb-2 hover:text-primary transition-colors cursor-pointer"
+      {/* Content Section */}
+      <CardContent className="p-4 sm:p-5 flex flex-col flex-grow">
+        <h3
+          className="font-playfair text-base sm:text-lg font-semibold mb-1.5 text-neutral-900 hover:text-primary transition-colors cursor-pointer line-clamp-1"
           onClick={handleCardClick}
         >
           {name}
         </h3>
-        <p className="font-poppins text-sm text-muted-foreground mb-4 flex-grow line-clamp-3">
+        <p className="font-poppins text-xs sm:text-sm text-neutral-500 mb-4 flex-grow line-clamp-2 leading-relaxed">
           {description}
         </p>
-        <Button 
-          asChild 
-          className="w-full bg-primary hover:bg-accent text-white mt-auto"
+        <Button
+          asChild
+          className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-10 sm:h-11 text-sm font-medium transition-all duration-300 hover:shadow-md mt-auto"
         >
-          <a 
-            href={whatsappLink} 
-            target="_blank" 
+          <a
+            href={whatsappLink}
+            target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center space-x-2"
+            className="flex items-center justify-center gap-2"
             onClick={handleWhatsAppClick}
           >
-            <ShoppingCart size={16} />
+            <ShoppingCart size={15} />
             <span>Inquire on WhatsApp</span>
-            <ExternalLink size={14} />
+            <ExternalLink size={13} />
           </a>
         </Button>
       </CardContent>

@@ -32,38 +32,38 @@ const ContactSection = memo(function ContactSection() {
     return () => observer.disconnect();
   }, []);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
 
-    fetch("/", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(formData as any).toString(),
-    })
-      .then(() => {
-        setSubmitted(true);
-        toast({
-          title: "Message sent successfully!",
-          description: `Thank you ${name}, we'll contact you soon.`,
-        });
-        setName("");
-        setEmail("");
-        setMessage("");
-      })
-      .catch((error) => {
-        console.error("Form submission error:", error);
-        toast({
-          title: "Something went wrong!",
-          description: "Please try again later or contact us directly.",
-          variant: "destructive",
-        });
-      })
-      .finally(() => setIsSubmitting(false));
-  }, [name, toast]);
+      if (!res.ok) throw new Error("Failed to send");
+
+      setSubmitted(true);
+      toast({
+        title: "Message sent successfully!",
+        description: `Thank you ${name}, we'll contact you soon.`,
+      });
+      setName("");
+      setEmail("");
+      setMessage("");
+    } catch (error) {
+      console.error("Form submission error:", error);
+      toast({
+        title: "Something went wrong!",
+        description: "Please try again later or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [name, email, message, toast]);
 
   // Google Ads conversion tracking
   const gtagReportConversion = useCallback((url?: string, targetWindow?: Window | null) => {
@@ -284,16 +284,10 @@ const ContactSection = memo(function ContactSection() {
                   <p className="text-sm sm:text-base text-white/70">We'll get back to you shortly.</p>
                 </div>
               ) : (
-                <form 
-                  onSubmit={handleSubmit} 
-                  name="contact" 
-                  method="POST" 
-                  data-netlify="true" 
-                  data-netlify-honeypot="bot-field"
+                <form
+                  onSubmit={handleSubmit}
                   className="space-y-4 sm:space-y-5"
                 >
-                  <input type="hidden" name="form-name" value="contact" />
-                  <input type="hidden" name="bot-field" />
                   
                   <div>
                     <label className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">Name</label>

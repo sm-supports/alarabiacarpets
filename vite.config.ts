@@ -91,7 +91,6 @@ export default defineConfig(({ mode }) => ({
           // Other libraries
           'misc': [
             'cmdk',
-            'emailjs-com',
             'next-themes',
             'react-day-picker',
             'react-resizable-panels',

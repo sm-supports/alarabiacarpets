@@ -652,9 +652,6 @@
 }
 
 /* ===================================
-   Accordion (existing) fix
-   =================================== */
-/* ===================================
    Product Card Styles
    =================================== */
 .product-card {
@@ -673,13 +670,18 @@
   background: rgb(var(--color-near-black));
 }
 
+/* Base transition for images inside product cards */
+.product-card img {
+  transition: transform var(--duration-normal) var(--ease-out-expo);
+}
+
 /* Smooth image zoom on hover */
 .product-card:hover img {
   transform: scale(1.05);
 }
 
 /* ===================================
-   Accordion (existing) fix
+   Animations
    =================================== */
 @keyframes accordion-down {
   from {

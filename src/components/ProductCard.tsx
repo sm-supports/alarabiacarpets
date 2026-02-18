@@ -95,14 +95,14 @@ const ProductCard = memo(function ProductCard({
           <>
             <button
               onClick={(e) => { e.stopPropagation(); scroll('left'); }}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
               aria-label="Previous image"
             >
               <ChevronLeft size={18} />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); scroll('right'); }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
               aria-label="Next image"
             >
               <ChevronRight size={18} />
@@ -159,7 +159,7 @@ const ProductCard = memo(function ProductCard({
                 <>
                   {(!isLoaded && !hasError && index === 0) && (
                     <div className="absolute inset-0 bg-gradient-to-br from-neutral-100 to-neutral-200 animate-pulse flex items-center justify-center">
-                      <div className="w-10 h-10 border-3 border-neutral-200 border-t-primary rounded-full animate-spin"></div>
+                      <div className="w-10 h-10 border-2 border-neutral-200 border-t-primary rounded-full animate-spin"></div>
                     </div>
                   )}
 

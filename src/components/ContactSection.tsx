@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, MapPin, Mail, Phone, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 
 const ContactSection = memo(function ContactSection() {
   const [name, setName] = useState("");
@@ -11,6 +12,7 @@ const ContactSection = memo(function ContactSection() {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
@@ -40,10 +42,13 @@ const ContactSection = memo(function ContactSection() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({ name, email, message, turnstileToken }),
       });
 
-      if (!res.ok) throw new Error("Failed to send");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: "Unknown error" }));
+        throw new Error(errorData.error || "Failed to send");
+      }
 
       setSubmitted(true);
       toast({
@@ -53,17 +58,23 @@ const ContactSection = memo(function ContactSection() {
       setName("");
       setEmail("");
       setMessage("");
+      setTurnstileToken("");
     } catch (error) {
       console.error("Form submission error:", error);
+      const errorMsg = error instanceof Error ? error.message : "Unknown error";
+
       toast({
         title: "Something went wrong!",
-        description: "Please try again later or contact us directly.",
+        description:
+          errorMsg.includes("verification")
+            ? "Verification failed. Please refresh the page and try again."
+            : "Please try again later or contact us directly.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
-  }, [name, email, message, toast]);
+  }, [name, email, message, turnstileToken, toast]);
 
   // Google Ads conversion tracking
   const gtagReportConversion = useCallback((url?: string, targetWindow?: Window | null) => {
@@ -327,10 +338,20 @@ const ContactSection = memo(function ContactSection() {
                       placeholder="Tell us about your project..."
                     />
                   </div>
-                  
+
+                  <div className="flex justify-center">
+                    <CloudflareTurnstile
+                      siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                      onVerify={(token) => setTurnstileToken(token)}
+                      onExpire={() => setTurnstileToken("")}
+                      onError={() => setTurnstileToken("")}
+                      theme="dark"
+                    />
+                  </div>
+
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !turnstileToken}
                     className="w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:bg-gray-100 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? "Sending..." : "Send Message"}

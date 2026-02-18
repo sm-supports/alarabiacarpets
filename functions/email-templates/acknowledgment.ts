@@ -9,8 +9,10 @@ function escapeHtml(text: string): string {
 
 export function generateAcknowledgmentEmail(name: string, message: string): string {
   const year = new Date().getFullYear();
-  const escapedName = escapeHtml(name);
-  const escapedMessage = escapeHtml(message).replace(/\n/g, "<br>");
+  const safeName = name ?? "";
+  const safeMessage = message ?? "";
+  const escapedName = escapeHtml(safeName);
+  const escapedMessage = escapeHtml(safeMessage).replace(/\n/g, "<br>");
 
   return `<!DOCTYPE html>
 <html lang="en">

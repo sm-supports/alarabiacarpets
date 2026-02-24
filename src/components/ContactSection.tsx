@@ -50,6 +50,15 @@ const ContactSection = memo(function ContactSection() {
         throw new Error(errorData.error || "Failed to send");
       }
 
+      // Fire Google Ads conversion for lead form submission
+      if (typeof (window as any).gtag === "function") {
+        (window as any).gtag("event", "conversion", {
+          send_to: "AW-16463357836/vNfLCO7DwcgbEIzPq6o9",
+          value: 1.0,
+          currency: "INR",
+        });
+      }
+
       setSubmitted(true);
       toast({
         title: "Message sent successfully!",

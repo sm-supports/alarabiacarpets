@@ -1,15 +1,28 @@
 import { MessageCircle, Mail, MapPin, Instagram, Facebook, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { products } from "@/data/products";
+
+// Footer product link config - resolved dynamically from products data
+const footerCategoryLinks = [
+  { label: 'Carpets', preferredId: 'carpet', category: 'carpet' },
+  { label: 'Majlis Sofas', preferredId: 'majlis-sofa', category: 'furniture' },
+  { label: 'Barkia', preferredId: 'barkia', category: 'barkia' },
+  { label: 'Curtains', preferredId: 'curtain', category: 'curtains' },
+];
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
     products: [
-      { label: 'Carpets', href: '/products/luxury-carpets' },
-      { label: 'Majlis Sofas', href: '/products/majlis-sets' },
-      { label: 'Barkia', href: '/products/premium-barkia' },
-      { label: 'Curtains', href: '/products/curtains' },
+      ...footerCategoryLinks
+        .map(config => {
+          const product = products.find(p => p.id === config.preferredId)
+            || products.find(p => p.category === config.category);
+          if (!product) return null;
+          return { label: config.label, href: `/products/${product.id}` };
+        })
+        .filter((item): item is NonNullable<typeof item> => item !== null),
       { label: 'All Products', href: '/products' },
     ],
     company: [

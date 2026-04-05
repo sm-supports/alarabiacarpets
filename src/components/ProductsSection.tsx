@@ -1,48 +1,79 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { products } from "@/data/products";
 
-// Product showcase data
-const productShowcases = [
-    {
-      id: "luxury-carpets",
-      name: "Luxury Carpets",
+// Showcase presentation config - resolved dynamically from products data
+const showcaseConfig = [
+  {
+    preferredId: "carpet",
+    category: "carpet",
+    name: "Luxury Carpets",
     tagline: "Comfort Beneath Your Feet",
     description: "Soft, durable carpets crafted from premium materials. Transform any room with our extensive collection of patterns and textures.",
-      imageSrc: "/Products/Carpets/carpet.webp",
     features: ["Premium Materials", "Stain Resistant", "Custom Sizes"],
-    color: "forest",
-      whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Luxury%20Carpets"
-    },
-    {
-      id: "majlis-sets",
+    color: "forest" as const,
+  },
+  {
+    preferredId: "majlis-sofa",
+    category: "furniture",
     name: "Majlis Sofas",
     tagline: "Where Tradition Meets Comfort",
     description: "Contemporary majlis seating that honors tradition while embracing modern comfort. Custom designs available.",
-      imageSrc: "/Products/Furniture/majlis-sofa.webp",
     features: ["Custom Designs", "Premium Fabrics", "Traditional Craftsmanship"],
-    color: "gold",
-    whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Majlis%20Sofas"
+    color: "gold" as const,
   },
   {
-    id: "premium-barkia",
+    preferredId: "barkia",
+    category: "barkia",
     name: "Premium Barkia",
     tagline: "Elegant Room Dividers",
     description: "High-quality Barkia panels for elegant room separation and decoration. Perfect for creating distinct spaces with style.",
-    imageSrc: "/Products/barkia&pvc/barkia.webp",
     features: ["Multiple Designs", "Easy Installation", "Durable Materials"],
-    color: "teal",
-    whatsappLink: "https://wa.me/+97455512858?text=I'm%20interested%20in%20Premium%20Barkia"
+    color: "teal" as const,
   },
 ];
 
-// Additional products grid
-const additionalProducts = [
-  { id: "curtains", name: "Curtains", imageSrc: "/Products/Curtain/curtain.webp", link: "/products/curtains" },
-  { id: "roller-blinds", name: "Roller Blinds", imageSrc: "/Products/Curtain/roller.webp", link: "/products/roller-blinds" },
-  { id: "grass-carpet", name: "Grass Carpet", imageSrc: "/Products/Carpets/grass-carpet.webp", link: "/products/grass-carpet" },
-  { id: "sofas", name: "Modern Sofas", imageSrc: "/Products/Furniture/sofa.webp", link: "/products/sofas" },
+// Build showcases dynamically from real product data
+const productShowcases = showcaseConfig
+  .map(config => {
+    const product = products.find(p => p.id === config.preferredId)
+      || products.find(p => p.category === config.category);
+    if (!product) return null;
+    return {
+      id: product.id,
+      imageSrc: product.imageSrc,
+      whatsappLink: product.whatsappLink,
+      name: config.name,
+      tagline: config.tagline,
+      description: config.description,
+      features: config.features,
+      color: config.color,
+    };
+  })
+  .filter((item): item is NonNullable<typeof item> => item !== null);
+
+// Additional products config - resolved dynamically
+const additionalProductConfig = [
+  { preferredId: "curtain", category: "curtains", displayName: "Curtains" },
+  { preferredId: "roller", category: "curtains", displayName: "Roller Blinds" },
+  { preferredId: "grass-carpet", category: "carpet", displayName: "Grass Carpet" },
+  { preferredId: "sofa", category: "furniture", displayName: "Modern Sofas" },
 ];
+
+const additionalProducts = additionalProductConfig
+  .map(config => {
+    const product = products.find(p => p.id === config.preferredId)
+      || products.find(p => p.category === config.category);
+    if (!product) return null;
+    return {
+      id: product.id,
+      name: config.displayName,
+      imageSrc: product.imageSrc,
+      link: `/products/${product.id}`,
+    };
+  })
+  .filter((item): item is NonNullable<typeof item> => item !== null);
 
 // Individual product showcase component
 function ProductShowcase({ 

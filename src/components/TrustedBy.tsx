@@ -8,6 +8,7 @@ function useCountUp(end: number, duration = 2000, isVisible: boolean) {
     if (!isVisible || hasAnimated.current) return;
     hasAnimated.current = true;
 
+    let animationFrameId: number;
     const startTime = performance.now();
     const step = (currentTime: number) => {
       const elapsed = currentTime - startTime;
@@ -16,10 +17,12 @@ function useCountUp(end: number, duration = 2000, isVisible: boolean) {
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(eased * end));
       if (progress < 1) {
-        requestAnimationFrame(step);
+        animationFrameId = requestAnimationFrame(step);
       }
     };
-    requestAnimationFrame(step);
+    animationFrameId = requestAnimationFrame(step);
+
+    return () => cancelAnimationFrame(animationFrameId);
   }, [isVisible, end, duration]);
 
   return count;

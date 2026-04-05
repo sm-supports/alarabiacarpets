@@ -1,5 +1,45 @@
 import { useEffect, useRef, useState } from 'react';
 
+function useCountUp(end: number, duration = 2000, isVisible: boolean) {
+  const [count, setCount] = useState(0);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    if (!isVisible || hasAnimated.current) return;
+    hasAnimated.current = true;
+
+    const startTime = performance.now();
+    const step = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * end));
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    };
+    requestAnimationFrame(step);
+  }, [isVisible, end, duration]);
+
+  return count;
+}
+
+function AnimatedStat({ value, label, isVisible }: { value: string; label: string; isVisible: boolean }) {
+  const numericPart = parseInt(value.replace(/[^0-9]/g, ''), 10);
+  const suffix = value.replace(/[0-9]/g, '');
+  const count = useCountUp(numericPart, 2000, isVisible);
+
+  return (
+    <div className="text-center p-4 sm:p-0">
+      <p className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-0.5 sm:mb-1">
+        {count}{suffix}
+      </p>
+      <p className="text-xs sm:text-sm text-gray-500">{label}</p>
+    </div>
+  );
+}
+
 const logos = [
   { src: '/logos/logo1.webp', alt: 'Ezdan Mall' },
   { src: '/logos/logo2.webp', alt: 'Enormous' },
@@ -112,16 +152,8 @@ export default function TrustedBy() {
             { value: '14+', label: 'Trusted Partners' },
             { value: '10+', label: 'Years Experience' },
             { value: '100%', label: 'Satisfaction' },
-          ].map((stat, index) => (
-            <div 
-              key={stat.label}
-              className="text-center p-4 sm:p-0"
-            >
-              <p className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-0.5 sm:mb-1">
-                {stat.value}
-              </p>
-              <p className="text-xs sm:text-sm text-gray-500">{stat.label}</p>
-            </div>
+          ].map((stat) => (
+            <AnimatedStat key={stat.label} value={stat.value} label={stat.label} isVisible={isVisible} />
           ))}
         </div>
       </div>

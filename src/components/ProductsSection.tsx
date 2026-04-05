@@ -73,7 +73,8 @@ const additionalProducts = additionalProductConfig
       link: `/products/${product.id}`,
     };
   })
-  .filter((item): item is NonNullable<typeof item> => item !== null);
+  .filter((item): item is NonNullable<typeof item> => item !== null)
+  .filter((item, index, arr) => arr.findIndex(p => p.id === item.id) === index);
 
 // Individual product showcase component
 function ProductShowcase({ 
@@ -108,14 +109,12 @@ function ProductShowcase({
   return (
     <div className={`py-12 sm:py-16 lg:py-24 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
       <div className="container mx-auto px-4 sm:px-5 lg:px-8">
-        <div 
-          className={`grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center ${
-            isReversed ? 'lg:flex-row-reverse' : ''
-          }`}
+        <div
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center"
         >
           {/* Image - Shows first on mobile */}
-          <div 
-            className={`${isReversed ? 'lg:order-1' : ''} order-1 lg:order-none transition-all duration-1000 ease-out-expo ${
+          <div
+            className={`order-1 ${isReversed ? 'lg:order-2' : 'lg:order-1'} transition-all duration-1000 ease-out-expo ${
               isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
             }`}
             style={{ transitionDelay: `${index * 100}ms` }}
@@ -135,8 +134,8 @@ function ProductShowcase({
           </div>
 
           {/* Content */}
-          <div 
-            className={`${isReversed ? 'lg:order-2' : ''} order-2 lg:order-none transition-all duration-1000 ease-out-expo ${
+          <div
+            className={`order-2 ${isReversed ? 'lg:order-1' : 'lg:order-2'} transition-all duration-1000 ease-out-expo ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             }`}
             style={{ transitionDelay: `${index * 100 + 150}ms` }}

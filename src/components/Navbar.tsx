@@ -80,7 +80,7 @@ const Navbar = memo(function Navbar() {
                 />
               </div>
               <span className="font-display text-lg md:text-xl font-semibold tracking-tight text-forest-900">
-                Al Arabia
+                Al Arabia Carpets
               </span>
             </Link>
 
@@ -183,7 +183,7 @@ const Navbar = memo(function Navbar() {
                 className="w-8 h-8 object-contain"
               />
               <span className="font-display text-lg font-semibold text-forest-900">
-                Al Arabia
+                Al Arabia Carpets
               </span>
             </Link>
             <button

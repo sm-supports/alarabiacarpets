@@ -3,9 +3,18 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ChevronLeft, Check, ImageIcon, Video } from "lucide-react";
 import { products, Product } from "@/data/products";
+
+const categoryLabels: Record<string, string> = {
+  carpet: "Carpets",
+  curtains: "Curtains",
+  furniture: "Furniture",
+  interior: "Interior Design",
+  barkia: "Barkia & PVC",
+};
 
 const ProductDetail = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -49,6 +58,12 @@ const ProductDetail = () => {
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col">
+        <SEO
+          title="Product Not Found"
+          description="This product could not be found. Browse our full collection of premium home furnishings at Al Arabia Carpets."
+          path={`/products/${productId}`}
+          noindex
+        />
         <Navbar />
         <main className="flex-grow flex items-center justify-center flex-col p-4">
           <h2 className="font-playfair text-2xl mb-4">Product Not Found</h2>
@@ -62,6 +77,18 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title={product.name}
+        description={`${product.name} - ${product.description} Free installation & delivery in Qatar. Contact Al Arabia Carpets at +974 5551 2858.`}
+        path={`/products/${product.id}`}
+        image={product.imageSrc}
+        product={{
+          name: product.name,
+          description: product.description,
+          image: product.imageSrc,
+          category: categoryLabels[product.category] || product.category,
+        }}
+      />
       <Navbar />
       <main className="flex-grow">
         {/* Product Details Section */}

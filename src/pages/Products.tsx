@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -61,6 +62,11 @@ const Products = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="Products"
+        description="Browse premium carpets, Barkia, PVC flooring, curtains, furniture & interior design products at Al Arabia Carpets. Free installation & delivery across Qatar."
+        path="/products"
+      />
       <Navbar />
       <main className="flex-grow">
         {/* Hero Header */}

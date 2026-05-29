@@ -5,10 +5,12 @@ import ServicesSection from "@/components/ServicesSection";
 import ContactSection from "@/components/ContactSection";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      <SEO path="/" />
       <Navbar />
       <main className="flex-grow">
         {/* Hero Section - Full viewport immersive intro */}

@@ -1,12 +1,18 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const About = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="About Us"
+        description="Learn about Al Arabia Carpets - Qatar's trusted provider of premium carpets, Barkia, PVC flooring, curtains, furniture & interior design services in Doha."
+        path="/about"
+      />
       <Navbar />
       <main className="flex-grow">
         {/* Hero Banner */}

@@ -1,0 +1,12 @@
+{
+  "id": "",
+  "name": "",
+  "category": "",
+  "description": "Premium [name] for your home and office.",
+  "price": "Contact for Price",
+  "media": [
+    { "type": "image", "src": "/Products/[folder]/[filename]" }
+  ],
+  "imageSrc": "/Products/[folder]/[filename]",
+  "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20[URL-encoded-name]"
+}

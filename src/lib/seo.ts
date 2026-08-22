@@ -267,3 +267,75 @@ export function buildProductJsonLd(product: Product) {
       : {}),
   };
 }
+
+// --- Category landing pages ------------------------------------------------
+
+import type { Metadata } from "next";
+import { getCategory } from "@/data/categories";
+
+/**
+ * CollectionPage wrapping an ItemList.
+ *
+ * Category pages emit this rather than Product: they have no SKU and no price,
+ * so a Product schema there was never eligible for a rich result.
+ */
+export function buildCollectionPage(opts: {
+  name: string;
+  description: string;
+  path: string;
+  items: Array<{ name: string; path: string }>;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${absoluteUrl(opts.path)}#collection`,
+    name: opts.name,
+    description: opts.description,
+    url: absoluteUrl(opts.path),
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: opts.items.length,
+      itemListElement: opts.items.map((item, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: item.name,
+        url: absoluteUrl(item.path),
+      })),
+    },
+  };
+}
+
+/**
+ * Metadata for a category landing page.
+ *
+ * Titles and descriptions are reused verbatim from the hub products these pages
+ * replaced -- they are already indexed and already inside the 60/160 budgets, so
+ * the page type changes without also changing the SERP signals.
+ */
+export function buildCategoryMetadata(slug: string): Metadata {
+  const category = getCategory(slug);
+  if (!category) throw new Error(`Unknown category slug: ${slug}`);
+
+  const path = `/products/${category.slug}`;
+  const title = buildTitle(category.seoTitle);
+
+  return {
+    title: { absolute: title },
+    description: clampDescription(category.metaDescription),
+    alternates: { canonical: path },
+    openGraph: {
+      type: "website",
+      title,
+      description: category.metaDescription,
+      url: path,
+      images: [{ url: absoluteUrl(category.heroImage), alt: category.heroImageAlt }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: category.metaDescription,
+      images: [absoluteUrl(category.heroImage)],
+    },
+  };
+}

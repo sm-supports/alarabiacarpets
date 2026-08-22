@@ -6,6 +6,8 @@ import JsonLd from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { Phone } from "lucide-react";
 import { products } from "@/data/products";
+import { categories } from "@/data/categories";
+import Link from "next/link";
 import { buildBreadcrumb, buildItemList, clampDescription, productPath } from "@/lib/seo";
 import WhatsAppLink from "@/components/WhatsAppLink";
 
@@ -42,6 +44,40 @@ export default function ProductsPage() {
             </p>
           </div>
         </div>
+
+        {/* Shop by category -- makes /products a hub that links down to the
+            landing pages rather than a competitor for the same queries. */}
+        <section className="py-10 md:py-12 bg-white border-b border-neutral-100">
+          <div className="container mx-auto px-4 sm:px-5 lg:px-8">
+            <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-6 text-neutral-900">
+              Shop by category
+            </h2>
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              {categories.map((c) => (
+                <Link
+                  key={c.slug}
+                  href={`/products/${c.slug}`}
+                  className="group block rounded-xl overflow-hidden border border-neutral-200 transition-all duration-300 hover:shadow-md"
+                >
+                  <div className="aspect-[4/3] overflow-hidden bg-neutral-100">
+                    <img
+                      src={c.heroImage}
+                      alt={c.heroImageAlt}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-3 sm:p-4">
+                    <h3 className="font-playfair text-sm sm:text-base font-semibold text-neutral-900 group-hover:text-primary transition-colors">
+                      {c.label}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
         <section className="py-10 md:py-14 bg-neutral-50">
           <div className="container mx-auto px-4">

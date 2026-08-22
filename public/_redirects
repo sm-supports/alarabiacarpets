@@ -1,6 +1,13 @@
 # Legacy index.html URL -> canonical root
 /index.html  /  301
 
+# The two furniture hubs collided when categories became landing pages.
+# /products/majlis-sofa is now the furniture category page and absorbed the
+# "Sofas" copy as its own section. This 301 only fires because
+# out/products/sofa.html is no longer emitted -- Pages serves a matching static
+# asset before it consults this file.
+/products/sofa  /products/majlis-sofa  301
+
 # NOTE: the SPA fallback rule (/*  /index.html  200) was deliberately removed.
 # Every route is now a real prerendered HTML file, and that rule made every
 # unknown URL return HTTP 200 with the 404 page -- a soft-404 to crawlers.

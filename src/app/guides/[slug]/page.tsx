@@ -8,6 +8,7 @@ import WhatsAppLink from "@/components/WhatsAppLink";
 import { Button } from "@/components/ui/button";
 import { guides, getGuide } from "@/data/guides";
 import { products } from "@/data/products";
+import { getCategory } from "@/data/categories";
 import {
   SITE_NAME,
   SITE_URL,
@@ -69,10 +70,26 @@ export default async function GuidePage({
   const guide = getGuide(slug);
   if (!guide) notFound();
 
-  // The cluster link: every guide points into the transactional product pages.
+  // The cluster link: every guide points into the transactional pages.
+  // Missing ids are dropped silently, so both lookups are asserted below.
   const related = guide.relatedProductIds
     .map((id) => products.find((p) => p.id === id))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
+
+  if (related.length !== guide.relatedProductIds.length) {
+    throw new Error(
+      `Guide "${guide.slug}" references a product id that no longer exists: ` +
+        guide.relatedProductIds.filter((id) => !products.some((p) => p.id === id)).join(", ")
+    );
+  }
+
+  const relatedCategories = (guide.relatedCategorySlugs ?? [])
+    .map((slug) => getCategory(slug))
+    .filter((c): c is NonNullable<typeof c> => Boolean(c));
+
+  if (relatedCategories.length !== (guide.relatedCategorySlugs ?? []).length) {
+    throw new Error(`Guide "${guide.slug}" references an unknown category slug`);
+  }
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -198,6 +215,28 @@ export default async function GuidePage({
             </div>
           </div>
         </article>
+
+        {/* Cluster link up to the category landing pages */}
+        {relatedCategories.length > 0 && (
+          <section className="py-10 md:py-12 bg-white">
+            <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
+              <h2 className="font-playfair text-2xl font-bold mb-5 text-neutral-900">
+                Browse the full range
+              </h2>
+              <div className="flex flex-wrap gap-3">
+                {relatedCategories.map((c) => (
+                  <Link
+                    key={c.slug}
+                    href={`/products/${c.slug}`}
+                    className="font-poppins text-sm px-4 py-2.5 rounded-full border border-neutral-200 text-neutral-700 transition-all duration-300 hover:border-primary/40 hover:text-primary"
+                  >
+                    {c.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Cluster link into the money pages */}
         {related.length > 0 && (

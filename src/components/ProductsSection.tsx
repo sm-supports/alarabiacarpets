@@ -4,13 +4,15 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { products } from "@/data/products";
+import { getCategory } from "@/data/categories";
+import { PHONE_E164 } from "@/lib/seo";
 import { trackWhatsAppClick } from "@/lib/analytics";
 
-// Showcase presentation config - resolved dynamically from products data
+// Showcase presentation config. Each entry points at a CATEGORY landing page --
+// these were category-hub products until they became real category pages.
 const showcaseConfig = [
   {
-    preferredId: "carpet",
-    category: "carpet",
+    categorySlug: "carpet",
     name: "Luxury Carpets",
     tagline: "Comfort Beneath Your Feet",
     description: "Soft, durable carpets crafted from premium materials. Transform any room with our extensive collection of patterns and textures.",
@@ -18,8 +20,7 @@ const showcaseConfig = [
     color: "forest" as const,
   },
   {
-    preferredId: "majlis-sofa",
-    category: "furniture",
+    categorySlug: "majlis-sofa",
     name: "Majlis Sofas",
     tagline: "Where Tradition Meets Comfort",
     description: "Contemporary majlis seating that honors tradition while embracing modern comfort. Custom designs available.",
@@ -27,8 +28,7 @@ const showcaseConfig = [
     color: "gold" as const,
   },
   {
-    preferredId: "barkia",
-    category: "barkia",
+    categorySlug: "barkia",
     name: "Premium Barkia",
     tagline: "Elegant Room Dividers",
     description: "High-quality Barkia panels for elegant room separation and decoration. Perfect for creating distinct spaces with style.",
@@ -37,47 +37,59 @@ const showcaseConfig = [
   },
 ];
 
-// Build showcases dynamically from real product data
-const productShowcases = showcaseConfig
-  .map(config => {
-    const product = products.find(p => p.id === config.preferredId)
-      || products.find(p => p.category === config.category);
-    if (!product) return null;
-    return {
-      id: product.id,
-      imageSrc: product.imageSrc,
-      whatsappLink: product.whatsappLink,
-      name: config.name,
-      tagline: config.tagline,
-      description: config.description,
-      features: config.features,
-      color: config.color,
-    };
-  })
-  .filter((item): item is NonNullable<typeof item> => item !== null);
+// Resolved from the category data with NO fallback: a bad slug must throw at
+// module scope. The previous `|| products.find(by category)` fallback would
+// silently render a different product with a different image -- including
+// swapping the homepage LCP image that src/app/page.tsx preloads.
+const productShowcases = showcaseConfig.map(config => {
+  const category = getCategory(config.categorySlug);
+  if (!category) throw new Error(`Unknown category slug: ${config.categorySlug}`);
+  return {
+    id: category.slug,
+    imageSrc: category.heroImage,
+    href: `/products/${category.slug}`,
+    whatsappLink: `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(
+      `I'm interested in ${config.name}`
+    )}`,
+    name: config.name,
+    tagline: config.tagline,
+    description: config.description,
+    features: config.features,
+    color: config.color,
+  };
+});
 
-// Additional products config - resolved dynamically
-const additionalProductConfig = [
-  { preferredId: "curtain", category: "curtains", displayName: "Curtains" },
-  { preferredId: "roller", category: "curtains", displayName: "Roller Blinds" },
-  { preferredId: "grass-carpet", category: "carpet", displayName: "Grass Carpet" },
-  { preferredId: "sofa", category: "furniture", displayName: "Modern Sofas" },
+// "More to Explore" tiles. `categorySlug` entries link to a landing page;
+// `productId` entries link to a real SKU. Neither has a fallback.
+const additionalProductConfig: Array<
+  { displayName: string } & ({ categorySlug: string } | { productId: string })
+> = [
+  { categorySlug: "curtain", displayName: "Curtains" },
+  { productId: "roller", displayName: "Roller Blinds" },
+  { productId: "grass-carpet", displayName: "Grass Carpet" },
+  { categorySlug: "interior", displayName: "Interior Design" },
 ];
 
-const additionalProducts = additionalProductConfig
-  .map(config => {
-    const product = products.find(p => p.id === config.preferredId)
-      || products.find(p => p.category === config.category);
-    if (!product) return null;
+const additionalProducts = additionalProductConfig.map(config => {
+  if ("categorySlug" in config) {
+    const category = getCategory(config.categorySlug);
+    if (!category) throw new Error(`Unknown category slug: ${config.categorySlug}`);
     return {
-      id: product.id,
+      id: category.slug,
       name: config.displayName,
-      imageSrc: product.imageSrc,
-      link: `/products/${product.id}`,
+      imageSrc: category.heroImage,
+      link: `/products/${category.slug}`,
     };
-  })
-  .filter((item): item is NonNullable<typeof item> => item !== null)
-  .filter((item, index, arr) => arr.findIndex(p => p.id === item.id) === index);
+  }
+  const product = products.find(p => p.id === config.productId);
+  if (!product) throw new Error(`Unknown product id: ${config.productId}`);
+  return {
+    id: product.id,
+    name: config.displayName,
+    imageSrc: product.imageSrc,
+    link: `/products/${product.id}`,
+  };
+});
 
 // Individual product showcase component
 function ProductShowcase({ 
@@ -171,10 +183,10 @@ function ProductShowcase({
             {/* CTAs - Stack on mobile */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link
-                href={`/products/${product.id}`}
+                href={product.href}
                 className={`group inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3 text-white text-sm font-medium rounded-full transition-all duration-300 hover:shadow-float active:scale-[0.98] ${colorClasses.button}`}
               >
-                View Details
+                View Range
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <a

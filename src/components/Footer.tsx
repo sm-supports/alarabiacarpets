@@ -2,30 +2,17 @@
 
 import { MessageCircle, Mail, MapPin, Instagram, Facebook, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { products } from "@/data/products";
+import { categories } from "@/data/categories";
 import { trackWhatsAppClick } from "@/lib/analytics";
-
-// Footer product link config - resolved dynamically from products data
-const footerCategoryLinks = [
-  { label: 'Carpets', preferredId: 'carpet', category: 'carpet' },
-  { label: 'Majlis Sofas', preferredId: 'majlis-sofa', category: 'furniture' },
-  { label: 'Barkia', preferredId: 'barkia', category: 'barkia' },
-  { label: 'Curtains', preferredId: 'curtain', category: 'curtains' },
-];
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
+    // Straight from the category data -- every link is a category landing page.
+    // No lookup, so no fallback that could silently point somewhere else.
     products: [
-      ...footerCategoryLinks
-        .map(config => {
-          const product = products.find(p => p.id === config.preferredId)
-            || products.find(p => p.category === config.category);
-          if (!product) return null;
-          return { label: config.label, href: `/products/${product.id}` };
-        })
-        .filter((item): item is NonNullable<typeof item> => item !== null),
+      ...categories.map((c) => ({ label: c.label, href: `/products/${c.slug}` })),
       { label: 'All Products', href: '/products' },
     ],
     company: [

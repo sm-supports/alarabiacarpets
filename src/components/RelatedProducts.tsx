@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { products } from "@/data/products";
-import { categoryLabel, productImageAlt } from "@/lib/seo";
+import { categoryLabel, categoryPath, productImageAlt } from "@/lib/seo";
 
 /**
  * Same-category siblings, with a top-up from other categories when a category
@@ -27,13 +27,23 @@ export default function RelatedProducts({
     .filter((p) => p.id !== currentId && p.category === category)
     .slice(0, limit);
 
+  const href = categoryPath(category);
+
   if (related.length === 0) return null;
 
   return (
     <section className="py-14 md:py-16 bg-neutral-50">
       <div className="container mx-auto px-4 sm:px-5 lg:px-8">
         <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-8 text-neutral-900">
-          More in {categoryLabel(category)}
+          {/* Links up to the category landing page. This fires on every product
+              page, so it is the main path crawlers take from a SKU to a money page. */}
+          {href ? (
+            <Link href={href} className="hover:text-primary transition-colors">
+              More in {categoryLabel(category)}
+            </Link>
+          ) : (
+            <>More in {categoryLabel(category)}</>
+          )}
         </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {related.map((p) => (
@@ -68,6 +78,16 @@ export default function RelatedProducts({
             </Link>
           ))}
         </div>
+        {href && (
+          <div className="mt-8">
+            <Link
+              href={href}
+              className="font-poppins text-sm font-medium text-primary hover:underline"
+            >
+              View all {categoryLabel(category)} &rarr;
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

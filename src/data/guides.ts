@@ -39,6 +39,8 @@ export interface Guide {
   faqs?: GuideFaq[];
   /** Product ids this guide links into. */
   relatedProductIds: string[];
+  /** Category landing pages this guide links into (src/data/categories.ts). */
+  relatedCategorySlugs?: string[];
 }
 
 export const guides: Guide[] = [
@@ -113,7 +115,8 @@ export const guides: Guide[] = [
         a: "With a good wear layer and correct installation, barkia in a domestic setting lasts many years. Longevity depends far more on the wear layer thickness and the quality of the sub-floor preparation than on the headline plank thickness.",
       },
     ],
-    relatedProductIds: ["barkia", "pvc-barkia", "spc-zigzag-barkia-installation", "skerting-nala-profile"],
+    relatedProductIds: ["pvc-barkia", "spc-zigzag-barkia-installation", "skerting-nala-profile"],
+    relatedCategorySlugs: ["barkia"],
   },
   {
     slug: "choosing-carpet-for-qatar-homes",
@@ -186,7 +189,8 @@ export const guides: Guide[] = [
         a: "Generally yes. Tiles wear well, lift for under-floor cable access, and let you replace a stained or damaged tile individually rather than relaying the whole floor.",
       },
     ],
-    relatedProductIds: ["carpet", "tiles-carpet-office-carpet", "mosque-masjid-carpet", "stairs-carpet-installation"],
+    relatedProductIds: ["tiles-carpet-office-carpet", "mosque-masjid-carpet", "stairs-carpet-installation"],
+    relatedCategorySlugs: ["carpet"],
   },
   {
     slug: "majlis-interior-design-ideas",
@@ -256,7 +260,8 @@ export const guides: Guide[] = [
         a: "Either a short, dense wall-to-wall carpet, which adds warmth and absorbs sound, or barkia with large rugs defining the seating area. Both suit floor-level and raised seating.",
       },
     ],
-    relatedProductIds: ["majlis-sofa", "luxury-majlis-sofa", "interior", "curtain"],
+    relatedProductIds: ["luxury-majlis-sofa"],
+    relatedCategorySlugs: ["majlis-sofa", "interior", "curtain"],
   },
 ];
 
@@ -267,4 +272,9 @@ export function getGuide(slug: string): Guide | undefined {
 /** Guides that link to a given product, for the reverse cluster link. */
 export function guidesForProduct(productId: string): Guide[] {
   return guides.filter((g) => g.relatedProductIds.includes(productId));
+}
+
+/** Guides that link to a given category landing page. */
+export function guidesForCategory(categorySlug: string): Guide[] {
+  return guides.filter((g) => g.relatedCategorySlugs?.includes(categorySlug));
 }

@@ -57,7 +57,9 @@ export async function generateMetadata({
   const path = `/products/${product.id}`;
 
   return {
-    title,
+    // absolute: productTitle already accounts for the brand suffix, so the root
+    // layout template must not append it again.
+    title: { absolute: title },
     description: clampDescription(description),
     alternates: { canonical: path },
     openGraph: {

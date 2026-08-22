@@ -75,7 +75,7 @@ export const products: Product[] = [
     "id": "artificial-grass-installation-work",
     "name": "Artificial grass installation work",
     "category": "carpet",
-    "description": "Premium Artificial grass installation work for your home and office.",
+    "description": "Professional artificial grass installation with proper base preparation and drainage.",
     "price": "Contact for Price",
     "media": [
       {
@@ -92,7 +92,42 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Artificial grass installation work.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Artificial%20grass%20installation%20work"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Artificial%20grass%20installation%20work",
+    seoTitle: "Artificial Grass Installation Qatar | Doha Fitting",
+    metaDescription: "Professional artificial grass installation across Qatar. Base preparation, drainage and seam-free finishing for gardens, terraces and play areas in Doha.",
+    imageAlt: "Artificial grass installation in progress on a Doha garden",
+    longDescription: [
+      "How artificial grass is installed matters as much as the grass itself. A poorly prepared base leads to visible seams, dips and water sitting on the surface.",
+      "Our installers prepare and level the base, lay a free-draining sub-layer, join the grass so seams are not visible, and secure and trim the edges. We install on gardens, terraces, balconies, play areas and pool surrounds throughout Qatar.",
+    ],
+    specs: [
+      {
+        label: "Includes",
+        value: "Base preparation and levelling",
+      },
+      {
+        label: "Drainage",
+        value: "Free-draining sub-layer",
+      },
+      {
+        label: "Seams",
+        value: "Joined to be visually seamless",
+      },
+      {
+        label: "Areas",
+        value: "Gardens, terraces, pool surrounds",
+      },
+    ],
+    faqs: [
+      {
+        q: "What does artificial grass installation involve?",
+        a: "We clear and level the area, lay a free-draining base, roll out and join the grass so the seams are not visible, then secure and trim the edges.",
+      },
+      {
+        q: "Will water drain away properly?",
+        a: "Yes. The grass has a perforated backing and sits on a free-draining base, so rain and hose water pass through instead of pooling on the surface.",
+      },
+    ]
   },
   {
     "id": "event-normal-carpet",
@@ -178,7 +213,7 @@ export const products: Product[] = [
     "id": "mosque-masjid-carpet",
     "name": "Mosque:masjid carpet",
     "category": "carpet",
-    "description": "Premium Mosque:masjid carpet for your home and office.",
+    "description": "Prayer-row and plain mosque carpet, aligned to the qiblah and fitted across Qatar.",
     "price": "Contact for Price",
     "media": [
       {
@@ -187,7 +222,46 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Mosque:masjid carpet.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Mosque%3Amasjid%20carpet"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Mosque%3Amasjid%20carpet",
+    seoTitle: "Mosque & Masjid Carpet Qatar | Supply & Fitting",
+    metaDescription: "Mosque and masjid carpet supplied and installed across Qatar. Prayer-row designs, heavy-duty pile for high footfall, and full fitting by Al Arabia Carpets in Doha.",
+    imageAlt: "Mosque prayer hall carpet with prayer rows installed in Qatar",
+    longDescription: [
+      "We supply and install prayer-hall carpet for mosques and masjids across Qatar, in both plain and prayer-row (saff) designs that keep rows straight and evenly spaced.",
+      "Mosque carpet takes very heavy foot traffic, so we specify a dense, hard-wearing pile that holds its appearance and is straightforward to vacuum. We handle measuring, alignment of the rows toward the qiblah, cutting and fitting.",
+    ],
+    specs: [
+      {
+        label: "Designs",
+        value: "Prayer-row (saff) and plain",
+      },
+      {
+        label: "Pile",
+        value: "Dense, heavy-traffic specification",
+      },
+      {
+        label: "Row alignment",
+        value: "Set to the qiblah on site",
+      },
+      {
+        label: "Installation",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Do you supply prayer-row mosque carpet?",
+        a: "Yes. We supply saff (prayer-row) carpet as well as plain prayer-hall carpet, and we align the rows to the qiblah during installation.",
+      },
+      {
+        q: "Is mosque carpet suitable for very high foot traffic?",
+        a: "The carpet we specify for mosques uses a dense, hard-wearing pile chosen for heavy daily use, so it resists flattening and stays easy to vacuum.",
+      },
+      {
+        q: "Can you carpet a full prayer hall?",
+        a: "Yes. We measure the hall, plan the layout so rows run true across the full width, and complete the fitting to a schedule that works around prayer times.",
+      },
+    ]
   },
   {
     "id": "pvc-gym-mat-indoor-game-mat",
@@ -208,7 +282,7 @@ export const products: Product[] = [
     "id": "tiles-carpet-office-carpet",
     "name": "Tiles carpet:office carpet",
     "category": "carpet",
-    "description": "Premium Tiles carpet:office carpet for your home and office.",
+    "description": "Modular office carpet tiles, hard-wearing and individually replaceable.",
     "price": "Contact for Price",
     "media": [
       {
@@ -217,13 +291,52 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Tiles carpet:office carpet.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Tiles%20carpet%3Aoffice%20carpet"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Tiles%20carpet%3Aoffice%20carpet",
+    seoTitle: "Office Carpet Tiles Qatar | Supply & Installation",
+    metaDescription: "Office carpet tiles supplied and fitted across Qatar. Hard-wearing, individually replaceable, and installed with minimal disruption to your workplace in Doha.",
+    imageAlt: "Office carpet tiles installed in a commercial workspace in Doha",
+    longDescription: [
+      "Carpet tiles are the practical choice for offices: they are hard-wearing, quick to lay, and any tile that becomes stained or damaged can be lifted and swapped without redoing the whole floor.",
+      "We install office carpet across Qatar and can work outside business hours so your workplace keeps running. Tiles also lift easily for access to under-floor cabling.",
+    ],
+    specs: [
+      {
+        label: "Format",
+        value: "Modular carpet tiles",
+      },
+      {
+        label: "Best for",
+        value: "Offices, meeting rooms, commercial",
+      },
+      {
+        label: "Repairs",
+        value: "Individual tiles replaceable",
+      },
+      {
+        label: "Cable access",
+        value: "Tiles lift for under-floor access",
+      },
+      {
+        label: "Scheduling",
+        value: "Out-of-hours fitting available",
+      },
+    ],
+    faqs: [
+      {
+        q: "Why choose carpet tiles for an office?",
+        a: "Tiles wear well under office traffic, and a damaged or stained tile can be replaced individually instead of relaying the whole floor. They also lift easily for access to under-floor cabling.",
+      },
+      {
+        q: "Can you install office carpet outside working hours?",
+        a: "Yes. We regularly schedule commercial installations in the evening or over a weekend so the workplace is not disrupted.",
+      },
+    ]
   },
   {
     "id": "carpet",
-    "name": "carpet",
+    "name": "Carpets",
     "category": "carpet",
-    "description": "Premium carpet for your home and office.",
+    "description": "Wall-to-wall carpet, tiles, runners and rugs, measured and fitted across Qatar.",
     "price": "Contact for Price",
     "media": [
       {
@@ -232,13 +345,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/carpet.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20carpet"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20carpet",
+    seoTitle: "Carpets in Qatar | Supply & Fitting in Doha",
+    metaDescription: "Premium carpets supplied and fitted across Qatar. Wall-to-wall, rugs, mosque, office and stair carpet with free measurement and installation in Doha.",
+    imageAlt: "Premium wall-to-wall carpet fitted in a Doha home by Al Arabia Carpets",
+    longDescription: [
+      "Al Arabia Carpets supplies and fits carpet across Qatar for homes, majlis, mosques, offices and event spaces. Our range covers wall-to-wall broadloom, carpet tiles, stair runners and made-to-measure rugs in a wide choice of pile heights and colours.",
+      "We bring samples to you, measure the space, and handle cutting, laying, joining and edge finishing. Delivery and installation anywhere in Qatar are included in the quoted price.",
+    ],
+    specs: [
+      {
+        label: "Types",
+        value: "Wall-to-wall, tiles, runners, rugs",
+      },
+      {
+        label: "Suitable for",
+        value: "Homes, majlis, mosques, offices",
+      },
+      {
+        label: "Measurement",
+        value: "Free on-site survey",
+      },
+      {
+        label: "Installation",
+        value: "Included across Qatar",
+      },
+      {
+        label: "Samples",
+        value: "Brought to your location",
+      },
+    ],
+    faqs: [
+      {
+        q: "Do you measure and fit carpet in Doha?",
+        a: "Yes. We carry out a free on-site measurement anywhere in Doha and across Qatar, then cut, lay and finish the carpet for you. Both delivery and fitting are included.",
+      },
+      {
+        q: "What types of carpet do you supply?",
+        a: "We supply wall-to-wall broadloom, carpet tiles for offices, stair carpet, mosque and prayer-hall carpet, event carpet and made-to-measure rugs.",
+      },
+      {
+        q: "How long does carpet installation take?",
+        a: "A typical room is fitted the same day. Larger areas such as mosques or full office floors are scheduled in advance, and we confirm the timeline after measuring.",
+      },
+    ]
   },
   {
     "id": "grass-carpet",
-    "name": "grass-carpet",
+    "name": "Artificial Grass Carpet",
     "category": "carpet",
-    "description": "Premium grass-carpet for your home and office.",
+    "description": "UV-stable artificial grass for gardens, terraces and play areas, installed in Doha.",
     "price": "Contact for Price",
     "media": [
       {
@@ -247,13 +403,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/grass-carpet.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20grass-carpet"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20grass-carpet",
+    seoTitle: "Artificial Grass Carpet Qatar | Supply & Fitting",
+    metaDescription: "Artificial grass carpet in Qatar for gardens, terraces, balconies and play areas. UV-stable, drains freely, and installed across Doha with delivery included.",
+    imageAlt: "Artificial grass carpet laid on a Doha terrace by Al Arabia Carpets",
+    longDescription: [
+      "Artificial grass gives you a green surface all year round without irrigation, mowing or fertiliser, which makes it well suited to Qatar's climate. We install it on gardens, roof terraces, balconies, play areas and around pools.",
+      "Our grass is UV-stabilised so it holds its colour under strong sun, and it is laid over a free-draining base so rain and hose water pass straight through rather than pooling.",
+    ],
+    specs: [
+      {
+        label: "Best for",
+        value: "Gardens, terraces, balconies, play areas",
+      },
+      {
+        label: "UV stability",
+        value: "UV-stabilised for Gulf sun",
+      },
+      {
+        label: "Drainage",
+        value: "Free-draining backing",
+      },
+      {
+        label: "Maintenance",
+        value: "Occasional rinse and brush",
+      },
+      {
+        label: "Installation",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Does artificial grass fade in Qatar's sun?",
+        a: "Our artificial grass is UV-stabilised specifically for Gulf conditions, so it holds its colour far longer than non-stabilised alternatives. We can show you samples that have been in service outdoors.",
+      },
+      {
+        q: "How do you maintain artificial grass?",
+        a: "Rinse it with a hose from time to time and brush the pile upright in high-traffic spots. There is no mowing, watering or fertilising.",
+      },
+      {
+        q: "Can artificial grass be laid on a roof terrace or balcony?",
+        a: "Yes. It is a common installation in Doha. We fit it over a free-draining base so water passes through to the existing drainage.",
+      },
+    ]
   },
   {
     "id": "home-curtains",
     "name": "Home curtains",
     "category": "curtains",
-    "description": "Premium Home curtains for your home and office.",
+    "description": "Custom curtains for villas and apartments, measured, made and fitted in Doha.",
     "price": "Contact for Price",
     "media": [
       {
@@ -270,13 +469,48 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Curtain/Home curtains 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Home%20curtains"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Home%20curtains",
+    seoTitle: "Home Curtains Qatar | Custom Made for Villas",
+    metaDescription: "Custom home curtains in Qatar for villas and apartments. Blackout and sheer options, measured, made and fitted across Doha by Al Arabia Carpets.",
+    imageAlt: "Custom home curtains in a Qatari villa living room",
+    longDescription: [
+      "Home curtains are made to your window measurements and to the look of the room, whether that is a full lined drape for a majlis or something lighter for a bedroom.",
+      "We visit with fabric samples, measure each window, and return to fit the finished curtains together with the track or pole.",
+    ],
+    specs: [
+      {
+        label: "Made to measure",
+        value: "Every window measured on site",
+      },
+      {
+        label: "Options",
+        value: "Blackout, sheer, lined",
+      },
+      {
+        label: "Suitable for",
+        value: "Villas and apartments",
+      },
+      {
+        label: "Installation",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Do you bring fabric samples to the house?",
+        a: "Yes. We bring samples so you can judge colour and weight in your own lighting, and we measure the windows during the same visit.",
+      },
+      {
+        q: "Do you supply the curtain tracks as well?",
+        a: "Yes, we supply and fit tracks and poles, including double tracks where you want sheers layered under blackout curtains.",
+      },
+    ]
   },
   {
     "id": "office-blind-office-roller-vertical-blinds",
     "name": "Office blind:office roller:vertical blinds",
     "category": "curtains",
-    "description": "Premium Office blind:office roller:vertical blinds for your home and office.",
+    "description": "Vertical and roller blinds for offices, controlling glare without darkening the space.",
     "price": "Contact for Price",
     "media": [
       {
@@ -293,13 +527,48 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Curtain/Office blind:office roller:vertical blinds 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Office%20blind%3Aoffice%20roller%3Avertical%20blinds"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Office%20blind%3Aoffice%20roller%3Avertical%20blinds",
+    seoTitle: "Office Blinds Qatar | Roller & Vertical Blinds",
+    metaDescription: "Office roller and vertical blinds in Qatar. Glare control for workstations and meeting rooms, made to measure and fitted across Doha, out of hours if needed.",
+    imageAlt: "Vertical and roller blinds fitted in a Doha office",
+    longDescription: [
+      "Office blinds are mainly about controlling glare on screens while keeping the space bright. We supply both vertical blinds, which suit wide window runs and let you angle the light, and roller blinds in sunscreen fabric.",
+      "Every blind is made to measure and fitted by our team. Commercial installations can be scheduled out of hours so your office keeps working.",
+    ],
+    specs: [
+      {
+        label: "Types",
+        value: "Vertical and roller blinds",
+      },
+      {
+        label: "Fabrics",
+        value: "Sunscreen and blackout",
+      },
+      {
+        label: "Best for",
+        value: "Workstations, meeting rooms",
+      },
+      {
+        label: "Scheduling",
+        value: "Out-of-hours fitting available",
+      },
+    ],
+    faqs: [
+      {
+        q: "Which blinds are best for reducing screen glare?",
+        a: "Sunscreen roller blinds or vertical blinds both work well. Verticals let you angle the slats to block low sun across a wide window run, while sunscreen rollers cut glare evenly and keep the view.",
+      },
+      {
+        q: "Can you fit office blinds outside business hours?",
+        a: "Yes. We regularly schedule commercial fitting in the evening or at a weekend so the workplace is not disrupted.",
+      },
+    ]
   },
   {
     "id": "curtain",
-    "name": "curtain",
+    "name": "Curtains",
     "category": "curtains",
-    "description": "Premium curtain for your home and office.",
+    "description": "Made-to-measure curtains in blackout, sheer and lined options, with tracks fitted.",
     "price": "Contact for Price",
     "media": [
       {
@@ -308,13 +577,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Curtain/curtain.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20curtain"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20curtain",
+    seoTitle: "Curtains in Qatar | Made to Measure in Doha",
+    metaDescription: "Made-to-measure curtains in Qatar. Blackout, sheer and lined options with tracks, poles and full fitting. Free measurement and installation across Doha.",
+    imageAlt: "Made-to-measure curtains fitted in a Doha living room",
+    longDescription: [
+      "We make curtains to the exact measurements of your windows, so they hang correctly and close without gaps at the edges \u2014 which matters a great deal for blocking light and heat in Qatar.",
+      "Choose blackout linings for bedrooms, sheers for living areas, or a layered combination. We supply and fit the tracks or poles as well, and measurement and installation are included.",
+    ],
+    specs: [
+      {
+        label: "Made to measure",
+        value: "Cut to your window sizes",
+      },
+      {
+        label: "Options",
+        value: "Blackout, sheer, lined, layered",
+      },
+      {
+        label: "Hardware",
+        value: "Tracks and poles supplied and fitted",
+      },
+      {
+        label: "Measurement",
+        value: "Free on-site survey",
+      },
+      {
+        label: "Installation",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Do you measure and install curtains in Doha?",
+        a: "Yes. We measure your windows free of charge, make the curtains to those measurements, and fit them along with the track or pole. Installation is included.",
+      },
+      {
+        q: "Do blackout curtains help with the heat?",
+        a: "Yes. A lined blackout curtain blocks direct sun and reduces the heat coming through the glass, which noticeably helps in rooms that take the afternoon sun.",
+      },
+      {
+        q: "Can I combine sheers with blackout curtains?",
+        a: "Yes, layering is common. A sheer keeps daytime privacy while letting light through, with a blackout curtain closing over it at night. We fit a double track for this.",
+      },
+    ]
   },
   {
     "id": "roller",
-    "name": "roller",
+    "name": "Roller Blinds",
     "category": "curtains",
-    "description": "Premium roller for your home and office.",
+    "description": "Made-to-measure roller blinds in blackout and sunscreen fabrics for homes and offices.",
     "price": "Contact for Price",
     "media": [
       {
@@ -323,7 +635,46 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Curtain/roller.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20roller"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20roller",
+    seoTitle: "Roller Blinds Qatar | Made to Measure & Fitted",
+    metaDescription: "Roller blinds in Qatar made to measure. Blackout and sunscreen fabrics for homes and offices, with free measurement and installation across Doha.",
+    imageAlt: "Made-to-measure roller blinds fitted in a Doha office",
+    longDescription: [
+      "Roller blinds give a clean, uncluttered window in a minimum of space, which makes them a good fit for offices, kitchens and modern interiors where full curtains would be too heavy.",
+      "We make each blind to your window measurements in either blackout or sunscreen fabric, and fit it inside or outside the reveal depending on the window. Measurement and installation are included.",
+    ],
+    specs: [
+      {
+        label: "Made to measure",
+        value: "Cut to your window sizes",
+      },
+      {
+        label: "Fabrics",
+        value: "Blackout and sunscreen",
+      },
+      {
+        label: "Mounting",
+        value: "Inside or outside the reveal",
+      },
+      {
+        label: "Best for",
+        value: "Offices, kitchens, modern interiors",
+      },
+      {
+        label: "Installation",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "What is the difference between blackout and sunscreen roller blinds?",
+        a: "Blackout fabric blocks light almost entirely, which suits bedrooms. Sunscreen fabric cuts glare and heat while still letting you see out, which suits offices and living areas.",
+      },
+      {
+        q: "Do you make roller blinds to measure?",
+        a: "Yes, every blind is made to your window measurements and fitted by our team. We take the measurements ourselves so the sizing is right.",
+      },
+    ]
   },
   {
     "id": "khema-majlis-sofa",
@@ -348,7 +699,7 @@ export const products: Product[] = [
     "id": "luxury-majlis-sofa",
     "name": "Luxury majlis sofa",
     "category": "furniture",
-    "description": "Premium Luxury majlis sofa for your home and office.",
+    "description": "Premium majlis seating with heavier fabrics, deeper cushioning and detailed finishing.",
     "price": "Contact for Price",
     "media": [
       {
@@ -361,7 +712,42 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Luxury majlis sofa vid 1.mp4",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Luxury%20majlis%20sofa"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Luxury%20majlis%20sofa",
+    seoTitle: "Luxury Majlis Sofa Qatar | Custom Made Seating",
+    metaDescription: "Luxury majlis sofas custom made in Qatar. Premium fabrics, detailed finishing and seating sized to your majlis, with delivery included across Doha.",
+    imageAlt: "Luxury majlis sofa with premium upholstery in a Qatari majlis",
+    longDescription: [
+      "Our luxury majlis seating uses heavier premium fabrics, deeper cushioning and more detailed finishing than the standard range, for a majlis intended to receive guests.",
+      "Every piece is sized to your room and upholstered to your selection. We measure on site, bring samples, and deliver and position the finished seating anywhere in Qatar.",
+    ],
+    specs: [
+      {
+        label: "Made to measure",
+        value: "Sized to your majlis",
+      },
+      {
+        label: "Fabric",
+        value: "Premium range",
+      },
+      {
+        label: "Finishing",
+        value: "Detailed trim and edging",
+      },
+      {
+        label: "Delivery",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "What makes the luxury range different?",
+        a: "It uses heavier premium fabrics, deeper and firmer cushioning, and more detailed finishing on the trim and edging than our standard majlis seating.",
+      },
+      {
+        q: "Do you measure the majlis before quoting?",
+        a: "Yes. We measure on site so the seating runs cleanly along your walls, and we bring fabric samples at the same visit.",
+      },
+    ]
   },
   {
     "id": "majlis-and-cabinets-majlis-sofa",
@@ -411,9 +797,9 @@ export const products: Product[] = [
   },
   {
     "id": "majlis-sofa",
-    "name": "majlis-sofa",
+    "name": "Majlis Sofas",
     "category": "furniture",
-    "description": "Premium majlis-sofa for your home and office.",
+    "description": "Custom majlis seating built to your room measurements, in your choice of fabric.",
     "price": "Contact for Price",
     "media": [
       {
@@ -422,13 +808,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/majlis-sofa.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20majlis-sofa"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20majlis-sofa",
+    seoTitle: "Majlis Sofas in Qatar | Custom Made in Doha",
+    metaDescription: "Custom majlis sofas made in Qatar to your room measurements. Traditional floor seating and raised majlis in your choice of fabric, delivered across Doha.",
+    imageAlt: "Custom traditional majlis seating in a Qatari home",
+    longDescription: [
+      "A majlis is built around its seating, so we make majlis sofas to the measurements of your room rather than to a fixed catalogue size. That means seating that runs cleanly along your walls with no awkward gaps at the corners.",
+      "Choose from traditional floor-level majlis, raised majlis seating, and matching armrests, bolsters and cushions, in a wide range of fabrics. We measure, produce and deliver anywhere in Qatar.",
+    ],
+    specs: [
+      {
+        label: "Made to measure",
+        value: "Sized to your room",
+      },
+      {
+        label: "Styles",
+        value: "Floor-level and raised majlis",
+      },
+      {
+        label: "Includes",
+        value: "Armrests, bolsters, cushions",
+      },
+      {
+        label: "Fabric",
+        value: "Wide range, samples brought to you",
+      },
+      {
+        label: "Delivery",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Are majlis sofas made to measure?",
+        a: "Yes. We measure your majlis and build the seating to fit the walls exactly, which avoids the gaps you get when standard-size pieces are pushed together.",
+      },
+      {
+        q: "Can I choose the fabric?",
+        a: "Yes. We bring fabric samples to you so you can see colour and texture in your own lighting before deciding.",
+      },
+      {
+        q: "How long does a custom majlis take?",
+        a: "Production time depends on the size of the majlis and the fabric selected. We confirm a firm lead time when we measure and quote.",
+      },
+    ]
   },
   {
     "id": "sofa",
-    "name": "sofa",
+    "name": "Sofas",
     "category": "furniture",
-    "description": "Premium sofa for your home and office.",
+    "description": "Custom and ready-made sofas for living rooms, majlis and offices across Qatar.",
     "price": "Contact for Price",
     "media": [
       {
@@ -437,7 +866,42 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/sofa.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20sofa"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20sofa",
+    seoTitle: "Sofas in Qatar | Custom & Ready-Made in Doha",
+    metaDescription: "Sofas in Qatar from Al Arabia Carpets. Custom and ready-made designs in your choice of fabric, built for family use and delivered across Doha.",
+    imageAlt: "Modern living room sofa supplied by Al Arabia Carpets in Doha",
+    longDescription: [
+      "We supply sofas for living rooms, majlis and offices across Qatar, both ready-made and built to your own dimensions when a standard size will not suit the room.",
+      "Frames are built for everyday family use and upholstered in your choice of fabric. We bring samples to you, and delivery anywhere in Qatar is included.",
+    ],
+    specs: [
+      {
+        label: "Options",
+        value: "Custom-built and ready-made",
+      },
+      {
+        label: "Suitable for",
+        value: "Living rooms, majlis, offices",
+      },
+      {
+        label: "Fabric",
+        value: "Your choice, samples provided",
+      },
+      {
+        label: "Delivery",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Can you build a sofa to my own size?",
+        a: "Yes. If a standard sofa will not fit the space, we build to your measurements and confirm the dimensions with you before production starts.",
+      },
+      {
+        q: "Do you deliver sofas across Qatar?",
+        a: "Yes, delivery is included anywhere in Qatar, and our team positions the sofa in the room for you.",
+      },
+    ]
   },
   {
     "id": "cabin-interior-design",
@@ -600,9 +1064,9 @@ export const products: Product[] = [
   },
   {
     "id": "interior",
-    "name": "interior",
+    "name": "Interior Design",
     "category": "interior",
-    "description": "Premium interior for your home and office.",
+    "description": "Full interior design and fit-out: gypsum, panelling, cabinetry, flooring and furnishing.",
     "price": "Contact for Price",
     "media": [
       {
@@ -611,7 +1075,50 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/interior.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20interior"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20interior",
+    seoTitle: "Interior Design in Qatar | Doha Fit-Out Services",
+    metaDescription: "Interior design and fit-out in Qatar. Gypsum work, wall panelling, cabinetry, flooring and furnishing delivered as one project by Al Arabia Carpets in Doha.",
+    imageAlt: "Completed interior design and fit-out project in Doha, Qatar",
+    longDescription: [
+      "We take on interior design and fit-out for homes and offices across Qatar, covering gypsum board work, false ceilings, wall panelling, TV units, cabinetry, flooring, curtains and furniture.",
+      "Because we supply the flooring, curtains and furniture ourselves, the whole project runs through one team, which keeps the finishes coordinated and avoids the gaps that appear when several contractors are involved.",
+    ],
+    specs: [
+      {
+        label: "Scope",
+        value: "Design through to full fit-out",
+      },
+      {
+        label: "Includes",
+        value: "Gypsum, panelling, cabinetry, ceilings",
+      },
+      {
+        label: "Also supplied",
+        value: "Flooring, curtains, furniture",
+      },
+      {
+        label: "Projects",
+        value: "Villas, apartments, offices, retail",
+      },
+      {
+        label: "Consultation",
+        value: "Free, on site in Doha",
+      },
+    ],
+    faqs: [
+      {
+        q: "Do you handle the whole fit-out or just the design?",
+        a: "Both. We can produce the design and carry out the full fit-out, including gypsum work, ceilings, panelling, cabinetry, flooring, curtains and furniture.",
+      },
+      {
+        q: "Do you work on offices as well as homes?",
+        a: "Yes. We take on villas, apartments, offices and retail spaces across Qatar.",
+      },
+      {
+        q: "Is the consultation free?",
+        a: "Yes. We visit the property in Doha, discuss what you want to achieve, and prepare a quotation at no cost.",
+      },
+    ]
   },
   {
     "id": "al-wakra-white-ultra-modern-waterproof-spc-flooring",
@@ -801,7 +1308,7 @@ export const products: Product[] = [
     "id": "stairs-carpet-installation",
     "name": "Stairs carpet installation",
     "category": "barkia",
-    "description": "Premium Stairs carpet installation for your home and office.",
+    "description": "Stair carpet templated and fitted to every tread, riser and landing.",
     "price": "Contact for Price",
     "media": [
       {
@@ -810,7 +1317,42 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Stairs carpet installation.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Stairs%20carpet%20installation"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Stairs%20carpet%20installation",
+    seoTitle: "Stairs Carpet Installation Qatar | Al Arabia",
+    metaDescription: "Stair carpet supply and installation across Qatar. Precise fitting to treads, risers and landings for a safe, quiet staircase. Free measurement in Doha.",
+    imageAlt: "Carpeted staircase with fitted treads and risers in a Doha villa",
+    longDescription: [
+      "Carpeting a staircase makes it quieter and safer underfoot, and it is the part of a home where fitting quality matters most. Every tread, riser and winder has to be measured and cut individually.",
+      "Our installers template each step, fit the carpet tight to the nosing, and finish the landings so the transition is clean. We work on straight, turning and spiral staircases across Qatar.",
+    ],
+    specs: [
+      {
+        label: "Covers",
+        value: "Treads, risers, winders, landings",
+      },
+      {
+        label: "Stair types",
+        value: "Straight, turning and spiral",
+      },
+      {
+        label: "Benefit",
+        value: "Quieter and safer underfoot",
+      },
+      {
+        label: "Measurement",
+        value: "Free on-site survey",
+      },
+    ],
+    faqs: [
+      {
+        q: "Can you carpet a turning or spiral staircase?",
+        a: "Yes. Winders and spiral flights are templated and cut step by step so the carpet sits tight to each nosing without rucking.",
+      },
+      {
+        q: "Does stair carpet make stairs safer?",
+        a: "It adds grip underfoot and softens a fall, and it noticeably reduces the noise of people using the stairs. Correct fitting to the nosing is what makes the difference.",
+      },
+    ]
   },
   {
     "id": "sunset-teak-gold-elegant-spc-vinyl-flooring-qatar",
@@ -829,9 +1371,9 @@ export const products: Product[] = [
   },
   {
     "id": "barkia",
-    "name": "barkia",
+    "name": "Barkia Flooring",
     "category": "barkia",
-    "description": "Premium barkia for your home and office.",
+    "description": "Waterproof, hard-wearing barkia flooring supplied and installed anywhere in Qatar.",
     "price": "Contact for Price",
     "media": [
       {
@@ -840,13 +1382,60 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/barkia.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20barkia"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20barkia",
+    seoTitle: "Barkia Flooring in Qatar | Supply & Installation",
+    metaDescription: "Barkia flooring supplied and installed across Qatar. Waterproof, hard-wearing surfaces for majlis, villas and offices, with free measurement and fitting in Doha.",
+    imageAlt: "Barkia flooring installed in a Doha villa by Al Arabia Carpets",
+    longDescription: [
+      "Barkia is one of the most widely used floor finishes in Qatar, valued for standing up to heat, humidity and heavy foot traffic while staying easy to clean. Al Arabia Carpets supplies and fits barkia for villas, majlis, offices, shops and outdoor terraces throughout Doha and the surrounding municipalities.",
+      "Our team measures your space, recommends the right thickness and finish for the room, and handles the full installation, including sub-floor preparation and skirting. Delivery and fitting anywhere in Qatar are included.",
+    ],
+    specs: [
+      {
+        label: "Application",
+        value: "Residential, commercial and outdoor",
+      },
+      {
+        label: "Water resistance",
+        value: "Fully waterproof surface",
+      },
+      {
+        label: "Installation",
+        value: "Included, by our own fitters",
+      },
+      {
+        label: "Measurement",
+        value: "Free on-site survey in Doha",
+      },
+      {
+        label: "Service area",
+        value: "All of Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "What is barkia flooring?",
+        a: "Barkia is a durable, waterproof floor covering widely used in Qatar for homes, majlis and commercial spaces. It resists heat and humidity, cleans easily, and can be laid over most existing sub-floors.",
+      },
+      {
+        q: "Do you install barkia across Qatar?",
+        a: "Yes. Al Arabia Carpets delivers and installs across Doha, Al Wakra, Al Khor, Lusail, Al Rayyan and the rest of Qatar. Delivery and installation are included.",
+      },
+      {
+        q: "How long does barkia installation take?",
+        a: "Most residential rooms are completed in a single day. Larger villas and commercial areas are scheduled over two or three days, and we confirm the timeline after the on-site measurement.",
+      },
+      {
+        q: "Can barkia be installed over existing tiles?",
+        a: "In most cases yes, provided the tiles are sound and level. Our installer checks the sub-floor during the free survey and advises if any preparation is needed.",
+      },
+    ]
   },
   {
     "id": "pvc-barkia",
-    "name": "pvc-barkia",
+    "name": "PVC Barkia Flooring",
     "category": "barkia",
-    "description": "Premium pvc-barkia for your home and office.",
+    "description": "100% waterproof PVC barkia flooring, ideal for kitchens, bathrooms and wet areas.",
     "price": "Contact for Price",
     "media": [
       {
@@ -855,7 +1444,50 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/pvc-barkia.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20pvc-barkia"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20pvc-barkia",
+    seoTitle: "PVC Barkia Flooring Doha | Waterproof & Fitted",
+    metaDescription: "PVC barkia flooring in Qatar: 100% waterproof, scratch-resistant and quick to install. Free measurement, delivery and fitting across Doha from Al Arabia Carpets.",
+    imageAlt: "PVC barkia waterproof flooring installed in a Doha interior",
+    longDescription: [
+      "PVC barkia is the fully synthetic version of traditional barkia, giving you a 100% waterproof floor that will not swell, warp or stain. It is the practical choice for kitchens, bathrooms, laundry areas and any space that sees water.",
+      "Available in a wide range of wood-effect and stone-effect finishes, PVC barkia installs quickly with minimal disruption and needs nothing more than routine sweeping and mopping to stay looking new.",
+    ],
+    specs: [
+      {
+        label: "Material",
+        value: "PVC / vinyl composite",
+      },
+      {
+        label: "Water resistance",
+        value: "100% waterproof",
+      },
+      {
+        label: "Best for",
+        value: "Kitchens, bathrooms, wet areas",
+      },
+      {
+        label: "Maintenance",
+        value: "Sweep and damp mop",
+      },
+      {
+        label: "Installation",
+        value: "Included, typically one day per room",
+      },
+    ],
+    faqs: [
+      {
+        q: "Is PVC barkia fully waterproof?",
+        a: "Yes. PVC barkia is 100% waterproof through its full thickness, so standing water will not cause swelling or damage. That makes it suitable for kitchens, bathrooms and laundry rooms.",
+      },
+      {
+        q: "How is PVC barkia different from regular barkia?",
+        a: "PVC barkia is entirely synthetic and completely waterproof, while standard barkia may include composite layers that are water-resistant rather than waterproof. For wet areas we recommend PVC.",
+      },
+      {
+        q: "How do I clean PVC barkia?",
+        a: "Sweep or vacuum regularly and clean with a damp mop and mild detergent. Avoid abrasive scourers and harsh solvents, which can dull the wear layer.",
+      },
+    ]
   }
 ];
 

@@ -9,9 +9,11 @@
 export const SITE_NAME = "Al Arabia Carpets";
 export const SITE_URL = "https://alarabiacarpets.com";
 export const DEFAULT_IMAGE = "/lovable-uploads/green-white-logo.webp";
-export const DEFAULT_TITLE = `${SITE_NAME} | Premium Home Furnishings & Interior Design in Qatar | Doha`;
+// Kept under 60 characters so Google does not truncate it in results.
+export const DEFAULT_TITLE = `${SITE_NAME} | Carpets, Barkia & Interior Design Qatar`;
+// Kept within the ~160 character budget search engines display.
 export const DEFAULT_DESCRIPTION =
-  "Al Arabia Carpets - Qatar's leading provider of premium Barkia, PVC flooring, carpets, sofas, curtains & interior design services. Free installation & delivery across Doha.";
+  "Qatar's provider of premium Barkia, PVC flooring, carpets, sofas, curtains & interior design. Free installation & delivery across Doha.";
 
 export const PHONE = "+974 5551 2858";
 export const PHONE_E164 = "+97455512858";
@@ -184,8 +186,31 @@ export function productPath(product: Product): string {
   return `/products/${product.id}`;
 }
 
+/** Google truncates titles around 60 characters. */
+export const TITLE_MAX = 60;
+
+/**
+ * Build a complete <title>, appending the brand only when it still fits inside
+ * the display budget. Product pages emit this as `title.absolute` so the root
+ * layout's "%s | Al Arabia Carpets" template does not append a second time and
+ * push every title past the limit.
+ */
+export function buildTitle(base: string): string {
+  const suffix = ` | ${SITE_NAME}`;
+  if (base.length + suffix.length <= TITLE_MAX) return base + suffix;
+  if (base.length <= TITLE_MAX) return base;
+  return `${base.slice(0, TITLE_MAX - 1).trimEnd()}\u2026`;
+}
+
 export function productTitle(product: Product): string {
-  return product.seoTitle ?? `${product.name} in Qatar`;
+  if (product.seoTitle) return buildTitle(product.seoTitle);
+  // Several product names already contain "Qatar" or "Doha"; appending the
+  // location again produces titles like "... SPC Qatar in Qatar".
+  const hasLocation = /qatar|doha/i.test(product.name);
+  if (hasLocation) return buildTitle(product.name);
+  // Prefer dropping the location suffix over truncating the product name.
+  const withLocation = `${product.name} in Qatar`;
+  return buildTitle(withLocation.length <= TITLE_MAX ? withLocation : product.name);
 }
 
 export function productDescription(product: Product): string {

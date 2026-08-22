@@ -81,7 +81,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Artificial flowers grass 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Artificial%20flowers%20grass"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Artificial%20flowers%20grass"
   },
   {
     "id": "artificial-grass-installation-work",
@@ -104,7 +104,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Artificial grass installation work.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Artificial%20grass%20installation%20work",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Artificial%20grass%20installation%20work",
     seoTitle: "Artificial Grass Installation Qatar | Doha Fitting",
     metaDescription: "Professional artificial grass installation across Qatar. Base preparation, drainage and seam-free finishing for gardens, terraces and play areas in Doha.",
     imageAlt: "Artificial grass installation in progress on a Doha garden",
@@ -143,7 +143,7 @@ export const products: Product[] = [
   },
   {
     "id": "event-normal-carpet",
-    "name": "Event:normal carpet",
+    "name": "Event Carpet",
     "category": "carpet",
     "description": "Premium Event:normal carpet for your home and office.",
     "price": "Contact for Price",
@@ -154,7 +154,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Event:normal carpet.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Event%3Anormal%20carpet"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Event%20Carpet"
   },
   {
     "id": "home-design-luxury-carpet",
@@ -169,7 +169,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Home design luxury carpet.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Home%20design%20luxury%20carpet"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Home%20design%20luxury%20carpet"
   },
   {
     "id": "luxury-home-carpet",
@@ -196,11 +196,11 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Luxury home carpet 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Luxury%20home%20carpet"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Luxury%20home%20carpet"
   },
   {
     "id": "mosjid-mosque-carpet-installation",
-    "name": "Mosjid:mosque carpet installation",
+    "name": "Masjid & Mosque Carpet Installation",
     "category": "carpet",
     "description": "Premium Mosjid:mosque carpet installation for your home and office.",
     "price": "Contact for Price",
@@ -219,11 +219,11 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Mosjid:mosque carpet installation 0.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Mosjid%3Amosque%20carpet%20installation"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Masjid%20%26%20Mosque%20Carpet%20Installation"
   },
   {
     "id": "mosque-masjid-carpet",
-    "name": "Mosque:masjid carpet",
+    "name": "Mosque & Masjid Carpet",
     "category": "carpet",
     "description": "Prayer-row and plain mosque carpet, aligned to the qiblah and fitted across Qatar.",
     "price": "Contact for Price",
@@ -234,7 +234,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Mosque:masjid carpet.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Mosque%3Amasjid%20carpet",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Mosque%20%26%20Masjid%20Carpet",
     seoTitle: "Mosque & Masjid Carpet Qatar | Supply & Fitting",
     metaDescription: "Mosque and masjid carpet supplied and installed across Qatar. Prayer-row designs, heavy-duty pile for high footfall, and full fitting by Al Arabia Carpets in Doha.",
     imageAlt: "Mosque prayer hall carpet with prayer rows installed in Qatar",
@@ -277,7 +277,7 @@ export const products: Product[] = [
   },
   {
     "id": "pvc-gym-mat-indoor-game-mat",
-    "name": "PVC gym mat:indoor game mat",
+    "name": "PVC Gym Mat & Indoor Game Mat",
     "category": "carpet",
     "description": "Premium PVC gym mat:indoor game mat for your home and office.",
     "price": "Contact for Price",
@@ -288,11 +288,11 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/PVC gym mat:indoor game mat.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20PVC%20gym%20mat%3Aindoor%20game%20mat"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20PVC%20Gym%20Mat%20%26%20Indoor%20Game%20Mat"
   },
   {
     "id": "tiles-carpet-office-carpet",
-    "name": "Tiles carpet:office carpet",
+    "name": "Carpet Tiles & Office Carpet",
     "category": "carpet",
     "description": "Modular office carpet tiles, hard-wearing and individually replaceable.",
     "price": "Contact for Price",
@@ -303,7 +303,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Tiles carpet:office carpet.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Tiles%20carpet%3Aoffice%20carpet",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Carpet%20Tiles%20%26%20Office%20Carpet",
     seoTitle: "Office Carpet Tiles Qatar | Supply & Installation",
     metaDescription: "Office carpet tiles supplied and fitted across Qatar. Hard-wearing, individually replaceable, and installed with minimal disruption to your workplace in Doha.",
     imageAlt: "Office carpet tiles installed in a commercial workspace in Doha",
@@ -357,7 +357,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/grass-carpet.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20grass-carpet",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Artificial%20Grass%20Carpet",
     seoTitle: "Artificial Grass Carpet Qatar | Supply & Fitting",
     metaDescription: "Artificial grass carpet in Qatar for gardens, terraces, balconies and play areas. UV-stable, drains freely, and installed across Doha with delivery included.",
     imageAlt: "Artificial grass carpet laid on a Doha terrace by Al Arabia Carpets",
@@ -423,7 +423,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Curtain/Home curtains 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Home%20curtains",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Home%20curtains",
     seoTitle: "Home Curtains Qatar | Custom Made for Villas",
     metaDescription: "Custom home curtains in Qatar for villas and apartments. Blackout and sheer options, measured, made and fitted across Doha by Al Arabia Carpets.",
     imageAlt: "Custom home curtains in a Qatari villa living room",
@@ -462,7 +462,7 @@ export const products: Product[] = [
   },
   {
     "id": "office-blind-office-roller-vertical-blinds",
-    "name": "Office blind:office roller:vertical blinds",
+    "name": "Office Roller & Vertical Blinds",
     "category": "curtains",
     "description": "Vertical and roller blinds for offices, controlling glare without darkening the space.",
     "price": "Contact for Price",
@@ -481,7 +481,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Curtain/Office blind:office roller:vertical blinds 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Office%20blind%3Aoffice%20roller%3Avertical%20blinds",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Office%20Roller%20%26%20Vertical%20Blinds",
     seoTitle: "Office Blinds Qatar | Roller & Vertical Blinds",
     metaDescription: "Office roller and vertical blinds in Qatar. Glare control for workstations and meeting rooms, made to measure and fitted across Doha, out of hours if needed.",
     imageAlt: "Vertical and roller blinds fitted in a Doha office",
@@ -531,7 +531,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Curtain/roller.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20roller",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Roller%20Blinds",
     seoTitle: "Roller Blinds Qatar | Made to Measure & Fitted",
     metaDescription: "Roller blinds in Qatar made to measure. Blackout and sunscreen fabrics for homes and offices, with free measurement and installation across Doha.",
     imageAlt: "Made-to-measure roller blinds fitted in a Doha office",
@@ -589,7 +589,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Khema majlis sofa 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Khema%20majlis%20sofa"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Khema%20majlis%20sofa"
   },
   {
     "id": "luxury-majlis-sofa",
@@ -608,7 +608,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Luxury majlis sofa vid 1.mp4",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Luxury%20majlis%20sofa",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Luxury%20majlis%20sofa",
     seoTitle: "Luxury Majlis Sofa Qatar | Custom Made Seating",
     metaDescription: "Luxury majlis sofas custom made in Qatar. Premium fabrics, detailed finishing and seating sized to your majlis, with delivery included across Doha.",
     imageAlt: "Luxury majlis sofa with premium upholstery in a Qatari majlis",
@@ -647,7 +647,7 @@ export const products: Product[] = [
   },
   {
     "id": "majlis-and-cabinets-majlis-sofa",
-    "name": "Majlis and cabinets:majlis sofa",
+    "name": "Majlis Sofa & Cabinets",
     "category": "furniture",
     "description": "Premium Majlis and cabinets:majlis sofa for your home and office.",
     "price": "Contact for Price",
@@ -666,7 +666,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Majlis and cabinets:majlis sofa 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Majlis%20and%20cabinets%3Amajlis%20sofa"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Majlis%20Sofa%20%26%20Cabinets"
   },
   {
     "id": "modern-majlis",
@@ -689,7 +689,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Modern majlis 2.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Modern%20majlis"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Modern%20majlis"
   },
   {
     "id": "cabin-interior-design",
@@ -720,7 +720,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Cabin interior design 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Cabin%20interior%20design"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Cabin%20interior%20design"
   },
   {
     "id": "cabinet-and-gypsum-board-work",
@@ -747,7 +747,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Cabinet and gypsum board work 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Cabinet%20and%20gypsum%20board%20work"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Cabinet%20and%20gypsum%20board%20work"
   },
   {
     "id": "gypsum-board-work-design",
@@ -778,7 +778,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Gypsum board work design 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Gypsum%20board%20work%20design"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Gypsum%20board%20work%20design"
   },
   {
     "id": "indoor-wall-panel-design",
@@ -797,11 +797,11 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Indoor wall panel design 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Indoor%20wall%20panel%20design"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Indoor%20wall%20panel%20design"
   },
   {
     "id": "television-decore-with-cabin-box",
-    "name": "Television decore with cabin box",
+    "name": "TV Unit with Cabinet Box",
     "category": "interior",
     "description": "Premium Television decore with cabin box for your home and office.",
     "price": "Contact for Price",
@@ -848,7 +848,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Television decore with cabin box 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Television%20decore%20with%20cabin%20box"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20TV%20Unit%20with%20Cabinet%20Box"
   },
   {
     "id": "al-wakra-white-ultra-modern-waterproof-spc-flooring",
@@ -863,7 +863,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Al Wakra White – Ultra-Modern Waterproof SPC Flooring.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Al%20Wakra%20White%20%E2%80%93%20Ultra-Modern%20Waterproof%20SPC%20Flooring",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Al%20Wakra%20White%20%E2%80%93%20Ultra-Modern%20Waterproof%20SPC%20Flooring",
     seoTitle: "Al Wakra White SPC Flooring | Retail & Showroom",
     metaDescription: "Al Wakra White SPC flooring in Qatar. A near-white matt decor for showrooms, retail and ultra-modern interiors. Commercial-grade, fitted in Doha.",
     imageAlt: "Al Wakra White SPC flooring in a modern Doha showroom",
@@ -921,7 +921,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Arabian Night Espresso – High-End Waterproof SPC.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Arabian%20Night%20Espresso%20%E2%80%93%20High-End%20Waterproof%20SPC",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Arabian%20Night%20Espresso%20%E2%80%93%20High-End%20Waterproof%20SPC",
     seoTitle: "Arabian Night Espresso SPC | Dark Floor Qatar",
     metaDescription: "Arabian Night Espresso SPC flooring in Qatar. A very dark, high-contrast decor for dramatic interiors. Honest advice on dust before you commit.",
     imageAlt: "Arabian Night Espresso dark SPC flooring in a Doha interior",
@@ -979,7 +979,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Desert Walnut Classic – Luxury SPC Flooring Doha.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Desert%20Walnut%20Classic%20%E2%80%93%20Luxury%20SPC%20Flooring%20Doha",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Desert%20Walnut%20Classic%20%E2%80%93%20Luxury%20SPC%20Flooring%20Doha",
     seoTitle: "Desert Walnut SPC Flooring Doha | Mid-Tone Walnut",
     metaDescription: "Desert Walnut Classic SPC flooring in Doha. A mid-tone walnut that hides dust and marks better than pale or dark floors. Fitted across Qatar.",
     imageAlt: "Desert Walnut Classic SPC flooring in a Doha family home",
@@ -1037,7 +1037,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Doha Coastal Grey – Premium Rigid Core SPC Vinyl.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Doha%20Coastal%20Grey%20%E2%80%93%20Premium%20Rigid%20Core%20SPC%20Vinyl",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Doha%20Coastal%20Grey%20%E2%80%93%20Premium%20Rigid%20Core%20SPC%20Vinyl",
     seoTitle: "Doha Coastal Grey SPC Vinyl | Rigid Core Flooring",
     metaDescription: "Doha Coastal Grey rigid core SPC vinyl flooring. A cool grey decor for modern villas, dent-resistant under heavy furniture. Fitted across Qatar.",
     imageAlt: "Doha Coastal Grey SPC vinyl flooring in a modern Qatari villa",
@@ -1095,11 +1095,11 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Outdoor wall panel products.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Outdoor%20wall%20panel%20products"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Outdoor%20wall%20panel%20products"
   },
   {
     "id": "pearl-grey-herringbone-100-waterproof-spc-qatar",
-    "name": "Pearl Grey Herringbone – 100  Waterproof SPC Qatar",
+    "name": "Pearl Grey Herringbone \u2013 100% Waterproof SPC",
     "category": "barkia",
     "description": "Pearl grey SPC in a herringbone pattern. The only format-led floor in the range.",
     "price": "Contact for Price",
@@ -1110,7 +1110,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Pearl Grey Herringbone – 100  Waterproof SPC Qatar.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Pearl%20Grey%20Herringbone%20%E2%80%93%20100%20%20Waterproof%20SPC%20Qatar",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Pearl%20Grey%20Herringbone%20%5Cu2013%20100%25%20Waterproof%20SPC",
     seoTitle: "Pearl Grey Herringbone SPC Flooring Qatar",
     metaDescription: "Pearl Grey Herringbone SPC flooring in Qatar. A classic herringbone laying pattern in waterproof SPC, fitted plank by plank across Doha.",
     imageAlt: "Pearl Grey Herringbone SPC flooring laid in a Doha entrance hall",
@@ -1168,7 +1168,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Qatar Breeze Oak – Bright & Waterproof SPC Flooring.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Qatar%20Breeze%20Oak%20%E2%80%93%20Bright%20%26%20Waterproof%20SPC%20Flooring",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Qatar%20Breeze%20Oak%20%E2%80%93%20Bright%20%26%20Waterproof%20SPC%20Flooring",
     seoTitle: "Qatar Breeze Oak SPC Flooring | Bright Neutral Oak",
     metaDescription: "Qatar Breeze Oak SPC flooring in Qatar. A bright, cool-neutral oak that lifts north-facing and enclosed rooms. Supplied and installed across Doha.",
     imageAlt: "Qatar Breeze Oak SPC flooring in a bright Doha room",
@@ -1226,7 +1226,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Qatar Sand Oak – Luxury Waterproof SPC Flooring.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Qatar%20Sand%20Oak%20%E2%80%93%20Luxury%20Waterproof%20SPC%20Flooring",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Qatar%20Sand%20Oak%20%E2%80%93%20Luxury%20Waterproof%20SPC%20Flooring",
     seoTitle: "Qatar Sand Oak SPC Flooring | Light Oak Decor",
     metaDescription: "Qatar Sand Oak SPC flooring in Doha. A warm, light oak decor that opens up small rooms and hides everyday dust. Supplied and fitted across Qatar.",
     imageAlt: "Qatar Sand Oak SPC flooring laid in a bright Doha living room",
@@ -1284,7 +1284,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Royal Mahogany – Luxury Waterproof Vinyl SPC.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Royal%20Mahogany%20%E2%80%93%20Luxury%20Waterproof%20Vinyl%20SPC",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Royal%20Mahogany%20%E2%80%93%20Luxury%20Waterproof%20Vinyl%20SPC",
     seoTitle: "Royal Mahogany SPC Flooring | Formal Majlis Floor",
     metaDescription: "Royal Mahogany waterproof vinyl SPC flooring in Qatar. A deep red-brown decor for formal majlis and reception rooms. Supplied and installed in Doha.",
     imageAlt: "Royal Mahogany SPC flooring in a formal Qatari majlis",
@@ -1342,7 +1342,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Scandinavian White Oak – Modern Waterproof SPC Doha.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Scandinavian%20White%20Oak%20%E2%80%93%20Modern%20Waterproof%20SPC%20Doha",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Scandinavian%20White%20Oak%20%E2%80%93%20Modern%20Waterproof%20SPC%20Doha",
     seoTitle: "Scandinavian White Oak SPC Flooring Doha | Minimal",
     metaDescription: "Scandinavian White Oak SPC flooring in Doha. A pale, low-contrast decor for minimal interiors and apartments. Supplied and installed across Qatar.",
     imageAlt: "Scandinavian White Oak SPC flooring in a minimal Doha apartment",
@@ -1389,7 +1389,7 @@ export const products: Product[] = [
   },
   {
     "id": "skerting-nala-profile",
-    "name": "Skerting:Nala:profile",
+    "name": "Skirting & Nala Profile",
     "category": "barkia",
     "description": "Premium Skerting:Nala:profile for your home and office.",
     "price": "Contact for Price",
@@ -1400,11 +1400,11 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Skerting:Nala:profile.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Skerting%3ANala%3Aprofile"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Skirting%20%26%20Nala%20Profile"
   },
   {
     "id": "spc-zigzag-barkia-installation",
-    "name": "Spc zigzag barkia installation",
+    "name": "SPC Zigzag Barkia Installation",
     "category": "barkia",
     "description": "Premium Spc zigzag barkia installation for your home and office.",
     "price": "Contact for Price",
@@ -1419,7 +1419,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Spc zigzag barkia installation vid.mp4",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Spc%20zigzag%20barkia%20installation"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20SPC%20Zigzag%20Barkia%20Installation"
   },
   {
     "id": "stairs-carpet-installation",
@@ -1434,7 +1434,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Stairs carpet installation.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Stairs%20carpet%20installation",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Stairs%20carpet%20installation",
     seoTitle: "Stairs Carpet Installation Qatar | Al Arabia",
     metaDescription: "Stair carpet supply and installation across Qatar. Precise fitting to treads, risers and landings for a safe, quiet staircase. Free measurement in Doha.",
     imageAlt: "Carpeted staircase with fitted treads and risers in a Doha villa",
@@ -1484,7 +1484,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Sunset Teak Gold – Elegant SPC Vinyl Flooring Qatar.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Sunset%20Teak%20Gold%20%E2%80%93%20Elegant%20SPC%20Vinyl%20Flooring%20Qatar",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Sunset%20Teak%20Gold%20%E2%80%93%20Elegant%20SPC%20Vinyl%20Flooring%20Qatar",
     seoTitle: "Sunset Teak Gold SPC Flooring Qatar | Warm Teak",
     metaDescription: "Sunset Teak Gold SPC vinyl flooring in Qatar. Warm golden teak tones for traditional interiors that still want a light floor. Fitted across Doha.",
     imageAlt: "Sunset Teak Gold SPC flooring in a traditional Qatari interior",
@@ -1542,7 +1542,7 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/pvc-barkia.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20pvc-barkia",
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20PVC%20Barkia%20Flooring",
     seoTitle: "PVC Barkia Flooring Doha | Waterproof & Fitted",
     metaDescription: "PVC barkia flooring in Qatar: 100% waterproof, scratch-resistant and quick to install. Free measurement, delivery and fitting across Doha from Al Arabia Carpets.",
     imageAlt: "PVC barkia waterproof flooring installed in a Doha interior",

@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowRight, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 

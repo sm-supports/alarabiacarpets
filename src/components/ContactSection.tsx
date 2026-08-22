@@ -1,9 +1,11 @@
+"use client";
+
 import { useState, memo, useCallback, useMemo, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, MapPin, Mail, Phone, MessageCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 import { trackFormLead, trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
 
@@ -202,13 +204,13 @@ const ContactSection = memo(function ContactSection() {
               <p className="text-xs sm:text-sm text-white/60 mb-3 sm:mb-4">Quick Links</p>
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 <Link 
-                  to="/products"
+                  href="/products"
                   className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-white/80 bg-white/5 rounded-full border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-[0.98]"
                 >
                   View Products
                 </Link>
                 <Link 
-                  to="/about"
+                  href="/about"
                   className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-white/80 bg-white/5 rounded-full border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-[0.98]"
                 >
                   About Us

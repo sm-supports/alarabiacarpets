@@ -1,3 +1,5 @@
+"use client";
+
 import { Truck, Wrench, Headphones, Shield } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { trackWhatsAppClick } from "@/lib/analytics";

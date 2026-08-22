@@ -1,5 +1,7 @@
+"use client";
+
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { products } from "@/data/products";
 import { trackWhatsAppClick } from "@/lib/analytics";
@@ -169,7 +171,7 @@ function ProductShowcase({
             {/* CTAs - Stack on mobile */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link
-                to={`/products/${product.id}`}
+                href={`/products/${product.id}`}
                 className={`group inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3 text-white text-sm font-medium rounded-full transition-all duration-300 hover:shadow-float active:scale-[0.98] ${colorClasses.button}`}
               >
                 View Details
@@ -258,7 +260,7 @@ export default function ProductsSection() {
             {additionalProducts.map((product, index) => (
               <Link
                 key={product.id}
-                to={product.link}
+                href={product.link}
                 data-index={productShowcases.length + index}
                 className={`group relative aspect-[4/5] sm:aspect-square rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-700 ease-out-expo hover:shadow-float active:scale-[0.98] ${
                   visibleItems.has(productShowcases.length + index) 
@@ -289,7 +291,7 @@ export default function ProductsSection() {
           {/* View All CTA */}
           <div className="mt-8 sm:mt-12 text-center">
             <Link
-              to="/products"
+              href="/products"
               className="group inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-forest-900 text-white text-sm sm:text-base font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-float active:scale-[0.98] w-full sm:w-auto max-w-xs sm:max-w-none mx-auto"
             >
               View All Products

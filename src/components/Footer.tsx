@@ -1,5 +1,7 @@
+"use client";
+
 import { MessageCircle, Mail, MapPin, Instagram, Facebook, ArrowUpRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { products } from "@/data/products";
 import { trackWhatsAppClick } from "@/lib/analytics";
 
@@ -45,7 +47,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Column - Full width on mobile */}
           <div className="col-span-2 sm:col-span-2 lg:col-span-2">
-            <Link to="/" className="inline-flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
+            <Link href="/" className="inline-flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
               <img 
                 src="/lovable-uploads/tran-golden-logo.webp" 
                 alt="Al Arabia Carpets" 
@@ -98,7 +100,7 @@ export default function Footer() {
               {footerLinks.products.map((link) => (
                 <li key={link.label}>
                   <Link 
-                    to={link.href}
+                    href={link.href}
                     className="text-xs sm:text-sm text-gray-600 hover:text-forest-900 transition-colors"
                   >
                     {link.label}
@@ -115,7 +117,7 @@ export default function Footer() {
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
                   <Link 
-                    to={link.href}
+                    href={link.href}
                     className="text-xs sm:text-sm text-gray-600 hover:text-forest-900 transition-colors"
                   >
                     {link.label}

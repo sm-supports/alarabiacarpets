@@ -1,12 +1,15 @@
+"use client";
+
 import { useState, useEffect, memo, useCallback, useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { X, ChevronRight } from "lucide-react";
 import { trackWhatsAppClick } from "@/lib/analytics";
 
 const Navbar = memo(function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
 
   // Navigation items
   const navigationItems = useMemo(() => [
@@ -29,7 +32,7 @@ const Navbar = memo(function Navbar() {
   // Close mobile menu on route change
   useEffect(() => {
     setIsOpen(false);
-  }, [location.pathname]);
+  }, [pathname]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -45,10 +48,10 @@ const Navbar = memo(function Navbar() {
 
   const isActive = useCallback((path: string) => {
     if (path === '/') {
-      return location.pathname === '/';
+      return pathname === '/';
     }
-    return location.pathname.startsWith(path);
-  }, [location.pathname]);
+    return pathname.startsWith(path);
+  }, [pathname]);
 
   const toggleMenu = useCallback(() => {
     setIsOpen(prev => !prev);
@@ -68,7 +71,7 @@ const Navbar = memo(function Navbar() {
           <div className="flex items-center justify-between h-14 md:h-16">
             {/* Logo */}
             <Link 
-              to="/" 
+              href="/" 
               className="flex items-center gap-3 group"
             >
               <div className="relative w-9 h-9 md:w-10 md:h-10 overflow-hidden rounded-lg">
@@ -90,7 +93,7 @@ const Navbar = memo(function Navbar() {
               {navigationItems.map((item) => (
                 <Link
                   key={item.path}
-                  to={item.path}
+                  href={item.path}
                   className={`relative px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-full ${
                     isActive(item.path)
                       ? 'text-forest-900'
@@ -175,7 +178,7 @@ const Navbar = memo(function Navbar() {
           {/* Menu Header */}
           <div className="flex items-center justify-between h-14 px-5 border-b border-gray-100 bg-white">
             <Link 
-              to="/" 
+              href="/" 
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3"
             >
@@ -209,7 +212,7 @@ const Navbar = memo(function Navbar() {
                   style={{ transitionDelay: isOpen ? `${index * 50 + 100}ms` : '0ms' }}
                 >
                   <Link
-                    to={item.path}
+                    href={item.path}
                     onClick={() => setIsOpen(false)}
                     className={`flex items-center justify-between p-4 rounded-2xl transition-all duration-200 ${
                       isActive(item.path)

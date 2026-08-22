@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from 'react';
 import { preloadImages } from '@/lib/image-utils';
 

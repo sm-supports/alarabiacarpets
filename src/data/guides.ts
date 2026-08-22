@@ -45,6 +45,180 @@ export interface Guide {
 
 export const guides: Guide[] = [
   {
+    slug: "choosing-curtains-and-blinds-qatar",
+    title: "Choosing Curtains and Blinds for Qatar Homes",
+    seoTitle: "Choosing Curtains & Blinds for Qatar Homes",
+    metaDescription:
+      "How to choose curtains and blinds in Qatar: blackout vs sheer, layering, heat and glare control, tracks vs poles, and how to measure. From Al Arabia Carpets, Doha.",
+    excerpt:
+      "Blackout, sheer or layered; what actually reduces heat; roller versus vertical for offices; and how to measure so they hang properly.",
+    heroImage: "/Products/Curtain/curtain.webp",
+    heroImageAlt: "Made-to-measure curtains hanging in a Doha living room",
+    updatedAt: "2026-08-23",
+    intro: [
+      "In most countries curtains are chosen on how they look. In Qatar they are doing real work as well: blocking a sun that will heat a room through the glass all afternoon, and cutting the glare that makes a screen unreadable.",
+      "That means the fabric decision and the room decision are the same decision. This guide goes through it in the order it actually comes up.",
+    ],
+    sections: [
+      {
+        heading: "Blackout, sheer, or both?",
+        body: [
+          "The first question is how much light you want to keep out, and at what times of day.",
+          "A blackout lining blocks essentially all light and, just as importantly, blocks the radiant heat coming through the glass. A sheer diffuses light and gives daytime privacy while keeping the room bright. Layering the two on a double track is the most flexible arrangement and the one we fit most often.",
+        ],
+        bullets: [
+          "Bedrooms: blackout, particularly on any window taking morning or afternoon sun.",
+          "Living rooms and majlis: layered — sheer by day, blackout closed in the evening.",
+          "Rooms with a view you want to keep: sheer alone, or a sunscreen roller blind.",
+          "Rooms that overheat: blackout with a lining, closed during the hottest hours.",
+        ],
+      },
+      {
+        heading: "What actually reduces heat",
+        body: [
+          "A curtain reduces heat by stopping sunlight before it is absorbed by surfaces inside the room. Once the floor and furniture have warmed up, closing the curtain no longer helps much — which is why the timing matters more than people expect.",
+          "The practical rule is to close them on the sun-facing side before the room heats, not after. A lined curtain, hung close to the glass and wide enough to overlap the reveal at each side, does noticeably more than an unlined one hung narrow.",
+        ],
+      },
+      {
+        heading: "Roller and vertical blinds for offices",
+        body: [
+          "Offices have a different problem: glare on screens rather than heat and privacy. A sunscreen roller blind cuts glare while keeping the view and the daylight, which is usually preferable to blacking out a workspace.",
+          "Vertical blinds suit wide window runs, because the slats can be angled to block low sun from one side without darkening the whole room. Between the two, the choice is mostly about window shape.",
+        ],
+        bullets: [
+          "Wide window runs, low sun from one side: vertical blinds.",
+          "Standard windows, screen glare: sunscreen roller blinds.",
+          "Meeting rooms needing full darkening for projection: blackout roller.",
+        ],
+      },
+      {
+        heading: "Tracks, poles and how to measure",
+        body: [
+          "Curtains that do not hang properly are usually a hardware or measuring problem, not a fabric one. A track carries weight better and is what a double layer needs; a pole is more decorative and suits a single lighter curtain.",
+          "Measure the track or pole, not the window — the fabric width is calculated from the hardware, and the hardware should extend past the reveal on both sides so the curtain can stack clear of the glass. Height is measured from the fixing point to where you want the hem, which is a design choice: sill, below sill, or floor length.",
+        ],
+        bullets: [
+          "Extend the track past the window on both sides so the curtain stacks off the glass.",
+          "Fix higher than the window head — it makes the window and the room read taller.",
+          "Floor length looks best in a majlis or living room; sill length suits kitchens.",
+          "For layered curtains, specify a double track from the start.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Do blackout curtains reduce heat in Qatar?",
+        a: "Yes, provided they are closed before the room heats up rather than after. A lined blackout curtain hung close to the glass and overlapping the reveal at both sides blocks the sunlight before interior surfaces absorb it, which is where the heat gain actually comes from.",
+      },
+      {
+        q: "Should I use curtains or blinds?",
+        a: "Curtains for bedrooms, living rooms and majlis, where you want softness, sound absorption and full darkening. Blinds for offices, kitchens and anywhere the priority is controlling glare in a small amount of space. Plenty of homes use both, room by room.",
+      },
+      {
+        q: "How do I measure for curtains?",
+        a: "Measure the track or pole rather than the window, because the fabric width is calculated from the hardware. Extend it past the reveal on both sides so the curtain can stack clear of the glass, and decide the drop — sill, below sill or floor — before ordering. We measure free of charge, which removes the guesswork.",
+      },
+      {
+        q: "What is a double track and do I need one?",
+        a: "Two parallel tracks so a sheer and a blackout curtain can hang and operate independently. You need one if you want daytime privacy with light plus full darkening at night. It has to be specified at the start — retrofitting a second track means refixing the whole thing.",
+      },
+    ],
+    relatedProductIds: ["home-curtains", "roller", "office-blind-office-roller-vertical-blinds"],
+    relatedCategorySlugs: ["curtain"],
+  },
+  {
+    slug: "interior-design-guide-qatar",
+    title: "Planning an Interior Fit-Out in Qatar",
+    seoTitle: "Planning an Interior Fit-Out in Qatar",
+    metaDescription:
+      "How to plan an interior fit-out in Qatar: what to decide first, gypsum ceilings and panelling, sequencing the trades, and what a fit-out quote should include.",
+    excerpt:
+      "What has to be decided before work starts, why the order of trades matters more than any single choice, and what a quote should cover.",
+    heroImage: "/Products/Interior Design/interior.webp",
+    heroImageAlt: "Completed interior fit-out with gypsum ceiling detail in Doha",
+    updatedAt: "2026-08-23",
+    intro: [
+      "Most fit-outs do not go wrong because someone picked the wrong colour. They go wrong at the handovers — a floor laid before the joinery was scribed to it, lighting positions fixed before the ceiling design was settled, a wardrobe built to a wall that later got panelled.",
+      "This guide is about the order of decisions, which in our experience matters more than any individual choice in it.",
+    ],
+    sections: [
+      {
+        heading: "Decide these before anything is ordered",
+        body: [
+          "A handful of decisions constrain everything downstream. Settling them early costs nothing; changing them once work has started is where budgets go.",
+        ],
+        bullets: [
+          "Lighting positions — they must be fixed before the ceiling is boarded.",
+          "Whether the ceiling is dropped, and by how much, since it sets the final room height.",
+          "Where built-in joinery goes, so wall finishes stop and start in the right places.",
+          "Floor finish, because it determines threshold heights at every doorway.",
+          "Whether power and data sockets need moving, which is a first-fix job.",
+        ],
+      },
+      {
+        heading: "Ceilings and wall panelling",
+        body: [
+          "Gypsum is what turns a flat ceiling into part of the design. A dropped section over a seating area, a perimeter cove concealing indirect lighting, or a bulkhead defining a dining zone all add depth without using any floor area — which matters in a room that is already furnished to its limit.",
+          "Wall panelling does the same job vertically. The thing to keep in mind is restraint: one panelled feature wall against three plain ones reads as deliberate, whereas panelling every wall closes the room in and cancels the effect.",
+        ],
+      },
+      {
+        heading: "The order the trades should run in",
+        body: [
+          "This sequence is the single most useful thing in this guide. Running it out of order is what produces the gaps, the mismatched levels and the repainting.",
+        ],
+        bullets: [
+          "First fix: electrical and any plumbing moves, before anything closes up.",
+          "Gypsum: ceilings, bulkheads and coves, with lighting positions already set.",
+          "Joinery: built-in cabinetry, scribed to the finished walls.",
+          "Wall finishes: panelling, wallpaper or paint.",
+          "Flooring: laid once dust-generating work is finished.",
+          "Curtains and furniture: measured against the finished room, not the drawing.",
+        ],
+      },
+      {
+        heading: "What a fit-out quote should include",
+        body: [
+          "Compare quotes on what is actually covered, not the headline number. The gaps are where the variations come from later.",
+        ],
+        bullets: [
+          "A site survey before any figure is given.",
+          "Making good: filling, sanding and preparing surfaces, not just the new work.",
+          "Removal and disposal of what is being taken out.",
+          "Threshold and skirting details where finishes meet.",
+          "A stated sequence and a realistic timeline per phase.",
+          "Who is responsible for painting, and whether it is in or out.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "What should be decided first in a fit-out?",
+        a: "Lighting positions and whether the ceiling is being dropped. Both have to be fixed before the gypsum goes up, and both are expensive to change afterwards because it means opening the ceiling again. Almost everything else can be adjusted later at a manageable cost.",
+      },
+      {
+        q: "How much ceiling height does a false ceiling take?",
+        a: "Usually 10 to 20 centimetres, depending on the detail and what services run above it. In a room that is already low we would suggest a partial drop over one zone rather than the whole ceiling, so you get the detail without losing the height everywhere.",
+      },
+      {
+        q: "Should one contractor handle the whole fit-out?",
+        a: "It removes the handover problem, which is where most fit-out defects originate. When flooring, joinery and gypsum are quoted by different contractors, each sets out to their own tolerances and the junctions between them are nobody's responsibility.",
+      },
+      {
+        q: "Can a fit-out be done while we live in the house?",
+        a: "Yes, if it is phased room by room. We complete one room fully and hand it back before opening the next, so the house stays liveable. It takes longer overall than clearing out, but for most families that is the right trade.",
+      },
+    ],
+    relatedProductIds: [
+      "gypsum-board-work-design",
+      "cabinet-and-gypsum-board-work",
+      "indoor-wall-panel-design",
+      "television-decore-with-cabin-box",
+    ],
+    relatedCategorySlugs: ["interior"],
+  },
+  {
     slug: "barkia-buying-guide-qatar",
     title: "Barkia Buying Guide for Qatar Homes",
     seoTitle: "Barkia Buying Guide for Qatar Homes",

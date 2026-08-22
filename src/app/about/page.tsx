@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import JsonLd from "@/components/JsonLd";
 import WhatsAppLink from "@/components/WhatsAppLink";
-import { buildBreadcrumb, clampDescription } from "@/lib/seo";
+import { buildBreadcrumb, clampDescription, DEFAULT_OG_IMAGES } from "@/lib/seo";
 
 const DESCRIPTION =
   "Learn about Al Arabia Carpets - Qatar's trusted provider of premium carpets, Barkia, PVC flooring, curtains, furniture & interior design services in Doha.";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: "About Us",
   description: clampDescription(DESCRIPTION),
   alternates: { canonical: "/about" },
-  openGraph: { title: "About Us", description: DESCRIPTION, url: "/about" },
+  openGraph: { title: "About Us", description: DESCRIPTION, url: "/about", images: DEFAULT_OG_IMAGES },
 };
 
 export default function AboutPage() {

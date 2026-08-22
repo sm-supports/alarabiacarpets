@@ -28,6 +28,15 @@ export const LONGITUDE = 51.520008;
  * Meta descriptions are truncated at 155 chars so search engines don't clip
  * mid-word. Ported verbatim from the old SEO component.
  */
+/**
+ * Share image for pages with no imagery of their own.
+ *
+ * Next REPLACES the openGraph object rather than merging it, so a page that
+ * defines `openGraph` without `images` gets no og:image at all -- not the root
+ * layout's. Any such page must spread this in.
+ */
+export const DEFAULT_OG_IMAGES = [{ url: DEFAULT_IMAGE, alt: SITE_NAME }];
+
 export function clampDescription(description: string): string {
   return description.length > 155 ? `${description.slice(0, 152)}...` : description;
 }
@@ -56,6 +65,10 @@ const SERVICES = [
   ["Sofas & Majlis Furniture", "Custom sofas and traditional majlis furniture solutions"],
   ["Curtains & Roller Blinds", "Custom curtains and roller blinds for residential and commercial spaces"],
   ["Interior Design Services", "Complete interior design solutions for homes and offices"],
+  ["Wallpaper Installation", "Wallpaper supply and installation including full wall preparation"],
+  ["Kitchen Cabinets", "Made-to-measure kitchen cabinetry designed, built and installed"],
+  ["Wardrobes & Room Cabinets", "Built-in wardrobes and storage sized floor to ceiling"],
+  ["Parquet & Laminate Flooring", "Herringbone, chevron and plank parquet and laminate supplied and laid"],
 ];
 
 const POSTAL_ADDRESS = {
@@ -337,5 +350,33 @@ export function buildCategoryMetadata(slug: string): Metadata {
       description: category.metaDescription,
       images: [absoluteUrl(category.heroImage)],
     },
+  };
+}
+
+// --- Service landing pages -------------------------------------------------
+
+/**
+ * Service schema.
+ *
+ * Deliberately emits no `image` (there is no photography for these services --
+ * see the comment in src/data/services.ts) and no `offers` (no price), matching
+ * the same discipline applied to Product: assert nothing we cannot back up.
+ */
+export function buildServiceJsonLd(service: {
+  slug: string;
+  heading: string;
+  label: string;
+  metaDescription: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${absoluteUrl(`/services/${service.slug}`)}#service`,
+    name: service.heading,
+    serviceType: service.label,
+    description: service.metaDescription,
+    url: absoluteUrl(`/services/${service.slug}`),
+    provider: { "@id": `${SITE_URL}/#organization` },
+    areaServed: { "@type": "Country", name: COUNTRY },
   };
 }

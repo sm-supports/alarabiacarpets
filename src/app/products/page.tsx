@@ -8,7 +8,7 @@ import { Phone } from "lucide-react";
 import { products } from "@/data/products";
 import { categories } from "@/data/categories";
 import Link from "next/link";
-import { buildBreadcrumb, buildItemList, clampDescription, productPath } from "@/lib/seo";
+import { buildBreadcrumb, buildItemList, clampDescription, productPath, DEFAULT_OG_IMAGES } from "@/lib/seo";
 import WhatsAppLink from "@/components/WhatsAppLink";
 
 const DESCRIPTION =
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: "Products",
   description: clampDescription(DESCRIPTION),
   alternates: { canonical: "/products" },
-  openGraph: { title: "Products", description: DESCRIPTION, url: "/products" },
+  openGraph: { title: "Products", description: DESCRIPTION, url: "/products", images: DEFAULT_OG_IMAGES },
 };
 
 export default function ProductsPage() {

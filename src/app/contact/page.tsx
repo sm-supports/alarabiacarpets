@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContactSection from "@/components/ContactSection";
 import JsonLd from "@/components/JsonLd";
-import { buildBreadcrumb, clampDescription } from "@/lib/seo";
+import { buildBreadcrumb, clampDescription, DEFAULT_OG_IMAGES } from "@/lib/seo";
 
 const DESCRIPTION =
   "Contact Al Arabia Carpets in Doha, Qatar for carpets, Barkia, PVC flooring, curtains, furniture and interior design. Free consultation, installation and delivery.";
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "Contact Us",
   description: clampDescription(DESCRIPTION),
   alternates: { canonical: "/contact" },
-  openGraph: { title: "Contact Us", description: DESCRIPTION, url: "/contact" },
+  openGraph: { title: "Contact Us", description: DESCRIPTION, url: "/contact", images: DEFAULT_OG_IMAGES },
 };
 
 export default function ContactPage() {

@@ -9,6 +9,7 @@ import {
   CITY,
   COUNTRY,
   DEFAULT_DESCRIPTION,
+  DEFAULT_IMAGE,
   DEFAULT_TITLE,
   EMAIL,
   LATITUDE,
@@ -73,11 +74,16 @@ export const metadata: Metadata = {
     url: SITE_URL,
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
+    // Site-wide share image. Pages with their own imagery (products, categories,
+    // guides) override this; everything else -- the homepage included -- would
+    // otherwise produce a preview card with no image at all.
+    images: [{ url: DEFAULT_IMAGE, alt: SITE_NAME }],
   },
   twitter: {
     card: "summary_large_image",
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_IMAGE],
   },
   icons: {
     icon: "/lovable-uploads/green-white-logo.webp",

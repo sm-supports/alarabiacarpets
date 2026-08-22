@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import { guides } from "@/data/guides";
-import { buildBreadcrumb, buildItemList, clampDescription } from "@/lib/seo";
+import { buildBreadcrumb, buildItemList, clampDescription, DEFAULT_OG_IMAGES } from "@/lib/seo";
 
 const DESCRIPTION =
   "Practical guides to carpets, barkia flooring, curtains and majlis design in Qatar, written by the Al Arabia Carpets team in Doha.";
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: "Guides",
   description: clampDescription(DESCRIPTION),
   alternates: { canonical: "/guides" },
-  openGraph: { title: "Guides", description: DESCRIPTION, url: "/guides" },
+  openGraph: { title: "Guides", description: DESCRIPTION, url: "/guides", images: DEFAULT_OG_IMAGES },
 };
 
 export default function GuidesPage() {

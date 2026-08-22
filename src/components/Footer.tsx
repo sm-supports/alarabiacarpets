@@ -3,6 +3,7 @@
 import { MessageCircle, Mail, MapPin, Instagram, Facebook, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { categories } from "@/data/categories";
+import { services } from "@/data/services";
 import { trackWhatsAppClick } from "@/lib/analytics";
 
 export default function Footer() {
@@ -15,11 +16,14 @@ export default function Footer() {
       ...categories.map((c) => ({ label: c.label, href: `/products/${c.slug}` })),
       { label: 'All Products', href: '/products' },
     ],
+    // Services share the Company column: the footer grid has no spare column,
+    // and these are browse-level links like the rest of that list.
     company: [
       { label: 'Guides', href: '/guides' },
       { label: 'About Us', href: '/about' },
       { label: 'Contact', href: '/contact' },
-      { label: 'Services', href: '/#services' },
+      { label: 'Services', href: '/services' },
+      ...services.map((s) => ({ label: s.label, href: `/services/${s.slug}` })),
     ],
     social: [
       { label: 'Instagram', href: 'https://instagram.com/alarabiacarpet', icon: Instagram },

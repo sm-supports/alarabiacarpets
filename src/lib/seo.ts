@@ -170,17 +170,10 @@ export function buildItemList(items: Array<{ name: string; path: string }>) {
 
 import type { Product } from "@/data/products";
 
-export const CATEGORY_LABELS: Record<string, string> = {
-  barkia: "Barkia & PVC",
-  carpet: "Carpets",
-  furniture: "Furniture",
-  curtains: "Curtains",
-  interior: "Interior Design",
-};
-
-export function categoryLabel(category: string): string {
-  return CATEGORY_LABELS[category] ?? category;
-}
+// Category labels live with the category data, which is the single source of
+// truth. Re-exported here so existing import sites keep working unchanged.
+import { categoryLabel } from "@/data/categories";
+export { CATEGORY_LABELS, categoryLabel, categoryPath } from "@/data/categories";
 
 export function productPath(product: Product): string {
   return `/products/${product.id}`;

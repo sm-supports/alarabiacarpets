@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Filter } from "lucide-react";
 import type { Product } from "@/data/products";
 import { productImageAlt } from "@/lib/seo";
+import { categories } from "@/data/categories";
 import {
   Dialog,
   DialogContent,
@@ -15,13 +16,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+// Derived from the category data rather than duplicated, so a new category
+// cannot appear on a landing page but be missing from this filter.
 const CATEGORIES: Record<string, { label: string }> = {
   all: { label: "All Products" },
-  barkia: { label: "Barkia & PVC" },
-  carpet: { label: "Carpets" },
-  furniture: { label: "Furniture" },
-  curtains: { label: "Curtains" },
-  interior: { label: "Interior Design" },
+  ...Object.fromEntries(categories.map((c) => [c.key, { label: c.label }])),
 };
 
 /**

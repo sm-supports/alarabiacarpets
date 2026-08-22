@@ -1,19 +1,26 @@
-
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import SEO from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { trackWhatsAppClick } from "@/lib/analytics";
+import JsonLd from "@/components/JsonLd";
+import WhatsAppLink from "@/components/WhatsAppLink";
+import { buildBreadcrumb, clampDescription } from "@/lib/seo";
 
-const About = () => {
+const DESCRIPTION =
+  "Learn about Al Arabia Carpets - Qatar's trusted provider of premium carpets, Barkia, PVC flooring, curtains, furniture & interior design services in Doha.";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description: clampDescription(DESCRIPTION),
+  alternates: { canonical: "/about" },
+  openGraph: { title: "About Us", description: DESCRIPTION, url: "/about" },
+};
+
+export default function AboutPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <SEO
-        title="About Us"
-        description="Learn about Al Arabia Carpets - Qatar's trusted provider of premium carpets, Barkia, PVC flooring, curtains, furniture & interior design services in Doha."
-        path="/about"
-      />
+      <JsonLd data={buildBreadcrumb([["About", "/about"]])} />
       <Navbar />
       <main className="flex-grow">
         {/* Hero Banner */}
@@ -150,21 +157,16 @@ const About = () => {
             <p className="font-poppins max-w-2xl mx-auto mb-8">
               Contact us today to discuss your home furnishing needs and discover how we can help.
             </p>
-            <a 
-              href="https://wa.me/+97455512858"
-              onClick={() => trackWhatsAppClick("about_page")} 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <WhatsAppLink
+              source="about_page"
               className="inline-flex items-center justify-center space-x-2 px-6 py-3 bg-white text-primary rounded-md hover:bg-white/90 transition-colors font-poppins font-medium"
             >
               Contact Us on WhatsApp
-            </a>
+            </WhatsAppLink>
           </div>
         </section>
       </main>
   <Footer />
     </div>
   );
-};
-
-export default About;
+}

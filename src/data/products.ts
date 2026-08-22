@@ -3,6 +3,16 @@ export interface ProductMedia {
   src: string;
 }
 
+export interface ProductSpec {
+  label: string;
+  value: string;
+}
+
+export interface ProductFaq {
+  q: string;
+  a: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -12,6 +22,33 @@ export interface Product {
   imageSrc: string;
   media: ProductMedia[];
   whatsappLink: string;
+
+  // --- Optional SEO / content fields ---
+  // Products without these fall back to the generic copy above, so the catalog
+  // can be enriched incrementally rather than all 43 at once.
+
+  /** Multi-paragraph body copy shown under the short description. */
+  longDescription?: string[];
+  /** Rendered as a specs table and useful for AI Overview extraction. */
+  specs?: ProductSpec[];
+  /** Rendered as <details> elements and emitted as FAQPage JSON-LD. */
+  faqs?: ProductFaq[];
+  /** Overrides the generated <title>. Keep under 60 characters. */
+  seoTitle?: string;
+  /** Overrides the generated meta description. Aim for 150-160 characters. */
+  metaDescription?: string;
+  /** Descriptive alt text; falls back to the product name. */
+  imageAlt?: string;
+
+  /**
+   * Starting price in QAR. Drives the AggregateOffer in Product JSON-LD.
+   * When absent the offer is omitted entirely -- a Product without offers is
+   * valid schema.org, whereas the old price-less Offer was not.
+   */
+  priceFrom?: number;
+  priceTo?: number;
+  /** e.g. "per sqm", "per piece" -- display only. */
+  priceUnit?: string;
 }
 
 export const products: Product[] = [

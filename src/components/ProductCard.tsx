@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, ExternalLink, ImageIcon, Video, ChevronLeft, ChevronRight } from "lucide-react";
 import { memo, useCallback, useState, useRef, useEffect } from "react";
 import { ProductMedia } from "@/data/products";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { trackWhatsAppClick } from "@/lib/analytics";
 
 interface ProductCardProps {
@@ -16,6 +18,10 @@ interface ProductCardProps {
   whatsappLink: string;
   onClick?: () => void;
   priority?: boolean;
+  /** Product detail URL. When set the title renders as a real crawlable anchor. */
+  href?: string;
+  /** Descriptive alt text; falls back to the product name. */
+  imageAlt?: string;
 }
 
 const ProductCard = memo(function ProductCard({
@@ -25,8 +31,11 @@ const ProductCard = memo(function ProductCard({
   media = [],
   whatsappLink,
   onClick,
-  priority = false
+  priority = false,
+  href,
+  imageAlt
 }: ProductCardProps) {
+  const router = useRouter();
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -36,8 +45,12 @@ const ProductCard = memo(function ProductCard({
   const displayMedia = media.length > 0 ? media : [{ type: 'image', src: imageSrc } as ProductMedia];
 
   const handleCardClick = useCallback(() => {
+    if (href) {
+      router.push(href);
+      return;
+    }
     onClick?.();
-  }, [onClick]);
+  }, [href, router, onClick]);
 
   const handleWhatsAppClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -178,7 +191,7 @@ const ProductCard = memo(function ProductCard({
 
                   <img
                     src={item.src}
-                    alt={`${name} - ${index + 1}`}
+                    alt={imageAlt ? `${imageAlt}${index > 0 ? ` (view ${index + 1})` : ""}` : `${name} - ${index + 1}`}
                     loading={priority && index === 0 ? "eager" : "lazy"}
                     decoding="async"
                     fetchPriority={priority && index === 0 ? "high" : "auto"}
@@ -195,11 +208,22 @@ const ProductCard = memo(function ProductCard({
 
       {/* Content Section */}
       <CardContent className="p-4 sm:p-5 flex flex-col flex-grow">
-        <h3
-          className="font-playfair text-base sm:text-lg font-semibold mb-1.5 text-neutral-900 hover:text-primary transition-colors cursor-pointer line-clamp-1"
-          onClick={handleCardClick}
-        >
-          {name}
+        <h3 className="font-playfair text-base sm:text-lg font-semibold mb-1.5 text-neutral-900 line-clamp-1">
+          {href ? (
+            <Link
+              href={href}
+              className="hover:text-primary transition-colors"
+            >
+              {name}
+            </Link>
+          ) : (
+            <span
+              className="hover:text-primary transition-colors cursor-pointer"
+              onClick={handleCardClick}
+            >
+              {name}
+            </span>
+          )}
         </h3>
         <p className="font-poppins text-xs sm:text-sm text-neutral-500 mb-4 flex-grow line-clamp-2 leading-relaxed">
           {description}

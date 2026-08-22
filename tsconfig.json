@@ -41,7 +41,6 @@
     "node_modules",
     "functions",
     "out",
-    ".next",
-    "src/legacy-pages"
+    ".next"
   ]
 }

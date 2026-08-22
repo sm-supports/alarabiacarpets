@@ -854,7 +854,7 @@ export const products: Product[] = [
     "id": "al-wakra-white-ultra-modern-waterproof-spc-flooring",
     "name": "Al Wakra White – Ultra-Modern Waterproof SPC Flooring",
     "category": "barkia",
-    "description": "Premium Al Wakra White – Ultra-Modern Waterproof SPC Flooring for your home and office.",
+    "description": "Near-white SPC with a clean matt finish. Built for retail, showrooms and ultra-modern interiors.",
     "price": "Contact for Price",
     "media": [
       {
@@ -863,13 +863,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Al Wakra White – Ultra-Modern Waterproof SPC Flooring.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Al%20Wakra%20White%20%E2%80%93%20Ultra-Modern%20Waterproof%20SPC%20Flooring"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Al%20Wakra%20White%20%E2%80%93%20Ultra-Modern%20Waterproof%20SPC%20Flooring",
+    seoTitle: "Al Wakra White SPC Flooring | Retail & Showroom",
+    metaDescription: "Al Wakra White SPC flooring in Qatar. A near-white matt decor for showrooms, retail and ultra-modern interiors. Commercial-grade, fitted in Doha.",
+    imageAlt: "Al Wakra White SPC flooring in a modern Doha showroom",
+    longDescription: [
+      "Al Wakra White is the most extreme light decor in the range \u2014 closer to a painted floor than a wood one. It is specified mostly for commercial work: showrooms, clinics, salons and retail units where the floor needs to disappear so that product or merchandising carries the whole visual weight.",
+      "In a domestic setting it is a bold, high-maintenance choice. We fit it in homes occasionally, almost always in a room with a specific purpose \u2014 a home office, a dressing room \u2014 rather than as a whole-house floor.",
+    ],
+    specs: [
+      {
+        label: "Decor",
+        value: "Near-white, minimal grain",
+      },
+      {
+        label: "Finish",
+        value: "Clean matt",
+      },
+      {
+        label: "Best for",
+        value: "Showrooms, retail, clinics",
+      },
+      {
+        label: "Domestic use",
+        value: "Single rooms rather than whole house",
+      },
+      {
+        label: "Maintenance",
+        value: "Higher -- marks are visible",
+      },
+    ],
+    faqs: [
+      {
+        q: "Is a white floor practical at home?",
+        a: "In a specific room, yes; across a whole house it is demanding. Dark marks and scuffs read immediately against near-white. We normally suggest it for a dressing room or home office rather than hallways and family areas.",
+      },
+      {
+        q: "Why is white common in showrooms?",
+        a: "Because the floor is meant to vanish. A near-white matt surface throws light back onto whatever is being displayed and adds no colour of its own, which is exactly what retail and clinical spaces want.",
+      },
+      {
+        q: "Does it scratch more easily than darker decors?",
+        a: "No \u2014 the wear layer is the same. Scratches and scuffs are simply more visible against a very pale surface, so the floor looks worn sooner even though it is wearing at the same rate.",
+      },
+    ]
   },
   {
     "id": "arabian-night-espresso-high-end-waterproof-spc",
     "name": "Arabian Night Espresso – High-End Waterproof SPC",
     "category": "barkia",
-    "description": "Premium Arabian Night Espresso – High-End Waterproof SPC for your home and office.",
+    "description": "Very dark espresso SPC. High contrast and dramatic, with honest trade-offs on dust.",
     "price": "Contact for Price",
     "media": [
       {
@@ -878,13 +921,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Arabian Night Espresso – High-End Waterproof SPC.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Arabian%20Night%20Espresso%20%E2%80%93%20High-End%20Waterproof%20SPC"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Arabian%20Night%20Espresso%20%E2%80%93%20High-End%20Waterproof%20SPC",
+    seoTitle: "Arabian Night Espresso SPC | Dark Floor Qatar",
+    metaDescription: "Arabian Night Espresso SPC flooring in Qatar. A very dark, high-contrast decor for dramatic interiors. Honest advice on dust before you commit.",
+    imageAlt: "Arabian Night Espresso dark SPC flooring in a Doha interior",
+    longDescription: [
+      "Espresso is the darkest decor we stock and the most dramatic. Against pale walls and light furniture it produces the sort of contrast that photographs extremely well and gives a room real definition.",
+      "We will always raise one thing before you commit: in Qatar, fine dust is pale, and it is visible on a dark floor within a day of cleaning. Plenty of clients choose it anyway and are happy \u2014 but you should choose it knowing that, not discover it afterwards.",
+    ],
+    specs: [
+      {
+        label: "Decor",
+        value: "Very dark espresso brown",
+      },
+      {
+        label: "Contrast",
+        value: "High against pale walls",
+      },
+      {
+        label: "Best for",
+        value: "Feature rooms, low-traffic spaces",
+      },
+      {
+        label: "Shows dust",
+        value: "High -- the main trade-off",
+      },
+      {
+        label: "Room size",
+        value: "Suits larger, well-lit rooms",
+      },
+    ],
+    faqs: [
+      {
+        q: "Does a dark floor show dust in Qatar?",
+        a: "Yes, noticeably. Airborne dust here is pale and settles visibly on a dark surface, often within a day. It cleans off easily, but you will see it between cleans in a way you would not on a mid or light floor.",
+      },
+      {
+        q: "Should I use espresso in a small room?",
+        a: "Usually not. A very dark floor absorbs light and pulls the boundaries of a room inward, so a small or dim space can feel closed in. It is at its best in larger rooms with good natural light.",
+      },
+      {
+        q: "How do I make a dark floor work?",
+        a: "Keep the walls and larger furniture pale so the contrast is deliberate, use layered lighting rather than one ceiling fitting, and accept a slightly more frequent cleaning routine. Done that way it is the most striking floor we fit.",
+      },
+    ]
   },
   {
     "id": "desert-walnut-classic-luxury-spc-flooring-doha",
     "name": "Desert Walnut Classic – Luxury SPC Flooring Doha",
     "category": "barkia",
-    "description": "Premium Desert Walnut Classic – Luxury SPC Flooring Doha for your home and office.",
+    "description": "Mid-tone walnut SPC. The most forgiving decor in the range for busy family homes.",
     "price": "Contact for Price",
     "media": [
       {
@@ -893,13 +979,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Desert Walnut Classic – Luxury SPC Flooring Doha.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Desert%20Walnut%20Classic%20%E2%80%93%20Luxury%20SPC%20Flooring%20Doha"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Desert%20Walnut%20Classic%20%E2%80%93%20Luxury%20SPC%20Flooring%20Doha",
+    seoTitle: "Desert Walnut SPC Flooring Doha | Mid-Tone Walnut",
+    metaDescription: "Desert Walnut Classic SPC flooring in Doha. A mid-tone walnut that hides dust and marks better than pale or dark floors. Fitted across Qatar.",
+    imageAlt: "Desert Walnut Classic SPC flooring in a Doha family home",
+    longDescription: [
+      "If you want the floor you will think about least, this is it. Mid-tone walnut sits between the two extremes that cause complaints: pale floors that show every dark mark, and dark floors that show every speck of pale dust.",
+      "That makes it our standard recommendation for hallways, family rooms and any home with children or frequent guests. It is not the most striking decor we sell, and that is precisely why it keeps looking good between cleans.",
+    ],
+    specs: [
+      {
+        label: "Decor",
+        value: "Mid-tone classic walnut",
+      },
+      {
+        label: "Best for",
+        value: "Family homes, hallways",
+      },
+      {
+        label: "Shows dust",
+        value: "Lowest in the range",
+      },
+      {
+        label: "Shows marks",
+        value: "Low",
+      },
+      {
+        label: "Traffic",
+        value: "Heavy",
+      },
+    ],
+    faqs: [
+      {
+        q: "Which SPC decor is easiest to keep looking clean?",
+        a: "This one. Pale floors hide dust but show dark marks; dark floors do the reverse. A mid-tone walnut is the only part of the range that is forgiving in both directions, which is why we fit so much of it in hallways.",
+      },
+      {
+        q: "Is mid-tone a boring choice?",
+        a: "It is the safe one, and in a hallway or family room that is the right trade. If you want the floor to be a feature, look at Mahogany or the Herringbone; if you want it to disappear and stay tidy, choose this.",
+      },
+      {
+        q: "Does it suit both traditional and modern rooms?",
+        a: "Yes, more than any other decor here. Mid walnut is neutral enough to sit with traditional majlis seating and with contemporary furniture, which is useful if the house mixes both.",
+      },
+    ]
   },
   {
     "id": "doha-coastal-grey-premium-rigid-core-spc-vinyl",
     "name": "Doha Coastal Grey – Premium Rigid Core SPC Vinyl",
     "category": "barkia",
-    "description": "Premium Doha Coastal Grey – Premium Rigid Core SPC Vinyl for your home and office.",
+    "description": "Cool-toned grey SPC with a rigid core. Suits modern villas with white walls and dark joinery.",
     "price": "Contact for Price",
     "media": [
       {
@@ -908,7 +1037,50 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Doha Coastal Grey – Premium Rigid Core SPC Vinyl.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Doha%20Coastal%20Grey%20%E2%80%93%20Premium%20Rigid%20Core%20SPC%20Vinyl"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Doha%20Coastal%20Grey%20%E2%80%93%20Premium%20Rigid%20Core%20SPC%20Vinyl",
+    seoTitle: "Doha Coastal Grey SPC Vinyl | Rigid Core Flooring",
+    metaDescription: "Doha Coastal Grey rigid core SPC vinyl flooring. A cool grey decor for modern villas, dent-resistant under heavy furniture. Fitted across Qatar.",
+    imageAlt: "Doha Coastal Grey SPC vinyl flooring in a modern Qatari villa",
+    longDescription: [
+      "Coastal Grey is a cool-toned decor built for contemporary interiors \u2014 white or off-white walls, dark joinery, glass and metal. Where an oak decor warms a room, this one keeps it crisp, which is what most modern villa schemes in Doha are reaching for.",
+      "It is a rigid core board, so it resists denting under point loads better than a flexible vinyl. That matters in rooms carrying heavy furniture: majlis seating, dining tables, wardrobes and appliances all sit on small feet that concentrate a lot of weight.",
+    ],
+    specs: [
+      {
+        label: "Decor",
+        value: "Cool grey, low colour variation",
+      },
+      {
+        label: "Core",
+        value: "Rigid stone plastic composite",
+      },
+      {
+        label: "Best for",
+        value: "Modern villas, heavy furniture",
+      },
+      {
+        label: "Dent resistance",
+        value: "High",
+      },
+      {
+        label: "Pairs with",
+        value: "White walls, dark joinery",
+      },
+    ],
+    faqs: [
+      {
+        q: "What does a rigid core actually change?",
+        a: "It resists denting. A flexible vinyl can take a permanent mark from a heavy item on a small foot; a rigid core spreads that load. If you are putting wardrobes, a dining table or a full majlis onto the floor, it is the more forgiving choice.",
+      },
+      {
+        q: "Is grey flooring still a good choice?",
+        a: "For contemporary interiors, yes. Grey reads as neutral against white walls and lets joinery and furniture carry the colour. It suits a scheme built around glass and metal better than an oak decor does.",
+      },
+      {
+        q: "Does a cool grey floor make a room feel cold?",
+        a: "It can if the room has little natural light and no warm textures. We usually pair it with a rug and warmer upholstery, which keeps the crispness without the room feeling stark.",
+      },
+    ]
   },
   {
     "id": "outdoor-wall-panel-products",
@@ -929,7 +1101,7 @@ export const products: Product[] = [
     "id": "pearl-grey-herringbone-100-waterproof-spc-qatar",
     "name": "Pearl Grey Herringbone – 100  Waterproof SPC Qatar",
     "category": "barkia",
-    "description": "Premium Pearl Grey Herringbone – 100  Waterproof SPC Qatar for your home and office.",
+    "description": "Pearl grey SPC in a herringbone pattern. The only format-led floor in the range.",
     "price": "Contact for Price",
     "media": [
       {
@@ -938,13 +1110,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Pearl Grey Herringbone – 100  Waterproof SPC Qatar.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Pearl%20Grey%20Herringbone%20%E2%80%93%20100%20%20Waterproof%20SPC%20Qatar"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Pearl%20Grey%20Herringbone%20%E2%80%93%20100%20%20Waterproof%20SPC%20Qatar",
+    seoTitle: "Pearl Grey Herringbone SPC Flooring Qatar",
+    metaDescription: "Pearl Grey Herringbone SPC flooring in Qatar. A classic herringbone laying pattern in waterproof SPC, fitted plank by plank across Doha.",
+    imageAlt: "Pearl Grey Herringbone SPC flooring laid in a Doha entrance hall",
+    longDescription: [
+      "Every other decor in this range is chosen on colour. This one is chosen on pattern. Herringbone lays short planks at right angles into a zig-zag, and the result is a floor that carries a room on its own \u2014 which is why it turns up most often in entrance halls, dining rooms and formal majlis.",
+      "The pearl grey is deliberately restrained. A strongly coloured herringbone quickly becomes overwhelming across a large area, so a quiet tone lets the pattern do the work without the floor shouting.",
+    ],
+    specs: [
+      {
+        label: "Laying pattern",
+        value: "Herringbone, 45 degrees",
+      },
+      {
+        label: "Decor",
+        value: "Pearl grey, restrained",
+      },
+      {
+        label: "Plank format",
+        value: "Short planks",
+      },
+      {
+        label: "Best for",
+        value: "Entrance halls, dining, formal majlis",
+      },
+      {
+        label: "Installation",
+        value: "Longer -- laid plank by plank",
+      },
+    ],
+    faqs: [
+      {
+        q: "Does herringbone cost more to install?",
+        a: "Yes. Each short plank is set individually at an angle and the pattern has to stay true across the whole room, so it takes considerably longer than a straight lay and generates more offcuts. We quote herringbone separately for that reason.",
+      },
+      {
+        q: "Does herringbone suit a small room?",
+        a: "It can work well in a small entrance hall, where the pattern becomes a feature you see all at once. In a small living room it tends to be too busy \u2014 the pattern needs either a contained space or a large one to look deliberate.",
+      },
+      {
+        q: "Which direction should herringbone run?",
+        a: "Usually pointing along the main sightline as you enter, which draws the eye through the space. We set the direction on site with you before laying, because it is not something that can be changed afterwards.",
+      },
+    ]
   },
   {
     "id": "qatar-breeze-oak-bright-waterproof-spc-flooring",
     "name": "Qatar Breeze Oak – Bright & Waterproof SPC Flooring",
     "category": "barkia",
-    "description": "Premium Qatar Breeze Oak – Bright & Waterproof SPC Flooring for your home and office.",
+    "description": "Bright, airy oak SPC with a cool-neutral cast. For rooms that need to feel more open.",
     "price": "Contact for Price",
     "media": [
       {
@@ -953,13 +1168,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Qatar Breeze Oak – Bright & Waterproof SPC Flooring.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Qatar%20Breeze%20Oak%20%E2%80%93%20Bright%20%26%20Waterproof%20SPC%20Flooring"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Qatar%20Breeze%20Oak%20%E2%80%93%20Bright%20%26%20Waterproof%20SPC%20Flooring",
+    seoTitle: "Qatar Breeze Oak SPC Flooring | Bright Neutral Oak",
+    metaDescription: "Qatar Breeze Oak SPC flooring in Qatar. A bright, cool-neutral oak that lifts north-facing and enclosed rooms. Supplied and installed across Doha.",
+    imageAlt: "Qatar Breeze Oak SPC flooring in a bright Doha room",
+    longDescription: [
+      "Breeze Oak is our answer for rooms that feel closed in \u2014 north-facing spaces, rooms with one small window, interior rooms with no direct daylight. The decor is bright with a cool-neutral cast, so it lifts a space without adding the yellow that a warm oak brings.",
+      "Set against Sand Oak, this is the cooler and slightly crisper of the two. If a room already gets strong afternoon sun, Sand Oak's warmth is usually the better match; if the room is dim, this one does more work.",
+    ],
+    specs: [
+      {
+        label: "Decor",
+        value: "Bright oak, cool-neutral cast",
+      },
+      {
+        label: "Best for",
+        value: "North-facing and enclosed rooms",
+      },
+      {
+        label: "Tone",
+        value: "Light, neutral rather than warm",
+      },
+      {
+        label: "Effect",
+        value: "Lifts and opens a dim space",
+      },
+      {
+        label: "Shows dust",
+        value: "Low",
+      },
+    ],
+    faqs: [
+      {
+        q: "What flooring suits a room with little natural light?",
+        a: "A bright, cool-neutral decor like this one. It reflects what light there is without adding a colour cast, so the room reads as more open. A warm or dark floor in the same space tends to make it feel more enclosed.",
+      },
+      {
+        q: "How does Breeze Oak differ from Qatar Sand Oak?",
+        a: "Both are light oaks. Breeze is cooler and more neutral; Sand is warmer with a golden undertone. Choose Breeze for a dim room that needs lifting, Sand for a sunny room where warmth is welcome.",
+      },
+      {
+        q: "Will a cool oak work with warm furniture?",
+        a: "Generally yes \u2014 a neutral cast is easier to pair than a strongly warm or cool one. It sits comfortably with both cream and grey upholstery, which is why it is a safe pick when the furniture is not decided yet.",
+      },
+    ]
   },
   {
     "id": "qatar-sand-oak-luxury-waterproof-spc-flooring",
     "name": "Qatar Sand Oak – Luxury Waterproof SPC Flooring",
     "category": "barkia",
-    "description": "Premium Qatar Sand Oak – Luxury Waterproof SPC Flooring for your home and office.",
+    "description": "Warm sand-toned oak SPC. A light, forgiving floor that makes smaller rooms feel bigger.",
     "price": "Contact for Price",
     "media": [
       {
@@ -968,13 +1226,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Qatar Sand Oak – Luxury Waterproof SPC Flooring.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Qatar%20Sand%20Oak%20%E2%80%93%20Luxury%20Waterproof%20SPC%20Flooring"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Qatar%20Sand%20Oak%20%E2%80%93%20Luxury%20Waterproof%20SPC%20Flooring",
+    seoTitle: "Qatar Sand Oak SPC Flooring | Light Oak Decor",
+    metaDescription: "Qatar Sand Oak SPC flooring in Doha. A warm, light oak decor that opens up small rooms and hides everyday dust. Supplied and fitted across Qatar.",
+    imageAlt: "Qatar Sand Oak SPC flooring laid in a bright Doha living room",
+    longDescription: [
+      "Sand Oak is the lightest decor in our SPC range and the one we suggest most often for apartments and smaller villas. Pale floors bounce daylight back into a room, which makes a modest floor area read as noticeably larger, and they keep a space feeling cool even when the light outside is harsh.",
+      "The warm sand undertone is what separates it from a grey-leaning light oak. It sits comfortably with beige and cream majlis seating, which is the most common palette we work with in Qatar, and it does not fight with gold or brass fittings.",
+    ],
+    specs: [
+      {
+        label: "Decor",
+        value: "Light oak, warm sand undertone",
+      },
+      {
+        label: "Best for",
+        value: "Apartments and small rooms",
+      },
+      {
+        label: "Plank format",
+        value: "Standard straight plank",
+      },
+      {
+        label: "Light behaviour",
+        value: "Reflective, brightens a room",
+      },
+      {
+        label: "Shows dust",
+        value: "Low",
+      },
+    ],
+    faqs: [
+      {
+        q: "Does a light floor make a room look bigger?",
+        a: "It genuinely helps. A pale floor reflects daylight back up into the room instead of absorbing it, so the boundaries of the space read as further away. In a small majlis or an apartment living room the difference is easy to see.",
+      },
+      {
+        q: "Will Sand Oak show dust in Qatar?",
+        a: "Less than most. Fine dust here is pale, so it disappears against a light sand-toned floor in a way it never does on a dark one. This is the decor we recommend when someone tells us their current floor always looks dusty.",
+      },
+      {
+        q: "Does it clash with beige majlis seating?",
+        a: "No, and that is the main reason we suggest it. The warm undertone sits with cream and beige upholstery rather than pulling grey against it, which is what a cooler light oak tends to do.",
+      },
+    ]
   },
   {
     "id": "royal-mahogany-luxury-waterproof-vinyl-spc",
     "name": "Royal Mahogany – Luxury Waterproof Vinyl SPC",
     "category": "barkia",
-    "description": "Premium Royal Mahogany – Luxury Waterproof Vinyl SPC for your home and office.",
+    "description": "Deep red-brown mahogany SPC. A formal floor for majlis and reception rooms.",
     "price": "Contact for Price",
     "media": [
       {
@@ -983,13 +1284,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Royal Mahogany – Luxury Waterproof Vinyl SPC.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Royal%20Mahogany%20%E2%80%93%20Luxury%20Waterproof%20Vinyl%20SPC"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Royal%20Mahogany%20%E2%80%93%20Luxury%20Waterproof%20Vinyl%20SPC",
+    seoTitle: "Royal Mahogany SPC Flooring | Formal Majlis Floor",
+    metaDescription: "Royal Mahogany waterproof vinyl SPC flooring in Qatar. A deep red-brown decor for formal majlis and reception rooms. Supplied and installed in Doha.",
+    imageAlt: "Royal Mahogany SPC flooring in a formal Qatari majlis",
+    longDescription: [
+      "Mahogany is a formal decor, and we fit it almost entirely in rooms meant to receive guests: the main majlis, a reception room, an office where clients are met. The deep red-brown carries a sense of weight that a pale oak simply does not.",
+      "It works best where there is enough natural light or good layered lighting to bring out the red in the grain. In a dim room the same decor flattens towards plain brown, so we will usually walk through the lighting with you before recommending it.",
+    ],
+    specs: [
+      {
+        label: "Decor",
+        value: "Deep red-brown mahogany",
+      },
+      {
+        label: "Best for",
+        value: "Formal majlis, reception rooms",
+      },
+      {
+        label: "Lighting",
+        value: "Needs good light to show the red",
+      },
+      {
+        label: "Formality",
+        value: "High",
+      },
+      {
+        label: "Shows dust",
+        value: "Moderate to high",
+      },
+    ],
+    faqs: [
+      {
+        q: "Is mahogany too formal for a family room?",
+        a: "It can be. The depth of colour that makes it right for a guest majlis reads as heavy in a room used casually every day. For family areas we would usually point you at a mid-tone walnut or an oak instead.",
+      },
+      {
+        q: "Does mahogany need particular lighting?",
+        a: "It benefits from it. The red in the grain only shows under decent natural or layered light; under a single dim ceiling fitting the floor flattens towards a plain dark brown and you lose what you paid for.",
+      },
+      {
+        q: "What furniture suits a mahogany floor?",
+        a: "Traditional and formal majlis seating, and gold or brass detailing. It also carries patterned rugs well, which a busier floor decor would fight with.",
+      },
+    ]
   },
   {
     "id": "scandinavian-white-oak-modern-waterproof-spc-doha",
     "name": "Scandinavian White Oak – Modern Waterproof SPC Doha",
     "category": "barkia",
-    "description": "Premium Scandinavian White Oak – Modern Waterproof SPC Doha for your home and office.",
+    "description": "Pale, low-contrast white oak SPC. The quietest floor in the range for minimal interiors.",
     "price": "Contact for Price",
     "media": [
       {
@@ -998,7 +1342,50 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Scandinavian White Oak – Modern Waterproof SPC Doha.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Scandinavian%20White%20Oak%20%E2%80%93%20Modern%20Waterproof%20SPC%20Doha"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Scandinavian%20White%20Oak%20%E2%80%93%20Modern%20Waterproof%20SPC%20Doha",
+    seoTitle: "Scandinavian White Oak SPC Flooring Doha | Minimal",
+    metaDescription: "Scandinavian White Oak SPC flooring in Doha. A pale, low-contrast decor for minimal interiors and apartments. Supplied and installed across Qatar.",
+    imageAlt: "Scandinavian White Oak SPC flooring in a minimal Doha apartment",
+    longDescription: [
+      "This is the quietest decor we stock. The grain is subtle and the contrast between light and dark within each plank is deliberately low, so the floor recedes and lets furniture, art and joinery do the talking.",
+      "That restraint is the point. In a minimal interior a busy floor with strong grain becomes the loudest thing in the room, which is rarely what the design intended. We fit a lot of this in apartments and in rooms where the client has spent their budget on the furniture.",
+    ],
+    specs: [
+      {
+        label: "Decor",
+        value: "Pale white-washed oak",
+      },
+      {
+        label: "Grain contrast",
+        value: "Low, subtle",
+      },
+      {
+        label: "Best for",
+        value: "Minimal interiors, apartments",
+      },
+      {
+        label: "Visual weight",
+        value: "Recedes",
+      },
+      {
+        label: "Shows dust",
+        value: "Low",
+      },
+    ],
+    faqs: [
+      {
+        q: "Why choose a floor with less grain?",
+        a: "So it does not compete. In a minimal room a strongly grained floor becomes the busiest surface in the space. A low-contrast decor lets the furniture and the architecture read clearly, which is usually the whole intent of the scheme.",
+      },
+      {
+        q: "Does white oak look cold?",
+        a: "Less than a grey. It is pale but still a warm-neutral rather than a cool one, so it stays comfortable in a room with plenty of light without tipping into the starkness a grey can bring.",
+      },
+      {
+        q: "Is it practical in a family home?",
+        a: "Yes, with the same caveat as any pale floor: it hides dust well but shows dark spills more clearly. The wear layer handles the traffic; it is a cleaning-habits question, not a durability one.",
+      },
+    ]
   },
   {
     "id": "skerting-nala-profile",
@@ -1088,7 +1475,7 @@ export const products: Product[] = [
     "id": "sunset-teak-gold-elegant-spc-vinyl-flooring-qatar",
     "name": "Sunset Teak Gold – Elegant SPC Vinyl Flooring Qatar",
     "category": "barkia",
-    "description": "Premium Sunset Teak Gold – Elegant SPC Vinyl Flooring Qatar for your home and office.",
+    "description": "Golden teak SPC with warm honey tones. Traditional character without a dark floor.",
     "price": "Contact for Price",
     "media": [
       {
@@ -1097,7 +1484,50 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Sunset Teak Gold – Elegant SPC Vinyl Flooring Qatar.webp",
-    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Sunset%20Teak%20Gold%20%E2%80%93%20Elegant%20SPC%20Vinyl%20Flooring%20Qatar"
+    "whatsappLink": "https://wa.me/+97455512858?text=I'm%20interested%20in%20Sunset%20Teak%20Gold%20%E2%80%93%20Elegant%20SPC%20Vinyl%20Flooring%20Qatar",
+    seoTitle: "Sunset Teak Gold SPC Flooring Qatar | Warm Teak",
+    metaDescription: "Sunset Teak Gold SPC vinyl flooring in Qatar. Warm golden teak tones for traditional interiors that still want a light floor. Fitted across Doha.",
+    imageAlt: "Sunset Teak Gold SPC flooring in a traditional Qatari interior",
+    longDescription: [
+      "Teak Gold solves a problem that comes up often: a client wants traditional warmth but does not want a dark room. The honey-gold tone reads as traditional and rich while staying mid-light, so the floor carries character without swallowing the light.",
+      "The golden cast is strong enough to influence a scheme, so it is worth deciding on this floor before the upholstery rather than after. It sits beautifully with cream and gold, and works against cool greys and stark whites.",
+    ],
+    specs: [
+      {
+        label: "Decor",
+        value: "Golden teak, honey tones",
+      },
+      {
+        label: "Best for",
+        value: "Traditional interiors wanting light",
+      },
+      {
+        label: "Tone",
+        value: "Mid-light, strongly warm",
+      },
+      {
+        label: "Pairs with",
+        value: "Cream and gold schemes",
+      },
+      {
+        label: "Avoid with",
+        value: "Cool greys, stark white",
+      },
+    ],
+    faqs: [
+      {
+        q: "How is Teak Gold different from Sand Oak?",
+        a: "Both are light, but Teak Gold has a much stronger golden cast and more visible grain character. Sand Oak is the quieter, more neutral of the two; Teak Gold is a decision that shapes the rest of the room.",
+      },
+      {
+        q: "Will the gold tone date?",
+        a: "Warm woods move in and out of fashion more than neutrals do. If you want a floor you will not think about for fifteen years, a mid oak is safer. If you want the room to feel warm and traditional now, this is the better-looking floor.",
+      },
+      {
+        q: "Should I choose the floor or the furniture first?",
+        a: "With this decor, the floor. The golden cast is strong enough to influence how upholstery colours read, so matching fabric to the floor works better than the other way round.",
+      },
+    ]
   },
   {
     "id": "pvc-barkia",

@@ -21,6 +21,8 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 |------|---------|
 | `src/app/` | Routes (App Router). Each `page.tsx` is a server component exporting `metadata` |
 | `src/data/guides.ts` | Guide/blog content — `Guide` interface + `guides` array |
+| `src/data/categories.ts` | Category landing pages — single source of truth for category labels |
+| `src/data/services.ts` | Service landing pages (no product SKUs, deliberately no images) |
 | `src/components/` | Reusable components (Navbar, Footer, HeroSection, ProductCard, etc.) |
 | `src/components/ui/` | shadcn/ui primitives (Button, Card, Input, etc.) |
 | `src/data/products.ts` | Product catalog — `Product` interface + `products` array |
@@ -97,3 +99,10 @@ Verified on every build; do not regress these:
 - `public/_routes.json` stays pinned to `{"include": ["/api/*"]}`
 - Product JSON-LD omits `offers` unless `priceFrom` is set; never emit a price-less `Offer`
 - `sitemap.ts` / `robots.ts` need `export const dynamic = "force-static"`
+- Category slugs in `src/data/categories.ts` are indexed URLs — never rename one
+- Never re-add a `sofa` product: `/products/sofa` 301s to `/products/majlis-sofa`, and Pages
+  serves a matching static asset *before* consulting `_redirects`, so emitting the file kills the redirect
+- Removing any product id deletes an indexed URL — pair it with a 301 or it becomes a hard 404
+- Pages that define `openGraph` must spread in `DEFAULT_OG_IMAGES`: Next replaces the
+  openGraph object rather than merging, so omitting `images` yields no og:image at all
+- Services in `src/data/services.ts` have no photography — never point a hero at an unrelated product image

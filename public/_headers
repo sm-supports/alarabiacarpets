@@ -15,6 +15,11 @@
 # Keep them out of the index -- they would read as thin duplicate content.
 /*.txt
   X-Robots-Tag: noindex
+# Note: Cloudflare's * crosses /, so this also matches /robots.txt. That is
+# harmless -- X-Robots-Tag governs indexing, not fetching, and robots.txt is
+# never indexed while still being fully honoured. Do not try to override it with
+# a more specific /robots.txt rule: Cloudflare Pages CONCATENATES same-name
+# headers rather than replacing them, which yields "noindex, all".
 
 /*
   X-Content-Type-Options: nosniff

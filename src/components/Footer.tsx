@@ -1,6 +1,7 @@
 import { MessageCircle, Mail, MapPin, Instagram, Facebook, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { products } from "@/data/products";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 // Footer product link config - resolved dynamically from products data
 const footerCategoryLinks = [
@@ -65,6 +66,7 @@ export default function Footer() {
                 href="https://wa.me/+97455512858"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick("footer_contact")}
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-forest-900 transition-colors"
               >
                 <MessageCircle className="w-4 h-4 flex-shrink-0" />
@@ -133,6 +135,7 @@ export default function Footer() {
               href="https://wa.me/+97455512858"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick("footer_get_quote")}
               className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-forest-900 text-white text-xs sm:text-sm font-medium rounded-full transition-all duration-300 hover:bg-forest-700 active:scale-[0.98]"
             >
               Get Quote
@@ -149,6 +152,9 @@ export default function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => {
+                      if (social.href.includes("wa.me")) trackWhatsAppClick("footer_social");
+                    }}
                     className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 transition-all duration-300 hover:bg-forest-900 hover:text-white active:scale-[0.95]"
                     aria-label={social.label}
                   >

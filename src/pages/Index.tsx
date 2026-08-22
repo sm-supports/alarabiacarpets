@@ -20,14 +20,10 @@ const Index = () => {
         <TrustedBy />
         
         {/* Products Section - Apple-style product showcases */}
-        <section id="products">
-          <ProductsSection />
-        </section>
+        <ProductsSection />
         
         {/* Services Section - Why choose us */}
-        <section id="services">
-          <ServicesSection />
-        </section>
+        <ServicesSection />
         
         {/* Contact Section - CTA and contact form */}
         <ContactSection />

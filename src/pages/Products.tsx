@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { trackWhatsAppClick } from "@/lib/analytics";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
@@ -178,7 +179,7 @@ const Products = () => {
               Contact us directly through WhatsApp and our team will help you find the perfect solution for your home.
             </p>
             <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-              <a href="https://wa.me/+97455512858" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2">
+              <a href="https://wa.me/+97455512858" target="_blank" rel="noopener noreferrer" onClick={() => trackWhatsAppClick("products_page")} className="flex items-center space-x-2">
                 <Phone size={16} />
                 <span>Contact Us on WhatsApp</span>
               </a>

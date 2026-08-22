@@ -7,6 +7,7 @@ import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ChevronLeft, Check, ImageIcon, Video } from "lucide-react";
 import { products, Product } from "@/data/products";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 const categoryLabels: Record<string, string> = {
   carpet: "Carpets",
@@ -197,7 +198,8 @@ const ProductDetail = () => {
                     className="w-full bg-primary hover:bg-accent text-white flex items-center justify-center gap-2"
                   >
                     <a 
-                      href={product.whatsappLink} 
+                      href={product.whatsappLink}
+                      onClick={() => trackWhatsAppClick(`product_detail:${product.id}`)} 
                       target="_blank" 
                       rel="noopener noreferrer"
                     >
@@ -224,7 +226,8 @@ const ProductDetail = () => {
               className="bg-green-600 hover:bg-green-700 text-white"
             >
               <a 
-                href="https://wa.me/+97455512858" 
+                href="https://wa.me/+97455512858"
+                onClick={() => trackWhatsAppClick(`product_detail_bottom:${product.id}`)}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2"

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, ExternalLink, ImageIcon, Video, ChevronLeft, ChevronRight } from "lucide-react";
 import { memo, useCallback, useState, useRef, useEffect } from "react";
 import { ProductMedia } from "@/data/products";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 interface ProductCardProps {
   name: string;
@@ -38,7 +39,8 @@ const ProductCard = memo(function ProductCard({
 
   const handleWhatsAppClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-  }, []);
+    trackWhatsAppClick(`product_card:${name}`);
+  }, [name]);
 
   const handleImageLoad = useCallback(() => {
     setIsLoaded(true);

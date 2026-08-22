@@ -1,5 +1,6 @@
 import { Truck, Wrench, Headphones, Shield } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 const services = [
   {
@@ -128,6 +129,7 @@ export default function ServicesSection() {
           </p>
           <a
             href="https://wa.me/+97455512858"
+            onClick={() => trackWhatsAppClick("services_section")}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 bg-forest-900 text-white text-sm font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-float active:scale-[0.98] w-full sm:w-auto max-w-xs sm:max-w-none mx-auto"

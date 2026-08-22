@@ -1,6 +1,7 @@
 import { useState, useEffect, memo, useCallback, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { X, ChevronRight } from "lucide-react";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 const Navbar = memo(function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -108,6 +109,7 @@ const Navbar = memo(function Navbar() {
             <div className="hidden md:flex items-center gap-3">
               <a
                 href="https://wa.me/+97455512858"
+                onClick={() => trackWhatsAppClick("navbar_desktop")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-forest-900 text-white text-sm font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-elevated"
@@ -235,7 +237,7 @@ const Navbar = memo(function Navbar() {
                 href="https://wa.me/+97455512858"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setIsOpen(false)}
+                onClick={() => { trackWhatsAppClick("navbar_mobile"); setIsOpen(false); }}
                 className="flex items-center justify-center gap-3 w-full px-6 py-4 bg-forest-900 text-white text-lg font-medium rounded-2xl transition-all duration-300 hover:bg-forest-700 active:scale-[0.98]"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

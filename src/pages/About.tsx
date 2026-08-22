@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 const About = () => {
   return (
@@ -150,7 +151,8 @@ const About = () => {
               Contact us today to discuss your home furnishing needs and discover how we can help.
             </p>
             <a 
-              href="https://wa.me/+97455512858" 
+              href="https://wa.me/+97455512858"
+              onClick={() => trackWhatsAppClick("about_page")} 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center space-x-2 px-6 py-3 bg-white text-primary rounded-md hover:bg-white/90 transition-colors font-poppins font-medium"

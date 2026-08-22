@@ -2,6 +2,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { products } from "@/data/products";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 // Showcase presentation config - resolved dynamically from products data
 const showcaseConfig = [
@@ -176,6 +177,7 @@ function ProductShowcase({
               </Link>
               <a
                 href={product.whatsappLink}
+                onClick={() => trackWhatsAppClick(`showcase:${product.id}`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3 bg-white text-forest-900 text-sm font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98]"

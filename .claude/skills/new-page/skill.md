@@ -1,18 +1,37 @@
 # Add a New Page
 
-## Step 1: Create the Page File
+Routing is file-based (Next.js App Router). There is no central route table — creating the
+directory *is* registering the route.
 
-Create `src/pages/<PageName>.tsx` using PascalCase.
+## Step 1: Create the Route
 
-Follow this template (based on existing pages):
+Create `src/app/<route-segment>/page.tsx`. The directory name is the URL, in lowercase
+kebab-case, so `src/app/our-services/page.tsx` serves `/our-services`.
+
+Keep the page a **server component** (no `"use client"` at the top) so it can export
+`metadata`. That is what puts the title, description and canonical into the static HTML.
 
 ```tsx
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import JsonLd from "@/components/JsonLd";
+import { buildBreadcrumb, clampDescription } from "@/lib/seo";
 
-const PageName = () => {
+const DESCRIPTION =
+  "One sentence, 150-160 characters, describing the page for search results.";
+
+export const metadata: Metadata = {
+  title: "Page Title",            // keep short: " | Al Arabia Carpets" is appended
+  description: clampDescription(DESCRIPTION),
+  alternates: { canonical: "/route-segment" },
+  openGraph: { title: "Page Title", description: DESCRIPTION, url: "/route-segment" },
+};
+
+export default function PageNamePage() {
   return (
     <div className="min-h-screen flex flex-col">
+      <JsonLd data={buildBreadcrumb([["Page Title", "/route-segment"]])} />
       <Navbar />
       <main className="flex-grow">
         {/* Hero Banner */}
@@ -37,55 +56,63 @@ const PageName = () => {
       <Footer />
     </div>
   );
-};
-
-export default PageName;
+}
 ```
 
-## Step 2: Register the Route
+## Step 2: Interactivity
 
-Open `src/App.tsx` and:
+If the page needs state, effects, or event handlers, do **not** add `"use client"` to
+`page.tsx` — that would remove its ability to export metadata. Instead extract the
+interactive part into its own component with `"use client"` at the top and render it from
+the page. See `src/components/ProductsGrid.tsx` (filter state) and
+`src/components/ProductMedia.tsx` (image load state) for the pattern.
 
-1. Add a lazy import at the top with the other page imports:
-   ```tsx
-   const PageName = lazy(() => import("./pages/PageName"));
-   ```
+For a tracked WhatsApp CTA on a server page, use `<WhatsAppLink source="..." />` rather than
+an `<a>` with an `onClick`.
 
-2. Add the route ABOVE the catch-all `"*"` route (look for the comment):
-   ```tsx
-   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-   ```
-   Insert:
-   ```tsx
-   <Route path="/page-name" element={<PageName />} />
-   ```
+## Step 3: Dynamic Routes
 
-Route paths use lowercase kebab-case.
+For `src/app/things/[slug]/page.tsx`, static export requires every path be known at build:
 
-## Step 3: Add Navigation Link (if applicable)
+```tsx
+export function generateStaticParams() {
+  return things.map((t) => ({ slug: t.slug }));
+}
+export const dynamicParams = false;
 
-Open `src/components/Navbar.tsx` and add the link to the navigation items. The Navbar uses React Router `Link` components.
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;   // Next 15: params is a Promise, must be awaited
+  ...
+}
+```
 
-## Step 4: Verify
+Forgetting `await params` still builds successfully but yields an undefined slug, silently
+rendering every page as not-found. Check with the Step 5 verification.
+
+## Step 4: Add Navigation Link (if applicable)
+
+- `src/components/Navbar.tsx` — add to the `navigationItems` array (`{ path, label }`).
+- `src/components/Footer.tsx` — add to `footerLinks.company`.
+
+Both use `next/link`, so the prop is `href`, not `to`.
+
+New routes are picked up by `src/app/sitemap.ts` only if you add them — static pages are
+listed explicitly there; data-driven ones are mapped from their data file.
+
+## Step 5: Verify
 
 ```bash
-npx tsc --noEmit
-npm run dev
+npx tsc --noEmit && npm run build
 ```
 
-Navigate to the new route and confirm:
-- Page loads with Navbar and Footer
-- Hero banner displays correctly
-- Content renders on mobile and desktop
-- Browser back/forward navigation works
+Then confirm the page was actually prerendered with its metadata:
 
-## Rules
+```bash
+grep -o '<title>[^<]*' out/<route-segment>.html
+grep -o 'rel="canonical" href="[^"]*"' out/<route-segment>.html
+grep -c '<h1' out/<route-segment>.html
+```
 
-- All pages MUST use the `<Navbar />` + `<Footer />` wrapper pattern
-- All pages MUST be lazy-loaded via `React.lazy()` in App.tsx
-- The Suspense fallback (PageLoader) is already configured globally — do not add another
-- Route paths use lowercase kebab-case
-
-## Canonical Example
-
-Read `src/pages/About.tsx` for the simplest page template.
+Expect exactly one `<h1>`, a title under 60 characters, and a canonical URL.

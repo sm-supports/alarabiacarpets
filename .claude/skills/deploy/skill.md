@@ -1,5 +1,9 @@
 # Deploy to Cloudflare Pages
 
+The site is a Next.js 15 App Router project using **static export** (`output: 'export'`).
+`npm run build` prerenders every route to HTML in `out/`, which is what gets deployed.
+The `functions/` directory is a separate Cloudflare Pages Function and is unaffected by the build.
+
 ## Pre-flight Checks
 
 1. Run TypeScript check — must pass with zero errors:
@@ -7,67 +11,99 @@
    npx tsc --noEmit
    ```
 
-2. Run production build:
+2. Run the production build:
    ```bash
    npm run build
    ```
 
-3. Verify `dist/` was created and contains `index.html`:
+3. Verify `out/` contains a page per route (52 at time of writing: 47 static + 404 + guides):
    ```bash
-   ls dist/index.html
+   find out -name '*.html' | wc -l
    ```
 
-4. Check no assets exceed 1MB:
+4. Verify the deploy control files made it into `out/`:
    ```bash
-   find dist/assets -type f -size +1M
+   ls out/_redirects out/_headers out/_routes.json out/sitemap.xml out/robots.txt out/404.html
    ```
-   If any files appear, investigate — large bundles indicate missing code splitting.
+
+## SEO Regression Checks
+
+These guard the invariants the site was rebuilt for. All should print nothing or the expected count.
+
+5. Every product page has an `<h1>` and a unique title:
+   ```bash
+   grep -L '<h1' out/products/*.html; grep -h -o '<title>[^<]*' out/products/*.html | sort | uniq -d
+   ```
+
+6. The product grid still emits crawlable anchors (expect 43):
+   ```bash
+   grep -o 'href="/products/[a-z0-9-]*"' out/products.html | sort -u | wc -l
+   ```
+
+7. No SPA fallback rule (it would reintroduce soft-404s):
+   ```bash
+   grep -v '^\s*#' out/_redirects | grep '^/\*' && echo "FAIL: SPA fallback present"
+   ```
+
+8. Metadata is in the static HTML, not injected by JS:
+   ```bash
+   grep -o 'rel="canonical" href="[^"]*"' out/products/carpet.html
+   ```
 
 ## Local Verification
 
-5. Start full-stack local dev (Workers + static):
+9. Start full-stack local dev (builds, then serves `out/` with Functions):
    ```bash
    npm run pages:dev
    ```
 
-6. Manually verify these routes load correctly:
-   - `/` (homepage with hero, products, services)
-   - `/products` (product grid with category filter)
-   - `/products/<any-product-id>` (detail page with media carousel)
-   - `/about` (about page with story and values)
-   - `/contact` (contact form with Turnstile widget)
+10. Verify these routes load: `/`, `/products`, `/products/<id>`, `/guides`,
+    `/guides/<slug>`, `/about`, `/contact`.
 
-7. Submit a test contact form to verify the Workers function processes it.
+11. Verify an unknown URL returns a real 404, not 200:
+    ```bash
+    curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8788/not-a-real-page
+    ```
 
-8. Stop the dev server.
+12. Verify the contact Function still routes:
+    ```bash
+    curl -s -X POST http://localhost:8788/api/contact -H 'Content-Type: application/json' -d '{}'
+    ```
+    Expect `{"error":"Bot verification required"}`.
+
+13. Submit a test contact form in the browser. Note: `.dev.vars` uses Cloudflare's
+    always-passes Turnstile test secret, but the **Resend key is the live one**, so a
+    successful submission sends a real email.
+
+14. Stop the dev server.
 
 ## Deploy
 
-9. Deploy to Cloudflare Pages:
-   ```bash
-   npx wrangler pages deploy dist --project-name alarabiacarpets
-   ```
+15. Deploy to Cloudflare Pages:
+    ```bash
+    npm run deploy
+    ```
 
-10. Note the deployment URL from the output.
+16. Note the deployment URL from the output. Prefer verifying on a preview URL before
+    promoting to production.
 
 ## Environment Variables
 
-These must be set on the Cloudflare dashboard (Settings → Environment variables), not in code:
-- `RESEND_API_KEY` — Resend email service API key
-- `TURNSTILE_SECRET_KEY` — Cloudflare Turnstile server-side secret
+Set on the Cloudflare dashboard (Settings → Environment variables), not in code:
 
-For local development, set these in a `.dev.vars` file (gitignored).
+| Variable | Type | Notes |
+|---|---|---|
+| `RESEND_API_KEY` | Runtime secret | Used by `functions/api/contact.ts` |
+| `TURNSTILE_SECRET_KEY` | Runtime secret | Server-side Turnstile verification |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | **Build-time** | Inlined at build. If missing, the Turnstile widget never renders and the contact form's submit button stays permanently disabled. Set for Production *and* Preview. |
+| `NODE_VERSION` | Build-time | `20` |
 
-## Post-Deploy Verification
+For local development, set the two secrets in `.dev.vars` (gitignored) and the
+`NEXT_PUBLIC_*` key in `.env` (also gitignored).
 
-11. Check the live site at `https://alarabiacarpets.com`
-12. Test the contact form on production (Turnstile must verify)
-13. Verify product images load (check browser console for 404s)
-14. Confirm Google Analytics is firing (Network tab → googletagmanager)
+## Do Not Change
 
-## Rules
-
-- Never deploy without a passing TypeScript check
-- Never deploy without testing the build locally first
-- The `wrangler.toml` config is authoritative — do not change `pages_build_output_dir` or `compatibility_flags`
-- Project name is `alarabiacarpets` — do not change
+- `pages_build_output_dir = "out"` in `wrangler.toml` — must match the Next export directory.
+- `public/_routes.json` — pinned to `{"include": ["/api/*"]}`. Because `functions/` exists,
+  Pages otherwise auto-generates a `_routes.json` whose `exclude` list caps at 100 rules,
+  far fewer than this export's file count, sending static requests through the Worker.

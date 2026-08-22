@@ -4,10 +4,10 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 
 ## Tech Stack
 
-- **Frontend:** React 18, TypeScript, Vite
-- **UI:** Tailwind CSS, shadcn/ui (Radix), Lucide icons, Framer Motion
-- **Routing:** React Router v6 with lazy-loaded pages
-- **Data fetching:** TanStack React Query
+- **Frontend:** React 19, TypeScript, Next.js 15 (App Router)
+- **Rendering:** Static export (`output: 'export'`) — every route is prerendered to HTML at build time
+- **UI:** Tailwind CSS, shadcn/ui (Radix), Lucide icons
+- **SEO:** Next.js Metadata API + JSON-LD builders in `src/lib/seo.ts`
 - **Backend:** Cloudflare Workers Functions (TypeScript)
 - **Email:** Resend API
 - **Bot protection:** Cloudflare Turnstile
@@ -19,7 +19,8 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 
 | Path | Purpose |
 |------|---------|
-| `src/pages/` | Route pages (Index, Products, ProductDetail, About, Contact, NotFound) |
+| `src/app/` | Routes (App Router). Each `page.tsx` is a server component exporting `metadata` |
+| `src/data/guides.ts` | Guide/blog content — `Guide` interface + `guides` array |
 | `src/components/` | Reusable components (Navbar, Footer, HeroSection, ProductCard, etc.) |
 | `src/components/ui/` | shadcn/ui primitives (Button, Card, Input, etc.) |
 | `src/data/products.ts` | Product catalog — `Product` interface + `products` array |
@@ -28,16 +29,18 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 | `functions/api/` | Cloudflare Workers API endpoints |
 | `functions/email-templates/` | HTML email template generators |
 | `public/Products/` | Product images/videos organized by category folder |
-| `index.html` | SEO meta tags, structured data, analytics scripts |
+| `src/app/layout.tsx` | Root metadata, fonts, third-party scripts (replaces the old index.html) |
+| `src/lib/seo.ts` | SEO constants + JSON-LD builders |
+| `src/lib/analytics.ts` | GA4 + Google Ads events — all tracking goes through here |
 
 ## Commands
 
 ```bash
-npm run dev          # Vite dev server (frontend only)
-npm run build        # Production build → dist/
-npm run pages:dev    # Full-stack local dev (Workers + static)
+npm run dev          # Next dev server (frontend only)
+npm run build        # Static export → out/
+npm run pages:dev    # Full-stack local dev (build + Workers + static)
 npx tsc --noEmit     # TypeScript type check
-npx wrangler pages deploy dist --project-name alarabiacarpets  # Deploy
+npm run deploy       # Build and deploy to Cloudflare Pages
 ```
 
 ## Brand Constants
@@ -57,8 +60,12 @@ npx wrangler pages deploy dist --project-name alarabiacarpets  # Deploy
 ## Conventions
 
 - All pages wrap content in `<Navbar />` + `<main className="flex-grow">` + `<Footer />`
-- All pages are lazy-loaded via `React.lazy()` in `src/App.tsx`
-- New routes go ABOVE the catch-all `"*"` route in App.tsx
+- Every `page.tsx` stays a **server component** exporting `metadata` or `generateMetadata`;
+  push interactivity into `"use client"` leaf components (see `ProductsGrid`, `ProductMedia`)
+- New routes are new directories under `src/app/` — there is no central route table
+- Dynamic routes need `generateStaticParams()`; `params` is a Promise and must be awaited
+- Never use `useSearchParams` without a Suspense boundary — it hard-fails under static export
+- Plain `<img>` only, not `next/image`: product paths contain `&`, which breaks `/_next/image`
 - Path alias `@` maps to `src/`
 - Product images live in `public/Products/<CategoryFolder>/`
 - Container pattern: `<div className="container mx-auto px-4 sm:px-5 lg:px-8">`
@@ -79,3 +86,14 @@ npx wrangler pages deploy dist --project-name alarabiacarpets  # Deploy
 For specialized workflows, read the relevant skill in `.claude/skills/`. Each folder contains a `skill.md` with step-by-step instructions.
 
 See `.claude/skills/README.md` for the full skills index.
+
+## SEO invariants
+
+Verified on every build; do not regress these:
+
+- One `<h1>` per page, no skipped heading levels
+- Titles ≤ 60 chars, descriptions ≤ 160, no duplicates across pages
+- `public/_redirects` must NOT contain an SPA fallback (`/* /index.html 200`) — it causes soft-404s
+- `public/_routes.json` stays pinned to `{"include": ["/api/*"]}`
+- Product JSON-LD omits `offers` unless `priceFrom` is set; never emit a price-less `Offer`
+- `sitemap.ts` / `robots.ts` need `export const dynamic = "force-static"`

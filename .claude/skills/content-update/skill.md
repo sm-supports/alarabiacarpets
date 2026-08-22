@@ -7,13 +7,15 @@
 | Hero headline & subtitle | `src/components/HeroSection.tsx` | `h1` text, subtitle `p` tag, badge text, CTA button labels |
 | Trust indicators | `src/components/HeroSection.tsx` | TrustIndicator component props (`title`, `subtitle`) |
 | Services section | `src/components/ServicesSection.tsx` | `services` array at top of file (`title`, `description`, `icon`, `color`) |
-| About page | `src/pages/About.tsx` | Our Story text, Values cards, Why Choose Us cards |
-| Products page header | `src/pages/Products.tsx` | Hero header `h1` and description text |
+| About page | `src/app/about/page.tsx` | Our Story text, Values cards, Why Choose Us cards |
+| Products page header | `src/app/products/page.tsx` | Hero header `h1` and description text |
 | Contact CTA text | `src/components/ContactSection.tsx` | Section heading, description, form labels |
 | Trusted By logos | `src/components/TrustedBy.tsx` | Logo images array |
 | Footer | `src/components/Footer.tsx` | Address, phone, navigation links, copyright |
-| Page title & SEO | `index.html` | `<title>`, `<meta name="description">`, OG tags |
-| Structured data | `index.html` | JSON-LD `<script type="application/ld+json">` block |
+| Site-wide title & SEO | `src/app/layout.tsx` + `src/lib/seo.ts` | Default title/description, OG, geo tags |
+| Per-page SEO | that route's `page.tsx` | `export const metadata` / `generateMetadata` |
+| Structured data | `src/lib/seo.ts` | `buildLocalBusiness`, `buildOrganization`, `buildProductJsonLd`, etc. |
+| Guides / blog content | `src/data/guides.ts` | `Guide` interface + `guides` array |
 
 ## Content Update Rules
 
@@ -25,7 +27,7 @@
 
 ## SEO Updates
 
-File: `index.html` (project root)
+File: `src/app/layout.tsx` (root metadata) and `src/lib/seo.ts` (constants)
 
 Key tags to update:
 - `<title>` — keep under 60 characters

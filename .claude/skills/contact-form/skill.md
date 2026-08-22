@@ -5,7 +5,7 @@
 | Layer | File |
 |-------|------|
 | Frontend form | `src/components/ContactSection.tsx` |
-| Contact page | `src/pages/Contact.tsx` (renders ContactSection) |
+| Contact page | `src/app/contact/page.tsx` (server component, renders ContactSection) |
 | API endpoint | `functions/api/contact.ts` (Cloudflare Workers) |
 | Email template | `functions/email-templates/acknowledgment.ts` |
 | Turnstile widget | `src/components/CloudflareTurnstile.tsx` |
@@ -77,7 +77,7 @@ The form fires conversion events — do not remove without explicit instruction:
 - Form submission: `AW-16463357836/vNfLCO7DwcgbEIzPq6o9`
 - WhatsApp clicks: `AW-16463357836/n6RiCOKH_I0bEIzPq6o9`
 
-These are defined in `index.html` as `gtag_report_conversion()`.
+Conversion tracking lives in `src/lib/analytics.ts` (`trackFormLead`, `trackWhatsAppClick`, `trackPhoneClick`). All events use currency `QAR`. The legacy `gtag_report_conversion()` global is re-created by `src/components/ThirdPartyScripts.tsx` for backward compatibility.
 
 ## Turnstile Configuration
 

@@ -24,7 +24,7 @@ interface Product {
 
 ## Current Categories
 
-Defined in `src/pages/Products.tsx` (the `categories` object):
+Defined in `src/components/ProductsGrid.tsx` (the `CATEGORIES` object) and mirrored in `CATEGORY_LABELS` in `src/lib/seo.ts`:
 
 | Key | Label | Image Folder |
 |-----|-------|-------------|
@@ -38,7 +38,7 @@ Defined in `src/pages/Products.tsx` (the `categories` object):
 
 1. Choose a lowercase single-word key (e.g., `lighting`)
 2. Create the image folder: `public/Products/<FolderName>/`
-3. Add the category to the `categories` object in `src/pages/Products.tsx`:
+3. Add the category to `CATEGORIES` in `src/components/ProductsGrid.tsx` AND to `CATEGORY_LABELS` in `src/lib/seo.ts` (the latter feeds breadcrumbs and Product schema):
    ```typescript
    const categories = {
      all: { label: "All Products" },

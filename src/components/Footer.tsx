@@ -29,6 +29,7 @@ export default function Footer() {
       { label: 'All Products', href: '/products' },
     ],
     company: [
+      { label: 'Guides', href: '/guides' },
       { label: 'About Us', href: '/about' },
       { label: 'Contact', href: '/contact' },
       { label: 'Services', href: '/#services' },
@@ -42,6 +43,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-white border-t border-gray-100">
+      <h2 className="sr-only">Site footer</h2>
       {/* Main Footer */}
       <div className="container mx-auto px-4 sm:px-5 lg:px-8 py-10 sm:py-12 lg:py-16">
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
@@ -95,7 +97,7 @@ export default function Footer() {
 
           {/* Products Column */}
           <div>
-            <h4 className="font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base">Products</h4>
+            <h3 className="font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base">Products</h3>
             <ul className="space-y-2 sm:space-y-3">
               {footerLinks.products.map((link) => (
                 <li key={link.label}>
@@ -112,7 +114,7 @@ export default function Footer() {
 
           {/* Company Column */}
           <div>
-            <h4 className="font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base">Company</h4>
+            <h3 className="font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base">Company</h3>
             <ul className="space-y-2 sm:space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
@@ -129,7 +131,7 @@ export default function Footer() {
 
           {/* CTA Column - Hidden on small mobile, shown on larger */}
           <div className="col-span-2 sm:col-span-1">
-            <h4 className="font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base">Get Started</h4>
+            <h3 className="font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base">Get Started</h3>
             <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
               Ready to transform your space? Get in touch for a free consultation.
             </p>

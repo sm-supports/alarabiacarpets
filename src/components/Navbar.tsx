@@ -15,6 +15,7 @@ const Navbar = memo(function Navbar() {
   const navigationItems = useMemo(() => [
     { path: '/', label: 'Home' },
     { path: '/products', label: 'Products' },
+    { path: '/guides', label: 'Guides' },
     { path: '/about', label: 'About' },
     { path: '/contact', label: 'Contact' },
   ], []);

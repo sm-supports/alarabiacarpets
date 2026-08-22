@@ -52,6 +52,8 @@ export default function ProductsGrid({ products }: { products: Product[] }) {
 
   return (
     <>
+      <h2 className="sr-only">Browse products by category</h2>
+
       {/* Mobile filter */}
       <div className="mb-8 flex justify-center md:hidden">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

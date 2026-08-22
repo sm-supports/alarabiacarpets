@@ -245,7 +245,7 @@ const ContactSection = memo(function ContactSection() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h4 className="text-lg sm:text-xl font-semibold text-white mb-2">Thank You!</h4>
+                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">Thank You!</h3>
                   <p className="text-sm sm:text-base text-white/70">We'll get back to you shortly.</p>
                 </div>
               ) : (

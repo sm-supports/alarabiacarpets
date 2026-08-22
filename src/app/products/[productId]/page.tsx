@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import ProductMedia from "@/components/ProductMedia";
 import RelatedProducts from "@/components/RelatedProducts";
+import RelatedGuides from "@/components/RelatedGuides";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Check, ShoppingCart } from "lucide-react";
@@ -228,6 +229,8 @@ export default async function ProductDetailPage({
             </div>
           </section>
         ) : null}
+
+        <RelatedGuides productId={product.id} />
 
         <RelatedProducts currentId={product.id} category={product.category} />
 

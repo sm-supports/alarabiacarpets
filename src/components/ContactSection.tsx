@@ -293,7 +293,7 @@ const ContactSection = memo(function ContactSection() {
 
                   <div className="flex justify-center">
                     <CloudflareTurnstile
-                      siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                      siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
                       onVerify={(token) => setTurnstileToken(token)}
                       onExpire={() => setTurnstileToken("")}
                       onError={() => setTurnstileToken("")}

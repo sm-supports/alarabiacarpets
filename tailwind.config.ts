@@ -114,10 +114,10 @@ export default {
 				},
 			},
 			fontFamily: {
-				'playfair': ['Playfair Display', 'Georgia', 'serif'],
-				'poppins': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-				'display': ['Playfair Display', 'Georgia', 'serif'],
-				'body': ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+				'playfair': ['var(--font-playfair)', 'Playfair Display', 'Georgia', 'serif'],
+				'poppins': ['var(--font-poppins)', 'Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+				'display': ['var(--font-playfair)', 'Playfair Display', 'Georgia', 'serif'],
+				'body': ['var(--font-poppins)', 'Poppins', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
 			},
 			fontSize: {
 				'display': ['clamp(3rem, 8vw, 5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],

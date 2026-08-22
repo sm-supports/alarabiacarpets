@@ -20,13 +20,12 @@ export default function RelatedProducts({
   category: string;
   limit?: number;
 }) {
-  const sameCategory = products.filter(
-    (p) => p.id !== currentId && p.category === category
-  );
-  const others = products.filter(
-    (p) => p.id !== currentId && p.category !== category
-  );
-  const related = [...sameCategory, ...others].slice(0, limit);
+  // Same category only. Padding with other categories made the
+  // "More in {category}" heading factually wrong for small categories, and gave
+  // crawlers misleading anchor context.
+  const related = products
+    .filter((p) => p.id !== currentId && p.category === category)
+    .slice(0, limit);
 
   if (related.length === 0) return null;
 

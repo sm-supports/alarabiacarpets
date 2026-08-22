@@ -34,8 +34,11 @@ export default function WhatsAppLink({
       href={target}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={() => trackWhatsAppClick(source)}
       {...rest}
+      onClick={(e) => {
+        trackWhatsAppClick(source);
+        rest.onClick?.(e);
+      }}
     >
       {children}
     </a>

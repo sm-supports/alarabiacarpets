@@ -108,11 +108,6 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${playfair.variable} ${poppins.variable}`}>
-      <head>
-        {/* LCP images. React 19 hoists these into <head>. */}
-        <link rel="preload" as="image" href="/lovable-uploads/green-white-logo.webp" fetchPriority="high" />
-        <link rel="preload" as="image" href="/Products/Carpets/carpet.webp" fetchPriority="high" />
-      </head>
       <body>
         <Providers>{children}</Providers>
         <WhatsAppFloat />

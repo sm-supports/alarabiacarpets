@@ -218,6 +218,22 @@ export function productDescription(product: Product): string {
   return `${product.name} - ${product.description} Free installation & delivery in Qatar. Contact ${SITE_NAME} at ${PHONE}.`;
 }
 
+/**
+ * The image to advertise for a product in metadata and structured data.
+ *
+ * `imageSrc` is a display field and is a video for some products (their media[0]
+ * is an .mp4). An og:image or schema.org Product.image pointing at a video
+ * yields no social preview card and is rejected by the Rich Results Test, so
+ * prefer the first real image in media[] and fall back to the site logo.
+ */
+export function productImage(product: Product): string {
+  if (!product.imageSrc.endsWith(".mp4")) return product.imageSrc;
+  const firstImage = product.media?.find(
+    (m) => m.type === "image" && !m.src.endsWith(".mp4")
+  );
+  return firstImage?.src ?? DEFAULT_IMAGE;
+}
+
 export function productImageAlt(product: Product): string {
   return product.imageAlt ?? `${product.name} - ${categoryLabel(product.category)} by ${SITE_NAME} in ${CITY}, ${COUNTRY}`;
 }
@@ -239,7 +255,7 @@ export function buildProductJsonLd(product: Product) {
     "@type": "Product",
     name: product.name,
     description: product.metaDescription ?? product.description,
-    image: absoluteUrl(product.imageSrc),
+    image: absoluteUrl(productImage(product)),
     sku: product.id,
     brand: { "@type": "Brand", name: SITE_NAME },
     category: categoryLabel(product.category),

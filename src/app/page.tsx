@@ -16,6 +16,9 @@ export const metadata = {
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      {/* Homepage LCP candidate: the first ProductsSection showcase image.
+          Page-specific, so it must not live in the root layout. */}
+      <link rel="preload" as="image" href="/Products/Carpets/carpet.webp" fetchPriority="high" />
       <JsonLd data={buildOrganization()} />
       <JsonLd data={buildWebSite()} />
       <JsonLd data={buildLocalBusiness()} />

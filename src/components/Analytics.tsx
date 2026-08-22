@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { trackPageView } from "@/lib/analytics";
 
@@ -17,9 +17,16 @@ import { trackPageView } from "@/lib/analytics";
  */
 export default function Analytics() {
   const pathname = usePathname();
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     if (!pathname) return;
+    // The landing page view is already sent by gtag('config') in
+    // ThirdPartyScripts; firing here too would count it twice.
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     trackPageView(pathname + window.location.search);
   }, [pathname]);
 

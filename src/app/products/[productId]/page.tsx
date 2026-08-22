@@ -19,6 +19,7 @@ import {
   categoryLabel,
   clampDescription,
   productDescription,
+  productImage,
   productImageAlt,
   productTitle,
 } from "@/lib/seo";
@@ -68,13 +69,13 @@ export async function generateMetadata({
       title,
       description,
       url: path,
-      images: [{ url: absoluteUrl(product.imageSrc), alt: productImageAlt(product) }],
+      images: [{ url: absoluteUrl(productImage(product)), alt: productImageAlt(product) }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [absoluteUrl(product.imageSrc)],
+      images: [absoluteUrl(productImage(product))],
     },
   };
 }

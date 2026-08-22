@@ -8,6 +8,12 @@ import { ArrowRight, MapPin, Mail, Phone, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 import { trackFormLead, trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
+import { EMAIL, PHONE } from "@/lib/seo";
+
+// Inlined at build time. If the Cloudflare Pages build environment does not
+// define it, the Turnstile widget cannot render and the form can never be
+// submitted -- so surface that instead of showing a permanently dead button.
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 const ContactSection = memo(function ContactSection() {
   const [name, setName] = useState("");
@@ -294,13 +300,20 @@ const ContactSection = memo(function ContactSection() {
                   </div>
 
                   <div className="flex justify-center">
-                    <CloudflareTurnstile
-                      siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-                      onVerify={(token) => setTurnstileToken(token)}
-                      onExpire={() => setTurnstileToken("")}
-                      onError={() => setTurnstileToken("")}
-                      theme="dark"
-                    />
+                    {TURNSTILE_SITE_KEY ? (
+                      <CloudflareTurnstile
+                        siteKey={TURNSTILE_SITE_KEY}
+                        onVerify={(token) => setTurnstileToken(token)}
+                        onExpire={() => setTurnstileToken("")}
+                        onError={() => setTurnstileToken("")}
+                        theme="dark"
+                      />
+                    ) : (
+                      <p role="alert" className="text-sm text-red-300 text-center">
+                        This form is temporarily unavailable. Please reach us on
+                        WhatsApp at {PHONE} or email {EMAIL}.
+                      </p>
+                    )}
                   </div>
 
                   <button

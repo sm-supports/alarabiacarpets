@@ -13,6 +13,13 @@ export const GOOGLE_ADS_ID = "AW-16463357836";
 export const CONVERSION_LABELS = {
   formLead: `${GOOGLE_ADS_ID}/vNfLCO7DwcgbEIzPq6o9`,
   whatsappClick: `${GOOGLE_ADS_ID}/n6RiCOKH_I0bEIzPq6o9`,
+  /**
+   * Phone calls need their own conversion action. Until one is created in the
+   * Google Ads account and its label pasted here, phone clicks are recorded in
+   * GA4 only -- reusing the WhatsApp label would inflate and contaminate the
+   * WhatsApp conversion that bidding optimises against.
+   */
+  phoneClick: null as string | null,
 } as const;
 
 /** Al Arabia Carpets is a Qatar business — conversions are valued in Qatari riyal. */
@@ -67,15 +74,26 @@ export function trackWhatsAppClick(source: string): void {
 
 /** A tel: link was clicked. */
 export function trackPhoneClick(source: string): void {
-  trackConversion(CONVERSION_LABELS.whatsappClick, { source });
+  if (CONVERSION_LABELS.phoneClick) {
+    trackConversion(CONVERSION_LABELS.phoneClick, { source });
+  }
   gtagEvent("phone_click", { source, method: "phone" });
 }
 
 /**
- * Report a page view. Needed because a client-routed app only sends the
- * initial gtag('config') hit — in-app navigations were never tracked.
+ * Report a page view for a client-side navigation.
+ *
+ * Sends GA4's documented page_view event rather than re-invoking
+ * gtag('config'), which would re-run initialisation and re-read campaign
+ * parameters on every navigation. The initial page view is still emitted
+ * automatically by the config call in ThirdPartyScripts, so callers must not
+ * fire this on first mount or the landing page is counted twice.
  */
 export function trackPageView(path: string): void {
   if (!gtagReady()) return;
-  window.gtag!("config", GA_MEASUREMENT_ID, { page_path: path });
+  window.gtag!("event", "page_view", {
+    page_path: path,
+    page_location: window.location.href,
+    page_title: document.title,
+  });
 }

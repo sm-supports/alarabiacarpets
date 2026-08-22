@@ -68,7 +68,7 @@ export const products: Product[] = [
     "id": "artificial-flowers-grass",
     "name": "Artificial flowers grass",
     "category": "carpet",
-    "description": "Premium Artificial flowers grass for your home and office.",
+    "description": "Artificial green and flower walls for interiors, backdrops and event styling.",
     "price": "Contact for Price",
     "media": [
       {
@@ -81,7 +81,50 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Artificial flowers grass 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Artificial%20flowers%20grass"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Artificial%20flowers%20grass",
+    seoTitle: "Artificial Green & Flower Walls in Qatar",
+    metaDescription: "Artificial flower and green walls in Qatar. Vertical foliage panels for feature walls, receptions, backdrops and events. Installed across Doha.",
+    imageAlt: "Artificial flower and green wall panel installed as a feature wall in Doha",
+    longDescription: [
+      "This is greenery for walls, not for floors. Foliage and flower panels build up into a vertical surface used behind reception desks, as a feature wall in a majlis or caf\u00e9, and as a photo backdrop for events \u2014 the look of a planted wall with none of the irrigation, drainage or light a living one demands.",
+      "Panels are built up on site so the coverage reads as continuous rather than tiled, and flower clusters are distributed by hand. Mixing tones matters: a single flat green over a large area is the thing that makes an artificial wall look artificial.",
+    ],
+    specs: [
+      {
+        label: "Application",
+        value: "Vertical walls and backdrops",
+      },
+      {
+        label: "Best for",
+        value: "Receptions, feature walls, events",
+      },
+      {
+        label: "Build-up",
+        value: "Panels blended on site, seams disguised",
+      },
+      {
+        label: "Maintenance",
+        value: "Occasional dusting",
+      },
+      {
+        label: "Indoor / outdoor",
+        value: "Both, UV-stable options for outdoors",
+      },
+    ],
+    faqs: [
+      {
+        q: "How is a green wall different from artificial grass?",
+        a: "Different product and different job. Grass is a floor covering laid flat for gardens and terraces; a green wall is foliage and flower panels built up vertically as decoration. For lawns and terraces see our artificial grass carpet instead.",
+      },
+      {
+        q: "Does an artificial green wall look fake?",
+        a: "It does if it is a single flat green tiled across the wall. We mix foliage tones and distribute flower clusters by hand, and disguise the panel seams during build-up, which is what stops it reading as a repeating pattern.",
+      },
+      {
+        q: "How do you maintain it?",
+        a: "Dust it occasionally \u2014 a soft brush or a vacuum on low suction. There is no watering, feeding or light requirement, which is the whole reason to choose it over a living wall indoors.",
+      },
+    ]
   },
   {
     "id": "artificial-grass-installation-work",
@@ -145,7 +188,7 @@ export const products: Product[] = [
     "id": "event-normal-carpet",
     "name": "Event Carpet",
     "category": "carpet",
-    "description": "Premium Event:normal carpet for your home and office.",
+    "description": "Event and exhibition carpet supplied and laid for short-term use, then lifted.",
     "price": "Contact for Price",
     "media": [
       {
@@ -154,13 +197,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Event:normal carpet.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Event%20Carpet"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Event%20Carpet",
+    seoTitle: "Event Carpet Hire & Supply in Qatar | Doha",
+    metaDescription: "Event and exhibition carpet in Qatar. Fast supply and laying for conferences, weddings and stands, lifted and cleared afterwards. Doha-based.",
+    imageAlt: "Event carpet laid for an exhibition stand in Doha, Qatar",
+    longDescription: [
+      "Event carpet is judged on turnaround, not on lifespan. A stand build, a conference hall or a wedding venue needs covering to a deadline, looking sharp for a few days, and clearing again without leaving marks on the floor underneath.",
+      "We supply and lay for exhibitions, conferences, weddings and openings across Qatar, working to the venue's access window \u2014 which for most halls in Doha means overnight or early morning. Lifting and disposal afterwards is part of the job.",
+    ],
+    specs: [
+      {
+        label: "Best for",
+        value: "Exhibitions, conferences, weddings",
+      },
+      {
+        label: "Turnaround",
+        value: "Short lead time, deadline-driven",
+      },
+      {
+        label: "Fitting window",
+        value: "Overnight and early morning available",
+      },
+      {
+        label: "Afterwards",
+        value: "Lifted and cleared",
+      },
+      {
+        label: "Floor protection",
+        value: "Laid without marking the sub-floor",
+      },
+    ],
+    faqs: [
+      {
+        q: "How quickly can event carpet be laid?",
+        a: "Usually within the venue's access window, which for most Doha halls means overnight or early morning before the build starts. Tell us the deadline and the area and we will confirm whether it is achievable before you commit.",
+      },
+      {
+        q: "Do you lift the carpet after the event?",
+        a: "Yes, lifting and disposal are included. It is worth agreeing the removal slot at the same time as the install, because venues usually give a tighter window for the break-down than the build.",
+      },
+      {
+        q: "Will it damage the floor underneath?",
+        a: "No. It is laid so it can be lifted cleanly and does not mark the sub-floor, which matters in a venue with polished or finished flooring and a deposit attached to it.",
+      },
+    ]
   },
   {
     "id": "home-design-luxury-carpet",
     "name": "Home design luxury carpet",
     "category": "carpet",
-    "description": "Premium Home design luxury carpet for your home and office.",
+    "description": "Made-to-measure rugs and carpet cut to your room's shape, colour and border.",
     "price": "Contact for Price",
     "media": [
       {
@@ -169,13 +255,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Home design luxury carpet.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Home%20design%20luxury%20carpet"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Home%20design%20luxury%20carpet",
+    seoTitle: "Custom Made-to-Measure Rugs in Qatar | Doha",
+    metaDescription: "Custom rugs made to measure in Qatar. Any size or shape, with bound or braided borders, matched to your majlis or living room. Delivered in Doha.",
+    imageAlt: "Custom made-to-measure rug with a bound border in a Qatari majlis",
+    longDescription: [
+      "A made-to-measure rug solves what a standard size cannot: seating that does not sit on a 2\u00d73 metre rectangle, an L-shaped majlis, a round dining table, or a room where the rug should stop short of the walls by a specific margin.",
+      "We cut to your dimensions and finish the edge \u2014 bound, braided or with a contrast border \u2014 and can match a colour to fabric you already own. Bring the cushion or a photo of the seating and we will work from it.",
+    ],
+    specs: [
+      {
+        label: "Sizing",
+        value: "Any size, cut to your room",
+      },
+      {
+        label: "Shapes",
+        value: "Rectangular, round, L-shaped, bespoke",
+      },
+      {
+        label: "Edge finish",
+        value: "Bound, braided or contrast border",
+      },
+      {
+        label: "Colour matching",
+        value: "Matched to existing fabric",
+      },
+      {
+        label: "Delivery",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "What size should a majlis rug be?",
+        a: "Large enough that the front feet of all the seating sit on it \u2014 that is what visually ties the arrangement together. A rug floating in the middle with every piece off it makes the room look smaller, which is the usual problem with a standard size.",
+      },
+      {
+        q: "Can you match a rug to my existing furniture?",
+        a: "Yes. Bring a cushion, an offcut of the fabric or a clear photo in daylight, and we will match the colour. Judging a match from a phone screen alone is unreliable, so we prefer something physical.",
+      },
+      {
+        q: "Can you make a round or L-shaped rug?",
+        a: "Yes. Round rugs under dining tables and L-shapes for corner majlis seating are both common. The edge finishing takes longer on a curve, which is reflected in the quote.",
+      },
+    ]
   },
   {
     "id": "luxury-home-carpet",
     "name": "Luxury home carpet",
     "category": "carpet",
-    "description": "Premium Luxury home carpet for your home and office.",
+    "description": "Premium wall-to-wall carpet for bedrooms and majlis, with denser pile and better recovery.",
     "price": "Contact for Price",
     "media": [
       {
@@ -196,13 +325,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Luxury home carpet 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Luxury%20home%20carpet"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Luxury%20home%20carpet",
+    seoTitle: "Luxury Wall-to-Wall Carpet in Qatar | Doha",
+    metaDescription: "Luxury wall-to-wall carpet in Qatar. Denser pile with better recovery underfoot for bedrooms and majlis. Measured and fitted across Doha.",
+    imageAlt: "Luxury wall-to-wall carpet fitted in a Doha bedroom",
+    longDescription: [
+      "What you pay for in a premium carpet is density and recovery. More fibre packed into the same area means footprints and furniture dents lift out instead of setting in, and the surface still looks even after a year of use rather than showing tracks through the doorways.",
+      "It is worth the money in rooms where you notice underfoot comfort \u2014 bedrooms and majlis \u2014 and much less so in a hallway, where a hard-wearing mid-range carpet does the same job for less.",
+    ],
+    specs: [
+      {
+        label: "Format",
+        value: "Wall-to-wall broadloom",
+      },
+      {
+        label: "Pile",
+        value: "High density, good recovery",
+      },
+      {
+        label: "Best for",
+        value: "Bedrooms and majlis",
+      },
+      {
+        label: "Underlay",
+        value: "Recommended, quoted with the carpet",
+      },
+      {
+        label: "Fitting",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "What actually makes one carpet better than another?",
+        a: "Density more than anything. Press your thumb in \u2014 if you feel the backing easily, the pile is sparse and it will flatten along traffic routes. A dense pile springs back and keeps an even appearance far longer.",
+      },
+      {
+        q: "Where is a luxury carpet worth it?",
+        a: "Bedrooms and majlis, where you are barefoot and notice the difference underfoot. In a hallway the traffic is the dominant factor, so a hard-wearing mid-range carpet is usually the more sensible spend.",
+      },
+      {
+        q: "Do I need underlay?",
+        a: "For a wall-to-wall carpet, yes. It adds comfort, absorbs sound and \u2014 the part people underestimate \u2014 protects the pile from below, which measurably extends how long the carpet keeps its appearance.",
+      },
+    ]
   },
   {
     "id": "mosjid-mosque-carpet-installation",
     "name": "Masjid & Mosque Carpet Installation",
     "category": "carpet",
-    "description": "Premium Mosjid:mosque carpet installation for your home and office.",
+    "description": "Mosque carpet installation: qiblah alignment, row setting out and phased fitting.",
     "price": "Contact for Price",
     "media": [
       {
@@ -219,7 +391,50 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Mosjid:mosque carpet installation 0.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Masjid%20%26%20Mosque%20Carpet%20Installation"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Masjid%20%26%20Mosque%20Carpet%20Installation",
+    seoTitle: "Mosque Carpet Installation Qatar | Qiblah Set",
+    metaDescription: "Mosque and masjid carpet installation across Qatar. Rows set true to the qiblah, work phased around prayer times, minimal disruption in Doha.",
+    imageAlt: "Mosque carpet installation with prayer rows being set to the qiblah in Qatar",
+    longDescription: [
+      "Fitting a prayer hall is a setting-out job before it is a carpet job. The saff rows have to run true to the qiblah, not to the walls \u2014 and in most buildings those are not the same line. Get the first row wrong and the error is repeated and magnified across every row behind it.",
+      "We establish the qiblah on site, set the first row from it, and work outward. The second constraint is time: a prayer hall stays in use, so we phase the work around prayer times and hand back sections progressively rather than closing the hall.",
+    ],
+    specs: [
+      {
+        label: "Setting out",
+        value: "First row established from the qiblah",
+      },
+      {
+        label: "Scheduling",
+        value: "Phased around prayer times",
+      },
+      {
+        label: "Handover",
+        value: "Section by section, hall stays usable",
+      },
+      {
+        label: "Includes",
+        value: "Old carpet lifted and removed",
+      },
+      {
+        label: "Service area",
+        value: "All of Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "How do you align prayer rows to the qiblah?",
+        a: "We establish the qiblah direction on site and set the first row from it, then work outward. Rows are aligned to that line rather than to the walls, because in most buildings the two differ and aligning to the wall puts every row slightly off.",
+      },
+      {
+        q: "Does the mosque have to close during installation?",
+        a: "No. We phase the work around prayer times and hand back sections as they are completed, so the hall stays usable throughout. Larger halls are scheduled over several days on that basis.",
+      },
+      {
+        q: "Do you remove the old carpet?",
+        a: "Yes, lifting and disposing of the existing carpet is included. We also check the sub-floor once it is exposed and flag anything that needs attention before the new carpet goes down.",
+      },
+    ]
   },
   {
     "id": "mosque-masjid-carpet",
@@ -279,7 +494,7 @@ export const products: Product[] = [
     "id": "pvc-gym-mat-indoor-game-mat",
     "name": "PVC Gym Mat & Indoor Game Mat",
     "category": "carpet",
-    "description": "Premium PVC gym mat:indoor game mat for your home and office.",
+    "description": "PVC matting for gyms and play areas \u2014 shock absorbing, non-slip and wipe-clean.",
     "price": "Contact for Price",
     "media": [
       {
@@ -288,7 +503,50 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/PVC gym mat:indoor game mat.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20PVC%20Gym%20Mat%20%26%20Indoor%20Game%20Mat"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20PVC%20Gym%20Mat%20%26%20Indoor%20Game%20Mat",
+    seoTitle: "Gym & Play Area Matting in Qatar | PVC Flooring",
+    metaDescription: "PVC gym and indoor play matting in Qatar. Shock-absorbing, non-slip and wipe-clean flooring for home gyms and play areas. Fitted in Doha.",
+    imageAlt: "PVC gym matting installed in a home gym in Doha",
+    longDescription: [
+      "Gym matting is doing two jobs at once: protecting the floor beneath from dropped weights, and protecting joints from the impact of the floor. A tiled slab does neither, and in a villa gym the noise carries through the structure to the rooms below.",
+      "The same material works for indoor play areas, where the priority shifts to cushioning falls and surviving being wiped down constantly. It is non-slip underfoot and cleans with a mop.",
+    ],
+    specs: [
+      {
+        label: "Best for",
+        value: "Home gyms, play areas, activity rooms",
+      },
+      {
+        label: "Impact",
+        value: "Shock absorbing, protects the sub-floor",
+      },
+      {
+        label: "Surface",
+        value: "Non-slip",
+      },
+      {
+        label: "Cleaning",
+        value: "Wipe or mop clean",
+      },
+      {
+        label: "Noise",
+        value: "Reduces impact noise to rooms below",
+      },
+    ],
+    faqs: [
+      {
+        q: "Will gym matting protect the floor from dropped weights?",
+        a: "That is the main reason to fit it. Dropped plates crack tile and dent most hard floors. The matting absorbs the impact, and it also cuts the noise transmitted through the slab to rooms underneath, which matters in a villa.",
+      },
+      {
+        q: "Is it suitable for a children's play area?",
+        a: "Yes, and it is a common use. It cushions falls, it is non-slip, and it wipes clean \u2014 which for a play area matters more than anything else about it.",
+      },
+      {
+        q: "How do you clean it?",
+        a: "A mop and mild detergent. Avoid solvent cleaners, which can soften the surface over time. In a gym, wiping down after sessions also stops sweat marking the material.",
+      },
+    ]
   },
   {
     "id": "tiles-carpet-office-carpet",
@@ -695,7 +953,7 @@ export const products: Product[] = [
     "id": "cabin-interior-design",
     "name": "Cabin interior design",
     "category": "interior",
-    "description": "Premium Cabin interior design for your home and office.",
+    "description": "Full room fit-out delivered as one project \u2014 ceilings, panelling, joinery and finishes.",
     "price": "Contact for Price",
     "media": [
       {
@@ -720,13 +978,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Cabin interior design 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Cabin%20interior%20design"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Cabin%20interior%20design",
+    seoTitle: "Room Fit-Out & Interior Design in Qatar",
+    metaDescription: "Complete room fit-out in Qatar. Ceilings, panelling, joinery, flooring and furnishing designed and delivered as one project across Doha.",
+    imageAlt: "Completed interior fit-out with panelling and integrated joinery in Doha",
+    longDescription: [
+      "Where the other interior listings cover one element, this is the whole room handled end to end: ceiling, walls, joinery, flooring and furnishing sequenced by one team against one drawing.",
+      "The advantage is sequencing. A fit-out goes wrong at the handovers \u2014 flooring laid before the joinery is scribed, lighting positions fixed before the ceiling design is settled. Running it as a single project means those decisions are made in the right order and nobody is waiting on anybody.",
+    ],
+    specs: [
+      {
+        label: "Scope",
+        value: "Complete room, design to handover",
+      },
+      {
+        label: "Includes",
+        value: "Ceilings, panelling, joinery, flooring",
+      },
+      {
+        label: "Also supplied",
+        value: "Curtains and furniture from our ranges",
+      },
+      {
+        label: "Management",
+        value: "One team, one sequence",
+      },
+      {
+        label: "Consultation",
+        value: "Free, on site in Doha",
+      },
+    ],
+    faqs: [
+      {
+        q: "What is the advantage of one contractor for a fit-out?",
+        a: "Sequencing. Most fit-out problems happen at the handover between trades \u2014 a floor laid before the joinery is scribed to it, or lighting fixed before the ceiling is designed. One team working to one drawing puts those decisions in the right order.",
+      },
+      {
+        q: "Can you work room by room?",
+        a: "Yes, and for an occupied home it is usually the sensible approach. We complete one room fully before opening the next, so the house stays liveable rather than becoming a site throughout.",
+      },
+      {
+        q: "Do you supply the furniture and curtains too?",
+        a: "Yes. We make majlis seating and curtains and supply flooring in-house, so the soft furnishings can be specified alongside the fit-out instead of chased separately once the work is done.",
+      },
+    ]
   },
   {
     "id": "cabinet-and-gypsum-board-work",
     "name": "Cabinet and gypsum board work",
     "category": "interior",
-    "description": "Premium Cabinet and gypsum board work for your home and office.",
+    "description": "Built-in joinery integrated with gypsum work, so cabinetry and ceilings finish as one.",
     "price": "Contact for Price",
     "media": [
       {
@@ -747,13 +1048,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Cabinet and gypsum board work 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Cabinet%20and%20gypsum%20board%20work"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Cabinet%20and%20gypsum%20board%20work",
+    seoTitle: "Built-In Cabinets & Gypsum Joinery Qatar",
+    metaDescription: "Built-in cabinetry integrated with gypsum work in Qatar. Storage, niches and shelving finished flush with the walls and ceiling. Fitted in Doha.",
+    imageAlt: "Built-in cabinetry integrated with gypsum wall detailing in a Doha interior",
+    longDescription: [
+      "This is the work that sits between carpentry and gypsum: storage that is built into the wall rather than placed against it. Cabinets finish flush with the plasterwork, niches line through with the shelving beside them, and the join between joinery and wall disappears.",
+      "Doing both trades together is the whole point. When cabinetry and gypsum are quoted by separate contractors the tolerances rarely meet, and you end up with a shadow gap nobody planned. We set out the joinery and the boarding from the same drawing.",
+    ],
+    specs: [
+      {
+        label: "Work covered",
+        value: "Built-in cabinets, niches, shelving",
+      },
+      {
+        label: "Integration",
+        value: "Joinery and gypsum set out together",
+      },
+      {
+        label: "Finish",
+        value: "Flush with the surrounding wall",
+      },
+      {
+        label: "Best for",
+        value: "Living rooms, majlis, offices",
+      },
+      {
+        label: "Service area",
+        value: "All of Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Why combine cabinetry with gypsum work?",
+        a: "Because the junction between them is where the finish is won or lost. Set out from one drawing by one team, the cabinet face lines through with the wall. Split between two contractors, the tolerances almost never meet and a gap appears.",
+      },
+      {
+        q: "Can you build storage into an existing wall?",
+        a: "Usually yes. We check what is behind the wall first for services and structure, then form the recess and build the joinery into it. Depth is the limiting factor, and we confirm it during the survey.",
+      },
+      {
+        q: "Do you make lit display niches?",
+        a: "Yes. Niches with concealed LED are a common request in a majlis. The wiring has to be run before the boards close, so it is decided at design stage rather than added later.",
+      },
+    ]
   },
   {
     "id": "gypsum-board-work-design",
     "name": "Gypsum board work design",
     "category": "interior",
-    "description": "Premium Gypsum board work design for your home and office.",
+    "description": "False ceilings, bulkheads, coves and wall detailing in gypsum board.",
     "price": "Contact for Price",
     "media": [
       {
@@ -778,13 +1122,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Gypsum board work design 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Gypsum%20board%20work%20design"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Gypsum%20board%20work%20design",
+    seoTitle: "Gypsum Board Work in Qatar | False Ceilings",
+    metaDescription: "Gypsum board false ceilings, bulkheads, coves and wall detailing in Qatar. Designed and installed by our own team across Doha.",
+    imageAlt: "Gypsum board false ceiling with cove lighting in a Doha villa",
+    longDescription: [
+      "Gypsum is how a flat ceiling becomes part of the design. Dropping a section, running a cove around the perimeter or forming a bulkhead over a seating area gives a room definition without taking a centimetre of floor space, and it is the standard way ceilings are detailed in Qatari villas and majlis.",
+      "It is also where lighting gets planned. Coves conceal indirect strips that wash the ceiling, and recessed spots need their positions set before the boards close up. We work the lighting layout out with you at the design stage rather than cutting holes afterwards.",
+    ],
+    specs: [
+      {
+        label: "Work covered",
+        value: "False ceilings, bulkheads, coves",
+      },
+      {
+        label: "Wall detailing",
+        value: "Recesses, niches, feature panels",
+      },
+      {
+        label: "Lighting",
+        value: "Cove and recessed positions planned in",
+      },
+      {
+        label: "Finish",
+        value: "Taped, jointed and ready to paint",
+      },
+      {
+        label: "Service area",
+        value: "All of Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "What is a cove ceiling?",
+        a: "A recessed channel around the perimeter of the ceiling that hides an LED strip. The light washes upward and reflects back down, giving soft indirect illumination with no visible fitting. It is the most common gypsum detail we install.",
+      },
+      {
+        q: "How much ceiling height does a false ceiling take?",
+        a: "Typically 10 to 20 centimetres depending on the detail and what services run above it. We measure the existing height first, because in a room that is already low a shallower design or a partial drop is usually the better call.",
+      },
+      {
+        q: "Is the gypsum work painted?",
+        a: "We hand it over taped, jointed and ready to paint as standard. Painting can be included in the quote if you would like it finished as one job.",
+      },
+    ]
   },
   {
     "id": "indoor-wall-panel-design",
     "name": "Indoor wall panel design",
     "category": "interior",
-    "description": "Premium Indoor wall panel design for your home and office.",
+    "description": "Decorative interior wall panelling \u2014 slatted, fluted and upholstered feature walls.",
     "price": "Contact for Price",
     "media": [
       {
@@ -797,13 +1184,56 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Indoor wall panel design 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Indoor%20wall%20panel%20design"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Indoor%20wall%20panel%20design",
+    seoTitle: "Indoor Wall Panelling in Qatar | Feature Walls",
+    metaDescription: "Interior wall panelling in Qatar. Slatted, fluted and upholstered feature walls supplied and installed across Doha by Al Arabia Carpets.",
+    imageAlt: "Slatted indoor wall panelling on a feature wall in a Doha home",
+    longDescription: [
+      "Panelling changes a wall's texture rather than just its colour. Vertical slats and fluted profiles catch light down their length and throw fine shadow lines, so the surface reads differently through the day in a way paint or wallpaper never does.",
+      "It is most often used on one wall \u2014 behind a TV, behind the head of a bed, or along the run a majlis faces. Panelling every wall in a room usually overwhelms it, and we will say so before quoting.",
+    ],
+    specs: [
+      {
+        label: "Types",
+        value: "Slatted, fluted, upholstered",
+      },
+      {
+        label: "Best for",
+        value: "TV walls, bedheads, majlis feature walls",
+      },
+      {
+        label: "Effect",
+        value: "Texture and shadow line, not just colour",
+      },
+      {
+        label: "Coverage",
+        value: "Single feature wall recommended",
+      },
+      {
+        label: "Service area",
+        value: "All of Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Should I panel the whole room?",
+        a: "Rarely. Panelling works by contrast \u2014 one textured wall against three plain ones. Wrap a room in it and the effect cancels out and the space closes in. A single feature wall is almost always the stronger result.",
+      },
+      {
+        q: "What is the difference between slatted and fluted panelling?",
+        a: "Slatted uses separate battens with a visible gap between them, usually over a dark backing, which gives a strong striped rhythm. Fluted is a continuous surface with rounded grooves, so the effect is softer and more subtle.",
+      },
+      {
+        q: "Does panelling help with sound?",
+        a: "Slatted panelling over an acoustic backing does take the edge off echo in a hard-surfaced room. It is not soundproofing, but in a majlis with tiled floors and bare walls the difference in liveliness is noticeable.",
+      },
+    ]
   },
   {
     "id": "television-decore-with-cabin-box",
     "name": "TV Unit with Cabinet Box",
     "category": "interior",
-    "description": "Premium Television decore with cabin box for your home and office.",
+    "description": "TV feature walls with integrated cabinetry and concealed cable management.",
     "price": "Contact for Price",
     "media": [
       {
@@ -848,7 +1278,50 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Television decore with cabin box 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20TV%20Unit%20with%20Cabinet%20Box"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20TV%20Unit%20with%20Cabinet%20Box",
+    seoTitle: "TV Unit & Feature Wall Design in Qatar",
+    metaDescription: "TV feature walls with built-in cabinetry in Qatar. Concealed cabling, integrated storage and lighting, designed and installed across Doha.",
+    imageAlt: "TV feature wall with built-in cabinetry and concealed lighting in a Doha living room",
+    longDescription: [
+      "A TV wall is the piece of joinery a living room is arranged around, so it is worth building rather than buying. Built in, the screen sits at the right height for your seating, the cabling disappears into the wall, and the boxes and consoles get a ventilated home instead of a shelf of visible clutter.",
+      "We design the unit around your actual equipment \u2014 screen size, what needs to be reachable by remote, what needs airflow \u2014 and integrate lighting behind the screen where you want it. Backlighting a TV wall genuinely reduces eye strain in a dark room.",
+    ],
+    specs: [
+      {
+        label: "Includes",
+        value: "TV wall, cabinetry, cable management",
+      },
+      {
+        label: "Cabling",
+        value: "Concealed within the unit",
+      },
+      {
+        label: "Equipment",
+        value: "Ventilated housing for boxes and consoles",
+      },
+      {
+        label: "Lighting",
+        value: "Optional backlighting behind the screen",
+      },
+      {
+        label: "Service area",
+        value: "All of Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Can you hide the cables completely?",
+        a: "Yes. Power and HDMI run inside the unit and through the wall to the equipment housing, so nothing is visible. We need to know the screen position and the socket locations at design stage, because retrofitting it means opening the wall again.",
+      },
+      {
+        q: "How high should the TV be mounted?",
+        a: "So the centre of the screen sits roughly at eye level when you are seated. That is usually lower than people expect, and lower than a unit designed without reference to the actual seating. We set it from where your majlis or sofa will be.",
+      },
+      {
+        q: "Do the equipment boxes need ventilation?",
+        a: "They do. A receiver or console in a sealed cabinet runs hot and its life suffers. We build in ventilation and leave rear access, which also makes the eventual cable change far less painful.",
+      },
+    ]
   },
   {
     "id": "al-wakra-white-ultra-modern-waterproof-spc-flooring",

@@ -6,14 +6,16 @@
  * lists products, and these have none. A category page with an empty grid would
  * be worse than no page.
  *
- * IMAGES: wardrobes and parquet-flooring now have real project photography in
- * public/Services/<slug>/. wallpaper and kitchen-cabinets still have NONE --
- * nothing in public/ depicts either, and the wardrobe and TV-unit joinery shots
- * are not kitchens. Leave their heroImage/gallery unset rather than borrowing an
- * unrelated photo: a kitchen page illustrated with a bedroom wardrobe is a worse
- * result than one with no image, and og:image falls back to the brand logo.
- * Those two pages also draw imagery via `relatedProductIds`, where each photo is
- * attached to the product it actually depicts.
+ * IMAGES: all four services now have real project photography in
+ * public/Services/<slug>/. wardrobes has a full gallery; wallpaper,
+ * kitchen-cabinets and parquet-flooring currently have a hero only.
+ *
+ * The rule that got them here still stands: a photo goes on a service page only
+ * if it depicts THAT service. Never illustrate the kitchen page with a bedroom
+ * wardrobe or the wallpaper page with a carpet. If a future service has no
+ * photo, leave heroImage unset -- the page renders text-only, og:image falls
+ * back to the brand logo, and the Service schema omits `image` rather than
+ * asserting work we cannot show.
  */
 
 export interface ServiceStep {
@@ -123,6 +125,9 @@ export const services: Service[] = [
       "gypsum-board-work-design",
     ],
     relatedCategorySlugs: ["interior"],
+    heroImage: "/Services/wallpaper/wallpaper-tv-feature-wall.webp",
+    heroImageAlt:
+      "Damask-patterned wallpaper hung across a backlit TV feature wall in a Doha living room",
   },
   {
     slug: "kitchen-cabinets",
@@ -178,6 +183,9 @@ export const services: Service[] = [
       "television-decore-with-cabin-box",
     ],
     relatedCategorySlugs: ["interior", "barkia"],
+    heroImage: "/Services/kitchen-cabinets/fitted-kitchen-taupe-handleless.webp",
+    heroImageAlt:
+      "Handleless taupe fitted kitchen with a black stone worktop and under-cabinet lighting in Qatar",
   },
   {
     slug: "wardrobes",

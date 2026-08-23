@@ -14,6 +14,7 @@ import {
   buildBreadcrumb,
   buildFaq,
   buildServiceJsonLd,
+  absoluteUrl,
   buildTitle,
   clampDescription,
   DEFAULT_OG_IMAGES,
@@ -38,8 +39,12 @@ export async function generateMetadata({
   const title = buildTitle(service.seoTitle);
   const path = `/services/${service.slug}`;
 
-  // No openGraph.images: there is no photography for these services, so the
-  // root layout's brand logo is the honest fallback.
+  // Real project photo when we have one; brand logo otherwise. Never a
+  // borrowed image -- see the note at the top of src/data/services.ts.
+  const images = service.heroImage
+    ? [{ url: absoluteUrl(service.heroImage), alt: service.heroImageAlt ?? service.heading }]
+    : DEFAULT_OG_IMAGES;
+
   return {
     title: { absolute: title },
     description: clampDescription(service.metaDescription),
@@ -49,13 +54,13 @@ export async function generateMetadata({
       title,
       description: service.metaDescription,
       url: path,
-      images: DEFAULT_OG_IMAGES,
+      images,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: service.metaDescription,
-      images: DEFAULT_OG_IMAGES.map((i) => i.url),
+      images: images.map((i) => i.url),
     },
   };
 }
@@ -94,7 +99,8 @@ export default async function ServicePage({
 
       <Navbar />
       <main className="flex-grow">
-        {/* Text hero -- no image, deliberately. See src/data/services.ts. */}
+        {/* Text band. A hero photo follows it when the service has one; the
+            services without photography stay text-only rather than borrowing. */}
         <div className="bg-primary text-white py-12 md:py-16">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
             <nav aria-label="Breadcrumb" className="mb-5">
@@ -114,6 +120,19 @@ export default async function ServicePage({
             </p>
           </div>
         </div>
+
+        {service.heroImage && (
+          <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-4xl -mt-8 md:-mt-10 relative">
+            <img
+              src={service.heroImage}
+              alt={service.heroImageAlt ?? service.heading}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              className="w-full rounded-xl shadow-lg object-cover aspect-[16/10]"
+            />
+          </div>
+        )}
 
         <section className="py-12 md:py-14 bg-white">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
@@ -187,8 +206,31 @@ export default async function ServicePage({
           </div>
         </section>
 
-        {/* Related work. This is the only place imagery enters a service page,
-            and every image belongs to the product it actually depicts. */}
+        {/* Our work -- real project photos for this service. */}
+        {service.gallery?.length ? (
+          <section className="py-12 md:py-14 bg-neutral-50">
+            <div className="container mx-auto px-4 sm:px-5 lg:px-8">
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-8 text-neutral-900">
+                Our {service.label.toLowerCase()} work
+              </h2>
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {service.gallery.map((img) => (
+                  <figure key={img.src} className="overflow-hidden rounded-xl bg-neutral-100">
+                    <img
+                      src={img.src}
+                      alt={img.alt}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover aspect-[4/3] transition-transform duration-500 hover:scale-105"
+                    />
+                  </figure>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {/* Related products. Each image belongs to the product it depicts. */}
         {related.length > 0 && (
           <section className="py-12 md:py-14 bg-neutral-50">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8">

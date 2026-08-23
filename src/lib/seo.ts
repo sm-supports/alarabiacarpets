@@ -358,15 +358,16 @@ export function buildCategoryMetadata(slug: string): Metadata {
 /**
  * Service schema.
  *
- * Deliberately emits no `image` (there is no photography for these services --
- * see the comment in src/data/services.ts) and no `offers` (no price), matching
- * the same discipline applied to Product: assert nothing we cannot back up.
+ * Emits `image` only when the service has real project photography, and never
+ * `offers` (there is no price). Same discipline as Product: assert nothing we
+ * cannot back up.
  */
 export function buildServiceJsonLd(service: {
   slug: string;
   heading: string;
   label: string;
   metaDescription: string;
+  heroImage?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -378,5 +379,8 @@ export function buildServiceJsonLd(service: {
     url: absoluteUrl(`/services/${service.slug}`),
     provider: { "@id": `${SITE_URL}/#organization` },
     areaServed: { "@type": "Country", name: COUNTRY },
+    // Only when a real project photo exists -- never the brand logo, which
+    // would assert imagery of work we cannot show.
+    ...(service.heroImage ? { image: absoluteUrl(service.heroImage) } : {}),
   };
 }

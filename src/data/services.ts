@@ -6,13 +6,14 @@
  * lists products, and these have none. A category page with an empty grid would
  * be worse than no page.
  *
- * IMAGES: every service below intentionally has NO hero image. There is no
- * wallpaper, cabinet, wardrobe or parquet photography anywhere in public/.
- * Do not "fix" a missing hero by pointing it at a carpet or flooring photo --
- * a wallpaper page illustrated with a carpet is a worse result than one with no
- * image, and og:image already falls back to the brand logo from the root layout.
- * Photography enters these pages only through `relatedProductIds`, where each
- * image is attached to the product it actually depicts.
+ * IMAGES: wardrobes and parquet-flooring now have real project photography in
+ * public/Services/<slug>/. wallpaper and kitchen-cabinets still have NONE --
+ * nothing in public/ depicts either, and the wardrobe and TV-unit joinery shots
+ * are not kitchens. Leave their heroImage/gallery unset rather than borrowing an
+ * unrelated photo: a kitchen page illustrated with a bedroom wardrobe is a worse
+ * result than one with no image, and og:image falls back to the brand logo.
+ * Those two pages also draw imagery via `relatedProductIds`, where each photo is
+ * attached to the product it actually depicts.
  */
 
 export interface ServiceStep {
@@ -28,6 +29,11 @@ export interface ServiceFaq {
 export interface ServiceSpec {
   label: string;
   value: string;
+}
+
+export interface ServiceImage {
+  src: string;
+  alt: string;
 }
 
 export interface Service {
@@ -52,6 +58,11 @@ export interface Service {
   relatedProductIds: string[];
   /** Category landing pages this service links up to. */
   relatedCategorySlugs: string[];
+  /** Real project photo. Unset means we have none -- never borrow one. */
+  heroImage?: string;
+  heroImageAlt?: string;
+  /** Further project photos, shown as a gallery under the intro. */
+  gallery?: ServiceImage[];
 }
 
 const AREAS =
@@ -222,6 +233,55 @@ export const services: Service[] = [
       "cabin-interior-design",
     ],
     relatedCategorySlugs: ["interior", "majlis-sofa"],
+    heroImage: "/Services/wardrobes/walk-in-wardrobe-classic-white.webp",
+    heroImageAlt:
+      "Floor-to-ceiling fitted wardrobes with panelled doors in a Qatari dressing room",
+    gallery: [
+      {
+        src: "/Services/wardrobes/walk-in-wardrobe-lit-shelving.webp",
+        alt: "Walk-in wardrobe interior with glass shelving and integrated LED lighting",
+      },
+      {
+        src: "/Services/wardrobes/dressing-room-island-drawers.webp",
+        alt: "Dressing room fit-out with full-height wardrobes and a central drawer island",
+      },
+      {
+        src: "/Services/wardrobes/fitted-wardrobe-wood-veneer.webp",
+        alt: "Handleless wood veneer wardrobe run finished flush to the ceiling with cove lighting",
+      },
+      {
+        src: "/Services/wardrobes/fitted-wardrobe-handleless-white.webp",
+        alt: "Handleless white fitted wardrobe spanning a bedroom wall floor to ceiling",
+      },
+      {
+        src: "/Services/wardrobes/fitted-wardrobe-installation.webp",
+        alt: "Fitted wardrobe being installed and scribed to the wall in a Doha bedroom",
+      },
+      {
+        src: "/Services/wardrobes/sliding-mirror-wardrobe.webp",
+        alt: "Three-door sliding mirrored wardrobe fitted in a Qatari bedroom",
+      },
+      {
+        src: "/Services/wardrobes/wardrobe-with-dressing-table.webp",
+        alt: "Fitted wardrobe with an integrated dressing table and mirror",
+      },
+      {
+        src: "/Services/wardrobes/fitted-wardrobe-black-handles.webp",
+        alt: "White fitted wardrobes with long black handles running the width of a bedroom",
+      },
+      {
+        src: "/Services/wardrobes/corridor-wardrobe-run.webp",
+        alt: "Full-height wardrobe run built along a corridor wall",
+      },
+      {
+        src: "/Services/wardrobes/fitted-wardrobe-grey-wood.webp",
+        alt: "Fitted wardrobes in a grey wood finish with black handles",
+      },
+      {
+        src: "/Services/wardrobes/fitted-wardrobe-flush-detail.webp",
+        alt: "Detail of a handleless wardrobe finished flush with the wall and ceiling",
+      },
+    ],
   },
   {
     slug: "parquet-flooring",
@@ -278,6 +338,9 @@ export const services: Service[] = [
       "spc-zigzag-barkia-installation",
     ],
     relatedCategorySlugs: ["barkia"],
+    heroImage: "/Services/parquet-flooring/herringbone-laminate-installation.webp",
+    heroImageAlt:
+      "Herringbone laminate flooring being laid plank by plank over a levelled sub-floor in Qatar",
   },
 ];
 

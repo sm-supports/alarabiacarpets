@@ -44,14 +44,28 @@ export default function ServicesPage() {
 
         <section className="py-12 md:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
-            {/* Text cards: these services have no photography yet. See the
-                comment in src/data/services.ts before adding images here. */}
+            {/* Cards show a photo only where the service has one. wallpaper and
+                kitchen-cabinets stay text-only until real photos exist. */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {services.map((service) => (
                 <article
                   key={service.slug}
-                  className="bg-white rounded-xl border border-neutral-200 p-6 flex flex-col transition-all duration-300 hover:shadow-md"
+                  className="bg-white rounded-xl border border-neutral-200 overflow-hidden flex flex-col transition-all duration-300 hover:shadow-md"
                 >
+                  {service.heroImage && (
+                    <Link href={`/services/${service.slug}`} className="block group">
+                      <div className="aspect-[16/9] overflow-hidden bg-neutral-100">
+                        <img
+                          src={service.heroImage}
+                          alt={service.heroImageAlt ?? service.heading}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                    </Link>
+                  )}
+                  <div className="p-6 flex flex-col flex-grow">
                   <h2 className="font-playfair text-xl font-semibold text-neutral-900 mb-2">
                     <Link
                       href={`/services/${service.slug}`}
@@ -69,6 +83,7 @@ export default function ServicesPage() {
                   >
                     Read more
                   </Link>
+                  </div>
                 </article>
               ))}
             </div>

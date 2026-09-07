@@ -14,6 +14,7 @@ Each folder below contains a `skill.md` with step-by-step instructions for a spe
 | Content Update | `content-update/` | Update hero text, about page, services, SEO metadata |
 | Product Catalog | `product-catalog/` | Bulk product operations, categories, pricing |
 | Contact Form | `contact-form/` | Modify the contact form fields or API behavior |
+| Turnstile Spin | `turnstile-spin/` | Verify or change Turnstile bot protection on the contact form |
 
 ## How It Works
 

@@ -35,9 +35,15 @@ export default function RelatedProducts({
   // indexed". Rotating the window makes each category graph strongly connected:
   // every product is linked from `limit` siblings, and the set stays stable
   // across builds because it is derived from array position, not randomness.
-  const start = products
-    .filter((p) => p.category === category)
-    .findIndex((p) => p.id === currentId);
+  // Math.max guards the not-found case: findIndex returns -1, and JS `%` keeps
+  // the sign of the dividend, so (-1 % n) is -1 and siblings[-1] is undefined.
+  // Clamping to 0 starts the window at the first sibling instead of crashing.
+  const start = Math.max(
+    0,
+    products
+      .filter((p) => p.category === category)
+      .findIndex((p) => p.id === currentId)
+  );
   const related = Array.from(
     { length: Math.min(limit, siblings.length) },
     (_, i) => siblings[(start + i) % siblings.length]

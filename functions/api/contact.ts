@@ -127,7 +127,11 @@ async function verifyTurnstileToken(
   }
 
   if (outcome.success !== true) {
-    const codes = outcome["error-codes"] ?? [];
+    // Same untrusted body as above: the shape guard only proved `outcome` is an
+    // object, so this field can be any JSON value. `.join` on a non-array would
+    // throw here -- outside the try -- and escape as a 500.
+    const raw = outcome["error-codes"];
+    const codes = Array.isArray(raw) ? raw : [];
     return { ok: false, reason: codes.length ? codes.join(",") : "not-successful" };
   }
   if (outcome.action !== TURNSTILE_ACTION) {

@@ -4,7 +4,29 @@ import { generateAcknowledgmentEmail } from "../email-templates/acknowledgment";
 interface Env {
   RESEND_API_KEY: string;
   TURNSTILE_SECRET_KEY: string;
+  /**
+   * Comma-separated frontend hostnames allowed to submit this form, compared
+   * against the `hostname` siteverify returns. Optional: when unset, falls back
+   * to PRODUCTION_HOSTNAMES. Set it in .dev.vars for local work
+   * (`localhost,127.0.0.1`); never add those to the production value.
+   */
+  TURNSTILE_HOSTNAMES?: string;
 }
+
+const SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+
+// Must match the `action` the widget is rendered with in ContactSection.tsx.
+const TURNSTILE_ACTION = "contact";
+
+// Frontend hostnames this Function accepts tokens from when TURNSTILE_HOSTNAMES
+// is not configured. A leading "*." entry matches any subdomain (Pages preview
+// deployments live at <hash>.alarabiacarpets.pages.dev).
+const PRODUCTION_HOSTNAMES = [
+  "alarabiacarpets.com",
+  "www.alarabiacarpets.com",
+  "alarabiacarpets.pages.dev",
+  "*.alarabiacarpets.pages.dev",
+];
 
 interface CFContext {
   request: Request;
@@ -22,32 +44,91 @@ export async function onRequestOptions(): Promise<Response> {
   return new Response(null, { status: 204, headers });
 }
 
+interface SiteverifyOutcome {
+  success?: boolean;
+  action?: string;
+  hostname?: string;
+  "error-codes"?: string[];
+}
+
+type TurnstileResult = { ok: true } | { ok: false; reason: string };
+
+function expectedHostnames(env: Env): string[] {
+  const configured = (env.TURNSTILE_HOSTNAMES ?? "")
+    .split(",")
+    .map((hostname) => hostname.trim().toLowerCase())
+    .filter(Boolean);
+  return configured.length > 0 ? configured : PRODUCTION_HOSTNAMES;
+}
+
+function hostnameAllowed(hostname: unknown, allowed: string[]): boolean {
+  if (typeof hostname !== "string" || hostname.length === 0) {
+    return false;
+  }
+  const actual = hostname.toLowerCase();
+  return allowed.some((entry) =>
+    entry.startsWith("*.")
+      ? actual.endsWith(entry.slice(1)) && actual.length > entry.length - 1
+      : entry === actual
+  );
+}
+
+/**
+ * Canonical server-side Turnstile check. Fails closed on any transport error,
+ * non-2xx status, or malformed body, and requires `success`, the expected
+ * `action`, and an approved frontend `hostname`.
+ */
 async function verifyTurnstileToken(
-  token: string,
-  secretKey: string,
+  token: unknown,
+  env: Env,
   ip: string | null
-): Promise<boolean> {
+): Promise<TurnstileResult> {
+  if (typeof token !== "string" || token.length === 0 || token.length > 2048) {
+    return { ok: false, reason: "invalid-token" };
+  }
+  if (!env.TURNSTILE_SECRET_KEY) {
+    return { ok: false, reason: "secret-not-configured" };
+  }
+  const allowed = expectedHostnames(env);
+  if (allowed.length === 0) {
+    return { ok: false, reason: "no-hostnames-configured" };
+  }
+
   const formData = new URLSearchParams();
-  formData.append("secret", secretKey);
+  formData.append("secret", env.TURNSTILE_SECRET_KEY);
   formData.append("response", token);
   if (ip) {
     formData.append("remoteip", ip);
   }
 
-  const result = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-    {
+  let outcome: SiteverifyOutcome;
+  try {
+    const result = await fetch(SITEVERIFY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: formData.toString(),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!result.ok) {
+      throw new Error(`siteverify responded ${result.status}`);
     }
-  );
+    outcome = (await result.json()) as SiteverifyOutcome;
+  } catch (err) {
+    console.error("Turnstile siteverify request failed:", err);
+    return { ok: false, reason: "siteverify-unavailable" };
+  }
 
-  const outcome = (await result.json()) as {
-    success: boolean;
-    "error-codes"?: string[];
-  };
-  return outcome.success;
+  if (outcome.success !== true) {
+    const codes = outcome["error-codes"] ?? [];
+    return { ok: false, reason: codes.length ? codes.join(",") : "not-successful" };
+  }
+  if (outcome.action !== TURNSTILE_ACTION) {
+    return { ok: false, reason: "action-mismatch" };
+  }
+  if (!hostnameAllowed(outcome.hostname, allowed)) {
+    return { ok: false, reason: "hostname-mismatch" };
+  }
+  return { ok: true };
 }
 
 export async function onRequestPost(context: CFContext): Promise<Response> {
@@ -69,13 +150,14 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
     }
 
     const clientIp = context.request.headers.get("CF-Connecting-IP");
-    const isHuman = await verifyTurnstileToken(
+    const verification = await verifyTurnstileToken(
       turnstileToken,
-      context.env.TURNSTILE_SECRET_KEY,
+      context.env,
       clientIp
     );
 
-    if (!isHuman) {
+    if (!verification.ok) {
+      console.warn("Turnstile verification rejected:", verification.reason);
       return new Response(
         JSON.stringify({ error: "Bot verification failed" }),
         { status: 403, headers }

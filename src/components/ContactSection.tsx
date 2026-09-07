@@ -6,7 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, MapPin, Mail, Phone, MessageCircle } from "lucide-react";
 import Link from "next/link";
-import CloudflareTurnstile from "@/components/CloudflareTurnstile";
+import CloudflareTurnstile, {
+  type CloudflareTurnstileHandle,
+} from "@/components/CloudflareTurnstile";
 import { trackFormLead, trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
 import { EMAIL, PHONE } from "@/lib/seo";
 
@@ -14,6 +16,10 @@ import { EMAIL, PHONE } from "@/lib/seo";
 // define it, the Turnstile widget cannot render and the form can never be
 // submitted -- so surface that instead of showing a permanently dead button.
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
+// Stable Turnstile action for this surface. functions/api/contact.ts rejects
+// any token whose siteverify `action` does not equal this value.
+const TURNSTILE_ACTION = "contact";
 
 const ContactSection = memo(function ContactSection() {
   const [name, setName] = useState("");
@@ -24,6 +30,7 @@ const ContactSection = memo(function ContactSection() {
   const [turnstileToken, setTurnstileToken] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const turnstileRef = useRef<CloudflareTurnstileHandle>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -74,11 +81,16 @@ const ContactSection = memo(function ContactSection() {
       console.error("Form submission error:", error);
       const errorMsg = error instanceof Error ? error.message : "Unknown error";
 
+      // The token was redeemed (or rejected) by siteverify and cannot be
+      // reused. Reset the widget so the retry submits a fresh token.
+      turnstileRef.current?.reset();
+      setTurnstileToken("");
+
       toast({
         title: "Something went wrong!",
         description:
           errorMsg.includes("verification")
-            ? "Verification failed. Please refresh the page and try again."
+            ? "Verification failed. Please complete the check and try again."
             : "Please try again later or contact us directly.",
         variant: "destructive",
       });
@@ -302,7 +314,9 @@ const ContactSection = memo(function ContactSection() {
                   <div className="flex justify-center">
                     {TURNSTILE_SITE_KEY ? (
                       <CloudflareTurnstile
+                        ref={turnstileRef}
                         siteKey={TURNSTILE_SITE_KEY}
+                        action={TURNSTILE_ACTION}
                         onVerify={(token) => setTurnstileToken(token)}
                         onExpire={() => setTurnstileToken("")}
                         onError={() => setTurnstileToken("")}

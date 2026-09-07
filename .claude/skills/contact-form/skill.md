@@ -81,9 +81,21 @@ Conversion tracking lives in `src/lib/analytics.ts` (`trackFormLead`, `trackWhat
 
 ## Turnstile Configuration
 
-- Site key: `import.meta.env.VITE_TURNSTILE_SITE_KEY` (set in `.env`)
-- Secret key: `TURNSTILE_SECRET_KEY` (Cloudflare env var)
-- Widget component: `src/components/CloudflareTurnstile.tsx` handles script loading and cleanup
+- Site key: `process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY` (build-time; set in `.env` locally
+  and in the Pages project for Production *and* Preview)
+- Secret key: `TURNSTILE_SECRET_KEY` (runtime secret on the Pages project; `.dev.vars` locally)
+- Allowed hostnames: `TURNSTILE_HOSTNAMES` (optional, comma-separated). The Function compares
+  it against the `hostname` siteverify returns and falls back to the production hostnames in
+  `PRODUCTION_HOSTNAMES` when unset. `.dev.vars` sets `localhost,127.0.0.1`; never put those
+  in the production value.
+- Action: the widget renders with `action="contact"` and the Function rejects any token whose
+  siteverify `action` differs. Change both sides together or not at all.
+- Widget component: `src/components/CloudflareTurnstile.tsx` handles script loading, cleanup,
+  and exposes `reset()` through its `ref`. `ContactSection` calls it after a failed submit
+  because tokens are single-use.
+- Cloudflare's always-passes test secret (`1x0000…AA`) returns `hostname: "example.com"` and
+  no `action`, so it now fails the hostname and action checks. Local end-to-end testing of a
+  real submission needs the real widget secret in `.dev.vars`.
 - Do not modify the Turnstile verification logic unless changing providers
 
 ## Email Configuration

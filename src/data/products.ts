@@ -834,7 +834,7 @@ export const products: Product[] = [
     "id": "khema-majlis-sofa",
     "name": "Khema majlis sofa",
     "category": "furniture",
-    "description": "Premium Khema majlis sofa for your home and office.",
+    "description": "Tent-style khema majlis seating, built low and hard-wearing for camps and outdoor majlis.",
     "price": "Contact for Price",
     "media": [
       {
@@ -847,7 +847,51 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Khema majlis sofa 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Khema%20majlis%20sofa"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Khema%20majlis%20sofa",
+    seoTitle: "Khema Majlis Sofa Qatar | Tent Majlis Seating",
+    metaDescription: "Khema majlis sofas in Qatar for tents, camps and outdoor majlis. Low tent-style seating in hard-wearing fabric, measured and delivered across Doha.",
+    imageAlt: "Khema tent-style majlis sofa running along a tent wall",
+    longDescription: [
+      "Khema seating is the tent majlis version of our range: lower to the ground, firmer, and made to run in long continuous lines along the walls of a tent rather than sit as separate pieces in a room.",
+      "Because it spends the season outdoors, we build it differently. The fabrics are chosen for hard wear and easy cleaning rather than for delicacy, and the frames and cushioning are made to be moved, stacked and put back at the end of the camping season.",
+      "We measure the tent itself before quoting, so the run lengths and corner pieces match the actual walls instead of being cut down on the day.",
+    ],
+    specs: [
+      {
+        label: "Made to measure",
+        value: "Sized to your tent",
+      },
+      {
+        label: "Seating height",
+        value: "Low, floor-level style",
+      },
+      {
+        label: "Fabric",
+        value: "Hard-wearing, easy clean",
+      },
+      {
+        label: "Use",
+        value: "Camps, tents, outdoor majlis",
+      },
+      {
+        label: "Delivery",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "How is a khema majlis different from an indoor majlis sofa?",
+        a: "It sits lower, is firmer, and is built in long runs that follow the tent walls. The fabrics are also chosen for hard wear and cleaning rather than for a formal indoor look.",
+      },
+      {
+        q: "Can you deliver to a camp outside Doha?",
+        a: "Yes. We deliver and position khema seating anywhere in Qatar, including camp sites away from the city.",
+      },
+      {
+        q: "Will it survive a full camping season?",
+        a: "It is built for it. The frames and cushioning are made to be moved and stacked, and the fabrics are selected to take dust and repeated cleaning.",
+      },
+    ]
   },
   {
     "id": "luxury-majlis-sofa",
@@ -907,7 +951,7 @@ export const products: Product[] = [
     "id": "majlis-and-cabinets-majlis-sofa",
     "name": "Majlis Sofa & Cabinets",
     "category": "furniture",
-    "description": "Premium Majlis and cabinets:majlis sofa for your home and office.",
+    "description": "Majlis seating supplied with matching cabinetry, so the sofas and joinery are finished as one scheme.",
     "price": "Contact for Price",
     "media": [
       {
@@ -924,13 +968,57 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Majlis and cabinets:majlis sofa 1.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Majlis%20Sofa%20%26%20Cabinets"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Majlis%20Sofa%20%26%20Cabinets",
+    seoTitle: "Majlis Sofa & Cabinets Qatar | Fitted Together",
+    metaDescription: "Majlis sofas and matching cabinets made together in Qatar. Seating, TV units and storage finished in one scheme, measured and fitted across Doha.",
+    imageAlt: "Majlis sofa and matching fitted cabinets in a Doha majlis",
+    longDescription: [
+      "This is the seating and the joinery ordered as one job rather than two. You get the majlis sofas plus the cabinetry that goes with them -- the TV unit, the side cabinets and any storage built into the walls -- specified and finished to match.",
+      "Ordering them together is mainly about the finish. When the cabinets come from a different supplier than the seating, the timber tone and the upholstery rarely line up, and the join between fitted and loose furniture shows. Doing both lets us match them at the sample stage.",
+      "We measure the room once, produce the seating and the cabinetry to the same drawings, and install in a single visit so the majlis is finished in one go.",
+    ],
+    specs: [
+      {
+        label: "Scope",
+        value: "Seating plus fitted cabinetry",
+      },
+      {
+        label: "Includes",
+        value: "TV unit, side cabinets, storage",
+      },
+      {
+        label: "Made to measure",
+        value: "Sized to your room",
+      },
+      {
+        label: "Finish",
+        value: "Timber and fabric matched",
+      },
+      {
+        label: "Installation",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Can I order the cabinets without the seating?",
+        a: "Yes, but the reason to order them together is the match. Bought separately, the timber tone and the upholstery are chosen against different samples and rarely line up.",
+      },
+      {
+        q: "Do you design the cabinetry as well?",
+        a: "We do. We measure the room, propose a layout for the TV unit and storage, and build to the agreed drawings.",
+      },
+      {
+        q: "Is it installed in one visit?",
+        a: "That is the aim. The seating and the cabinetry are produced to the same schedule so the majlis is finished together rather than in stages.",
+      },
+    ]
   },
   {
     "id": "modern-majlis",
     "name": "Modern majlis",
     "category": "furniture",
-    "description": "Premium Modern majlis for your home and office.",
+    "description": "Contemporary majlis seating with lower backs and cleaner lines for modern villas and apartments.",
     "price": "Contact for Price",
     "media": [
       {
@@ -947,7 +1035,51 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Modern majlis 2.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Modern%20majlis"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Modern%20majlis",
+    seoTitle: "Modern Majlis Qatar | Contemporary Majlis Seating",
+    metaDescription: "Modern majlis seating in Qatar. Lower backs, clean lines and contemporary fabrics, made to measure for villas and apartments across Doha.",
+    imageAlt: "Modern majlis seating with low backs in a contemporary Doha villa",
+    longDescription: [
+      "The modern range keeps the majlis layout -- seating around the walls, open floor in the middle -- but drops the ornament. Backs are lower, arms are squarer, and the upholstery is pulled tight instead of buttoned and tufted.",
+      "It suits rooms that are already contemporary: plain walls, larger windows, and a lighter palette. We usually pair it with plainer fabrics in greys, sands and off-whites rather than the heavier patterned cloth used on traditional majlis seating.",
+      "Everything is still made to your room. We measure on site, bring the fabric range with us, and build the runs so they finish cleanly at the corners.",
+    ],
+    specs: [
+      {
+        label: "Made to measure",
+        value: "Sized to your room",
+      },
+      {
+        label: "Style",
+        value: "Low back, square arm",
+      },
+      {
+        label: "Fabric",
+        value: "Plain contemporary range",
+      },
+      {
+        label: "Suits",
+        value: "Modern villas and apartments",
+      },
+      {
+        label: "Delivery",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "How does this differ from a traditional majlis sofa?",
+        a: "Lower backs, squarer arms and tight upholstery instead of buttoning and tufting. The seating still runs around the room in the majlis layout, but the detailing is plainer.",
+      },
+      {
+        q: "Can I see fabric options before ordering?",
+        a: "Yes. We bring the fabric range to the measuring visit so you can choose against your own walls and light.",
+      },
+      {
+        q: "Does it work in an apartment rather than a villa?",
+        a: "It does. The lower profile is the reason people choose it for apartments, where a full-height traditional majlis can crowd the room.",
+      },
+    ]
   },
   {
     "id": "cabin-interior-design",
@@ -1559,7 +1691,7 @@ export const products: Product[] = [
     "id": "outdoor-wall-panel-products",
     "name": "Outdoor wall panel products",
     "category": "barkia",
-    "description": "Premium Outdoor wall panel products for your home and office.",
+    "description": "Exterior wall panels for facades, balconies and garden walls, rated for sun and rain.",
     "price": "Contact for Price",
     "media": [
       {
@@ -1568,7 +1700,51 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Outdoor wall panel products.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Outdoor%20wall%20panel%20products"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Outdoor%20wall%20panel%20products",
+    seoTitle: "Outdoor Wall Panels Qatar | Exterior Cladding",
+    metaDescription: "Outdoor wall panels in Qatar for facades, balconies and garden walls. UV stable and weather resistant cladding, measured and installed across Doha.",
+    imageAlt: "Outdoor wall panel cladding fitted to an exterior wall in Qatar",
+    longDescription: [
+      "These are exterior panels, specified for outdoor use rather than indoor wall panelling. They go on facades, balcony walls, garden and boundary walls, and the shaded elevations of villas.",
+      "Outdoors in Qatar the failure mode is not wear, it is sun. Panels that are fine indoors fade, chalk and go brittle within a season or two on a south elevation. The outdoor range is UV stable and rated for direct sun and rain, and it is fixed on a batten system that lets water drain behind the panel instead of trapping it against the wall.",
+      "We survey the elevation first, because the fixing method depends on what is behind the render, and set the panel runs out so the joints land sensibly against openings.",
+    ],
+    specs: [
+      {
+        label: "Use",
+        value: "Facades, balconies, garden walls",
+      },
+      {
+        label: "Rated for",
+        value: "Direct sun and rain",
+      },
+      {
+        label: "UV",
+        value: "Stable, fade resistant",
+      },
+      {
+        label: "Fixing",
+        value: "Battened, drained cavity behind",
+      },
+      {
+        label: "Installation",
+        value: "Included across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Can indoor wall panels be used outside?",
+        a: "Not reliably. Indoor panels are not UV stable, and on a sunny elevation in Qatar they fade, chalk and go brittle. The outdoor range is rated for direct sun and rain.",
+      },
+      {
+        q: "How are the panels fixed to the wall?",
+        a: "On a batten system that leaves a drained cavity behind the panel, so water runs away instead of being trapped against the wall.",
+      },
+      {
+        q: "Do you survey before quoting?",
+        a: "Yes. The fixing method depends on what is behind the render, so we survey the elevation and set the panel runs out against the openings first.",
+      },
+    ]
   },
   {
     "id": "pearl-grey-herringbone-100-waterproof-spc-qatar",
@@ -1864,7 +2040,7 @@ export const products: Product[] = [
     "id": "skerting-nala-profile",
     "name": "Skirting & Nala Profile",
     "category": "barkia",
-    "description": "Premium Skerting:Nala:profile for your home and office.",
+    "description": "Skirting and nala profiles that finish the floor-to-wall junction and cover expansion gaps.",
     "price": "Contact for Price",
     "media": [
       {
@@ -1873,13 +2049,57 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Skerting:Nala:profile.jpeg",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Skirting%20%26%20Nala%20Profile"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Skirting%20%26%20Nala%20Profile",
+    seoTitle: "Skirting & Nala Profile Qatar | Floor Trim",
+    metaDescription: "Skirting and nala profiles in Qatar. Trim that finishes the floor-to-wall junction and hides expansion gaps, colour matched and fitted across Doha.",
+    imageAlt: "Skirting and nala profile trim fitted at a floor-to-wall junction",
+    longDescription: [
+      "These are the trims, not the floor. Skirting covers the junction where the flooring meets the wall; nala and transition profiles cover the gaps at doorways, level changes and the edges of a run.",
+      "They matter more than they look. Rigid flooring has to be laid with an expansion gap at every wall so it can move with temperature, and the trim is what hides that gap while still letting the floor move underneath. Sealing the floor tight to the wall instead is the usual cause of buckling later.",
+      "We colour match the profile to the flooring, or deliberately contrast it where the wall finish calls for that, and fit it as part of the flooring installation.",
+    ],
+    specs: [
+      {
+        label: "Purpose",
+        value: "Finishes floor-to-wall junction",
+      },
+      {
+        label: "Covers",
+        value: "Expansion gaps and transitions",
+      },
+      {
+        label: "Colour",
+        value: "Matched to your flooring",
+      },
+      {
+        label: "Fitted with",
+        value: "SPC, PVC and barkia flooring",
+      },
+      {
+        label: "Service area",
+        value: "Across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Why is an expansion gap needed at all?",
+        a: "Rigid flooring expands and contracts with temperature. The gap gives it room to move; the skirting hides the gap without pinning the floor down. Fixing the floor tight to the wall is what causes buckling later.",
+      },
+      {
+        q: "Can the profile match my flooring?",
+        a: "Yes. We colour match the profile to the flooring you have chosen, or supply a contrasting one if the wall finish suits that better.",
+      },
+      {
+        q: "Is the trim quoted separately from the floor?",
+        a: "It is normally included in the flooring quote, since it is fitted as part of the same installation.",
+      },
+    ]
   },
   {
     "id": "spc-zigzag-barkia-installation",
     "name": "SPC Zigzag Barkia Installation",
     "category": "barkia",
-    "description": "Premium Spc zigzag barkia installation for your home and office.",
+    "description": "SPC barkia laid in a zigzag herringbone pattern, cut and angled on site.",
     "price": "Contact for Price",
     "media": [
       {
@@ -1892,7 +2112,51 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Spc zigzag barkia installation vid.mp4",
-    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20SPC%20Zigzag%20Barkia%20Installation"
+    "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20SPC%20Zigzag%20Barkia%20Installation",
+    seoTitle: "SPC Zigzag Barkia Installation Qatar | Herringbone",
+    metaDescription: "SPC barkia fitted in a zigzag herringbone pattern in Qatar. Each plank cut and angled on site by our own installers, with free measurement in Doha.",
+    imageAlt: "SPC barkia planks being laid in a zigzag herringbone pattern",
+    longDescription: [
+      "This is a laying pattern rather than a different product. The same SPC barkia planks are set at opposing angles so they interlock in a zigzag, which reads as a much more finished floor than a straight run of the identical material.",
+      "It is a slower installation. Every plank at the perimeter has to be cut to an angle, the pattern has to be set out from a centre line before anything is fixed, and there is more offcut waste than a straight lay, so both the labour and the material allowance are higher.",
+      "The trade-off is that it holds up in large open rooms where a straight lay starts to look flat, and it disguises a room that is slightly out of square better than parallel planks do.",
+    ],
+    specs: [
+      {
+        label: "Pattern",
+        value: "Zigzag herringbone",
+      },
+      {
+        label: "Material",
+        value: "SPC barkia planks",
+      },
+      {
+        label: "Set out",
+        value: "From a centre line",
+      },
+      {
+        label: "Suits",
+        value: "Large or open-plan rooms",
+      },
+      {
+        label: "Measurement",
+        value: "Free, across Qatar",
+      },
+    ],
+    faqs: [
+      {
+        q: "Does the zigzag pattern cost more than a straight lay?",
+        a: "Yes. Every perimeter plank is angle cut and there is more waste, so both the labour and the material allowance are higher than a straight run of the same barkia.",
+      },
+      {
+        q: "Is the material different from normal SPC barkia?",
+        a: "No. It is the same plank, set at opposing angles. The difference is entirely in how it is laid.",
+      },
+      {
+        q: "Where does the pattern work best?",
+        a: "In larger or open-plan rooms, where a straight lay tends to look flat. It also disguises a room that is slightly out of square.",
+      },
+    ]
   },
   {
     "id": "stairs-carpet-installation",

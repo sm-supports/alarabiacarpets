@@ -23,9 +23,25 @@ export default function RelatedProducts({
   // Same category only. Padding with other categories made the
   // "More in {category}" heading factually wrong for small categories, and gave
   // crawlers misleading anchor context.
-  const related = products
-    .filter((p) => p.id !== currentId && p.category === category)
-    .slice(0, limit);
+  const siblings = products.filter(
+    (p) => p.id !== currentId && p.category === category
+  );
+
+  // Circular window starting just after the current product, NOT siblings.slice(0, limit).
+  // A fixed prefix meant every page in a category linked to the same first few
+  // products, so in barkia (15) and carpet (10) everything past the prefix was
+  // reachable only from the category page -- 15 of 37 SKUs had zero sibling
+  // links, and Search Console parked them under "Discovered - currently not
+  // indexed". Rotating the window makes each category graph strongly connected:
+  // every product is linked from `limit` siblings, and the set stays stable
+  // across builds because it is derived from array position, not randomness.
+  const start = products
+    .filter((p) => p.category === category)
+    .findIndex((p) => p.id === currentId);
+  const related = Array.from(
+    { length: Math.min(limit, siblings.length) },
+    (_, i) => siblings[(start + i) % siblings.length]
+  );
 
   const href = categoryPath(category);
 

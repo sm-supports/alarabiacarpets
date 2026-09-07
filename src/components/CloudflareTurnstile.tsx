@@ -1,18 +1,31 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useImperativeHandle } from "react";
+import type { Ref } from "react";
+
+/** Imperative handle exposed through `ref`: lets the owning form reset the
+ *  widget after a failed submit. Turnstile tokens are single-use, so a retry
+ *  without a reset would replay a redeemed token and be rejected. */
+export interface CloudflareTurnstileHandle {
+  reset: () => void;
+}
 
 interface CloudflareTurnstileProps {
   siteKey: string;
+  /** Stable surface name (1-32 chars, [A-Za-z0-9_-]). Echoed back by
+   *  siteverify as `action` and checked server-side. */
+  action: string;
   onVerify: (token: string) => void;
   onExpire?: () => void;
   onError?: () => void;
   theme?: "dark" | "light" | "auto";
   className?: string;
+  ref?: Ref<CloudflareTurnstileHandle>;
 }
 
 interface TurnstileRenderOptions {
   sitekey: string;
+  action: string;
   callback: (token: string) => void;
   "expired-callback"?: () => void;
   "error-callback"?: () => void;
@@ -32,11 +45,13 @@ declare global {
 
 export default function CloudflareTurnstile({
   siteKey,
+  action,
   onVerify,
   onExpire,
   onError,
   theme = "dark",
   className = "",
+  ref,
 }: CloudflareTurnstileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
@@ -51,17 +66,34 @@ export default function CloudflareTurnstile({
     onErrorRef.current = onError;
   }, [onVerify, onExpire, onError]);
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      reset: () => {
+        if (widgetIdRef.current && window.turnstile) {
+          try {
+            window.turnstile.reset(widgetIdRef.current);
+          } catch (err) {
+            console.error("Turnstile reset failed:", err);
+          }
+        }
+      },
+    }),
+    []
+  );
+
   const renderWidget = useCallback(() => {
     if (window.turnstile && containerRef.current && !widgetIdRef.current) {
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: siteKey,
+        action,
         callback: (token) => onVerifyRef.current(token),
         "expired-callback": () => onExpireRef.current?.(),
         "error-callback": () => onErrorRef.current?.(),
         theme,
       });
     }
-  }, [siteKey, theme]);
+  }, [siteKey, action, theme]);
 
   useEffect(() => {
     let mounted = true;

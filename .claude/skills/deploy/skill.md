@@ -71,9 +71,11 @@ These guard the invariants the site was rebuilt for. All should print nothing or
     ```
     Expect `{"error":"Bot verification required"}`.
 
-13. Submit a test contact form in the browser. Note: `.dev.vars` uses Cloudflare's
-    always-passes Turnstile test secret, but the **Resend key is the live one**, so a
-    successful submission sends a real email.
+13. Submit a test contact form in the browser. Note: with Cloudflare's always-passes
+    Turnstile test secret in `.dev.vars`, siteverify reports `hostname: "example.com"` and
+    no `action`, so the Function returns 403. A real end-to-end submission needs the real
+    widget secret in `.dev.vars`, and the **Resend key is the live one**, so a successful
+    submission sends a real email.
 
 14. Stop the dev server.
 
@@ -95,6 +97,7 @@ Set on the Cloudflare dashboard (Settings → Environment variables), not in cod
 |---|---|---|
 | `RESEND_API_KEY` | Runtime secret | Used by `functions/api/contact.ts` |
 | `TURNSTILE_SECRET_KEY` | Runtime secret | Server-side Turnstile verification |
+| `TURNSTILE_HOSTNAMES` | Runtime (optional) | Comma-separated hostnames siteverify may report. Unset in production (code falls back to `alarabiacarpets.com`, `www.`, and `*.alarabiacarpets.pages.dev`); `localhost,127.0.0.1` in `.dev.vars`. Never include localhost in production. |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | **Build-time** | Inlined at build. If missing, the Turnstile widget never renders and the contact form's submit button stays permanently disabled. Set for Production *and* Preview. |
 | `NODE_VERSION` | Build-time | `20` |
 

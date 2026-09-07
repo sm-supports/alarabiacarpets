@@ -12,3 +12,15 @@
 # Every route is now a real prerendered HTML file, and that rule made every
 # unknown URL return HTTP 200 with the 404 page -- a soft-404 to crawlers.
 # Without it, Cloudflare Pages serves out/404.html with a real 404 status.
+
+# Legacy product-hub URLs Google still has indexed (GSC "Soft 404", 5 pages).
+# They were soft-404s only because of the SPA fallback above; removing it made
+# them hard 404s, which throws away the equity on URLs that map cleanly onto
+# live pages. 301 each to its closest equivalent instead.
+# Same caveat as /products/sofa: these only fire because no matching static
+# asset is emitted -- never add a product or category slug with these names.
+/products/luxury-carpets  /products/carpet       301
+/products/premium-barkia  /products/barkia       301
+/products/curtains        /products/curtain      301
+/products/majlis-sets     /products/majlis-sofa  301
+/products/roller-blinds   /products/roller       301

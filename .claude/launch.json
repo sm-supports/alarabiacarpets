@@ -4,8 +4,20 @@
     {
       "name": "dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 8080
+    },
+    {
+      "name": "pages",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "pages:preview"
+      ],
+      "port": 8788
     }
   ]
 }

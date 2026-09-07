@@ -112,7 +112,15 @@ async function verifyTurnstileToken(
     if (!result.ok) {
       throw new Error(`siteverify responded ${result.status}`);
     }
-    outcome = (await result.json()) as SiteverifyOutcome;
+    // result.json() is typed loosely and the cast is not a check: a body of
+    // literal `null` would survive it and then throw on `outcome.success`
+    // below -- outside this try, so it would escape as a 500 rather than the
+    // documented fail-closed rejection. Validate the shape here instead.
+    const parsed: unknown = await result.json();
+    if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("siteverify returned a malformed body");
+    }
+    outcome = parsed as SiteverifyOutcome;
   } catch (err) {
     console.error("Turnstile siteverify request failed:", err);
     return { ok: false, reason: "siteverify-unavailable" };

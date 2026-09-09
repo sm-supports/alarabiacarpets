@@ -22,7 +22,7 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 | `src/app/` | Routes (App Router). Each `page.tsx` is a server component exporting `metadata` |
 | `src/data/guides.ts` | Guide/blog content — `Guide` interface + `guides` array |
 | `src/data/categories.ts` | Category landing pages — single source of truth for category labels |
-| `src/data/services.ts` | Service landing pages (no product SKUs, deliberately no images) |
+| `src/data/services.ts` | Service landing pages (no product SKUs) — `Service` interface + `services` array; optional `heroImage` / `heroImageAlt` / `gallery` carry real project photos only (see SEO invariants) |
 | `src/components/` | Reusable components (Navbar, Footer, HeroSection, ProductCard, etc.) |
 | `src/components/ui/` | shadcn/ui primitives (Button, Card, Input, etc.) |
 | `src/data/products.ts` | Product catalog — `Product` interface + `products` array |

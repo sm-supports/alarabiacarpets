@@ -69,7 +69,21 @@ const SERVICES = [
   ["Kitchen Cabinets", "Made-to-measure kitchen cabinetry designed, built and installed"],
   ["Wardrobes & Room Cabinets", "Built-in wardrobes and storage sized floor to ceiling"],
   ["Parquet & Laminate Flooring", "Herringbone, chevron and plank parquet and laminate supplied and laid"],
+  ["Event Carpet Installation", "Event carpet supplied and laid for exhibitions, conferences and weddings, then lifted"],
+  ["Office Carpet & Carpet Tiles", "Contract carpet tiles and broadloom supplied and fitted around business hours"],
+  ["Vinyl & SPC Flooring", "Waterproof vinyl, PVC and rigid-core SPC flooring supplied and installed"],
+  ["Artificial Grass Installation", "Artificial grass and grass carpet laid over a compacted, free-draining base"],
+  ["Gypsum & C-Board Fixing", "False ceilings, coves, bulkheads and partitions boarded and finished ready for paint"],
+  ["Custom Sofa Making", "Sofas and majlis seating made to the room's measurements in your choice of fabric"],
+  ["TV Unit Design", "Built-in TV units and panelled feature walls with concealed lighting and cabling"],
+  ["Custom Cabinets", "Made-to-measure cabinetry for kitchens, bedrooms, living rooms and offices"],
 ];
+
+/**
+ * Cities named in the Service schema's areaServed. Kept in step with the AREAS
+ * sentence in src/data/services.ts, which says the same thing to human readers.
+ */
+const SERVICE_AREAS = ["Doha", "Al Rayyan", "Al Wakra", "Al Khor", "Lusail"];
 
 const POSTAL_ADDRESS = {
   "@type": "PostalAddress",
@@ -378,7 +392,14 @@ export function buildServiceJsonLd(service: {
     description: service.metaDescription,
     url: absoluteUrl(`/services/${service.slug}`),
     provider: { "@id": `${SITE_URL}/#organization` },
-    areaServed: { "@type": "Country", name: COUNTRY },
+    areaServed: [
+      { "@type": "Country", name: COUNTRY },
+      ...SERVICE_AREAS.map((name) => ({
+        "@type": "City",
+        name,
+        containedInPlace: { "@type": "Country", name: COUNTRY },
+      })),
+    ],
     // Only when a real project photo exists -- never the brand logo, which
     // would assert imagery of work we cannot show.
     ...(service.heroImage ? { image: absoluteUrl(service.heroImage) } : {}),

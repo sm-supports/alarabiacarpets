@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "pages:dev": "npm run build && wrangler pages dev out",
     "pages:preview": "wrangler pages dev out",
-    "deploy": "npm run build && wrangler pages deploy out --project-name alarabiacarpets"
+    "deploy": "npm run build && wrangler pages deploy out --project-name alarabiacarpets",
+    "llms": "node scripts/generate-llms-txt.mjs"
   },
   "dependencies": {
     "@radix-ui/react-aspect-ratio": "^1.1.15",

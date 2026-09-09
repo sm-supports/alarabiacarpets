@@ -10,6 +10,7 @@ import { Check } from "lucide-react";
 import { services, getService } from "@/data/services";
 import { products } from "@/data/products";
 import { getCategory } from "@/data/categories";
+import { guidesForService } from "@/data/guides";
 import {
   buildBreadcrumb,
   buildFaq,
@@ -86,6 +87,19 @@ export default async function ServicePage({
     return c;
   });
 
+  const relatedServices = (service.relatedServiceSlugs ?? []).map((s) => {
+    const other = getService(s);
+    if (!other) throw new Error(`Service "${service.slug}" references unknown service slug: ${s}`);
+    if (other.slug === service.slug) throw new Error(`Service "${service.slug}" links to itself`);
+    return other;
+  });
+
+  const relatedGuides = guidesForService(service.slug);
+
+  // A folded-in sub-topic contributes its questions to the same FAQPage rather
+  // than to a second one -- same handling as Category.secondary.
+  const allFaqs = [...service.faqs, ...(service.secondary?.faqs ?? [])];
+
   return (
     <div className="min-h-screen flex flex-col">
       <JsonLd data={buildServiceJsonLd(service)} />
@@ -95,7 +109,7 @@ export default async function ServicePage({
           [service.label, `/services/${service.slug}`],
         ])}
       />
-      {service.faqs.length > 0 && <JsonLd data={buildFaq(service.faqs)} />}
+      {allFaqs.length > 0 && <JsonLd data={buildFaq(allFaqs)} />}
 
       <Navbar />
       <main className="flex-grow">
@@ -173,6 +187,29 @@ export default async function ServicePage({
               ))}
             </dl>
 
+            {service.secondary && (
+              <>
+                <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
+                  {service.secondary.heading}
+                </h2>
+                {service.secondary.intro.map((para, i) => (
+                  <p key={i} className="font-poppins text-neutral-700 leading-relaxed mb-4 text-[15px]">
+                    {para}
+                  </p>
+                ))}
+                {service.secondary.specs?.length ? (
+                  <dl className="font-poppins text-sm divide-y divide-neutral-100 border-y border-neutral-100 mt-6">
+                    {service.secondary.specs.map((spec) => (
+                      <div key={spec.label} className="flex justify-between gap-4 py-2.5">
+                        <dt className="text-neutral-500">{spec.label}</dt>
+                        <dd className="text-neutral-900 font-medium text-right">{spec.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : null}
+              </>
+            )}
+
             <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
               How it works
             </h2>
@@ -189,7 +226,7 @@ export default async function ServicePage({
               Frequently Asked Questions
             </h2>
             <div className="divide-y divide-neutral-200 border-y border-neutral-200">
-              {service.faqs.map((faq) => (
+              {allFaqs.map((faq) => (
                 <details key={faq.q} className="group py-4">
                   <summary className="font-poppins font-medium text-neutral-900 cursor-pointer list-none flex justify-between items-center gap-4">
                     <h3 className="text-base">{faq.q}</h3>
@@ -211,7 +248,7 @@ export default async function ServicePage({
           <section className="py-12 md:py-14 bg-neutral-50">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8">
               <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-8 text-neutral-900">
-                Our {service.label.toLowerCase()} work
+                Our {service.label} projects
               </h2>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {service.gallery.map((img) => (
@@ -280,6 +317,58 @@ export default async function ServicePage({
                     </Link>
                   ))}
                 </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Cluster links: guides that cover this service, and the sibling
+            service pages a visitor is most likely to need next. */}
+        {(relatedGuides.length > 0 || relatedServices.length > 0) && (
+          <section className="py-12 md:py-14 bg-white border-t border-neutral-100">
+            <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
+              {relatedGuides.length > 0 && (
+                <>
+                  <h2 className="font-playfair text-2xl font-bold text-neutral-900 mb-6">
+                    Helpful reading
+                  </h2>
+                  <ul className="space-y-4">
+                    {relatedGuides.map((guide) => (
+                      <li key={guide.slug}>
+                        <Link
+                          href={`/guides/${guide.slug}`}
+                          className="group block rounded-xl border border-neutral-200 bg-white p-4 sm:p-5 transition-all duration-300 hover:shadow-md hover:border-primary/30"
+                        >
+                          <h3 className="font-playfair text-base sm:text-lg font-semibold text-neutral-900 group-hover:text-primary transition-colors">
+                            {guide.title}
+                          </h3>
+                          <p className="font-poppins text-sm text-neutral-500 mt-1 leading-relaxed">
+                            {guide.excerpt}
+                          </p>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
+              {relatedServices.length > 0 && (
+                <>
+                  <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
+                    Related services
+                  </h2>
+                  <div className="flex flex-wrap gap-3">
+                    {relatedServices.map((other) => (
+                      <Link
+                        key={other.slug}
+                        href={`/services/${other.slug}`}
+                        className="font-poppins text-sm px-4 py-2.5 rounded-full border border-neutral-200 bg-white text-neutral-700 transition-all duration-300 hover:border-primary/40 hover:text-primary"
+                      >
+                        {other.label}
+                      </Link>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           </section>

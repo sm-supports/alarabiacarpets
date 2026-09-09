@@ -7,7 +7,7 @@ import { services } from "@/data/services";
 import { buildBreadcrumb, buildCollectionPage, clampDescription, DEFAULT_OG_IMAGES } from "@/lib/seo";
 
 const DESCRIPTION =
-  "Wallpaper, kitchen cabinets, wardrobes and parquet flooring supplied and installed across Qatar by Al Arabia Carpets in Doha.";
+  "Flooring, carpet, cabinetry, wallpaper, sofa making and gypsum work supplied and installed across Qatar by Al Arabia Carpets in Doha.";
 
 export const metadata: Metadata = {
   title: "Services",

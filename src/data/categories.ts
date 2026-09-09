@@ -93,7 +93,42 @@ export const categories: Category[] = [
         q: "How long does carpet installation take?",
         a: "A typical room is fitted the same day. Larger areas such as mosques or full office floors are scheduled in advance, and we confirm the timeline after measuring.",
       },
+      {
+        q: "What is the difference between carpet tiles and wall-to-wall carpet?",
+        a: "Carpet tiles are laid as individual squares, so a stained or worn tile is lifted and replaced without touching the rest of the floor. Wall-to-wall broadloom is a continuous surface with no visible grid, which looks better in rooms where the floor is seen as a whole.",
+      },
+      {
+        q: "Which carpet is best for a high-traffic area?",
+        a: "A short, dense pile in a mid-tone colour. Long piles flatten in walkways and show every track, while very light and very dark colours both show marks. In offices and corridors we would normally recommend contract-grade carpet tiles for the same reason.",
+      },
+      {
+        q: "Do you supply carpet for mosques and events?",
+        a: "Yes, both. We supply and fit prayer-hall carpet with the traditional row markings, and we lay event carpet for exhibitions, conferences and weddings, usually overnight, then lift it afterwards.",
+      },
     ],
+    secondary: {
+      heading: "Carpet for offices, events and outdoor areas",
+      intro: [
+        "Beyond wall-to-wall carpet for homes and majlis, three other kinds of carpet work make up much of what we do in Qatar, and each is handled differently from a domestic fit.",
+        "Office carpet is normally supplied as carpet tiles and fitted around working hours, so a floor can be re-covered without the business closing. Event carpet is laid to a venue's access window, usually overnight, and lifted once the event closes. Grass carpet is an outdoor product laid over a compacted, free-draining base rather than straight onto sand.",
+      ],
+      specs: [
+        { label: "Office carpet", value: "Carpet tiles, fitted out of hours" },
+        { label: "Event carpet", value: "Overnight installation, lifted after" },
+        { label: "Grass carpet", value: "Laid over a drained, compacted base" },
+        { label: "Mosque carpet", value: "Prayer-hall carpet with row markings" },
+      ],
+      faqs: [
+        {
+          q: "Can you re-carpet an office without closing it?",
+          a: "Yes. Office floors are normally fitted in phases in the evenings or at weekends, department by department. Furniture is moved aside, the area is laid and put back, and the space is usable again the next working morning.",
+        },
+        {
+          q: "Do you lay artificial grass as well as carpet?",
+          a: "Yes. Grass carpet is laid for villa gardens, roof terraces, play areas and entrance steps. The important part is the base underneath it: laid over compacted, free-draining material it stays flat, whereas grass laid straight onto sand develops dips within a couple of years.",
+        },
+      ],
+    },
   },
   {
     slug: "barkia",
@@ -198,6 +233,18 @@ export const categories: Category[] = [
       {
         q: "Can I combine sheers with blackout curtains?",
         a: "Yes, layering is common. A sheer keeps daytime privacy while letting light through, with a blackout curtain closing over it at night. We fit a double track for this.",
+      },
+      {
+        q: "How long do made-to-measure curtains take?",
+        a: "Usually a couple of weeks from the measuring visit, and the fabric normally sets the pace rather than the making. If a fabric has to be ordered in we tell you at quotation stage rather than after you have committed to it.",
+      },
+      {
+        q: "Which blinds suit an office?",
+        a: "Roller and vertical blinds, in most cases. Both control glare on screens without darkening the room the way a curtain does, they take up almost no space at the window, and they are far easier to keep clean in a working office than fabric curtains.",
+      },
+      {
+        q: "How do I measure for curtains?",
+        a: "You do not need to. Measuring is the step most likely to go wrong, since it depends on the track position, the heading type and how far the curtain should extend past the glass. We measure free of charge and take responsibility for the result.",
       },
     ],
   },

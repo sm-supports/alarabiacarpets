@@ -42,8 +42,13 @@ npm run dev          # Next dev server (frontend only)
 npm run build        # Static export → out/
 npm run pages:dev    # Full-stack local dev (build + Workers + static)
 npx tsc --noEmit     # TypeScript type check
+npm run llms         # Regenerate public/llms.txt from out/ (run after a build)
 npm run deploy       # Build and deploy to Cloudflare Pages
 ```
+
+`public/llms.txt` is generated, not hand-written. After adding or renaming any
+page: `npm run build && npm run llms && npm run build` (the second build copies
+the regenerated file into `out/`).
 
 ## Brand Constants
 
@@ -105,4 +110,12 @@ Verified on every build; do not regress these:
 - Removing any product id deletes an indexed URL — pair it with a 301 or it becomes a hard 404
 - Pages that define `openGraph` must spread in `DEFAULT_OG_IMAGES`: Next replaces the
   openGraph object rather than merging, so omitting `images` yields no og:image at all
-- Services in `src/data/services.ts` have no photography — never point a hero at an unrelated product image
+- A service hero photo must depict that service. Leave `heroImage` unset rather than
+  borrowing one — `/services/event-carpet` is deliberately text-only because the only
+  asset we hold is a colour swatch scan, not a photo of our work
+- `Television decore with cabin box 2.jpeg` is a watermarked third-party 3D render, not
+  our project work — keep it out of any gallery
+- New keyword landing pages are entries in `src/data/services.ts`, not new routes:
+  `/services/[slug]` prerenders them and `sitemap.ts`/`Footer.tsx` pick them up
+- `relatedProductIds` / `relatedCategorySlugs` / `relatedServiceSlugs` throw at build on
+  an unknown value — that assertion is the internal-linking safety net, don't weaken it

@@ -51,7 +51,7 @@ export const guides: Guide[] = [
     title: "Choosing Curtains and Blinds for Qatar Homes",
     seoTitle: "Choosing Curtains & Blinds for Qatar Homes",
     metaDescription:
-      "How to choose curtains and blinds in Qatar: blackout vs sheer, layering, heat and glare control, tracks vs poles, and how to measure. From Al Arabia Carpets, Doha.",
+      "How to choose curtains and blinds in Qatar: blackout vs sheer, layering, heat and glare control, tracks vs poles, and how to measure your windows.",
     excerpt:
       "Blackout, sheer or layered; what actually reduces heat; roller versus vertical for offices; and how to measure so they hang properly.",
     heroImage: "/Products/Curtain/curtain.webp",
@@ -135,7 +135,7 @@ export const guides: Guide[] = [
     title: "Planning an Interior Fit-Out in Qatar",
     seoTitle: "Planning an Interior Fit-Out in Qatar",
     metaDescription:
-      "How to plan an interior fit-out in Qatar: what to decide first, gypsum ceilings and panelling, sequencing the trades, and what a fit-out quote should include.",
+      "How to plan an interior fit-out in Qatar: what to decide first, gypsum ceilings and panelling, sequencing the trades, and what a quote should include.",
     excerpt:
       "What has to be decided before work starts, why the order of trades matters more than any single choice, and what a quote should cover.",
     heroImage: "/Products/Interior Design/interior.webp",
@@ -227,7 +227,7 @@ export const guides: Guide[] = [
     title: "Barkia Buying Guide for Qatar Homes",
     seoTitle: "Barkia Buying Guide for Qatar Homes",
     metaDescription:
-      "How to choose barkia flooring in Qatar: PVC vs SPC, thickness, wet areas, and what installation should include. A practical guide from Al Arabia Carpets, Doha.",
+      "How to choose barkia flooring in Qatar: PVC vs SPC, thickness, wet areas, and what installation should include. A practical guide from Al Arabia Carpets.",
     excerpt:
       "PVC or SPC, what thickness to ask for, which rooms need a fully waterproof floor, and what a proper installation includes.",
     heroImage: "/Products/barkia&pvc/barkia.webp",
@@ -377,7 +377,7 @@ export const guides: Guide[] = [
     title: "Majlis Interior Design Ideas for Qatari Homes",
     seoTitle: "Majlis Interior Design Ideas for Qatari Homes",
     metaDescription:
-      "Majlis design ideas for Qatari homes: seating layout, floor-level vs raised, fabrics, lighting, curtains and flooring. Practical guidance from Al Arabia Carpets.",
+      "Majlis design ideas for Qatari homes: seating layout, floor-level vs raised, fabrics, lighting, curtains and flooring. Guidance from Al Arabia Carpets.",
     excerpt:
       "How to plan majlis seating that fits the room, choose between floor-level and raised, and coordinate fabric, lighting and flooring.",
     heroImage: "/Products/Furniture/majlis-sofa.webp",
@@ -601,7 +601,7 @@ export const guides: Guide[] = [
     title: "Artificial Grass in Qatar: A Practical Guide",
     seoTitle: "Artificial Grass in Qatar: Buying Guide",
     metaDescription:
-      "Choosing artificial grass in Qatar: pile height, drainage, UV stability and why the base under it matters more than the grass itself. From Al Arabia Carpets.",
+      "Choosing artificial grass in Qatar: pile height, drainage, UV stability and why the base under it matters more than the grass. From Al Arabia Carpets.",
     excerpt:
       "Pile height, drainage, heat and UV: what to specify, and why the base underneath decides how it looks in three years.",
     heroImage: "/Products/Carpets/Artificial grass installation work.jpeg",

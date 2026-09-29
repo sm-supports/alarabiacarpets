@@ -128,11 +128,21 @@ export default function CloudflareTurnstile({
       document.head.appendChild(script);
     }
 
+    // A blocked script (ad-blocker, network) never fires `load`, so without
+    // this the form would sit with a disabled button and no explanation.
+    const handleScriptError = () => {
+      if (mounted) {
+        onErrorRef.current?.();
+      }
+    };
+
     script.addEventListener("load", initWidget);
+    script.addEventListener("error", handleScriptError);
 
     return () => {
       mounted = false;
       script?.removeEventListener("load", initWidget);
+      script?.removeEventListener("error", handleScriptError);
       if (widgetIdRef.current && window.turnstile) {
         window.turnstile.remove(widgetIdRef.current);
         widgetIdRef.current = null;

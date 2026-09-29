@@ -3,13 +3,16 @@
 import { useEffect, useRef, useState } from 'react';
 
 function useCountUp(end: number, duration = 2000, isVisible: boolean) {
-  const [count, setCount] = useState(0);
+  // Starts at the final value so the prerendered HTML carries the real figure
+  // ("1000+", not "0+") for crawlers and visitors without JavaScript.
+  const [count, setCount] = useState(end);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
     if (!isVisible || hasAnimated.current) return;
     hasAnimated.current = true;
 
+    setCount(0);
     let animationFrameId: number;
     const startTime = performance.now();
     const step = (currentTime: number) => {

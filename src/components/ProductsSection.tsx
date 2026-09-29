@@ -30,9 +30,9 @@ const showcaseConfig = [
   {
     categorySlug: "barkia",
     name: "Premium Barkia",
-    tagline: "Elegant Room Dividers",
-    description: "High-quality Barkia panels for elegant room separation and decoration. Perfect for creating distinct spaces with style.",
-    features: ["Multiple Designs", "Easy Installation", "Durable Materials"],
+    tagline: "Flooring Built for Qatar",
+    description: "Waterproof, hard-wearing barkia and PVC flooring for majlis, villas and offices. Easy to clean and made to handle heat and heavy foot traffic.",
+    features: ["Waterproof", "Easy to Clean", "Professional Fitting"],
     color: "teal" as const,
   },
 ];

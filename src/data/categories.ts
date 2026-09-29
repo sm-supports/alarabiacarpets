@@ -137,7 +137,7 @@ export const categories: Category[] = [
     heading: "Barkia & PVC Flooring in Qatar",
     seoTitle: "Barkia Flooring in Qatar | Supply & Installation",
     metaDescription:
-      "Barkia flooring supplied and installed across Qatar. Waterproof, hard-wearing surfaces for majlis, villas and offices, with free measurement and fitting in Doha.",
+      "Barkia flooring supplied and installed across Qatar. Waterproof, hard-wearing floors for majlis, villas and offices, with free measurement and fitting.",
     heroImage: "/Products/barkia&pvc/barkia.webp",
     heroImageAlt: "Barkia flooring installed in a Doha villa by Al Arabia Carpets",
     intro: [
@@ -343,7 +343,7 @@ export const categories: Category[] = [
     heading: "Interior Design in Qatar",
     seoTitle: "Interior Design in Qatar | Doha Fit-Out Services",
     metaDescription:
-      "Interior design and fit-out in Qatar. Gypsum work, wall panelling, cabinetry, flooring and furnishing delivered as one project by Al Arabia Carpets in Doha.",
+      "Interior design and fit-out in Qatar. Gypsum work, wall panelling, cabinetry, flooring and furnishing delivered as one project by Al Arabia Carpets.",
     heroImage: "/Products/Interior Design/interior.webp",
     heroImageAlt: "Completed interior design and fit-out project in Doha, Qatar",
     intro: [

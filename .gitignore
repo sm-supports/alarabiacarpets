@@ -23,7 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.*
 .dev.vars
+.dev.vars.*
+.wrangler/
 # Next.js
 .next
 out

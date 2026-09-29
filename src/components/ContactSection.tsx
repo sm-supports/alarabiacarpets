@@ -28,6 +28,7 @@ const ContactSection = memo(function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileFailed, setTurnstileFailed] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const turnstileRef = useRef<CloudflareTurnstileHandle>(null);
@@ -273,55 +274,75 @@ const ContactSection = memo(function ContactSection() {
                 >
                   
                   <div>
-                    <label className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">Name</label>
+                    <label htmlFor="contact-name" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">Name</label>
                     <Input
+                      id="contact-name"
                       type="text"
                       name="name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
+                      maxLength={100}
                       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
                       placeholder="Your name"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">Email</label>
+                    <label htmlFor="contact-email" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">Email</label>
                     <Input
+                      id="contact-email"
                       type="email"
                       name="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      maxLength={254}
                       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
                       placeholder="your@email.com"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">Message</label>
+                    <label htmlFor="contact-message" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">Message</label>
                     <Textarea
+                      id="contact-message"
                       name="message"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       required
+                      maxLength={5000}
                       rows={4}
                       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl resize-none text-sm sm:text-base"
                       placeholder="Tell us about your project..."
                     />
                   </div>
 
-                  <div className="flex justify-center">
+                  <div className="flex flex-col items-center gap-3">
                     {TURNSTILE_SITE_KEY ? (
-                      <CloudflareTurnstile
-                        ref={turnstileRef}
-                        siteKey={TURNSTILE_SITE_KEY}
-                        action={TURNSTILE_ACTION}
-                        onVerify={(token) => setTurnstileToken(token)}
-                        onExpire={() => setTurnstileToken("")}
-                        onError={() => setTurnstileToken("")}
-                        theme="dark"
-                      />
+                      <>
+                        <CloudflareTurnstile
+                          ref={turnstileRef}
+                          siteKey={TURNSTILE_SITE_KEY}
+                          action={TURNSTILE_ACTION}
+                          onVerify={(token) => {
+                            setTurnstileFailed(false);
+                            setTurnstileToken(token);
+                          }}
+                          onExpire={() => setTurnstileToken("")}
+                          onError={() => {
+                            setTurnstileToken("");
+                            setTurnstileFailed(true);
+                          }}
+                          theme="dark"
+                        />
+                        {turnstileFailed && (
+                          <p role="alert" className="text-sm text-red-300 text-center">
+                            We couldn't load the security check. Please reach us on
+                            WhatsApp at {PHONE} or email {EMAIL}.
+                          </p>
+                        )}
+                      </>
                     ) : (
                       <p role="alert" className="text-sm text-red-300 text-center">
                         This form is temporarily unavailable. Please reach us on

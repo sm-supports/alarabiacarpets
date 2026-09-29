@@ -38,7 +38,12 @@ export const LONGITUDE = 51.520008;
 export const DEFAULT_OG_IMAGES = [{ url: DEFAULT_IMAGE, alt: SITE_NAME }];
 
 export function clampDescription(description: string): string {
-  return description.length > 155 ? `${description.slice(0, 152)}...` : description;
+  if (description.length <= 155) return description;
+  // Cut at the last word boundary so the snippet never ends mid-word.
+  const clipped = description.slice(0, 152);
+  const lastSpace = clipped.lastIndexOf(" ");
+  const base = lastSpace > 0 ? clipped.slice(0, lastSpace) : clipped;
+  return `${base.replace(/[\s.,;:-]+$/, "")}...`;
 }
 
 /**

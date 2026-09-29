@@ -66,7 +66,7 @@ export interface Product {
 export const products: Product[] = [
   {
     "id": "artificial-flowers-grass",
-    "name": "Artificial flowers grass",
+    "name": "Artificial Flowers Grass",
     "category": "carpet",
     "description": "Artificial green and flower walls for interiors, backdrops and event styling.",
     "price": "Contact for Price",
@@ -128,7 +128,7 @@ export const products: Product[] = [
   },
   {
     "id": "artificial-grass-installation-work",
-    "name": "Artificial grass installation work",
+    "name": "Artificial Grass Installation Work",
     "category": "carpet",
     "description": "Professional artificial grass installation with proper base preparation and drainage.",
     "price": "Contact for Price",
@@ -244,7 +244,7 @@ export const products: Product[] = [
   },
   {
     "id": "home-design-luxury-carpet",
-    "name": "Home design luxury carpet",
+    "name": "Home Design Luxury Carpet",
     "category": "carpet",
     "description": "Made-to-measure rugs and carpet cut to your room's shape, colour and border.",
     "price": "Contact for Price",
@@ -302,7 +302,7 @@ export const products: Product[] = [
   },
   {
     "id": "luxury-home-carpet",
-    "name": "Luxury home carpet",
+    "name": "Luxury Home Carpet",
     "category": "carpet",
     "description": "Premium wall-to-wall carpet for bedrooms and majlis, with denser pile and better recovery.",
     "price": "Contact for Price",
@@ -451,7 +451,7 @@ export const products: Product[] = [
     "imageSrc": "/Products/Carpets/Mosque:masjid carpet.jpeg",
     "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Mosque%20%26%20Masjid%20Carpet",
     seoTitle: "Mosque & Masjid Carpet Qatar | Supply & Fitting",
-    metaDescription: "Mosque and masjid carpet supplied and installed across Qatar. Prayer-row designs, heavy-duty pile for high footfall, and full fitting by Al Arabia Carpets in Doha.",
+    metaDescription: "Mosque and masjid carpet supplied and installed across Qatar. Prayer-row designs, heavy-duty pile for high footfall, fitted by Al Arabia Carpets in Doha.",
     imageAlt: "Mosque prayer hall carpet with prayer rows installed in Qatar",
     longDescription: [
       "We supply and install prayer-hall carpet for mosques and masjids across Qatar, in both plain and prayer-row (saff) designs that keep rows straight and evenly spaced.",
@@ -563,7 +563,7 @@ export const products: Product[] = [
     "imageSrc": "/Products/Carpets/Tiles carpet:office carpet.jpeg",
     "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Carpet%20Tiles%20%26%20Office%20Carpet",
     seoTitle: "Office Carpet Tiles Qatar | Supply & Installation",
-    metaDescription: "Office carpet tiles supplied and fitted across Qatar. Hard-wearing, individually replaceable, and installed with minimal disruption to your workplace in Doha.",
+    metaDescription: "Office carpet tiles supplied and fitted across Qatar. Hard-wearing, individually replaceable, and installed with minimal disruption to your workplace.",
     imageAlt: "Office carpet tiles installed in a commercial workspace in Doha",
     longDescription: [
       "Carpet tiles are the practical choice for offices: they are hard-wearing, quick to lay, and any tile that becomes stained or damaged can be lifted and swapped without redoing the whole floor.",
@@ -617,7 +617,7 @@ export const products: Product[] = [
     "imageSrc": "/Products/Carpets/grass-carpet.webp",
     "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Artificial%20Grass%20Carpet",
     seoTitle: "Artificial Grass Carpet Qatar | Supply & Fitting",
-    metaDescription: "Artificial grass carpet in Qatar for gardens, terraces, balconies and play areas. UV-stable, drains freely, and installed across Doha with delivery included.",
+    metaDescription: "Artificial grass carpet in Qatar for gardens, terraces, balconies and play areas. UV-stable, free-draining, and installed across Doha with free delivery.",
     imageAlt: "Artificial grass carpet laid on a Doha terrace by Al Arabia Carpets",
     longDescription: [
       "Artificial grass gives you a green surface all year round without irrigation, mowing or fertiliser, which makes it well suited to Qatar's climate. We install it on gardens, roof terraces, balconies, play areas and around pools.",
@@ -662,7 +662,7 @@ export const products: Product[] = [
   },
   {
     "id": "home-curtains",
-    "name": "Home curtains",
+    "name": "Home Curtains",
     "category": "curtains",
     "description": "Custom curtains for villas and apartments, measured, made and fitted in Doha.",
     "price": "Contact for Price",
@@ -741,7 +741,7 @@ export const products: Product[] = [
     "imageSrc": "/Products/Curtain/Office blind:office roller:vertical blinds 1.jpeg",
     "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20Office%20Roller%20%26%20Vertical%20Blinds",
     seoTitle: "Office Blinds Qatar | Roller & Vertical Blinds",
-    metaDescription: "Office roller and vertical blinds in Qatar. Glare control for workstations and meeting rooms, made to measure and fitted across Doha, out of hours if needed.",
+    metaDescription: "Office roller and vertical blinds in Qatar. Glare control for workstations and meeting rooms, made to measure and fitted across Doha, out of hours too.",
     imageAlt: "Vertical and roller blinds fitted in a Doha office",
     longDescription: [
       "Office blinds are mainly about controlling glare on screens while keeping the space bright. We supply both vertical blinds, which suit wide window runs and let you angle the light, and roller blinds in sunscreen fabric.",
@@ -832,7 +832,7 @@ export const products: Product[] = [
   },
   {
     "id": "khema-majlis-sofa",
-    "name": "Khema majlis sofa",
+    "name": "Khema Majlis Sofa",
     "category": "furniture",
     "description": "Tent-style khema majlis seating, built low and hard-wearing for camps and outdoor majlis.",
     "price": "Contact for Price",
@@ -895,7 +895,7 @@ export const products: Product[] = [
   },
   {
     "id": "luxury-majlis-sofa",
-    "name": "Luxury majlis sofa",
+    "name": "Luxury Majlis Sofa",
     "category": "furniture",
     "description": "Premium majlis seating with heavier fabrics, deeper cushioning and detailed finishing.",
     "price": "Contact for Price",
@@ -1016,7 +1016,7 @@ export const products: Product[] = [
   },
   {
     "id": "modern-majlis",
-    "name": "Modern majlis",
+    "name": "Modern Majlis",
     "category": "furniture",
     "description": "Contemporary majlis seating with lower backs and cleaner lines for modern villas and apartments.",
     "price": "Contact for Price",
@@ -1083,7 +1083,7 @@ export const products: Product[] = [
   },
   {
     "id": "cabin-interior-design",
-    "name": "Cabin interior design",
+    "name": "Cabin Interior Design",
     "category": "interior",
     "description": "Full room fit-out delivered as one project \u2014 ceilings, panelling, joinery and finishes.",
     "price": "Contact for Price",
@@ -1157,7 +1157,7 @@ export const products: Product[] = [
   },
   {
     "id": "cabinet-and-gypsum-board-work",
-    "name": "Cabinet and gypsum board work",
+    "name": "Cabinet and Gypsum Board Work",
     "category": "interior",
     "description": "Built-in joinery integrated with gypsum work, so cabinetry and ceilings finish as one.",
     "price": "Contact for Price",
@@ -1227,7 +1227,7 @@ export const products: Product[] = [
   },
   {
     "id": "gypsum-board-work-design",
-    "name": "Gypsum board work design",
+    "name": "Gypsum Board Work Design",
     "category": "interior",
     "description": "False ceilings, bulkheads, coves and wall detailing in gypsum board.",
     "price": "Contact for Price",
@@ -1301,7 +1301,7 @@ export const products: Product[] = [
   },
   {
     "id": "indoor-wall-panel-design",
-    "name": "Indoor wall panel design",
+    "name": "Indoor Wall Panel Design",
     "category": "interior",
     "description": "Decorative interior wall panelling \u2014 slatted, fluted and upholstered feature walls.",
     "price": "Contact for Price",
@@ -1375,10 +1375,6 @@ export const products: Product[] = [
       {
         "type": "image",
         "src": "/Products/Interior Design/Television decore with cabin box 10.jpeg"
-      },
-      {
-        "type": "image",
-        "src": "/Products/Interior Design/Television decore with cabin box 2.jpeg"
       },
       {
         "type": "image",
@@ -1689,7 +1685,7 @@ export const products: Product[] = [
   },
   {
     "id": "outdoor-wall-panel-products",
-    "name": "Outdoor wall panel products",
+    "name": "Outdoor Wall Panel Products",
     "category": "barkia",
     "description": "Exterior wall panels for facades, balconies and garden walls, rated for sun and rain.",
     "price": "Contact for Price",
@@ -2160,8 +2156,8 @@ export const products: Product[] = [
   },
   {
     "id": "stairs-carpet-installation",
-    "name": "Stairs carpet installation",
-    "category": "barkia",
+    "name": "Stairs Carpet Installation",
+    "category": "carpet",
     "description": "Stair carpet templated and fitted to every tread, riser and landing.",
     "price": "Contact for Price",
     "media": [
@@ -2281,7 +2277,7 @@ export const products: Product[] = [
     "imageSrc": "/Products/barkia&pvc/pvc-barkia.webp",
     "whatsappLink": "https://wa.me/+97455512858?text=I%27m%20interested%20in%20PVC%20Barkia%20Flooring",
     seoTitle: "PVC Barkia Flooring Doha | Waterproof & Fitted",
-    metaDescription: "PVC barkia flooring in Qatar: 100% waterproof, scratch-resistant and quick to install. Free measurement, delivery and fitting across Doha from Al Arabia Carpets.",
+    metaDescription: "PVC barkia flooring in Qatar: 100% waterproof, scratch-resistant and quick to install. Free measurement, delivery and fitting from Al Arabia Carpets.",
     imageAlt: "PVC barkia waterproof flooring installed in a Doha interior",
     longDescription: [
       "PVC barkia is the fully synthetic version of traditional barkia, giving you a 100% waterproof floor that will not swell, warp or stain. It is the practical choice for kitchens, bathrooms, laundry areas and any space that sees water.",

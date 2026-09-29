@@ -6,7 +6,7 @@ import JsonLd from "@/components/JsonLd";
 import { buildBreadcrumb, clampDescription, DEFAULT_OG_IMAGES } from "@/lib/seo";
 
 const DESCRIPTION =
-  "Contact Al Arabia Carpets in Doha, Qatar for carpets, Barkia, PVC flooring, curtains, furniture and interior design. Free consultation, installation and delivery.";
+  "Contact Al Arabia Carpets in Doha for carpets, Barkia, PVC flooring, curtains, furniture and interior design. Free consultation, delivery and fitting.";
 
 export const metadata: Metadata = {
   title: "Contact Us",

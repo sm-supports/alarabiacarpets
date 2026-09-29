@@ -12,7 +12,7 @@ import { buildBreadcrumb, buildItemList, clampDescription, productPath, DEFAULT_
 import WhatsAppLink from "@/components/WhatsAppLink";
 
 const DESCRIPTION =
-  "Browse premium carpets, Barkia, PVC flooring, curtains, furniture & interior design products at Al Arabia Carpets. Free installation & delivery across Qatar.";
+  "Browse premium carpets, Barkia, PVC flooring, curtains, furniture & interior design at Al Arabia Carpets. Free installation & delivery across Qatar.";
 
 export const metadata: Metadata = {
   title: "Products",

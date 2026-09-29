@@ -7,12 +7,13 @@ function escapeHtml(text: string): string {
     .replace(/'/g, "&#039;");
 }
 
-export function generateAcknowledgmentEmail(name: string, message: string): string {
+// The submitted message is deliberately NOT echoed back: this email goes to
+// whatever address the sender typed, so repeating their text would let anyone
+// send content of their choice from our domain.
+export function generateAcknowledgmentEmail(name: string): string {
   const year = new Date().getFullYear();
   const safeName = name ?? "";
-  const safeMessage = message ?? "";
   const escapedName = escapeHtml(safeName);
-  const escapedMessage = escapeHtml(safeMessage).replace(/\n/g, "<br>");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -65,20 +66,6 @@ export function generateAcknowledgmentEmail(name: string, message: string): stri
               <p style="font-family:'Poppins', Arial, Helvetica, sans-serif; font-size:15px; line-height:1.7; color:#444444; margin:0 0 24px 0;">
                 We&rsquo;ve received your message and truly appreciate you reaching out. Our team will review your inquiry and get back to you as soon as possible &mdash; typically within 24 hours.
               </p>
-
-              <!-- Echoed message -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;">
-                <tr>
-                  <td style="border-left:3px solid #C5A572; background-color:#F8F7F4; padding:16px 20px; border-radius:0 8px 8px 0;">
-                    <p style="font-family:'Poppins', Arial, Helvetica, sans-serif; font-size:11px; font-weight:600; color:#86868B; text-transform:uppercase; letter-spacing:0.08em; margin:0 0 10px 0;">
-                      Your Message
-                    </p>
-                    <p style="font-family:'Poppins', Arial, Helvetica, sans-serif; font-size:14px; line-height:1.7; color:#333333; margin:0;">
-                      ${escapedMessage}
-                    </p>
-                  </td>
-                </tr>
-              </table>
 
               <p style="font-family:'Poppins', Arial, Helvetica, sans-serif; font-size:15px; line-height:1.7; color:#444444; margin:0;">
                 In the meantime, feel free to reach out through any of the channels below.

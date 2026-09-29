@@ -580,7 +580,7 @@ export const services: Service[] = [
     label: "Artificial Grass",
     seoTitle: "Artificial Grass & Grass Carpet in Qatar",
     metaDescription:
-      "Artificial grass and grass carpet supplied and laid across Qatar. Villa gardens, roof terraces, majlis surrounds and play areas, fitted with proper drainage.",
+      "Artificial grass and grass carpet supplied and laid across Qatar. Villa gardens, roof terraces, majlis surrounds and play areas, with proper drainage.",
     excerpt:
       "Grass carpet for gardens, terraces and play areas, laid over a drained base so it stays flat and drains after rain.",
     intro: [
@@ -829,7 +829,7 @@ export const services: Service[] = [
     label: "Cabinets",
     seoTitle: "Custom Cabinets in Qatar",
     metaDescription:
-      "Made-to-measure cabinets in Qatar for kitchens, bedrooms and living rooms. Built to your room's real height and width and installed by our own team in Doha.",
+      "Made-to-measure cabinets in Qatar for kitchens, bedrooms and living rooms. Built to your room's real height and width and installed by our own team.",
     excerpt:
       "Kitchen, bedroom and living room cabinetry built to your room's real dimensions rather than to standard sizes.",
     intro: [

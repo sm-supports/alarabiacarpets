@@ -33,8 +33,15 @@ interface CFContext {
   env: Env;
 }
 
+// Length caps. Keep in sync with the maxLength attributes in ContactSection.tsx.
+const MAX_NAME_LENGTH = 100;
+const MAX_EMAIL_LENGTH = 254;
+const MAX_MESSAGE_LENGTH = 5000;
+
+// The form is same-origin, so CORS is only relevant to cross-origin callers.
+// Preview deployments post to their own origin and are unaffected.
 const headers: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://alarabiacarpets.com",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json",
@@ -145,13 +152,19 @@ async function verifyTurnstileToken(
 
 export async function onRequestPost(context: CFContext): Promise<Response> {
   try {
-    const { name, email, message, turnstileToken } =
-      (await context.request.json()) as {
-        name?: string;
-        email?: string;
-        message?: string;
-        turnstileToken?: string;
-      };
+    let body: unknown;
+    try {
+      body = await context.request.json();
+    } catch {
+      body = null;
+    }
+    if (body === null || typeof body !== "object" || Array.isArray(body)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid request body" }),
+        { status: 400, headers }
+      );
+    }
+    const { turnstileToken, ...fields } = body as Record<string, unknown>;
 
     // Verify Turnstile token
     if (!turnstileToken) {
@@ -176,8 +189,24 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       );
     }
 
-    // Validate required fields
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Validate required fields. The JSON body is untrusted, so check the types
+    // rather than trusting a cast: a non-string would throw in escapeHtml.
+    if (
+      typeof fields.name !== "string" ||
+      typeof fields.email !== "string" ||
+      typeof fields.message !== "string"
+    ) {
+      return new Response(
+        JSON.stringify({ error: "Name, email, and message are required" }),
+        { status: 400, headers }
+      );
+    }
+
+    // The name goes into the subject line, so collapse line breaks and other
+    // control characters.
+    const name = fields.name.replace(/[\u0000-\u001F\u007F]+/g, " ").trim();
+    const email = fields.email.trim();
+    const message = fields.message.trim();
 
     if (!name || !email || !message) {
       return new Response(
@@ -185,6 +214,21 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
         { status: 400, headers }
       );
     }
+
+    if (
+      name.length > MAX_NAME_LENGTH ||
+      email.length > MAX_EMAIL_LENGTH ||
+      message.length > MAX_MESSAGE_LENGTH
+    ) {
+      return new Response(
+        JSON.stringify({ error: "One or more fields are too long" }),
+        { status: 400, headers }
+      );
+    }
+
+    // Bare addresses only: no display-name syntax and no address lists, since
+    // this value is used as `to` and `replyTo`.
+    const emailRegex = /^[^\s@<>",;]+@[^\s@<>",;]+\.[^\s@<>",;]+$/;
 
     if (!emailRegex.test(email)) {
       return new Response(
@@ -195,8 +239,9 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
 
     const resend = new Resend(context.env.RESEND_API_KEY);
 
-    // Send admin notification (critical)
-    await resend.emails.send({
+    // Send admin notification (critical). The SDK reports API failures in
+    // `error` instead of throwing, so it has to be checked explicitly.
+    const { error: adminError } = await resend.emails.send({
       from: "Al Arabia Carpets <noreply@alarabiacarpets.com>",
       to: "info@alarabiacarpets.com",
       replyTo: email,
@@ -210,14 +255,25 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       `,
     });
 
+    if (adminError) {
+      console.error("Admin notification failed:", adminError);
+      return new Response(
+        JSON.stringify({ error: "Failed to send email" }),
+        { status: 502, headers }
+      );
+    }
+
     // Send acknowledgment to submitter (non-critical)
     try {
-      await resend.emails.send({
+      const { error: ackError } = await resend.emails.send({
         from: "Al Arabia Carpets <noreply@alarabiacarpets.com>",
         to: email,
         subject: "Thank you for contacting Al Arabia Carpets",
-        html: generateAcknowledgmentEmail(name, message),
+        html: generateAcknowledgmentEmail(name),
       });
+      if (ackError) {
+        console.error("Acknowledgment email failed:", ackError);
+      }
     } catch (ackError) {
       console.error("Acknowledgment email failed:", ackError);
     }

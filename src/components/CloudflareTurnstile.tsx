@@ -125,6 +125,12 @@ export default function CloudflareTurnstile({
         "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
       script.async = true;
       script.defer = true;
+      // A failed script never fires `load` or `error` again, so leaving it in
+      // the DOM would make every later mount wait on it forever. Drop it so
+      // the next mount creates a fresh one. Registered here rather than in
+      // handleScriptError so it still runs if this component has unmounted.
+      const created = script;
+      created.addEventListener("error", () => created.remove(), { once: true });
       document.head.appendChild(script);
     }
 

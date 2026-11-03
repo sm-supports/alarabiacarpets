@@ -43,8 +43,20 @@ npm run build        # Static export → out/
 npm run pages:dev    # Full-stack local dev (build + Workers + static)
 npx tsc --noEmit     # TypeScript type check
 npm run llms         # Regenerate public/llms.txt from out/ (run after a build)
-npm run deploy       # Build and deploy to Cloudflare Pages
+npm run deploy       # Build, stage on a case-sensitive image, deploy (prod only on main)
 ```
+
+Never run `wrangler pages deploy out` by hand from the Mac. The repo volume is
+case-insensitive, so `public/Products` merges with the `products/` route pages
+(likewise `Services`/`services`) and Pages, being case-sensitive, 404s every
+`/products/*` and `/services/*` URL. `npm run deploy` runs
+`scripts/deploy-pages.sh`, which copies `out/` onto a case-sensitive sparse image
+(`~/Library/Caches/alarabiacarpets-deploy.sparseimage`), splits any public/route
+folders that differ only in case, checks file counts and sitemap URLs, then
+deploys from the repo root so `functions/` is bundled. It deploys to production
+only when the current branch is `main`; any other branch gets a preview URL. On a
+case-sensitive filesystem it deploys `out/` directly. `DEPLOY_DRY_RUN=1` stages
+and verifies without deploying; `DEPLOY_SKIP_BUILD=1` reuses the existing `out/`.
 
 `public/llms.txt` is generated, not hand-written. After adding or renaming any
 page: `npm run build && npm run llms && npm run build` (the second build copies

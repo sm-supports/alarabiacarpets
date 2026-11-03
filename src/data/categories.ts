@@ -41,11 +41,20 @@ export interface Category {
   heroImageAlt: string;
   /** An additional topic folded onto this page (see furniture). */
   secondary?: CategorySection;
+  /**
+   * Headline starting price for the category hero, in QAR. Set by hand from the
+   * owner's price list rather than computed as the cheapest item: the cheapest
+   * carpet is event carpet (22/sqm), which would mislead someone after home carpet.
+   */
+  priceFrom?: number;
+  priceUnit?: string;
 }
 
 export const categories: Category[] = [
   {
     slug: "carpet",
+    priceFrom: 80,
+    priceUnit: "per sqm",
     key: "carpet",
     label: "Carpets",
     heading: "Carpets in Qatar",
@@ -132,6 +141,8 @@ export const categories: Category[] = [
   },
   {
     slug: "barkia",
+    priceFrom: 75,
+    priceUnit: "per sqm",
     key: "barkia",
     label: "Barkia & PVC",
     heading: "Barkia & PVC Flooring in Qatar",
@@ -187,6 +198,8 @@ export const categories: Category[] = [
   },
   {
     slug: "curtain",
+    priceFrom: 850,
+    priceUnit: "per piece",
     key: "curtains",
     label: "Curtains",
     heading: "Curtains & Blinds in Qatar",
@@ -250,6 +263,8 @@ export const categories: Category[] = [
   },
   {
     slug: "majlis-sofa",
+    priceFrom: 850,
+    priceUnit: "per piece",
     key: "furniture",
     label: "Furniture",
     heading: "Majlis Sofas & Furniture in Qatar",

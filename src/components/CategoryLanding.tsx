@@ -3,9 +3,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import HeroQuoteCta from "@/components/HeroQuoteCta";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
-import { products } from "@/data/products";
+import { formatFromPrice, products } from "@/data/products";
 import { categories, getCategory, type CategorySection } from "@/data/categories";
 import { guidesForCategory } from "@/data/guides";
 import {
@@ -87,6 +88,11 @@ export default function CategoryLanding({ slug }: { slug: string }) {
             <p className="font-poppins max-w-2xl text-white/80 text-sm md:text-base">
               {category.intro[0]}
             </p>
+            <HeroQuoteCta
+              source={`category:${category.slug}:hero`}
+              message={`Hi, I'd like a quote for ${category.label}.`}
+              price={category.priceFrom ? formatFromPrice(category.priceFrom, category.priceUnit) : undefined}
+            />
           </div>
         </div>
 

@@ -10,7 +10,7 @@ import RelatedGuides from "@/components/RelatedGuides";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Check, ShoppingCart } from "lucide-react";
-import { products } from "@/data/products";
+import { formatFromPrice, products } from "@/data/products";
 import {
   absoluteUrl,
   buildBreadcrumb,
@@ -138,7 +138,7 @@ export default async function ProductDetailPage({
                     </h1>
                     <p className="font-poppins font-medium text-lg text-primary">
                       {typeof product.priceFrom === "number"
-                        ? `From QAR ${product.priceFrom}${product.priceUnit ? ` ${product.priceUnit}` : ""}`
+                        ? formatFromPrice(product.priceFrom, product.priceUnit)
                         : product.price}
                     </p>
                   </div>

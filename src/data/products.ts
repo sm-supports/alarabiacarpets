@@ -2374,3 +2374,8 @@ export const products: Product[] = [
   }
 ];
 
+
+/** "From QAR 75 per sqm" -- the one wording used for starting prices across the site. */
+export function formatFromPrice(amount: number, unit?: string): string {
+  return `From QAR ${amount.toLocaleString("en-US")}${unit ? ` ${unit}` : ""}`;
+}

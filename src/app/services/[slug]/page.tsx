@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import HeroQuoteCta from "@/components/HeroQuoteCta";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { services, getService } from "@/data/services";
@@ -132,6 +133,8 @@ export default async function ServicePage({
             <p className="font-poppins max-w-2xl text-white/80 text-sm md:text-base">
               {service.excerpt}
             </p>
+            {/* No price here: services are quoted per job and have no priceFrom. */}
+            <HeroQuoteCta source={`service:${service.slug}:hero`} message={`Hi, I'd like a quote for ${service.label}.`} />
           </div>
         </div>
 

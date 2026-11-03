@@ -81,7 +81,7 @@ export default function ServicesPage() {
                     href={`/services/${service.slug}`}
                     className="font-poppins text-sm font-medium text-primary mt-4 hover:underline"
                   >
-                    Read more
+                    View {service.label} details
                   </Link>
                   </div>
                 </article>

@@ -10,7 +10,7 @@ import CloudflareTurnstile, {
   type CloudflareTurnstileHandle,
 } from "@/components/CloudflareTurnstile";
 import { trackFormLead, trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
-import { EMAIL, PHONE } from "@/lib/seo";
+import { EMAIL, PHONE, WHATSAPP_URL } from "@/lib/seo";
 
 // Inlined at build time. If the Cloudflare Pages build environment does not
 // define it, the Turnstile widget cannot render and the form can never be
@@ -105,7 +105,7 @@ const ContactSection = memo(function ContactSection() {
       icon: MessageCircle,
       label: "WhatsApp",
       value: "+974 5551 2858",
-      href: "https://wa.me/+97455512858",
+      href: WHATSAPP_URL,
       external: true,
       hasConversion: true,
     },
@@ -166,7 +166,7 @@ const ContactSection = memo(function ContactSection() {
           
           {/* Primary CTA */}
           <a
-            href="https://wa.me/+97455512858"
+            href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick("contact_section_primary")}

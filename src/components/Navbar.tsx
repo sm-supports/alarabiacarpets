@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X, ChevronRight } from "lucide-react";
 import { trackWhatsAppClick } from "@/lib/analytics";
+import { WHATSAPP_URL } from "@/lib/seo";
 
 const Navbar = memo(function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -113,7 +114,7 @@ const Navbar = memo(function Navbar() {
             {/* Desktop CTA */}
             <div className="hidden md:flex items-center gap-3">
               <a
-                href="https://wa.me/+97455512858"
+                href={WHATSAPP_URL}
                 onClick={() => trackWhatsAppClick("navbar_desktop")}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -239,7 +240,7 @@ const Navbar = memo(function Navbar() {
               style={{ transitionDelay: isOpen ? '300ms' : '0ms' }}
             >
               <a
-                href="https://wa.me/+97455512858"
+                href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => { trackWhatsAppClick("navbar_mobile"); setIsOpen(false); }}

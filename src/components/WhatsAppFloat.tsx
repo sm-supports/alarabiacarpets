@@ -1,7 +1,7 @@
 "use client";
 
 import { trackWhatsAppClick } from "@/lib/analytics";
-import { PHONE_E164 } from "@/lib/seo";
+import { WHATSAPP_URL } from "@/lib/seo";
 
 /**
  * Fixed WhatsApp CTA, always visible.
@@ -12,7 +12,7 @@ import { PHONE_E164 } from "@/lib/seo";
 export default function WhatsAppFloat() {
   return (
     <a
-      href={`https://wa.me/${PHONE_E164}?text=${encodeURIComponent(
+      href={`${WHATSAPP_URL}?text=${encodeURIComponent(
         "Hi Al Arabia Carpets, I'd like a quote."
       )}`}
       target="_blank"

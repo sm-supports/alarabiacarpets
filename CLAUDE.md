@@ -59,7 +59,7 @@ the regenerated file into `out/`).
 | Sage Teal (secondary) | `#4D7C6F` / `bg-teal-100`, `text-teal-600` |
 | Heading font | Playfair Display → `font-playfair` / `font-display` |
 | Body font | Poppins → `font-poppins` / `font-body` |
-| WhatsApp | +974 5551 2858 → `https://wa.me/+97455512858` |
+| WhatsApp | +974 5551 2858 → `WHATSAPP_URL` = `https://wa.me/97455512858` (no `+`; audits flag the `+` form as a broken link) |
 | Email | info@alarabiacarpets.com |
 | Address | Al Mansoura St, Doha, Qatar |
 | Domain | alarabiacarpets.com |
@@ -102,7 +102,9 @@ Verified on every build; do not regress these:
 - Titles ≤ 60 chars, descriptions ≤ 160, no duplicates across pages
 - `public/_redirects` must NOT contain an SPA fallback (`/* /index.html 200`) — it causes soft-404s
 - `public/_routes.json` stays pinned to `{"include": ["/api/*"]}`
-- Product JSON-LD omits `offers` unless `priceFrom` is set; never emit a price-less `Offer`
+- Product JSON-LD: items with `priceFrom` emit `Product` + `AggregateOffer`; items without it emit `Service`
+  (Google rejects a `Product` with no offers/review/rating). Never emit a price-less `Offer`
+- `robots.ts` must not set `host` (it is emitted as a full URL, which audits flag as invalid robots.txt)
 - `sitemap.ts` / `robots.ts` need `export const dynamic = "force-static"`
 - Category slugs in `src/data/categories.ts` are indexed URLs — never rename one
 - Never re-add a `sofa` product: `/products/sofa` 301s to `/products/majlis-sofa`, and Pages

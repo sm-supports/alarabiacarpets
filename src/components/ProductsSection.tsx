@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { products } from "@/data/products";
 import { getCategory } from "@/data/categories";
-import { PHONE_E164 } from "@/lib/seo";
+import { WHATSAPP_URL } from "@/lib/seo";
 import { trackWhatsAppClick } from "@/lib/analytics";
 
 // Showcase presentation config. Each entry points at a CATEGORY landing page --
@@ -48,7 +48,7 @@ const productShowcases = showcaseConfig.map(config => {
     id: category.slug,
     imageSrc: category.heroImage,
     href: `/products/${category.slug}`,
-    whatsappLink: `https://wa.me/${PHONE_E164}?text=${encodeURIComponent(
+    whatsappLink: `${WHATSAPP_URL}?text=${encodeURIComponent(
       `I'm interested in ${config.name}`
     )}`,
     name: config.name,

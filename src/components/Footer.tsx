@@ -5,6 +5,7 @@ import Link from "next/link";
 import { categories } from "@/data/categories";
 import { services } from "@/data/services";
 import { trackWhatsAppClick } from "@/lib/analytics";
+import { WHATSAPP_URL } from "@/lib/seo";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -28,7 +29,7 @@ export default function Footer() {
     social: [
       { label: 'Instagram', href: 'https://instagram.com/alarabiacarpet', icon: Instagram },
       { label: 'Facebook', href: 'https://facebook.com/alarabiacarpets', icon: Facebook },
-      { label: 'WhatsApp', href: 'https://wa.me/+97455512858', icon: MessageCircle },
+      { label: 'WhatsApp', href: WHATSAPP_URL, icon: MessageCircle },
     ],
   };
 
@@ -58,7 +59,7 @@ export default function Footer() {
             {/* Contact Info */}
             <div className="space-y-2.5 sm:space-y-3">
               <a 
-                href="https://wa.me/+97455512858"
+                href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackWhatsAppClick("footer_contact")}
@@ -127,7 +128,7 @@ export default function Footer() {
               Ready to transform your space? Get in touch for a free consultation.
             </p>
             <a
-              href="https://wa.me/+97455512858"
+              href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackWhatsAppClick("footer_get_quote")}

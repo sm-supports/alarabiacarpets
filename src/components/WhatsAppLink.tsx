@@ -1,7 +1,7 @@
 "use client";
 
 import { trackWhatsAppClick } from "@/lib/analytics";
-import { PHONE_E164 } from "@/lib/seo";
+import { WHATSAPP_URL } from "@/lib/seo";
 
 interface WhatsAppLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   /** Where the click came from, e.g. "products_page". */
@@ -27,7 +27,7 @@ export default function WhatsAppLink({
 }: WhatsAppLinkProps) {
   const target =
     href ??
-    `https://wa.me/${PHONE_E164}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
+    `${WHATSAPP_URL}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
 
   return (
     <a

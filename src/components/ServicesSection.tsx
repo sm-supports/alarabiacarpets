@@ -3,6 +3,7 @@
 import { Truck, Wrench, Headphones, Shield } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { trackWhatsAppClick } from "@/lib/analytics";
+import { WHATSAPP_URL } from "@/lib/seo";
 
 const services = [
   {
@@ -130,7 +131,7 @@ export default function ServicesSection() {
             Have questions about our services?
           </p>
           <a
-            href="https://wa.me/+97455512858"
+            href={WHATSAPP_URL}
             onClick={() => trackWhatsAppClick("services_section")}
             target="_blank"
             rel="noopener noreferrer"

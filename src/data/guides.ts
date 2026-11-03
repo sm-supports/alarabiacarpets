@@ -375,7 +375,8 @@ export const guides: Guide[] = [
   {
     slug: "majlis-interior-design-ideas",
     title: "Majlis Interior Design Ideas for Qatari Homes",
-    seoTitle: "Majlis Interior Design Ideas for Qatari Homes",
+    // Differs from `title` (the h1) on purpose: an identical h1 and <title> is flagged as duplicate content.
+    seoTitle: "Majlis Design Ideas Qatar: Layout, Seating & Decor",
     metaDescription:
       "Majlis design ideas for Qatari homes: seating layout, floor-level vs raised, fabrics, lighting, curtains and flooring. Guidance from Al Arabia Carpets.",
     excerpt:

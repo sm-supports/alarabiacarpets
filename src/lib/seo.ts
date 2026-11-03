@@ -17,6 +17,12 @@ export const DEFAULT_DESCRIPTION =
 
 export const PHONE = "+974 5551 2858";
 export const PHONE_E164 = "+97455512858";
+/**
+ * WhatsApp click-to-chat link. wa.me's documented format is the number without
+ * "+", spaces or dashes; the "+" form redirects too, but audit crawlers report it
+ * as a broken external link.
+ */
+export const WHATSAPP_URL = `https://wa.me/${PHONE_E164.replace(/\D/g, "")}`;
 export const EMAIL = "info@alarabiacarpets.com";
 export const STREET = "Al Mansoura St";
 export const CITY = "Doha";
@@ -88,7 +94,22 @@ const SERVICES = [
  * Cities named in the Service schema's areaServed. Kept in step with the AREAS
  * sentence in src/data/services.ts, which says the same thing to human readers.
  */
-const SERVICE_AREAS = ["Doha", "Al Rayyan", "Al Wakra", "Al Khor", "Lusail"];
+export const SERVICE_AREAS = ["Doha", "Al Rayyan", "Al Wakra", "Al Khor", "Lusail"];
+
+/** schema.org openingHours, plus the same hours for human readers. Keep the two in step. */
+export const OPENING_HOURS = "Mo-Su 08:00-22:00";
+export const OPENING_HOURS_TEXT = "Every day, 8:00 AM to 10:00 PM";
+
+function areaServed() {
+  return [
+    { "@type": "Country", name: COUNTRY },
+    ...SERVICE_AREAS.map((name) => ({
+      "@type": "City",
+      name,
+      containedInPlace: { "@type": "Country", name: COUNTRY },
+    })),
+  ];
+}
 
 const POSTAL_ADDRESS = {
   "@type": "PostalAddress",
@@ -116,7 +137,7 @@ export function buildLocalBusiness() {
     email: EMAIL,
     address: POSTAL_ADDRESS,
     geo: GEO,
-    openingHours: "Mo-Su 08:00-22:00",
+    openingHours: OPENING_HOURS,
     priceRange: "$$",
     image: absoluteUrl(DEFAULT_IMAGE),
     sameAs: SOCIAL_PROFILES,
@@ -263,18 +284,41 @@ export function productImageAlt(product: Product): string {
   return product.imageAlt ?? `${product.name} - ${categoryLabel(product.category)} by ${SITE_NAME} in ${CITY}, ${COUNTRY}`;
 }
 
+/** UN/CEFACT unit codes for the priceUnit display strings used in products.ts. */
+const UNIT_CODES: Record<string, string> = {
+  "per sqm": "MTK",
+  "per piece": "C62",
+};
+
 /**
- * Product JSON-LD.
+ * Product (or Service) JSON-LD for a catalogue item.
  *
- * `offers` is emitted only when a real price exists. Every product's `price`
- * field is the display string "Contact for Price", so the previous schema sent
- * an Offer carrying priceCurrency but no price -- invalid, which suppressed the
- * rich result and left a standing error in Search Console. Omitting `offers`
- * is valid schema.org; emitting a fake price of 0 would read as "free".
+ * Google treats a Product as invalid unless it carries `offers`, `review` or
+ * `aggregateRating`, and we have no reviews to mark up. So:
+ * - with a real `priceFrom`, emit Product + AggregateOffer (with the per-unit
+ *   price spelled out as a UnitPriceSpecification);
+ * - without one, emit a Service offered by the business -- no price required,
+ *   and true for these items, which are quoted and installed on site.
+ * Never emit a price-less Offer or a fake price of 0 (it reads as "free").
  */
 export function buildProductJsonLd(product: Product) {
-  const hasPrice = typeof product.priceFrom === "number";
+  const url = absoluteUrl(productPath(product));
+  if (typeof product.priceFrom !== "number") {
+    return {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "@id": `${url}#service`,
+      name: product.name,
+      description: product.metaDescription ?? product.description,
+      image: absoluteUrl(productImage(product)),
+      url,
+      serviceType: categoryLabel(product.category),
+      provider: { "@id": `${SITE_URL}/#organization` },
+      areaServed: areaServed(),
+    };
+  }
 
+  const unitCode = product.priceUnit ? UNIT_CODES[product.priceUnit] : undefined;
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -284,19 +328,22 @@ export function buildProductJsonLd(product: Product) {
     sku: product.id,
     brand: { "@type": "Brand", name: SITE_NAME },
     category: categoryLabel(product.category),
-    ...(hasPrice
-      ? {
-          offers: {
-            "@type": "AggregateOffer",
-            priceCurrency: "QAR",
-            lowPrice: product.priceFrom,
-            highPrice: product.priceTo ?? product.priceFrom,
-            availability: "https://schema.org/InStock",
-            url: absoluteUrl(productPath(product)),
-            seller: { "@id": `${SITE_URL}/#organization` },
-          },
-        }
-      : {}),
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "QAR",
+      lowPrice: product.priceFrom,
+      highPrice: product.priceTo ?? product.priceFrom,
+      availability: "https://schema.org/InStock",
+      url,
+      seller: { "@id": `${SITE_URL}/#organization` },
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: product.priceFrom,
+        priceCurrency: "QAR",
+        ...(unitCode ? { unitCode } : {}),
+        ...(product.priceUnit ? { unitText: product.priceUnit.replace(/^per /, "") } : {}),
+      },
+    },
   };
 }
 
@@ -397,14 +444,7 @@ export function buildServiceJsonLd(service: {
     description: service.metaDescription,
     url: absoluteUrl(`/services/${service.slug}`),
     provider: { "@id": `${SITE_URL}/#organization` },
-    areaServed: [
-      { "@type": "Country", name: COUNTRY },
-      ...SERVICE_AREAS.map((name) => ({
-        "@type": "City",
-        name,
-        containedInPlace: { "@type": "Country", name: COUNTRY },
-      })),
-    ],
+    areaServed: areaServed(),
     // Only when a real project photo exists -- never the brand logo, which
     // would assert imagery of work we cannot show.
     ...(service.heroImage ? { image: absoluteUrl(service.heroImage) } : {}),

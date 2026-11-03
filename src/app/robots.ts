@@ -47,6 +47,7 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: AI_CRAWLERS, allow: "/" },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
+    // No `host`: it is a Yandex-only directive that must be a bare hostname, and
+    // Next emits it as a full URL, which site audits flag as invalid robots.txt.
   };
 }

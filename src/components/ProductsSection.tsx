@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { products } from "@/data/products";
 import { getCategory } from "@/data/categories";
 import { WHATSAPP_URL } from "@/lib/seo";
-import { trackWhatsAppClick } from "@/lib/analytics";
+import WhatsAppLink from "@/components/WhatsAppLink";
 
 // Showcase presentation config. Each entry points at a CATEGORY landing page --
 // these were category-hub products until they became real category pages.
@@ -189,16 +189,14 @@ function ProductShowcase({
                 View Range
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
-              <a
+              <WhatsAppLink
                 href={product.whatsappLink}
-                onClick={() => trackWhatsAppClick(`showcase:${product.id}`)}
-                target="_blank"
-                rel="noopener noreferrer"
+                source={`showcase:${product.id}`}
                 className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3 bg-white text-forest-900 text-sm font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98]"
               >
                 Get Quote
                 <ArrowUpRight className="w-4 h-4" />
-              </a>
+              </WhatsAppLink>
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { memo, useCallback, useState, useRef, useEffect } from "react";
 import { ProductMedia } from "@/data/products";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { trackWhatsAppClick } from "@/lib/analytics";
+import WhatsAppLink from "@/components/WhatsAppLink";
 
 interface ProductCardProps {
   name: string;
@@ -54,8 +54,7 @@ const ProductCard = memo(function ProductCard({
 
   const handleWhatsAppClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    trackWhatsAppClick(`product_card:${name}`);
-  }, [name]);
+  }, []);
 
   const handleImageLoad = useCallback(() => {
     setIsLoaded(true);
@@ -232,17 +231,16 @@ const ProductCard = memo(function ProductCard({
           asChild
           className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-10 sm:h-11 text-sm font-medium transition-all duration-300 hover:shadow-md mt-auto"
         >
-          <a
+          <WhatsAppLink
             href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
+            source={`product_card:${name}`}
             className="flex items-center justify-center gap-2"
             onClick={handleWhatsAppClick}
           >
             <ShoppingCart size={15} />
             <span>Inquire on WhatsApp</span>
             <ExternalLink size={13} />
-          </a>
+          </WhatsAppLink>
         </Button>
       </CardContent>
     </Card>

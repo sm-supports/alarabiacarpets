@@ -19,6 +19,8 @@ interface CloudflareTurnstileProps {
   onExpire?: () => void;
   onError?: () => void;
   theme?: "dark" | "light" | "auto";
+  /** Widget language: "auto" follows the browser, "ar" fixes it on Arabic pages. */
+  language?: string;
   className?: string;
   ref?: Ref<CloudflareTurnstileHandle>;
 }
@@ -30,6 +32,7 @@ interface TurnstileRenderOptions {
   "expired-callback"?: () => void;
   "error-callback"?: () => void;
   theme?: "dark" | "light" | "auto";
+  language?: string;
 }
 
 declare global {
@@ -50,6 +53,7 @@ export default function CloudflareTurnstile({
   onExpire,
   onError,
   theme = "dark",
+  language = "auto",
   className = "",
   ref,
 }: CloudflareTurnstileProps) {
@@ -91,9 +95,10 @@ export default function CloudflareTurnstile({
         "expired-callback": () => onExpireRef.current?.(),
         "error-callback": () => onErrorRef.current?.(),
         theme,
+        language,
       });
     }
-  }, [siteKey, action, theme]);
+  }, [siteKey, action, theme, language]);
 
   useEffect(() => {
     let mounted = true;
@@ -117,7 +122,7 @@ export default function CloudflareTurnstile({
 
     const scriptId = "cf-turnstile-script";
     let script = document.getElementById(scriptId) as HTMLScriptElement | null;
-    
+
     if (!script) {
       script = document.createElement("script");
       script.id = scriptId;

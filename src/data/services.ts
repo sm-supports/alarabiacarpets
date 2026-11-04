@@ -881,6 +881,143 @@ export const services: Service[] = [
     heroImageAlt:
       "Full-height flush oak-veneer cabinetry running wall to wall under a coved gypsum ceiling",
   },
+  {
+    slug: "floor-mats",
+    heading: "Floor and Entrance Mats in Qatar",
+    label: "Floor & Entrance Mats",
+    seoTitle: "Floor & Entrance Mats in Qatar | Doha Supplier",
+    metaDescription:
+      "Floor and entrance mats in Qatar for homes, offices, gyms and shops. Non-slip, easy-clean options supplied by Al Arabia Carpets in Doha.",
+    excerpt:
+      "Entrance, door and gym mats chosen for where they will actually be used: wet shoes, heavy traffic or sweat and weights.",
+    intro: [
+      "A floor mat has one job, and it depends on the spot. By a villa entrance it has to catch sand before it reaches the floor. In a gym it has to take dropped weights. In an office lobby it has to stay flat under constant foot traffic and still look tidy.",
+      "Al Arabia Carpets supplies floor mats in Doha alongside our carpet and flooring ranges, so we can match the mat to the floor it sits on. Tell us the location and the size, and we will recommend a suitable type. " + AREAS,
+    ],
+    offers: [
+      "Entrance and door mats for villas and apartments",
+      "Lobby and corridor mats for offices and shops",
+      "PVC gym mats and indoor game mats",
+      "Mats cut to the size of the space",
+      "Non-slip options for areas that get wet",
+    ],
+    includes: [
+      "Advice on the right mat for the location",
+      "Measurement of the area on request",
+      "Delivery to your location in Qatar",
+    ],
+    specs: [
+      { label: "Used in", value: "Homes, offices, shops and gyms" },
+      { label: "Sizes", value: "Cut to the space" },
+      { label: "Service area", value: "All of Qatar" },
+    ],
+    steps: [
+      { title: "Tell us the spot", body: "Send us the location, the rough size and a photo on WhatsApp." },
+      { title: "We recommend a type", body: "We suggest a mat that suits the traffic, the moisture and the floor underneath." },
+      { title: "Quotation", body: "You get a clear price for the mat and delivery." },
+      { title: "Delivery", body: "We deliver to your home or business anywhere in Qatar." },
+    ],
+    faqs: [
+      { q: "Where can I buy durable floor mats in Qatar?", a: "Al Arabia Carpets supplies floor and entrance mats from our showroom on Al Mansoura St in Doha, and delivers across Qatar. Message us on WhatsApp with the location and size for a recommendation." },
+      { q: "What should I look for in a floor mat?", a: "Start with the location. Areas that get wet need a non-slip backing and a surface that dries quickly. Busy entrances need a dense surface that traps sand and holds its shape. Gyms need a thicker mat that absorbs impact. Check that it is easy to clean, because a mat that holds dirt stops doing its job." },
+      { q: "Can you make a mat to a specific size?", a: "Yes. Send us the measurements and we will tell you what can be cut to fit the space." },
+      { q: "Do you supply gym and game room mats?", a: "Yes. We supply PVC gym mats and indoor game mats for home gyms, fitness rooms and play areas." },
+    ],
+    relatedProductIds: ["pvc-gym-mat-indoor-game-mat", "tiles-carpet-office-carpet", "grass-carpet"],
+    relatedCategorySlugs: ["carpet", "barkia"],
+    relatedServiceSlugs: ["office-carpet", "vinyl-flooring"],
+  },
+  {
+    slug: "room-dividers",
+    heading: "Room Dividers and Partitions in Qatar",
+    label: "Room Dividers",
+    seoTitle: "Room Dividers & Partitions in Qatar | Doha",
+    metaDescription:
+      "Room dividers and partitions in Qatar for villas, majlis and offices. Gypsum, panel and storage dividers designed and fitted by Al Arabia Carpets in Doha.",
+    excerpt:
+      "Divide a room without losing the feel of the space, with gypsum partitions, decorative panels or storage units.",
+    intro: [
+      "Many homes and offices need a separation that the original layout does not provide: a majlis screened from the family area, a dining space set apart from the living room, or a private meeting area in an open office.",
+      "Al Arabia Carpets designs and fits room dividers in Doha as part of our interior work, so the divider matches the walls, joinery and flooring around it. We look at the room first, then recommend the type that suits how you use it. " + AREAS,
+    ],
+    offers: [
+      "Fixed partitions in gypsum and C-board",
+      "Decorative panel dividers",
+      "Storage and cabinet units that double as dividers",
+      "Dividers between a majlis and a family area",
+      "Partitions for offices and shops",
+    ],
+    includes: [
+      "Free site survey and measurement",
+      "Design advice to match the room",
+      "Written quotation",
+    ],
+    specs: [
+      { label: "Types", value: "Gypsum, panel and storage dividers" },
+      { label: "Used in", value: "Villas, majlis, offices and shops" },
+      { label: "Service area", value: "All of Qatar" },
+    ],
+    steps: [
+      { title: "Send us the room", body: "Share photos and rough measurements on WhatsApp and tell us what you want to separate." },
+      { title: "Free survey", body: "We visit, measure and suggest the type of divider that suits the space." },
+      { title: "Quotation", body: "You receive a written quote before any work starts." },
+      { title: "Fitting", body: "Our team builds and fits the divider, then finishes it to match the room." },
+    ],
+    faqs: [
+      { q: "What is the best way to divide a room?", a: "It depends on how much separation you need. A gypsum partition gives the most privacy but closes the space. A decorative panel keeps light moving through the room. A storage unit separates the room and adds useful cupboards at the same time." },
+      { q: "Can a divider separate a majlis from the family area?", a: "Yes, and it is one of the most common requests we discuss in Qatar. We take the privacy you want and the look of the majlis into account when we recommend a type." },
+      { q: "Do you make dividers for offices?", a: "Yes. We fit partitions for offices and shops as well as homes." },
+      { q: "Is the survey free?", a: "Yes. We visit, measure and quote at no cost anywhere in Qatar." },
+    ],
+    relatedProductIds: ["gypsum-board-work-design", "cabinet-and-gypsum-board-work", "indoor-wall-panel-design"],
+    relatedCategorySlugs: ["interior"],
+    relatedServiceSlugs: ["gypsum-c-board-fixing", "cabinets"],
+  },
+  {
+    slug: "ceramic-tiles",
+    heading: "Ceramic and Mosaic Tiles in Qatar",
+    label: "Ceramic & Mosaic Tiles",
+    seoTitle: "Ceramic & Mosaic Tiles in Qatar | Doha Supplier",
+    metaDescription:
+      "Ceramic and mosaic tiles in Qatar for floors, walls, bathrooms and kitchens. Compare options at Al Arabia Carpets on Al Mansoura St, Doha.",
+    excerpt:
+      "Ceramic and mosaic tiles for floors, walls, bathrooms and kitchens, chosen with the whole room in mind.",
+    intro: [
+      "Tile is hard to change once it is down, so the choice deserves more than a quick look at a single sample. The finish, the slip resistance and the way it sits next to your other materials all matter more once the room is finished.",
+      "Al Arabia Carpets supplies ceramic and mosaic tiles in Doha alongside our flooring, curtain and interior work, so you can plan the room as a whole. Tell us the room and the area, and we will help you compare suitable options. " + AREAS,
+    ],
+    offers: [
+      "Ceramic floor and wall tiles",
+      "Mosaic tiles for feature walls and bathrooms",
+      "Tiles for kitchens and bathrooms",
+      "Help matching tile to your flooring and cabinetry",
+    ],
+    includes: [
+      "Advice on the right tile for the room",
+      "Written quotation",
+      "Delivery to your location in Qatar",
+    ],
+    specs: [
+      { label: "Types", value: "Ceramic and mosaic" },
+      { label: "Used in", value: "Floors, walls, bathrooms and kitchens" },
+      { label: "Service area", value: "All of Qatar" },
+    ],
+    steps: [
+      { title: "Tell us the room", body: "Send the room type, the approximate area and any photo you like on WhatsApp." },
+      { title: "Compare options", body: "We suggest suitable tiles and explain the differences between them." },
+      { title: "Quotation", body: "You get a clear written price before you decide." },
+      { title: "Delivery", body: "We deliver the order to your location anywhere in Qatar." },
+    ],
+    faqs: [
+      { q: "Where can I find ceramic tile suppliers in Qatar?", a: "Al Arabia Carpets supplies ceramic and mosaic tiles from our showroom on Al Mansoura St in Doha, open every day, and delivers across Qatar." },
+      { q: "What should I look for in a tile supplier?", a: "Ask to see the tile in person rather than choosing from a photo, get a written quote that states the area it covers, and check that extra tiles from the same batch are available, because colour can vary between batches. A supplier who asks about the room before recommending a tile is a good sign." },
+      { q: "Which tiles suit bathrooms?", a: "Choose a floor tile with a slip-resistant surface, since polished tile gets slippery when wet. Mosaic works well on bathroom walls and curved areas because the small pieces follow the shape of the surface." },
+      { q: "What is mosaic tile best used for?", a: "Mosaic is most often used for feature walls, bathroom walls, kitchen backsplashes and small areas where a pattern makes more impact than a plain tile." },
+    ],
+    relatedProductIds: ["skerting-nala-profile", "pvc-barkia"],
+    relatedCategorySlugs: ["barkia", "interior"],
+    relatedServiceSlugs: ["vinyl-flooring", "kitchen-cabinets"],
+  },
 ];
 
 export function getService(slug: string): Service | undefined {

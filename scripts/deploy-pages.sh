@@ -52,6 +52,9 @@ else
 fi
 [ -f "$OUT/index.html" ] || die "$OUT/index.html missing - did the build run?"
 
+node scripts/check-text-ratio.mjs || die "pages under the 10% text-to-HTML ratio"
+node scripts/check-arabic.mjs || die "Arabic pages failed their checks"
+
 # Is out/ on a case-insensitive filesystem?
 probe="$OUT/.case-probe-$$"
 touch "$probe"
@@ -73,11 +76,12 @@ else
   [ "$(uname)" = "Darwin" ] || die "case-insensitive filesystem but not macOS; no staging strategy"
 
   # Collisions: a top-level public/ folder and an app route folder whose names
-  # differ only in case. Both export into the same out/ folder here.
+  # differ only in case. Both export into the same out/ folder here. Routes live
+  # inside route groups such as src/app/(en)/, which add nothing to the URL.
   pairs=""
   for pub in "$ROOT"/public/*/; do
     P="$(basename "$pub")"
-    for app in "$ROOT"/src/app/*/; do
+    for app in "$ROOT"/src/app/*/ "$ROOT"/src/app/\(*\)/*/; do
       R="$(basename "$app")"
       if [ "$P" != "$R" ] && [ "$(lower "$P")" = "$(lower "$R")" ]; then
         pairs="$pairs $P:$R"

@@ -1,6 +1,8 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { localePath } from "@/i18n";
+import { useLocale } from "@/i18n/LocaleProvider";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { trackWhatsAppClick } from "@/lib/analytics";
 import { WHATSAPP_URL } from "@/lib/seo";
 
@@ -12,11 +14,6 @@ interface WhatsAppLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement
   children: React.ReactNode;
 }
 
-/** Where the link points before hydration, i.e. in the static HTML. */
-const FALLBACK_HREF = "/contact";
-
-const noopSubscribe = () => () => {};
-
 /**
  * Tracked WhatsApp anchor -- every WhatsApp CTA on the site goes through this.
  *
@@ -24,11 +21,11 @@ const noopSubscribe = () => () => {};
  * can only live in a client component, and this keeps the boundary at the link
  * itself rather than forcing a whole page to go client.
  *
- * The static HTML links to the contact page; the wa.me URL is only set once
- * React has hydrated. WhatsApp answers site-audit crawlers with 429 on any
- * wa.me URL, bare or prefilled, so Semrush (which crawls without JS) reported
- * one broken external link on every page. Visitors get the real link a moment
- * after load, so hover, copy-link and long-press all show it.
+ * The static HTML links to the contact page in the page's language; the wa.me
+ * URL is only set once React has hydrated. WhatsApp answers site-audit crawlers
+ * with 429 on any wa.me URL, bare or prefilled, so Semrush (which crawls without
+ * JS) reported one broken external link on every page. Visitors get the real
+ * link a moment after load, so hover, copy-link and long-press all show it.
  */
 export default function WhatsAppLink({
   source,
@@ -37,16 +34,17 @@ export default function WhatsAppLink({
   children,
   ...rest
 }: WhatsAppLinkProps) {
+  const locale = useLocale();
   // false on the server and during hydration, true afterwards -- without the
   // mismatch a setState-in-effect would risk.
-  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
+  const hydrated = useHydrated();
   const target =
     href ??
     `${WHATSAPP_URL}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
 
   return (
     <a
-      href={hydrated ? target : FALLBACK_HREF}
+      href={hydrated ? target : localePath(locale, "/contact")}
       {...(hydrated && { target: "_blank", rel: "noopener noreferrer" })}
       {...rest}
       onClick={(e) => {

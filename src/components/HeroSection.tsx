@@ -1,11 +1,15 @@
 "use client";
 
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play } from "@/components/icons";
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/i18n/LocaleProvider";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export default function HeroSection() {
+  const hydrated = useHydrated();
   const [isVisible, setIsVisible] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     // Trigger animations after mount
@@ -25,13 +29,15 @@ export default function HeroSection() {
     >
       {/* Ambient Background Elements - Smaller on mobile */}
       <div className="absolute inset-0 overflow-hidden">
+        {hydrated && (
+          <>
         {/* Gradient orbs - reduced size on mobile for performance */}
         <div className="absolute top-1/4 -left-16 md:-left-32 w-48 h-48 md:w-96 md:h-96 bg-gold-200/40 rounded-full blur-3xl animate-float" />
         <div className="absolute bottom-1/4 -right-16 md:-right-32 w-64 h-64 md:w-[500px] md:h-[500px] bg-teal-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[800px] md:h-[800px] bg-forest-100/20 rounded-full blur-3xl" />
-        
+
         {/* Subtle grid pattern - hidden on mobile for performance */}
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.015] hidden md:block"
           style={{
             backgroundImage: `linear-gradient(rgba(10, 42, 31, 0.5) 1px, transparent 1px),
@@ -39,8 +45,10 @@ export default function HeroSection() {
             backgroundSize: '60px 60px'
           }}
         />
+          </>
+        )}
       </div>
-      
+
       {/* Main Content */}
       <div className="relative z-10 container mx-auto px-4 sm:px-5 lg:px-8 py-8 md:py-0">
         <div className="max-w-5xl mx-auto text-center">
@@ -52,7 +60,7 @@ export default function HeroSection() {
           >
             <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gold-500 rounded-full animate-pulse-subtle" />
             <span className="text-xs sm:text-sm font-medium text-gray-700">
-              Premium Home Furnishings in Qatar
+              {t.hero.badge}
             </span>
       </div>
 
@@ -63,9 +71,9 @@ export default function HeroSection() {
             }`}
             style={{ transitionDelay: '100ms', letterSpacing: '-0.02em' }}
           >
-            Transform Your Space
+            {t.hero.titleTop}
             <br />
-            <span className="text-gradient">Into Art</span>
+            <span className="text-gradient">{t.hero.titleBottom}</span>
                     </h1>
 
           {/* Subheadline - Smaller on mobile */}
@@ -75,9 +83,7 @@ export default function HeroSection() {
             }`}
             style={{ transitionDelay: '200ms' }}
           >
-            Discover handcrafted carpets, elegant majlis sofas, and premium 
-            home furnishings with complimentary delivery and installation 
-            throughout Qatar.
+            {t.hero.subtitle}
           </p>
 
           {/* CTA Buttons - Full width on mobile */}
@@ -89,17 +95,17 @@ export default function HeroSection() {
           >
             <button
               onClick={() => scrollToSection('products')}
-              className="group inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-forest-900 text-white text-base font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-float active:scale-[0.98]"
+              className="group hero-dark"
             >
-              Explore Collection
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              {t.hero.explore}
+              <ArrowRight className="arrow-go" />
             </button>
             <button
               onClick={() => scrollToSection('services')}
-              className="group inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-white text-forest-900 text-base font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98]"
+              className="group hero-light"
             >
               <Play className="w-4 h-4" />
-              Our Services
+              {t.hero.ourServices}
             </button>
                   </div>
 
@@ -110,51 +116,25 @@ export default function HeroSection() {
             }`}
             style={{ transitionDelay: '400ms' }}
           >
-            {/* Mobile: Horizontal scroll container */}
-            <div className="flex sm:hidden items-center gap-6 overflow-x-auto pb-2 px-4 w-full justify-center scrollbar-hide">
-              <TrustIndicator 
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 sm:gap-8 md:gap-12">
+              <TrustIndicator
                 icon="check"
-                title="Free Delivery"
-                subtitle="Across Qatar"
+                title={t.hero.freeDelivery}
+                subtitle={t.hero.acrossQatar}
                 bgColor="bg-forest-100"
                 iconColor="text-forest-700"
               />
-              <TrustIndicator 
+              <TrustIndicator
                 icon="tool"
-                title="Free Install"
-                subtitle="Pro Team"
+                title={t.hero.freeInstall}
+                subtitle={t.hero.proTeam}
                 bgColor="bg-gold-100"
                 iconColor="text-gold-600"
               />
-              <TrustIndicator 
+              <TrustIndicator
                 icon="star"
-                title="1000+"
-                subtitle="Customers"
-                bgColor="bg-teal-100"
-                iconColor="text-teal-600"
-              />
-            </div>
-
-            {/* Desktop: Regular layout */}
-            <div className="hidden sm:flex items-center gap-8 md:gap-12">
-              <TrustIndicator 
-                icon="check"
-                title="Free Delivery"
-                subtitle="Across Qatar"
-                bgColor="bg-forest-100"
-                iconColor="text-forest-700"
-              />
-              <TrustIndicator 
-                icon="tool"
-                title="Free Installation"
-                subtitle="Professional Team"
-                bgColor="bg-gold-100"
-                iconColor="text-gold-600"
-              />
-              <TrustIndicator 
-                icon="star"
-                title="1000+ Happy"
-                subtitle="Customers"
+                title={t.hero.happyCustomers}
+                subtitle={t.hero.customers}
                 bgColor="bg-teal-100"
                 iconColor="text-teal-600"
               />
@@ -178,7 +158,7 @@ export default function HeroSection() {
         }`}
         style={{ transitionDelay: '800ms' }}
       >
-        <span className="text-xs text-gray-400 uppercase tracking-wider">Scroll to explore</span>
+        <span className="text-xs text-gray-400 uppercase tracking-wider">{t.hero.scroll}</span>
         <div className="w-6 h-10 border-2 border-gray-300 rounded-full flex justify-center pt-2">
           <div className="w-1.5 h-3 bg-gray-400 rounded-full animate-bounce" />
         </div>
@@ -188,13 +168,13 @@ export default function HeroSection() {
 }
 
 // Trust Indicator Component for cleaner code
-function TrustIndicator({ 
-  icon, 
-  title, 
-  subtitle, 
-  bgColor, 
-  iconColor 
-}: { 
+function TrustIndicator({
+  icon,
+  title,
+  subtitle,
+  bgColor,
+  iconColor
+}: {
   icon: 'check' | 'tool' | 'star';
   title: string;
   subtitle: string;
@@ -224,7 +204,7 @@ function TrustIndicator({
       <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${bgColor} flex items-center justify-center`}>
         {icons[icon]}
       </div>
-      <div className="text-left">
+      <div className="text-start">
         <p className="text-xs sm:text-sm font-semibold text-forest-900 whitespace-nowrap">{title}</p>
         <p className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">{subtitle}</p>
       </div>

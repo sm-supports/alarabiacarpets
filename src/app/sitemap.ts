@@ -3,6 +3,7 @@ import { products } from "@/data/products";
 import { guides } from "@/data/guides";
 import { categories } from "@/data/categories";
 import { services } from "@/data/services";
+import { HTML_LANG, localePath } from "@/i18n/config";
 import { SITE_URL } from "@/lib/seo";
 
 /**
@@ -17,7 +18,7 @@ export const dynamic = "force-static";
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  return [
+  const pages: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "weekly", priority: 1.0 },
     { url: `${SITE_URL}/products`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${SITE_URL}/guides`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
@@ -51,4 +52,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     })),
   ];
+
+  // Every page exists in both languages, so each English entry gains an Arabic
+  // twin, and both carry the same hreflang set as the page's <head>.
+  return pages.flatMap((page) => {
+    const path = page.url.slice(SITE_URL.length) || "/";
+    const languages = {
+      en: `${SITE_URL}${path}`,
+      [HTML_LANG.ar]: `${SITE_URL}${localePath("ar", path)}`,
+      "x-default": `${SITE_URL}${path}`,
+    };
+    return [
+      { ...page, alternates: { languages } },
+      { ...page, url: languages[HTML_LANG.ar], alternates: { languages } },
+    ];
+  });
 }

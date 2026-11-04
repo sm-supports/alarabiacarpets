@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { ImageIcon } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ImageIcon } from "@/components/icons";
 import type { Product } from "@/data/products";
+import { useI18n } from "@/i18n/LocaleProvider";
 
 /**
  * Hero media for a product detail page.
@@ -17,8 +18,10 @@ export default function ProductMedia({
   product: Product;
   alt: string;
 }) {
+  const { t } = useI18n();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const handleImageLoad = useCallback(() => {
     setImageLoaded(true);
@@ -29,6 +32,15 @@ export default function ProductMedia({
     setImageError(true);
     setImageLoaded(false);
   }, []);
+
+  // The image in the static HTML can finish loading before React attaches onLoad,
+  // and the event won't fire again, which would leave the spinner up for good.
+  useEffect(() => {
+    const image = imageRef.current;
+    if (!image?.complete) return;
+    if (image.naturalWidth > 0) handleImageLoad();
+    else handleImageError();
+  }, [handleImageLoad, handleImageError]);
 
   const firstMedia = product.media?.[0];
   const isVideo = firstMedia?.type === "video";
@@ -45,7 +57,7 @@ export default function ProductMedia({
         <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
           <div className="text-gray-500 text-center p-6">
             <ImageIcon size={64} className="mx-auto mb-4 text-gray-400" />
-            <div className="text-lg font-medium mb-2">Image not available</div>
+            <div className="text-lg font-medium mb-2">{t.productCard.imageNotAvailable}</div>
             <div className="text-sm text-gray-400">{product.name}</div>
           </div>
         </div>
@@ -65,6 +77,7 @@ export default function ProductMedia({
         />
       ) : (
         <img
+          ref={imageRef}
           src={product.imageSrc}
           alt={alt}
           className={`w-full h-full object-cover transition-opacity duration-500 ${

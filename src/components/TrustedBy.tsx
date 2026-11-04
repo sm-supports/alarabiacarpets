@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
+import { useHydrated } from "@/hooks/use-hydrated";
+import { useI18n } from '@/i18n/LocaleProvider';
 
 function useCountUp(end: number, duration = 2000, isVisible: boolean) {
   // Starts at the final value so the prerendered HTML carries the real figure
@@ -40,7 +42,7 @@ function AnimatedStat({ value, label, isVisible }: { value: string; label: strin
 
   return (
     <div className="text-center p-4 sm:p-0">
-      <p className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-0.5 sm:mb-1">
+      <p className="stat-num">
         {count}{suffix}
       </p>
       <p className="text-xs sm:text-sm text-gray-500">{label}</p>
@@ -68,9 +70,11 @@ const logos = [
 export default function TrustedBy() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-  
+  const { t } = useI18n();
+
   // Duplicate logos for seamless infinite scroll
-  const extendedLogos = [...logos, ...logos];
+  const hydrated = useHydrated();
+  const extendedLogos = hydrated ? [...logos, ...logos] : [];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -90,27 +94,28 @@ export default function TrustedBy() {
   }, []);
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="py-12 sm:py-16 lg:py-24 bg-white border-y border-gray-100"
     >
       <div className="container mx-auto px-4 sm:px-5 lg:px-8">
         {/* Header */}
-        <div 
+        <div
           className={`text-center mb-8 sm:mb-12 lg:mb-14 transition-all duration-1000 ease-out-expo ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
           <p className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider mb-2 sm:mb-3">
-            Trusted Partners
+            {t.trusted.eyebrow}
           </p>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900">
-            Trusted by Leading Organizations
+            {t.trusted.title}
           </h2>
         </div>
 
-        {/* Logo Marquee */}
-        <div 
+        {/* Logo Marquee. Stays LTR in Arabic: its keyframes translate to the left. */}
+        <div
+          dir="ltr"
           className={`relative overflow-hidden transition-all duration-1000 ease-out-expo ${
             isVisible ? 'opacity-100' : 'opacity-0'
           }`}
@@ -119,14 +124,14 @@ export default function TrustedBy() {
           {/* Gradient Masks */}
           <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 lg:w-40 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 lg:w-40 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-          
+
           {/* Scrolling Container */}
-          <div className="flex animate-scroll hover:[animation-play-state:paused]">
+          <div className={`flex min-h-16 sm:min-h-20 lg:min-h-24 hover:[animation-play-state:paused] ${hydrated ? "animate-scroll" : ""}`}>
             {extendedLogos.map((logo, index) => {
               const isLarger = logo.src === '/logos/logo2.webp' || logo.src === '/logos/logo3.webp';
-              
+
               return (
-                <div 
+                <div
                   key={`${logo.src}-${index}`}
                   className="flex-shrink-0 w-28 h-16 sm:w-36 sm:h-20 lg:w-48 lg:h-24 flex items-center justify-center mx-2 sm:mx-4 lg:mx-6"
                 >
@@ -134,8 +139,8 @@ export default function TrustedBy() {
                     src={logo.src}
                     alt={logo.alt}
                     className={`object-contain transition-all duration-300 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 ${
-                      isLarger 
-                        ? 'max-h-14 sm:max-h-18 lg:max-h-24' 
+                      isLarger
+                        ? 'max-h-14 sm:max-h-18 lg:max-h-24'
                         : 'max-h-10 sm:max-h-14 lg:max-h-18'
                     }`}
                     loading="eager"
@@ -149,17 +154,17 @@ export default function TrustedBy() {
         </div>
 
         {/* Stats - 2x2 grid on mobile, 4 columns on desktop */}
-        <div 
+        <div
           className={`mt-10 sm:mt-14 lg:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 transition-all duration-1000 ease-out-expo ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
           style={{ transitionDelay: '400ms' }}
         >
           {[
-            { value: '1000+', label: 'Happy Customers' },
-            { value: '14+', label: 'Trusted Partners' },
-            { value: '10+', label: 'Years Experience' },
-            { value: '100%', label: 'Satisfaction' },
+            { value: '1000+', label: t.trusted.stats.customers },
+            { value: '14+', label: t.trusted.stats.partners },
+            { value: '10+', label: t.trusted.stats.years },
+            { value: '100%', label: t.trusted.stats.satisfaction },
           ].map((stat) => (
             <AnimatedStat key={stat.label} value={stat.value} label={stat.label} isVisible={isVisible} />
           ))}

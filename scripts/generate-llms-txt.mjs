@@ -39,7 +39,7 @@ for (const url of urls) {
   const title = /<title>([^<]*)<\/title>/.exec(html);
   const desc = /<meta name="description" content="([^"]*)"/.exec(html);
   pages[url] = {
-    title: decode(title ? title[1] : url).replace(/ \| Al Arabia Carpets$/, "").trim(),
+    title: decode(title ? title[1] : url).replace(/ \| (Al Arabia Carpets|سجاد العربية)$/, "").trim(),
     desc: decode(desc ? desc[1] : "").trim(),
   };
 }
@@ -69,16 +69,26 @@ const output =
     "",
     "> Supply and installation of carpets, vinyl and SPC flooring, curtains, custom furniture, cabinetry and interior fit-out across Qatar. Based on Al Mansoura St, Doha. Free on-site measurement, with installation included in quoted prices. Contact: +974 5551 2858 / info@alarabiacarpets.com",
     "",
+    "Al Arabia Carpets (سجاد العربية) has a showroom on Al Mansoura St, Doha, Qatar, open every",
+    "day from 8:00 AM to 10:00 PM. WhatsApp +974 5551 2858, email info@alarabiacarpets.com. Delivery",
+    "and installation are free across Qatar, and measurement and quotation are free.",
+    "",
     "This file lists the site's pages so language models and AI search engines can",
     "find the right one. Service pages describe work we carry out; product pages",
-    "describe items in the catalogue; guides are editorial. Prices are quoted after",
-    "an on-site survey rather than published, so no page states a price.",
+    "describe items in the catalogue; guides are editorial. Prices are in Qatari riyal",
+    "(QAR). Where a page states a price it is a starting price; the final figure is",
+    "quoted after measuring. Every page also exists in Arabic under /ar, listed below.",
     "",
     section("Services", ["/services", ...under("/services")]),
     section("Product categories", ["/products", ...categories]),
     section("Guides", ["/guides", ...under("/guides")]),
     section("Products", under("/products").filter((u) => !categories.includes(u))),
     section("Company", ["/about", "/contact"]),
+    section("الخدمات (Services in Arabic)", ["/ar/services", ...under("/ar/services")]),
+    section("فئات المنتجات (Product categories in Arabic)", ["/ar/products", ...categories.map((c) => `/ar${c}`)]),
+    section("الأدلة (Guides in Arabic)", ["/ar/guides", ...under("/ar/guides")]),
+    section("المنتجات (Products in Arabic)", under("/ar/products").filter((u) => !categories.includes(u.slice(3)))),
+    section("الشركة (Company in Arabic)", ["/ar", "/ar/about", "/ar/contact"]),
   ]
     .join("\n")
     .replace(/\n{3,}/g, "\n\n")

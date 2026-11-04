@@ -1,17 +1,19 @@
 "use client";
 
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ShoppingCart, ExternalLink, ImageIcon, Video, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingCart, ExternalLink, ImageIcon, Video, ChevronLeft, ChevronRight } from "@/components/icons";
 import { memo, useCallback, useState, useRef, useEffect } from "react";
 import { ProductMedia } from "@/data/products";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import { useI18n } from "@/i18n/LocaleProvider";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 interface ProductCardProps {
   name: string;
+  /** English name, so the analytics source is the same in both languages. */
+  analyticsName?: string;
   description: string;
   imageSrc: string; // Fallback/Preview
   media?: ProductMedia[];
@@ -26,6 +28,7 @@ interface ProductCardProps {
 
 const ProductCard = memo(function ProductCard({
   name,
+  analyticsName,
   description,
   imageSrc,
   media = [],
@@ -36,7 +39,8 @@ const ProductCard = memo(function ProductCard({
   imageAlt
 }: ProductCardProps) {
   const router = useRouter();
-  const [isLoaded, setIsLoaded] = useState(false);
+  const { t } = useI18n();
+  const hydrated = useHydrated();
   const [hasError, setHasError] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -56,14 +60,8 @@ const ProductCard = memo(function ProductCard({
     e.stopPropagation();
   }, []);
 
-  const handleImageLoad = useCallback(() => {
-    setIsLoaded(true);
-    setHasError(false);
-  }, []);
-
   const handleImageError = useCallback(() => {
     setHasError(true);
-    setIsLoaded(true);
   }, []);
 
   // Track active slide on scroll
@@ -103,23 +101,25 @@ const ProductCard = memo(function ProductCard({
   };
 
   return (
-    <Card className="product-card overflow-hidden h-full flex flex-col group border-0 shadow-md hover:shadow-xl transition-all duration-500 rounded-2xl bg-white">
-      {/* Media Container - Fixed 4:3 aspect ratio for uniformity */}
-      <div className="relative aspect-[4/3] bg-neutral-100 overflow-hidden rounded-t-2xl">
-        {/* Navigation Arrows (only if multiple items) */}
-        {displayMedia.length > 1 && (
+    <div className="group product-card pc-card">
+      {/* Media Container - Fixed 4:3 aspect ratio for uniformity. LTR in Arabic too,
+          because the slide tracking below assumes a positive scrollLeft. */}
+      <div dir="ltr" className="pc-media">
+        {/* Navigation Arrows (only if multiple items). These and the extra slides need
+            JavaScript anyway, and on /products they would be most of the static HTML. */}
+        {hydrated && displayMedia.length > 1 && (
           <>
             <button
               onClick={(e) => { e.stopPropagation(); scroll('left'); }}
               className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
-              aria-label="Previous image"
+              aria-label={t.productCard.previous}
             >
               <ChevronLeft size={18} />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); scroll('right'); }}
               className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
-              aria-label="Next image"
+              aria-label={t.productCard.next}
             >
               <ChevronRight size={18} />
             </button>
@@ -135,7 +135,7 @@ const ProductCard = memo(function ProductCard({
                       ? 'w-5 h-1.5 bg-white shadow-md'
                       : 'w-1.5 h-1.5 bg-white/60 hover:bg-white/80'
                   }`}
-                  aria-label={`Go to slide ${idx + 1}`}
+                  aria-label={t.productCard.goToSlide(idx + 1)}
                 />
               ))}
             </div>
@@ -143,7 +143,7 @@ const ProductCard = memo(function ProductCard({
         )}
 
         {/* Media Count Badge */}
-        {displayMedia.length > 1 && (
+        {hydrated && displayMedia.length > 1 && (
           <div className="absolute top-3 right-3 z-10 bg-black/40 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium">
             {displayMedia[activeIndex]?.type === 'video' ? <Video size={11} /> : <ImageIcon size={11} />}
             <span>{activeIndex + 1}/{displayMedia.length}</span>
@@ -153,13 +153,13 @@ const ProductCard = memo(function ProductCard({
         {/* Scrollable Media Container */}
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory h-full w-full scrollbar-hide"
+          className="pc-track scrollbar-hide"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {displayMedia.map((item, index) => (
+          {(hydrated ? displayMedia : displayMedia.slice(0, 1)).map((item, index) => (
             <div
               key={`${item.src}-${index}`}
-              className="flex-shrink-0 w-full h-full snap-center relative cursor-pointer"
+              className="pc-slide"
               onClick={handleCardClick}
             >
               {item.type === 'video' ? (
@@ -173,30 +173,23 @@ const ProductCard = memo(function ProductCard({
                 />
               ) : (
                 <>
-                  {(!isLoaded && !hasError && index === 0) && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-neutral-100 to-neutral-200 animate-pulse flex items-center justify-center">
-                      <div className="w-10 h-10 border-2 border-neutral-200 border-t-primary rounded-full animate-spin"></div>
-                    </div>
-                  )}
-
                   {hasError && index === 0 && (
                     <div className="absolute inset-0 bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center">
                       <div className="text-neutral-400 text-center p-4">
                         <ImageIcon size={40} className="mx-auto mb-2" />
-                        <div className="text-xs font-medium">Image unavailable</div>
+                        <div className="text-xs font-medium">{t.productCard.imageUnavailable}</div>
                       </div>
                     </div>
                   )}
 
                   <img
                     src={item.src}
-                    alt={imageAlt ? `${imageAlt}${index > 0 ? ` (view ${index + 1})` : ""}` : `${name} - ${index + 1}`}
+                    alt={imageAlt ? `${imageAlt}${index > 0 ? t.productCard.view(index + 1) : ""}` : `${name} - ${index + 1}`}
                     loading={priority && index === 0 ? "eager" : "lazy"}
                     decoding="async"
                     fetchPriority={priority && index === 0 ? "high" : "auto"}
-                    onLoad={index === 0 ? handleImageLoad : undefined}
                     onError={index === 0 ? handleImageError : undefined}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="pc-img"
                   />
                 </>
               )}
@@ -206,8 +199,8 @@ const ProductCard = memo(function ProductCard({
       </div>
 
       {/* Content Section */}
-      <CardContent className="p-4 sm:p-5 flex flex-col flex-grow">
-        <h3 className="font-playfair text-base sm:text-lg font-semibold mb-1.5 text-neutral-900 line-clamp-1">
+      <div className="pc-body">
+        <h3 className="pc-title">
           {href ? (
             <Link
               href={href}
@@ -224,26 +217,21 @@ const ProductCard = memo(function ProductCard({
             </span>
           )}
         </h3>
-        <p className="font-poppins text-xs sm:text-sm text-neutral-500 mb-4 flex-grow line-clamp-2 leading-relaxed">
+        <p className="pc-text">
           {description}
         </p>
-        <Button
-          asChild
-          className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-10 sm:h-11 text-sm font-medium transition-all duration-300 hover:shadow-md mt-auto"
+        <WhatsAppLink
+          href={whatsappLink}
+          source={`product_card:${analyticsName ?? name}`}
+          className="pc-cta"
+          onClick={handleWhatsAppClick}
         >
-          <WhatsAppLink
-            href={whatsappLink}
-            source={`product_card:${name}`}
-            className="flex items-center justify-center gap-2"
-            onClick={handleWhatsAppClick}
-          >
-            <ShoppingCart size={15} />
-            <span>Inquire on WhatsApp</span>
-            <ExternalLink size={13} />
-          </WhatsAppLink>
-        </Button>
-      </CardContent>
-    </Card>
+          <ShoppingCart size={15} />
+          <span>{t.productCard.inquire}</span>
+          <ExternalLink size={13} />
+        </WhatsAppLink>
+      </div>
+    </div>
   );
 });
 

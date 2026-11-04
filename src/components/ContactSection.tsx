@@ -4,13 +4,16 @@ import { useState, memo, useCallback, useMemo, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, MapPin, Mail, Phone, MessageCircle } from "lucide-react";
+import { ArrowRight, MapPin, Mail, Phone, MessageCircle } from "@/components/icons";
 import Link from "next/link";
 import CloudflareTurnstile, {
   type CloudflareTurnstileHandle,
 } from "@/components/CloudflareTurnstile";
 import { trackFormLead, trackPhoneClick } from "@/lib/analytics";
+import { useI18n } from "@/i18n/LocaleProvider";
+import { useHydrated } from "@/hooks/use-hydrated";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { EMAIL, PHONE, WHATSAPP_URL } from "@/lib/seo";
 
 // Inlined at build time. If the Cloudflare Pages build environment does not
@@ -23,6 +26,7 @@ const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const TURNSTILE_ACTION = "contact";
 
 const ContactSection = memo(function ContactSection() {
+  const hydrated = useHydrated();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -34,6 +38,8 @@ const ContactSection = memo(function ContactSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const turnstileRef = useRef<CloudflareTurnstileHandle>(null);
   const { toast } = useToast();
+  const { locale, t: dict, lp } = useI18n();
+  const t = dict.contactSection;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -60,7 +66,7 @@ const ContactSection = memo(function ContactSection() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, turnstileToken }),
+        body: JSON.stringify({ name, email, message, turnstileToken, locale }),
       });
 
       if (!res.ok) {
@@ -72,8 +78,8 @@ const ContactSection = memo(function ContactSection() {
 
       setSubmitted(true);
       toast({
-        title: "Message sent successfully!",
-        description: `Thank you ${name}, we'll contact you soon.`,
+        title: t.sentTitle,
+        description: t.sentText(name),
       });
       setName("");
       setEmail("");
@@ -89,56 +95,61 @@ const ContactSection = memo(function ContactSection() {
       setTurnstileToken("");
 
       toast({
-        title: "Something went wrong!",
+        title: t.errorTitle,
         description:
           errorMsg.includes("verification")
-            ? "Verification failed. Please complete the check and try again."
-            : "Please try again later or contact us directly.",
+            ? t.errorVerification
+            : t.errorGeneric,
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
-  }, [name, email, message, turnstileToken, toast]);
+  }, [name, email, message, turnstileToken, toast, locale, t]);
 
   const contactMethods = useMemo(() => [
     {
       icon: MessageCircle,
-      label: "WhatsApp",
+      label: t.whatsapp,
       value: "+974 5551 2858",
+      ltr: true,
       href: WHATSAPP_URL,
       external: true,
       hasConversion: true,
     },
     {
       icon: Mail,
-      label: "Email",
+      label: t.email,
       value: "info@alarabiacarpets.com",
+      ltr: true,
       href: "mailto:info@alarabiacarpets.com",
       external: false,
       hasConversion: false,
     },
     {
       icon: MapPin,
-      label: "Location",
-      value: "Al Mansoura St, Doha, Qatar",
+      label: t.location,
+      value: t.locationValue,
+      ltr: false,
       href: "https://maps.google.com/?q=Al+Mansoura+St,+Doha,+Qatar",
       external: true,
       hasConversion: false,
     },
-  ], []);
+  ], [t]);
 
   return (
-    <section 
+    <section
       ref={sectionRef}
-      id="contact" 
+      id="contact"
       className="relative py-16 sm:py-20 lg:py-28 bg-forest-900 overflow-hidden"
     >
       {/* Background Elements - Smaller on mobile */}
       <div className="absolute inset-0">
+        {hydrated && (
+          <>
         <div className="absolute top-0 left-1/4 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-gold-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 sm:w-96 sm:h-96 lg:w-[500px] lg:h-[500px] bg-teal-500/10 rounded-full blur-3xl" />
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.03] hidden sm:block"
           style={{
             backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px),
@@ -146,63 +157,62 @@ const ContactSection = memo(function ContactSection() {
             backgroundSize: '60px 60px'
           }}
         />
+          </>
+        )}
       </div>
 
       <div className="relative z-10 container mx-auto px-4 sm:px-5 lg:px-8">
         {/* CTA Header */}
-        <div 
+        <div
           className={`text-center mb-10 sm:mb-12 lg:mb-16 transition-all duration-1000 ease-out-expo ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-white mb-4 sm:mb-6 leading-tight">
-            Ready to Transform
+            {t.titleTop}
             <br />
-            <span className="text-gradient">Your Space?</span>
+            <span className="text-gradient">{t.titleBottom}</span>
           </h2>
           <p className="text-sm sm:text-base lg:text-lg text-white/70 max-w-2xl mx-auto mb-8 sm:mb-10 px-2">
-            Get in touch with our team for personalized recommendations and a free quote.
-            We're here to bring your vision to life.
+            {t.subtitle}
           </p>
-          
+
           {/* Primary CTA */}
           <WhatsAppLink
             source="contact_section_primary"
-            className="group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-gold-500 text-forest-900 text-base sm:text-lg font-semibold rounded-full transition-all duration-300 hover:bg-gold-400 hover:shadow-float active:scale-[0.98] w-full sm:w-auto max-w-sm sm:max-w-none"
+            className="group ct-primary"
           >
-            <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-            </svg>
-            Chat on WhatsApp
-            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1" />
+            <WhatsAppIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+            {t.chat}
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" />
           </WhatsAppLink>
         </div>
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 max-w-6xl mx-auto">
           {/* Contact Methods */}
-          <div 
+          <div
             className={`transition-all duration-1000 ease-out-expo ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
             style={{ transitionDelay: '200ms' }}
           >
             <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-6 sm:mb-8">
-              Get in Touch
+              {t.getInTouch}
             </h3>
-            
+
             <div className="space-y-3 sm:space-y-4">
               {contactMethods.map((method, index) => {
                 const Icon = method.icon;
-                const className = "group flex items-center gap-4 sm:gap-5 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 active:scale-[0.98]";
+                const className = "group ct-method";
                 const content = (
                   <>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 flex-shrink-0">
+                    <div className="ct-icon">
                       <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-gold-400" />
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs sm:text-sm text-white/60 mb-0.5 sm:mb-1">{method.label}</p>
-                      <p className="text-sm sm:text-base text-white font-medium truncate">{method.value}</p>
+                      <p className="text-sm sm:text-base text-white font-medium truncate">{method.ltr ? <bdi dir="ltr">{method.value}</bdi> : method.value}</p>
                     </div>
                   </>
                 );
@@ -228,33 +238,33 @@ const ContactSection = memo(function ContactSection() {
 
             {/* Quick Links */}
             <div className="mt-8 sm:mt-10 pt-8 sm:pt-10 border-t border-white/10">
-              <p className="text-xs sm:text-sm text-white/60 mb-3 sm:mb-4">Quick Links</p>
+              <p className="text-xs sm:text-sm text-white/60 mb-3 sm:mb-4">{t.quickLinks}</p>
               <div className="flex flex-wrap gap-2 sm:gap-3">
-                <Link 
-                  href="/products"
-                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-white/80 bg-white/5 rounded-full border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-[0.98]"
+                <Link
+                  href={lp("/products")}
+                  className="ct-chip"
                 >
-                  View Products
+                  {t.viewProducts}
                 </Link>
-                <Link 
-                  href="/about"
-                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-white/80 bg-white/5 rounded-full border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-[0.98]"
+                <Link
+                  href={lp("/about")}
+                  className="ct-chip"
                 >
-                  About Us
+                  {t.aboutUs}
                 </Link>
-                <a 
+                <a
                   href="tel:+97455512858"
                   onClick={() => trackPhoneClick("contact_section_call")}
-                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-white/80 bg-white/5 rounded-full border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-[0.98]"
+                  className="ct-chip"
                 >
-                  Call Now
+                  {t.callNow}
                 </a>
               </div>
             </div>
           </div>
 
           {/* Contact Form */}
-          <div 
+          <div
             className={`transition-all duration-1000 ease-out-expo ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
@@ -262,7 +272,7 @@ const ContactSection = memo(function ContactSection() {
           >
             <div className="p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
               <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-5 sm:mb-6">
-                Send a Message
+                {t.sendMessage}
               </h3>
 
               {submitted ? (
@@ -272,17 +282,19 @@ const ContactSection = memo(function ContactSection() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">Thank You!</h3>
-                  <p className="text-sm sm:text-base text-white/70">We'll get back to you shortly.</p>
+                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">{t.thanks}</h3>
+                  <p className="text-sm sm:text-base text-white/70">{t.thanksText}</p>
                 </div>
+              ) : !hydrated ? (
+                <div className="min-h-[420px]" />
               ) : (
                 <form
                   onSubmit={handleSubmit}
                   className="space-y-4 sm:space-y-5"
                 >
-                  
+
                   <div>
-                    <label htmlFor="contact-name" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">Name</label>
+                    <label htmlFor="contact-name" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">{t.name}</label>
                     <Input
                       id="contact-name"
                       type="text"
@@ -292,27 +304,28 @@ const ContactSection = memo(function ContactSection() {
                       required
                       maxLength={100}
                       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
-                      placeholder="Your name"
+                      placeholder={t.namePlaceholder}
                     />
                   </div>
-                  
+
                   <div>
-                    <label htmlFor="contact-email" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">Email</label>
+                    <label htmlFor="contact-email" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">{t.emailLabel}</label>
                     <Input
                       id="contact-email"
                       type="email"
+                      dir="ltr"
                       name="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       maxLength={254}
                       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
-                      placeholder="your@email.com"
+                      placeholder={t.emailPlaceholder}
                     />
                   </div>
-                  
+
                   <div>
-                    <label htmlFor="contact-message" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">Message</label>
+                    <label htmlFor="contact-message" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">{t.message}</label>
                     <Textarea
                       id="contact-message"
                       name="message"
@@ -322,7 +335,7 @@ const ContactSection = memo(function ContactSection() {
                       maxLength={5000}
                       rows={4}
                       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl resize-none text-sm sm:text-base"
-                      placeholder="Tell us about your project..."
+                      placeholder={t.messagePlaceholder}
                     />
                   </div>
 
@@ -343,18 +356,17 @@ const ContactSection = memo(function ContactSection() {
                             setTurnstileFailed(true);
                           }}
                           theme="dark"
+                          language={locale === "ar" ? "ar" : "auto"}
                         />
                         {turnstileFailed && (
                           <p role="alert" className="text-sm text-red-300 text-center">
-                            We couldn't load the security check. Please reach us on
-                            WhatsApp at {PHONE} or email {EMAIL}.
+                            {t.checkFailed(PHONE, EMAIL)}
                           </p>
                         )}
                       </>
                     ) : (
                       <p role="alert" className="text-sm text-red-300 text-center">
-                        This form is temporarily unavailable. Please reach us on
-                        WhatsApp at {PHONE} or email {EMAIL}.
+                        {t.unavailable(PHONE, EMAIL)}
                       </p>
                     )}
                   </div>
@@ -364,7 +376,7 @@ const ContactSection = memo(function ContactSection() {
                     disabled={isSubmitting || !turnstileToken}
                     className="w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:bg-gray-100 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting ? "Sending..." : "Send Message"}
+                    {isSubmitting ? t.sending : t.send}
                   </button>
                 </form>
               )}

@@ -1,40 +1,21 @@
 "use client";
 
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "@/components/icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { products } from "@/data/products";
 import { getCategory } from "@/data/categories";
 import { WHATSAPP_URL } from "@/lib/seo";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import { useI18n } from "@/i18n/LocaleProvider";
 
 // Showcase presentation config. Each entry points at a CATEGORY landing page --
 // these were category-hub products until they became real category pages.
+// Text comes from t.showcase, keyed by category slug.
 const showcaseConfig = [
-  {
-    categorySlug: "carpet",
-    name: "Luxury Carpets",
-    tagline: "Comfort Beneath Your Feet",
-    description: "Soft, durable carpets crafted from premium materials. Transform any room with our extensive collection of patterns and textures.",
-    features: ["Premium Materials", "Stain Resistant", "Custom Sizes"],
-    color: "forest" as const,
-  },
-  {
-    categorySlug: "majlis-sofa",
-    name: "Majlis Sofas",
-    tagline: "Where Tradition Meets Comfort",
-    description: "Contemporary majlis seating that honors tradition while embracing modern comfort. Custom designs available.",
-    features: ["Custom Designs", "Premium Fabrics", "Traditional Craftsmanship"],
-    color: "gold" as const,
-  },
-  {
-    categorySlug: "barkia",
-    name: "Premium Barkia",
-    tagline: "Flooring Built for Qatar",
-    description: "Waterproof, hard-wearing barkia and PVC flooring for majlis, villas and offices. Easy to clean and made to handle heat and heavy foot traffic.",
-    features: ["Waterproof", "Easy to Clean", "Professional Fitting"],
-    color: "teal" as const,
-  },
+  { categorySlug: "carpet", color: "forest" as const },
+  { categorySlug: "majlis-sofa", color: "gold" as const },
+  { categorySlug: "barkia", color: "teal" as const },
 ];
 
 // Resolved from the category data with NO fallback: a bad slug must throw at
@@ -48,26 +29,18 @@ const productShowcases = showcaseConfig.map(config => {
     id: category.slug,
     imageSrc: category.heroImage,
     href: `/products/${category.slug}`,
-    whatsappLink: `${WHATSAPP_URL}?text=${encodeURIComponent(
-      `I'm interested in ${config.name}`
-    )}`,
-    name: config.name,
-    tagline: config.tagline,
-    description: config.description,
-    features: config.features,
     color: config.color,
   };
 });
 
 // "More to Explore" tiles. `categorySlug` entries link to a landing page;
-// `productId` entries link to a real SKU. Neither has a fallback.
-const additionalProductConfig: Array<
-  { displayName: string } & ({ categorySlug: string } | { productId: string })
-> = [
-  { categorySlug: "curtain", displayName: "Curtains" },
-  { productId: "roller", displayName: "Roller Blinds" },
-  { productId: "grass-carpet", displayName: "Grass Carpet" },
-  { categorySlug: "interior", displayName: "Interior Design" },
+// `productId` entries link to a real SKU. Neither has a fallback. Tile names come
+// from t.showcase.more, keyed by slug or id.
+const additionalProductConfig: Array<{ categorySlug: string } | { productId: string }> = [
+  { categorySlug: "curtain" },
+  { productId: "roller" },
+  { productId: "grass-carpet" },
+  { categorySlug: "interior" },
 ];
 
 const additionalProducts = additionalProductConfig.map(config => {
@@ -76,7 +49,6 @@ const additionalProducts = additionalProductConfig.map(config => {
     if (!category) throw new Error(`Unknown category slug: ${config.categorySlug}`);
     return {
       id: category.slug,
-      name: config.displayName,
       imageSrc: category.heroImage,
       link: `/products/${category.slug}`,
     };
@@ -85,24 +57,26 @@ const additionalProducts = additionalProductConfig.map(config => {
   if (!product) throw new Error(`Unknown product id: ${config.productId}`);
   return {
     id: product.id,
-    name: config.displayName,
     imageSrc: product.imageSrc,
     link: `/products/${product.id}`,
   };
 });
 
 // Individual product showcase component
-function ProductShowcase({ 
-  product, 
-  index, 
-  isVisible 
-}: { 
-  product: typeof productShowcases[0]; 
+function ProductShowcase({
+  product,
+  index,
+  isVisible
+}: {
+  product: typeof productShowcases[0];
   index: number;
   isVisible: boolean;
 }) {
   const isReversed = index % 2 === 1;
-  
+  const { t, lp } = useI18n();
+  const copy = t.showcase.items[product.id];
+  const whatsappLink = `${WHATSAPP_URL}?text=${encodeURIComponent(t.common.interestedMessage(copy.name))}`;
+
   const colorClasses = {
     forest: {
       badge: 'bg-forest-100 text-forest-700',
@@ -134,17 +108,17 @@ function ProductShowcase({
             }`}
             style={{ transitionDelay: `${index * 100}ms` }}
           >
-            <div className="relative aspect-[4/3] sm:aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-elevated sm:shadow-float group">
+            <div className="sc-frame group">
               <img
                 src={product.imageSrc}
-                alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                alt={copy.name}
+                className="sc-img"
                 loading={index === 0 ? "eager" : "lazy"}
                 fetchPriority={index === 0 ? "high" : "auto"}
                 decoding={index === 0 ? "sync" : "async"}
               />
               {/* Subtle gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="sc-shade" />
             </div>
           </div>
 
@@ -156,21 +130,21 @@ function ProductShowcase({
             style={{ transitionDelay: `${index * 100 + 150}ms` }}
           >
             <span className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 mb-4 sm:mb-6 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded-full ${colorClasses.badge}`}>
-              {product.name}
+              {copy.name}
             </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-forest-900 mb-3 sm:mb-4 leading-tight">
-              {product.tagline}
+            <h2 className="sc-title">
+              {copy.tagline}
             </h2>
-            <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-lg">
-              {product.description}
+            <p className="sc-text">
+              {copy.description}
             </p>
-            
+
             {/* Features - Horizontal scroll on mobile */}
             <div className="flex gap-2 sm:gap-3 mb-6 sm:mb-8 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
-              {product.features.map((feature) => (
-                <span 
+              {copy.features.map((feature) => (
+                <span
                   key={feature}
-                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-gray-200 rounded-full text-xs sm:text-sm text-gray-700 whitespace-nowrap flex-shrink-0"
+                  className="sc-pill"
                 >
                   <svg className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${colorClasses.accent} flex-shrink-0`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -183,19 +157,19 @@ function ProductShowcase({
             {/* CTAs - Stack on mobile */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link
-                href={product.href}
-                className={`group inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3 text-white text-sm font-medium rounded-full transition-all duration-300 hover:shadow-float active:scale-[0.98] ${colorClasses.button}`}
+                href={lp(product.href)}
+                className={`group sc-cta ${colorClasses.button}`}
               >
-                View Range
-                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                {t.showcase.viewRange}
+                <ArrowRight className="arrow-go" />
               </Link>
               <WhatsAppLink
-                href={product.whatsappLink}
+                href={whatsappLink}
                 source={`showcase:${product.id}`}
-                className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3 bg-white text-forest-900 text-sm font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98]"
+                className="btn-outline"
               >
-                Get Quote
-                <ArrowUpRight className="w-4 h-4" />
+                {t.showcase.getQuote}
+                <ArrowUpRight className="w-4 h-4 rtl:-scale-x-100" />
               </WhatsAppLink>
             </div>
           </div>
@@ -208,6 +182,7 @@ function ProductShowcase({
 export default function ProductsSection() {
   const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
   const sectionRef = useRef<HTMLElement>(null);
+  const { t, lp } = useI18n();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -234,15 +209,14 @@ export default function ProductsSection() {
       <div className="py-12 sm:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-5 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-forest-900 mb-3 sm:mb-4">
-            Our Collection
+            {t.showcase.title}
           </h2>
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto px-4">
-            Explore our curated selection of premium home furnishings, each piece 
-            crafted to transform your living space.
+            {t.showcase.subtitle}
           </p>
         </div>
         </div>
-        
+
       {/* Product Showcases */}
       {productShowcases.map((product, index) => (
         <div key={product.id} data-index={index}>
@@ -259,10 +233,10 @@ export default function ProductsSection() {
         <div className="container mx-auto px-4 sm:px-5 lg:px-8">
           <div className="text-center mb-8 sm:mb-12">
             <h3 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-3 sm:mb-4">
-              More to Explore
+              {t.showcase.moreTitle}
             </h3>
             <p className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto">
-              Discover our complete range of home furnishing solutions.
+              {t.showcase.moreSubtitle}
             </p>
           </div>
 
@@ -270,42 +244,42 @@ export default function ProductsSection() {
             {additionalProducts.map((product, index) => (
               <Link
                 key={product.id}
-                href={product.link}
+                href={lp(product.link)}
                 data-index={productShowcases.length + index}
-                className={`group relative aspect-[4/5] sm:aspect-square rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-700 ease-out-expo hover:shadow-float active:scale-[0.98] ${
-                  visibleItems.has(productShowcases.length + index) 
-                    ? 'opacity-100 translate-y-0' 
+                className={`group more-tile ${
+                  visibleItems.has(productShowcases.length + index)
+                    ? 'opacity-100 translate-y-0'
                     : 'opacity-0 translate-y-8'
                 }`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
                 <img
                   src={product.imageSrc}
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  alt={t.showcase.more[product.id]}
+                  className="more-img"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute inset-0 flex items-end p-3 sm:p-4 lg:p-5">
+                <div className="more-shade" />
+                <div className="more-label">
                   <div className="flex items-center justify-between w-full">
-                    <span className="text-white text-sm sm:text-base font-medium">{product.name}</span>
-                    <span className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full transition-all duration-300 group-hover:bg-white">
-                      <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:text-forest-900" />
+                    <span className="text-white text-sm sm:text-base font-medium">{t.showcase.more[product.id]}</span>
+                    <span className="more-arrow">
+                      <ArrowUpRight className="more-icon" />
                     </span>
                   </div>
                 </div>
               </Link>
             ))}
         </div>
-        
+
           {/* View All CTA */}
           <div className="mt-8 sm:mt-12 text-center">
             <Link
-              href="/products"
-              className="group inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-forest-900 text-white text-sm sm:text-base font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-float active:scale-[0.98] w-full sm:w-auto max-w-xs sm:max-w-none mx-auto"
+              href={lp("/products")}
+              className="group all-cta"
             >
-              View All Products
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              {t.showcase.viewAll}
+              <ArrowRight className="arrow-go" />
             </Link>
           </div>
         </div>

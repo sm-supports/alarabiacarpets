@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
 
   reactStrictMode: true,
 
+  // Two root layouts (English and Arabic, for <html lang dir>) leave no single
+  // layout to wrap the 404 page, so it is its own document: app/global-not-found.tsx.
+  experimental: { globalNotFound: true },
+
   // Lint is run separately via `npm run lint`. The pre-existing rule violations
   // predate this migration -- the Vite build never invoked ESLint -- so they are
   // not allowed to block a deploy. Types are still checked on every build.

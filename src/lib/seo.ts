@@ -6,7 +6,11 @@
  * HTML rather than being injected after hydration.
  */
 
+import { HTML_LANG, localePath, type Locale } from "@/i18n/config";
+import { localizedCategoryLabel } from "@/i18n/labels";
+
 export const SITE_NAME = "Al Arabia Carpets";
+export const SITE_NAME_AR = "سجاد العربية";
 export const SITE_URL = "https://alarabiacarpets.com";
 export const DEFAULT_IMAGE = "/lovable-uploads/green-white-logo.webp";
 // Kept under 60 characters so Google does not truncate it in results.
@@ -42,6 +46,30 @@ export const LONGITUDE = 51.520008;
  * layout's. Any such page must spread this in.
  */
 export const DEFAULT_OG_IMAGES = [{ url: DEFAULT_IMAGE, alt: SITE_NAME }];
+
+export function defaultOgImages(locale: Locale = "en") {
+  return locale === "ar" ? [{ url: DEFAULT_IMAGE, alt: SITE_NAME_AR }] : DEFAULT_OG_IMAGES;
+}
+
+/**
+ * Fields Arabic pages must repeat in their openGraph object: Next replaces it
+ * rather than merging, so the root layout's og:locale would otherwise be lost.
+ */
+export function ogLocaleFields(locale: Locale = "en") {
+  return locale === "ar" ? { locale: "ar_QA", siteName: SITE_NAME_AR } : {};
+}
+
+/**
+ * Self-canonical plus the hreflang set. English stays x-default: it holds the
+ * URLs already indexed and cited, and it is the version for visitors outside
+ * Qatar. `path` is always the English form of the path.
+ */
+export function pageAlternates(path: string, locale: Locale = "en") {
+  return {
+    canonical: localePath(locale, path),
+    languages: { en: path, [HTML_LANG.ar]: localePath("ar", path), "x-default": path },
+  };
+}
 
 export function clampDescription(description: string): string {
   if (description.length <= 155) return description;
@@ -100,13 +128,38 @@ export const SERVICE_AREAS = ["Doha", "Al Rayyan", "Al Wakra", "Al Khor", "Lusai
 export const OPENING_HOURS = "Mo-Su 08:00-22:00";
 export const OPENING_HOURS_TEXT = "Every day, 8:00 AM to 10:00 PM";
 
-function areaServed() {
+const COUNTRY_AR = "قطر";
+const SERVICE_AREAS_AR = ["الدوحة", "الريان", "الوكرة", "الخور", "لوسيل"];
+
+const SERVICES_AR = [
+  ["توريد وتركيب الباركيه وأرضيات PVC", "توريد وتركيب الباركيه وأرضيات PVC الفاخرة مع توصيل مجاني"],
+  ["السجاد والعشب الصناعي", "سجاد عالي الجودة وعشب صناعي للاستخدام الداخلي والخارجي"],
+  ["الكنب وأثاث المجالس", "كنب حسب الطلب وحلول أثاث المجالس التقليدية"],
+  ["الستائر وستائر الرول", "ستائر وستائر رول حسب الطلب للبيوت والمنشآت التجارية"],
+  ["خدمات التصميم الداخلي", "حلول تصميم داخلي متكاملة للبيوت والمكاتب"],
+  ["تركيب ورق الجدران", "توريد وتركيب ورق الجدران مع تجهيز كامل للجدار"],
+  ["خزائن المطابخ", "خزائن مطابخ حسب المقاس، تصميم وتصنيع وتركيب"],
+  ["خزائن الملابس والغرف", "خزائن ملابس وتخزين مدمجة من الأرضية إلى السقف"],
+  ["الباركيه الخشبي واللامينيت", "توريد وتركيب الباركيه الخشبي واللامينيت بنقشة السمكة والشيفرون والألواح"],
+  ["تركيب سجاد المناسبات", "توريد وفرش سجاد المناسبات للمعارض والمؤتمرات والأعراس، ثم رفعه بعد المناسبة"],
+  ["سجاد المكاتب ومربعات الموكيت", "مربعات الموكيت والموكيت التجاري، توريد وتركيب خارج ساعات الدوام"],
+  ["أرضيات الفينيل و SPC", "توريد وتركيب أرضيات الفينيل و PVC و SPC المقاومة للماء"],
+  ["تركيب العشب الصناعي", "فرش العشب الصناعي وسجاد العشب فوق قاعدة مدكوكة جيدة التصريف"],
+  ["أعمال الجبس وألواح C-Board", "أسقف مستعارة وكرانيش وفواصل جاهزة للدهان"],
+  ["تفصيل الكنب", "كنب وجلسات مجالس حسب مقاس الغرفة وبالقماش الذي تختاره"],
+  ["تصميم وحدات التلفزيون", "وحدات تلفزيون مدمجة وجدران ديكورية مع إضاءة وتمديدات مخفية"],
+  ["الخزائن حسب الطلب", "خزائن حسب المقاس للمطابخ وغرف النوم والمعيشة والمكاتب"],
+];
+
+function areaServed(locale: Locale = "en") {
+  const country = locale === "ar" ? COUNTRY_AR : COUNTRY;
+  const areas = locale === "ar" ? SERVICE_AREAS_AR : SERVICE_AREAS;
   return [
-    { "@type": "Country", name: COUNTRY },
-    ...SERVICE_AREAS.map((name) => ({
+    { "@type": "Country", name: country },
+    ...areas.map((name) => ({
       "@type": "City",
       name,
-      containedInPlace: { "@type": "Country", name: COUNTRY },
+      containedInPlace: { "@type": "Country", name: country },
     })),
   ];
 }
@@ -118,24 +171,46 @@ const POSTAL_ADDRESS = {
   addressCountry: COUNTRY,
 };
 
+const POSTAL_ADDRESS_AR = {
+  "@type": "PostalAddress",
+  streetAddress: "شارع المنصورة",
+  addressLocality: "الدوحة",
+  addressCountry: COUNTRY_AR,
+};
+
+/** Name fields shared by the Organization, LocalBusiness and WebSite nodes. */
+function nameFields(locale: Locale) {
+  return locale === "ar"
+    ? { name: SITE_NAME_AR, alternateName: SITE_NAME, inLanguage: HTML_LANG.ar }
+    : { name: SITE_NAME, alternateName: SITE_NAME_AR };
+}
+
+/** Adds inLanguage to Arabic nodes and leaves English output untouched. */
+function langField(locale: Locale) {
+  return locale === "ar" ? { inLanguage: HTML_LANG.ar } : {};
+}
+
 const GEO = { "@type": "GeoCoordinates", latitude: LATITUDE, longitude: LONGITUDE };
 
 /**
  * LocalBusiness schema, ported from the old index.html.
  * Note `image` is now absolute -- it was a relative path before, which is invalid.
  */
-export function buildLocalBusiness() {
+export function buildLocalBusiness(locale: Locale = "en") {
+  const isAr = locale === "ar";
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "@id": `${SITE_URL}/#localbusiness`,
-    name: SITE_NAME,
-    description:
-      "Premium home furnishing solutions including Barkia, PVC flooring, carpets, sofas, curtains and interior design services in Qatar",
-    url: SITE_URL,
+    ...nameFields(locale),
+    description: isAr
+      ? "حلول مفروشات منزلية فاخرة تشمل الباركيه وأرضيات PVC والسجاد والكنب والستائر وخدمات التصميم الداخلي في قطر"
+      : "Premium home furnishing solutions including Barkia, PVC flooring, carpets, sofas, curtains and interior design services in Qatar",
+    url: isAr ? `${SITE_URL}/ar` : SITE_URL,
     telephone: PHONE,
     email: EMAIL,
-    address: POSTAL_ADDRESS,
+    knowsLanguage: ["ar", "en"],
+    address: isAr ? POSTAL_ADDRESS_AR : POSTAL_ADDRESS,
     geo: GEO,
     openingHours: OPENING_HOURS,
     priceRange: "$$",
@@ -144,8 +219,8 @@ export function buildLocalBusiness() {
     serviceArea: { "@type": "GeoCircle", geoMidpoint: GEO, geoRadius: "50000" },
     hasOfferCatalog: {
       "@type": "OfferCatalog",
-      name: "Home Furnishing Services",
-      itemListElement: SERVICES.map(([name, description]) => ({
+      name: isAr ? "خدمات المفروشات المنزلية" : "Home Furnishing Services",
+      itemListElement: (isAr ? SERVICES_AR : SERVICES).map(([name, description]) => ({
         "@type": "Offer",
         itemOffered: { "@type": "Service", name, description },
       })),
@@ -153,50 +228,54 @@ export function buildLocalBusiness() {
   };
 }
 
-export function buildOrganization() {
+export function buildOrganization(locale: Locale = "en") {
+  const isAr = locale === "ar";
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
-    name: SITE_NAME,
-    url: SITE_URL,
+    ...nameFields(locale),
+    url: isAr ? `${SITE_URL}/ar` : SITE_URL,
     logo: absoluteUrl(DEFAULT_IMAGE),
     email: EMAIL,
     telephone: PHONE,
-    address: POSTAL_ADDRESS,
+    knowsLanguage: ["ar", "en"],
+    address: isAr ? POSTAL_ADDRESS_AR : POSTAL_ADDRESS,
     sameAs: SOCIAL_PROFILES,
   };
 }
 
-export function buildWebSite() {
+export function buildWebSite(locale: Locale = "en") {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": `${SITE_URL}/#website`,
-    name: SITE_NAME,
-    url: SITE_URL,
+    ...nameFields(locale),
+    url: locale === "ar" ? `${SITE_URL}/ar` : SITE_URL,
     publisher: { "@id": `${SITE_URL}/#organization` },
   };
 }
 
-/** @param trail ordered [name, path] pairs, excluding the implicit Home root. */
-export function buildBreadcrumb(trail: Array<[string, string]>) {
+/** @param trail ordered [name, English path] pairs, excluding the implicit Home root. */
+export function buildBreadcrumb(trail: Array<[string, string]>, locale: Locale = "en") {
+  const home = locale === "ar" ? "الرئيسية" : "Home";
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: [["Home", "/"], ...trail].map(([name, path], i) => ({
+    itemListElement: [[home, "/"], ...trail].map(([name, path], i) => ({
       "@type": "ListItem",
       position: i + 1,
       name,
-      item: absoluteUrl(path),
+      item: absoluteUrl(localePath(locale, path)),
     })),
   };
 }
 
-export function buildFaq(faqs: Array<{ q: string; a: string }>) {
+export function buildFaq(faqs: Array<{ q: string; a: string }>, locale: Locale = "en") {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    ...langField(locale),
     mainEntity: faqs.map(({ q, a }) => ({
       "@type": "Question",
       name: q,
@@ -205,7 +284,7 @@ export function buildFaq(faqs: Array<{ q: string; a: string }>) {
   };
 }
 
-export function buildItemList(items: Array<{ name: string; path: string }>) {
+export function buildItemList(items: Array<{ name: string; path: string }>, locale: Locale = "en") {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -214,7 +293,7 @@ export function buildItemList(items: Array<{ name: string; path: string }>) {
       "@type": "ListItem",
       position: i + 1,
       name: item.name,
-      url: absoluteUrl(item.path),
+      url: absoluteUrl(localePath(locale, item.path)),
     })),
   };
 }
@@ -241,15 +320,20 @@ export const TITLE_MAX = 60;
  * layout's "%s | Al Arabia Carpets" template does not append a second time and
  * push every title past the limit.
  */
-export function buildTitle(base: string): string {
-  const suffix = ` | ${SITE_NAME}`;
+export function buildTitle(base: string, locale: Locale = "en"): string {
+  const suffix = ` | ${locale === "ar" ? SITE_NAME_AR : SITE_NAME}`;
   if (base.length + suffix.length <= TITLE_MAX) return base + suffix;
   if (base.length <= TITLE_MAX) return base;
   return `${base.slice(0, TITLE_MAX - 1).trimEnd()}\u2026`;
 }
 
-export function productTitle(product: Product): string {
-  if (product.seoTitle) return buildTitle(product.seoTitle);
+export function productTitle(product: Product, locale: Locale = "en"): string {
+  if (product.seoTitle) return buildTitle(product.seoTitle, locale);
+  if (locale === "ar") {
+    if (/قطر|الدوحة/.test(product.name)) return buildTitle(product.name, locale);
+    const located = `${product.name} في قطر`;
+    return buildTitle(located.length <= TITLE_MAX ? located : product.name, locale);
+  }
   // Several product names already contain "Qatar" or "Doha"; appending the
   // location again produces titles like "... SPC Qatar in Qatar".
   const hasLocation = /qatar|doha/i.test(product.name);
@@ -259,8 +343,11 @@ export function productTitle(product: Product): string {
   return buildTitle(withLocation.length <= TITLE_MAX ? withLocation : product.name);
 }
 
-export function productDescription(product: Product): string {
+export function productDescription(product: Product, locale: Locale = "en"): string {
   if (product.metaDescription) return product.metaDescription;
+  if (locale === "ar") {
+    return `${product.name} - ${product.description} توصيل وتركيب مجاني في قطر. تواصل مع ${SITE_NAME_AR} على ${PHONE}.`;
+  }
   return `${product.name} - ${product.description} Free installation & delivery in Qatar. Contact ${SITE_NAME} at ${PHONE}.`;
 }
 
@@ -280,14 +367,26 @@ export function productImage(product: Product): string {
   return firstImage?.src ?? DEFAULT_IMAGE;
 }
 
-export function productImageAlt(product: Product): string {
-  return product.imageAlt ?? `${product.name} - ${categoryLabel(product.category)} by ${SITE_NAME} in ${CITY}, ${COUNTRY}`;
+export function productImageAlt(product: Product, locale: Locale = "en"): string {
+  if (product.imageAlt) return product.imageAlt;
+  if (locale === "ar") {
+    const label = localizedCategoryLabel(locale, product.category, product.category);
+    return `${product.name} - ${label} من ${SITE_NAME_AR} في الدوحة، قطر`;
+  }
+  return `${product.name} - ${categoryLabel(product.category)} by ${SITE_NAME} in ${CITY}, ${COUNTRY}`;
 }
 
 /** UN/CEFACT unit codes for the priceUnit display strings used in products.ts. */
 const UNIT_CODES: Record<string, string> = {
   "per sqm": "MTK",
   "per piece": "C62",
+};
+
+/** Arabic unitText for the priceUnit display strings used in products.ts. */
+const UNIT_TEXT_AR: Record<string, string> = {
+  "per sqm": "متر مربع",
+  "per piece": "قطعة",
+  "per project": "مشروع",
 };
 
 /**
@@ -301,20 +400,22 @@ const UNIT_CODES: Record<string, string> = {
  *   and true for these items, which are quoted and installed on site.
  * Never emit a price-less Offer or a fake price of 0 (it reads as "free").
  */
-export function buildProductJsonLd(product: Product) {
-  const url = absoluteUrl(productPath(product));
+export function buildProductJsonLd(product: Product, locale: Locale = "en") {
+  const url = absoluteUrl(localePath(locale, productPath(product)));
+  const label = localizedCategoryLabel(locale, product.category, categoryLabel(product.category));
   if (typeof product.priceFrom !== "number") {
     return {
       "@context": "https://schema.org",
       "@type": "Service",
       "@id": `${url}#service`,
+      ...langField(locale),
       name: product.name,
       description: product.metaDescription ?? product.description,
       image: absoluteUrl(productImage(product)),
       url,
-      serviceType: categoryLabel(product.category),
+      serviceType: label,
       provider: { "@id": `${SITE_URL}/#organization` },
-      areaServed: areaServed(),
+      areaServed: areaServed(locale),
     };
   }
 
@@ -322,12 +423,13 @@ export function buildProductJsonLd(product: Product) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
+    ...langField(locale),
     name: product.name,
     description: product.metaDescription ?? product.description,
     image: absoluteUrl(productImage(product)),
     sku: product.id,
-    brand: { "@type": "Brand", name: SITE_NAME },
-    category: categoryLabel(product.category),
+    brand: { "@type": "Brand", name: locale === "ar" ? SITE_NAME_AR : SITE_NAME },
+    category: label,
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: "QAR",
@@ -341,7 +443,14 @@ export function buildProductJsonLd(product: Product) {
         price: product.priceFrom,
         priceCurrency: "QAR",
         ...(unitCode ? { unitCode } : {}),
-        ...(product.priceUnit ? { unitText: product.priceUnit.replace(/^per /, "") } : {}),
+        ...(product.priceUnit
+          ? {
+              unitText:
+                locale === "ar"
+                  ? UNIT_TEXT_AR[product.priceUnit] ?? product.priceUnit
+                  : product.priceUnit.replace(/^per /, ""),
+            }
+          : {}),
       },
     },
   };
@@ -350,7 +459,7 @@ export function buildProductJsonLd(product: Product) {
 // --- Category landing pages ------------------------------------------------
 
 import type { Metadata } from "next";
-import { getCategory } from "@/data/categories";
+import type { Category } from "@/data/categories";
 
 /**
  * CollectionPage wrapping an ItemList.
@@ -358,19 +467,24 @@ import { getCategory } from "@/data/categories";
  * Category pages emit this rather than Product: they have no SKU and no price,
  * so a Product schema there was never eligible for a rich result.
  */
-export function buildCollectionPage(opts: {
-  name: string;
-  description: string;
-  path: string;
-  items: Array<{ name: string; path: string }>;
-}) {
+export function buildCollectionPage(
+  opts: {
+    name: string;
+    description: string;
+    path: string;
+    items: Array<{ name: string; path: string }>;
+  },
+  locale: Locale = "en"
+) {
+  const pageUrl = absoluteUrl(localePath(locale, opts.path));
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "@id": `${absoluteUrl(opts.path)}#collection`,
+    "@id": `${pageUrl}#collection`,
+    ...langField(locale),
     name: opts.name,
     description: opts.description,
-    url: absoluteUrl(opts.path),
+    url: pageUrl,
     isPartOf: { "@id": `${SITE_URL}/#website` },
     mainEntity: {
       "@type": "ItemList",
@@ -379,7 +493,7 @@ export function buildCollectionPage(opts: {
         "@type": "ListItem",
         position: i + 1,
         name: item.name,
-        url: absoluteUrl(item.path),
+        url: absoluteUrl(localePath(locale, item.path)),
       })),
     },
   };
@@ -392,22 +506,20 @@ export function buildCollectionPage(opts: {
  * replaced -- they are already indexed and already inside the 60/160 budgets, so
  * the page type changes without also changing the SERP signals.
  */
-export function buildCategoryMetadata(slug: string): Metadata {
-  const category = getCategory(slug);
-  if (!category) throw new Error(`Unknown category slug: ${slug}`);
-
+export function buildCategoryMetadata(category: Category, locale: Locale = "en"): Metadata {
   const path = `/products/${category.slug}`;
-  const title = buildTitle(category.seoTitle);
+  const title = buildTitle(category.seoTitle, locale);
 
   return {
     title: { absolute: title },
     description: clampDescription(category.metaDescription),
-    alternates: { canonical: path },
+    alternates: pageAlternates(path, locale),
     openGraph: {
+      ...ogLocaleFields(locale),
       type: "website",
       title,
       description: category.metaDescription,
-      url: path,
+      url: localePath(locale, path),
       images: [{ url: absoluteUrl(category.heroImage), alt: category.heroImageAlt }],
     },
     twitter: {
@@ -428,23 +540,28 @@ export function buildCategoryMetadata(slug: string): Metadata {
  * `offers` (there is no price). Same discipline as Product: assert nothing we
  * cannot back up.
  */
-export function buildServiceJsonLd(service: {
-  slug: string;
-  heading: string;
-  label: string;
-  metaDescription: string;
-  heroImage?: string;
-}) {
+export function buildServiceJsonLd(
+  service: {
+    slug: string;
+    heading: string;
+    label: string;
+    metaDescription: string;
+    heroImage?: string;
+  },
+  locale: Locale = "en"
+) {
+  const url = absoluteUrl(localePath(locale, `/services/${service.slug}`));
   return {
     "@context": "https://schema.org",
     "@type": "Service",
-    "@id": `${absoluteUrl(`/services/${service.slug}`)}#service`,
+    "@id": `${url}#service`,
+    ...langField(locale),
     name: service.heading,
     serviceType: service.label,
     description: service.metaDescription,
-    url: absoluteUrl(`/services/${service.slug}`),
+    url,
     provider: { "@id": `${SITE_URL}/#organization` },
-    areaServed: areaServed(),
+    areaServed: areaServed(locale),
     // Only when a real project photo exists -- never the brand logo, which
     // would assert imagery of work we cannot show.
     ...(service.heroImage ? { image: absoluteUrl(service.heroImage) } : {}),

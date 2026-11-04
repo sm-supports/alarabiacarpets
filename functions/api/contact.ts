@@ -237,6 +237,9 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       );
     }
 
+    // Untrusted, so only an exact match selects the Arabic acknowledgment.
+    const locale = fields.locale === "ar" ? "ar" : "en";
+
     const resend = new Resend(context.env.RESEND_API_KEY);
 
     // Send admin notification (critical). The SDK reports API failures in
@@ -268,8 +271,11 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       const { error: ackError } = await resend.emails.send({
         from: "Al Arabia Carpets <noreply@alarabiacarpets.com>",
         to: email,
-        subject: "Thank you for contacting Al Arabia Carpets",
-        html: generateAcknowledgmentEmail(name),
+        subject:
+          locale === "ar"
+            ? "شكرًا لتواصلك مع سجاد العربية"
+            : "Thank you for contacting Al Arabia Carpets",
+        html: generateAcknowledgmentEmail(name, locale),
       });
       if (ackError) {
         console.error("Acknowledgment email failed:", ackError);

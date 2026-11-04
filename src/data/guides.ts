@@ -819,6 +819,187 @@ export const guides: Guide[] = [
     relatedCategorySlugs: ["interior"],
     relatedServiceSlugs: ["tv-unit-design", "cabinets", "gypsum-c-board-fixing"],
   },
+  {
+    slug: "flooring-options-prices-qatar",
+    title: "Flooring in Qatar: Options, Starting Prices and Choosing a Supplier",
+    seoTitle: "Flooring in Qatar: Options, Prices & Suppliers",
+    metaDescription:
+      "Compare carpet, barkia, SPC, vinyl and artificial grass in Qatar, with Al Arabia Carpets starting prices and what to ask a flooring supplier in Doha.",
+    excerpt:
+      "What each floor type is good at, what it starts at, and the questions that separate a reliable flooring supplier from the rest.",
+    heroImage: "/Products/barkia&pvc/barkia.webp",
+    heroImageAlt: "Wood-effect barkia flooring laid through a room in a Qatar home",
+    updatedAt: "2026-11-04",
+    intro: [
+      "Most people looking for flooring in Qatar are comparing two things at once: which material suits the room, and which supplier to trust with it. This guide covers both, using the starting prices we quote at Al Arabia Carpets in Doha.",
+      "Prices below are starting prices per square metre. The final figure depends on the product you choose and the area, which is why we measure first and quote free of charge.",
+    ],
+    sections: [
+      {
+        heading: "Flooring options and starting prices",
+        body: ["These are the options we supply and fit most often in Qatar, with the prices each one starts at."],
+        bullets: [
+          "Barkia, PVC and SPC flooring: from QAR 75 per sqm. Waterproof, easy to clean, and suited to kitchens, ground floors and busy family rooms.",
+          "Home carpet: from QAR 80 per sqm. Soft and quiet underfoot, and the usual choice for bedrooms and majlis.",
+          "Office carpet tiles: from QAR 70 per sqm. Individual tiles can be replaced if one is damaged.",
+          "Mosque carpet: from QAR 65 per sqm. Built for heavy use, with rows set out from the qiblah.",
+          "Event carpet: from QAR 22 per sqm. A short-term floor for exhibitions, conferences and weddings.",
+          "Artificial grass: from QAR 25 per sqm. For gardens, terraces, roofs and play areas.",
+        ],
+      },
+      {
+        heading: "How to choose by room",
+        body: [
+          "Let the room decide before the look does. If water is a realistic possibility, choose barkia, SPC or vinyl. If comfort and quiet matter most and the room stays dry, carpet is hard to beat. In a majlis, many families choose carpet or a wood-effect floor with a large rug.",
+        ],
+      },
+      {
+        heading: "What to ask a flooring supplier in Qatar",
+        body: ["A reliable supplier will answer these questions easily. Vague answers are a warning sign."],
+        bullets: [
+          "Do you measure the room yourselves before you quote?",
+          "Does the price include delivery, fitting and finishing at the edges?",
+          "Can I see samples in person before I decide?",
+          "Who does the fitting, your own team or a subcontractor?",
+          "What happens to the old flooring?",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Where can I find reputable flooring stores in Qatar?", a: "Al Arabia Carpets has a showroom on Al Mansoura St in Doha, open every day from 8:00 AM to 10:00 PM, where you can compare carpet, barkia and SPC samples in person. We supply and fit flooring across Qatar, with free delivery and installation." },
+      { q: "How much does flooring cost in Qatar?", a: "At Al Arabia Carpets, barkia and SPC start from QAR 75 per sqm and home carpet from QAR 80 per sqm. The final price depends on the product and the area, and we measure and quote free of charge." },
+      { q: "Which flooring is best for Qatar's climate?", a: "For rooms that may see water, barkia, SPC or vinyl handle heat and humidity well because they do not absorb moisture. For dry bedrooms and majlis, carpet is a comfortable choice." },
+    ],
+    relatedProductIds: ["pvc-barkia", "spc-zigzag-barkia-installation", "luxury-home-carpet", "grass-carpet"],
+    relatedCategorySlugs: ["barkia", "carpet"],
+    relatedServiceSlugs: ["vinyl-flooring", "parquet-flooring", "office-carpet"],
+  },
+  {
+    slug: "curtain-design-ideas-qatar",
+    title: "Modern Curtain Design Ideas for Qatar Homes",
+    seoTitle: "Modern Curtain Design Ideas for Qatar Homes",
+    metaDescription:
+      "Modern curtain designs for Qatar homes: layered sheers, blackout for bedrooms, roller blinds and full-height drapes, with advice from Al Arabia Carpets.",
+    excerpt:
+      "Layered sheers, blackout bedrooms, clean roller blinds and full-height drapes, and which rooms each one suits.",
+    heroImage: "/Products/Curtain/curtain.webp",
+    heroImageAlt: "Modern floor-to-ceiling curtains in a bright living room",
+    updatedAt: "2026-11-04",
+    intro: [
+      "A modern curtain is mostly about proportion and light. In Qatar, where the sun is strong and many villas have tall windows, the best designs manage glare first and look good second, though a well-chosen curtain does both.",
+      "These are the ideas we suggest most often at Al Arabia Carpets when customers ask what would suit a modern home in Doha.",
+    ],
+    sections: [
+      {
+        heading: "Modern curtain ideas that work in Qatar",
+        body: ["Each of these handles the strong daylight differently, so choose by the room rather than by the picture."],
+        bullets: [
+          "Layered sheer and blackout: a light sheer softens the sun during the day, and a heavier curtain closes the room at night.",
+          "Full-height drapes: hanging the track close to the ceiling makes a room feel taller, even if the window is not.",
+          "Roller blinds: a clean, flat look for offices, kitchens and modern living rooms.",
+          "Neutral fabrics: sand, grey and off-white sit easily with most floors and furniture and show less fading.",
+        ],
+      },
+      {
+        heading: "Choosing by room",
+        body: [
+          "Bedrooms usually need blackout fabric, since morning sun arrives early for much of the year. Living rooms benefit from layers, so you can keep the view during the day. Kitchens and bathrooms are better served by blinds, which stay away from water and heat.",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "What are the most modern curtain styles?", a: "Layered sheers with blackout curtains, full-height drapes and simple roller blinds are the styles customers in Qatar ask for most. Neutral colours keep them from dating quickly." },
+      { q: "What should I consider for a modern bedroom curtain?", a: "Start with light control, since blackout fabric makes the biggest difference to sleep. Then choose a colour that sits with the walls and flooring, and hang the curtain close to the ceiling so the room feels taller." },
+      { q: "Where can I buy curtains in Qatar?", a: "Al Arabia Carpets makes and fits curtains from our showroom on Al Mansoura St in Doha, where you can see the fabrics in person. We measure and quote free across Qatar." },
+    ],
+    relatedProductIds: ["home-curtains", "roller", "office-blind-office-roller-vertical-blinds"],
+    relatedCategorySlugs: ["curtain"],
+    relatedServiceSlugs: [],
+  },
+  {
+    slug: "kitchen-design-guide-qatar",
+    title: "Kitchen Design in Qatar: Modular or Made to Measure?",
+    seoTitle: "Kitchen Design in Qatar: Modular or Made to Measure",
+    metaDescription:
+      "Modular or made-to-measure kitchen? How the two compare on fit, storage and layout in Qatar homes, with kitchen planning advice from Al Arabia Carpets.",
+    excerpt:
+      "How modular and made-to-measure kitchens compare, the layouts that work, and what to plan before you order.",
+    heroImage: "/Services/kitchen-cabinets/fitted-kitchen-taupe-handleless.webp",
+    heroImageAlt: "Handleless taupe fitted kitchen with a black stone worktop in Qatar",
+    updatedAt: "2026-11-04",
+    intro: [
+      "The first decision in most kitchen projects is whether to buy modular units in fixed sizes or have cabinets built to measure. Both can look good. The difference shows up at the edges of the room, in the corners and in how much storage you end up with.",
+      "This guide sets out how we explain the choice at Al Arabia Carpets, where we build and install kitchen cabinets in Doha.",
+    ],
+    sections: [
+      {
+        heading: "Modular or made to measure",
+        body: [
+          "Modular kitchens use standard widths, which makes them quick to plan and easy to compare. The trade-off is that real walls rarely add up to standard widths, so gaps get closed with filler panels.",
+          "Made-to-measure cabinets are built to the room, so the run reaches the wall and awkward corners become usable storage. They suit rooms with unusual dimensions and owners who want every part of the wall used.",
+        ],
+      },
+      {
+        heading: "Planning a kitchen layout",
+        body: ["Before you choose finishes, settle the things that are expensive to change later."],
+        bullets: [
+          "Where the sink, hob and fridge sit relative to each other",
+          "Plumbing and electrical positions, and whether they can move",
+          "Which appliances are built in, and their exact sizes",
+          "How much tall storage and pantry space you need",
+          "The flooring, ideally planned together with the cabinets",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Should I choose a modular kitchen or a traditional cabinet setup?", a: "Choose modular if your walls suit standard widths and you want a simple, fast decision. Choose made-to-measure cabinets if the room has awkward dimensions or you want to use the full wall." },
+      { q: "Who makes kitchen cabinets in Doha?", a: "Al Arabia Carpets designs, builds and installs made-to-measure kitchen cabinets in Doha and across Qatar. We survey the room and quote free of charge." },
+    ],
+    relatedProductIds: ["cabinet-and-gypsum-board-work", "cabin-interior-design"],
+    relatedCategorySlugs: ["interior"],
+    relatedServiceSlugs: ["kitchen-cabinets", "cabinets"],
+  },
+  {
+    slug: "modern-carpet-design-qatar",
+    title: "Modern Carpet Design Ideas for Qatar Homes",
+    seoTitle: "Modern Carpet Design Ideas for Qatar Homes",
+    metaDescription:
+      "Modern carpet designs for Qatar homes: plain neutrals, subtle geometrics and textured piles, plus which rooms suit each, from Al Arabia Carpets in Doha.",
+    excerpt:
+      "Plain neutrals, subtle geometrics and textured piles, and how to choose a modern carpet that suits the room.",
+    heroImage: "/Products/Carpets/carpet.webp",
+    heroImageAlt: "Premium wall-to-wall carpet fitted in a Doha home",
+    updatedAt: "2026-11-04",
+    intro: [
+      "Modern carpet has moved away from heavy pattern. What customers in Qatar ask for now is texture, calm colour and a clean finish at the edges, so that the carpet supports the room rather than competes with it.",
+      "These are the styles we show most often at Al Arabia Carpets in Doha, starting from QAR 80 per sqm for home carpet.",
+    ],
+    sections: [
+      {
+        heading: "Modern carpet styles",
+        body: ["Each of these reads as modern for a different reason."],
+        bullets: [
+          "Plain neutrals: beige, sand and grey make a room feel larger and sit easily with most furniture.",
+          "Subtle geometrics: a low-contrast pattern adds interest without dominating the room.",
+          "Textured piles: a loop or cut-and-loop surface adds depth and hides footprints better than a flat pile.",
+          "Wall-to-wall in bedrooms: a continuous floor feels quiet and makes small rooms look bigger.",
+        ],
+      },
+      {
+        heading: "Choosing for the room",
+        body: [
+          "Bedrooms can take a softer, deeper pile. Stairs and corridors need a dense, hard-wearing carpet. In a majlis, a plain carpet lets the seating stand out, while a patterned one hides everyday wear better. Bring a photo of the room and we will show you samples that suit it.",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "What carpet colours look most modern?", a: "Neutral tones such as beige, sand and grey look the most current and work with most furniture. Add interest through texture or a subtle pattern rather than a strong colour." },
+      { q: "What is the best carpet for bedrooms in Qatar?", a: "A soft cut pile in a neutral colour is the most common choice, because it is comfortable underfoot and quiet. Al Arabia Carpets supplies and fits bedroom carpet from QAR 80 per sqm, with free delivery and installation." },
+    ],
+    relatedProductIds: ["home-design-luxury-carpet", "luxury-home-carpet", "stairs-carpet-installation"],
+    relatedCategorySlugs: ["carpet"],
+    relatedServiceSlugs: [],
+  },
 ];
 
 export function getGuide(slug: string): Guide | undefined {

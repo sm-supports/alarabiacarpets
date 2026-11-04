@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { products } from "@/data/products";
-import { categoryLabel, categoryPath, productImageAlt } from "@/lib/seo";
+import { categoryLabelFor, categorySlugFor, getProducts } from "@/data/localized";
+import { getDict, localePath, type Locale } from "@/i18n";
+import { productImageAlt } from "@/lib/seo";
 
 /**
  * Same-category siblings, with a top-up from other categories when a category
@@ -12,14 +13,20 @@ import { categoryLabel, categoryPath, productImageAlt } from "@/lib/seo";
  * dead end -- the only way out was the back button or WhatsApp.
  */
 export default function RelatedProducts({
+  locale,
   currentId,
   category,
   limit = 4,
 }: {
+  locale: Locale;
   currentId: string;
   category: string;
   limit?: number;
 }) {
+  const t = getDict(locale);
+  const products = getProducts(locale);
+  const label = categoryLabelFor(locale, category);
+
   // Same category only. Padding with other categories made the
   // "More in {category}" heading factually wrong for small categories, and gave
   // crawlers misleading anchor context.
@@ -49,30 +56,31 @@ export default function RelatedProducts({
     (_, i) => siblings[(start + i) % siblings.length]
   );
 
-  const href = categoryPath(category);
+  const slug = categorySlugFor(category);
+  const href = slug ? localePath(locale, `/products/${slug}`) : undefined;
 
   if (related.length === 0) return null;
 
   return (
     <section className="py-14 md:py-16 bg-neutral-50">
       <div className="container mx-auto px-4 sm:px-5 lg:px-8">
-        <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-8 text-neutral-900">
+        <h2 className="h2-sec">
           {/* Links up to the category landing page. This fires on every product
               page, so it is the main path crawlers take from a SKU to a money page. */}
           {href ? (
             <Link href={href} className="hover:text-primary transition-colors">
-              More in {categoryLabel(category)}
+              {t.productDetail.moreIn(label)}
             </Link>
           ) : (
-            <>More in {categoryLabel(category)}</>
+            <>{t.productDetail.moreIn(label)}</>
           )}
         </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {related.map((p) => (
             <Link
               key={p.id}
-              href={`/products/${p.id}`}
-              className="group block bg-white rounded-xl overflow-hidden border border-neutral-200 transition-all duration-300 hover:shadow-md"
+              href={localePath(locale, `/products/${p.id}`)}
+              className="group rel-card"
             >
               <div className="aspect-[4/3] overflow-hidden bg-neutral-100">
                 {p.imageSrc.endsWith(".mp4") ? (
@@ -82,19 +90,19 @@ export default function RelatedProducts({
                 ) : (
                   <img
                     src={p.imageSrc}
-                    alt={productImageAlt(p)}
+                    alt={productImageAlt(p, locale)}
                     loading="lazy"
                     decoding="async"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="rel-img"
                   />
                 )}
               </div>
               <div className="p-3 sm:p-4">
-                <h3 className="font-playfair text-sm sm:text-base font-semibold text-neutral-900 line-clamp-2 group-hover:text-primary transition-colors">
+                <h3 className="rel-title">
                   {p.name}
                 </h3>
                 <p className="font-poppins text-xs text-neutral-500 mt-1">
-                  {categoryLabel(p.category)}
+                  {label}
                 </p>
               </div>
             </Link>
@@ -106,7 +114,7 @@ export default function RelatedProducts({
               href={href}
               className="font-poppins text-sm font-medium text-primary hover:underline"
             >
-              View all {categoryLabel(category)} &rarr;
+              {t.productDetail.viewAll(label)} {locale === "ar" ? <>&larr;</> : <>&rarr;</>}
             </Link>
           </div>
         )}

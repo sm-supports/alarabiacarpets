@@ -2,6 +2,7 @@
 
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/data/products";
+import { useI18n } from "@/i18n/LocaleProvider";
 import { productImageAlt } from "@/lib/seo";
 
 /**
@@ -13,17 +14,18 @@ import { productImageAlt } from "@/lib/seo";
  * serializable JSON.
  */
 export default function ProductsGrid({ products }: { products: Product[] }) {
+  const { locale, t, lp } = useI18n();
   return (
     <>
-      <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-6 text-neutral-900">
-        All products
+      <h2 className="h2-sec6">
+        {t.productsGrid.heading}
       </h2>
 
       <div className="mb-6 flex items-center justify-between">
         <p className="font-poppins text-sm text-neutral-500">
-          Showing{" "}
+          {t.productsGrid.showing}{" "}
           <span className="font-semibold text-neutral-700">{products.length}</span>{" "}
-          {products.length === 1 ? "product" : "products"}
+          {products.length === 1 ? t.productsGrid.product : t.productsGrid.products}
         </p>
       </div>
 
@@ -32,12 +34,13 @@ export default function ProductsGrid({ products }: { products: Product[] }) {
           <ProductCard
             key={product.id}
             name={product.name}
+            analyticsName={product.analyticsName ?? product.name}
             description={product.description}
             imageSrc={product.imageSrc}
             media={product.media}
             whatsappLink={product.whatsappLink}
-            href={`/products/${product.id}`}
-            imageAlt={productImageAlt(product)}
+            href={lp(`/products/${product.id}`)}
+            imageAlt={productImageAlt(product, locale)}
             priority={index < 4}
           />
         ))}

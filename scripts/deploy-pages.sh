@@ -52,6 +52,9 @@ else
 fi
 [ -f "$OUT/index.html" ] || die "$OUT/index.html missing - did the build run?"
 
+node scripts/check-text-ratio.mjs || die "pages under the 10% text-to-HTML ratio"
+node scripts/check-arabic.mjs || die "Arabic pages failed their checks"
+
 # Is out/ on a case-insensitive filesystem?
 probe="$OUT/.case-probe-$$"
 touch "$probe"

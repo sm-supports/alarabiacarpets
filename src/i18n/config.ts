@@ -10,8 +10,13 @@ export const LOCALES: Locale[] = ["en", "ar"];
 /** BCP 47 tags for <html lang> and hreflang. */
 export const HTML_LANG: Record<Locale, string> = { en: "en", ar: "ar-QA" };
 
-/** Cookie set by the navbar switcher. The Cloudflare redirect rule reads it. */
+/** Records a language choice. The Cloudflare redirect rule reads it. */
 export const LOCALE_COOKIE = "site_lang";
+
+/** Browser only. Remembers a language the visitor chose, or an English ad chose for them. */
+export function rememberLocale(locale: Locale): void {
+  document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=31536000; SameSite=Lax; Secure`;
+}
 
 /** Site-relative path for `path` (an English path) in the given locale. */
 export function localePath(locale: Locale, path: string): string {

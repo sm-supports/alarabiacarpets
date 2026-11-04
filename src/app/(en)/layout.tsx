@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Poppins } from "next/font/google";
 import "@/index.css";
 import Providers from "@/app/providers";
+import AdLanguage from "@/components/AdLanguage";
 import Analytics from "@/components/Analytics";
 import ThirdPartyScripts from "@/components/ThirdPartyScripts";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Providers>{children}</Providers>
           <WhatsAppFloat />
         </LocaleProvider>
+        <AdLanguage />
         <Analytics />
         <ThirdPartyScripts />
       </body>

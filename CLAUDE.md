@@ -79,8 +79,14 @@ Western and prices stay QAR (`formatFromPrice` in `src/i18n`).
 
 Qatar visitors reach `/ar` through a Cloudflare Redirect Rule at the zone level, not
 code: country QA with no `site_lang` cookie, or `site_lang=ar`, redirects to `/ar` + path
-(GET, no file extension, not a verified bot). The navbar switcher sets the cookie. The
-rule can't be tested on preview URLs.
+(GET, no file extension, user agent without "bot", "crawler" or "spider"; the verified-bot
+field isn't allowed in this rule type). The navbar switcher sets the cookie. The rule can't
+be tested on preview URLs. Any path added to `public/_redirects` must also be added to the
+rule's exclusion list, or Qatar visitors get a 404 at `/ar/<old path>` instead of the 301.
+
+The ad's language decides the site's language. The rule skips any URL with `lang=en`, and
+`AdLanguage` then sets `site_lang=en`, so English campaigns must carry the Final URL suffix
+`lang=en`. Without it, their Qatar clicks land on Arabic pages. Arabic ads link to `/ar/...`.
 
 Use logical Tailwind classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-` over
 `space-x-`) so Arabic mirrors; directional icons get `rtl:-scale-x-100`. Use icons from

@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useI18n } from "@/i18n/LocaleProvider";
-import { HTML_LANG, LOCALE_COOKIE, localePath, stripLocale } from "@/i18n";
+import { HTML_LANG, localePath, rememberLocale, stripLocale } from "@/i18n";
 
 /**
  * Link to this page in the other language.
@@ -29,9 +29,7 @@ export default function LanguageSwitcher({
       lang={HTML_LANG[target]}
       hrefLang={HTML_LANG[target]}
       aria-label={t.nav.switchAria}
-      onClick={() => {
-        document.cookie = `${LOCALE_COOKIE}=${target}; path=/; max-age=31536000; SameSite=Lax; Secure`;
-      }}
+      onClick={() => rememberLocale(target)}
       className={className}
     >
       {short ? t.nav.switchShort : t.nav.switchLabel}

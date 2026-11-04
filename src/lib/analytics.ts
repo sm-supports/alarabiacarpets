@@ -11,8 +11,8 @@ export const GOOGLE_ADS_ID = "AW-16463357836";
 
 /** Conversion labels configured in the Google Ads account. */
 export const CONVERSION_LABELS = {
-  formLead: `${GOOGLE_ADS_ID}/vNfLCO7DwcgbEIzPq6o9`,
-  whatsappClick: `${GOOGLE_ADS_ID}/n6RiCOKH_I0bEIzPq6o9`,
+  formLead: `${GOOGLE_ADS_ID}/UHXsCPbnmbIdEIzPq6o9`,
+  whatsappClick: `${GOOGLE_ADS_ID}/1TvGCLDmmbIdEIzPq6o9`,
   /**
    * Phone calls need their own conversion action. Until one is created in the
    * Google Ads account and its label pasted here, phone clicks are recorded in

@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { trackWhatsAppClick } from "@/lib/analytics";
 import { WHATSAPP_URL } from "@/lib/seo";
 
@@ -11,6 +12,11 @@ interface WhatsAppLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement
   children: React.ReactNode;
 }
 
+/** Where the link points before hydration, i.e. in the static HTML. */
+const FALLBACK_HREF = "/contact";
+
+const noopSubscribe = () => () => {};
+
 /**
  * Tracked WhatsApp anchor -- every WhatsApp CTA on the site goes through this.
  *
@@ -18,11 +24,11 @@ interface WhatsAppLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement
  * can only live in a client component, and this keeps the boundary at the link
  * itself rather than forcing a whole page to go client.
  *
- * The static HTML carries the bare chat link; the prefilled `?text=` URL is
- * swapped in on pointerdown/click, before the browser follows the link. Each
- * distinct `?text=` URL is a separate external link to crawlers, and WhatsApp
- * answers a site audit's burst of them with 429, which Semrush reports as
- * dozens of broken links. One bare URL in the markup avoids that.
+ * The static HTML links to the contact page; the wa.me URL is only set once
+ * React has hydrated. WhatsApp answers site-audit crawlers with 429 on any
+ * wa.me URL, bare or prefilled, so Semrush (which crawls without JS) reported
+ * one broken external link on every page. Visitors get the real link a moment
+ * after load, so hover, copy-link and long-press all show it.
  */
 export default function WhatsAppLink({
   source,
@@ -31,27 +37,19 @@ export default function WhatsAppLink({
   children,
   ...rest
 }: WhatsAppLinkProps) {
+  // false on the server and during hydration, true afterwards -- without the
+  // mismatch a setState-in-effect would risk.
+  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
   const target =
     href ??
     `${WHATSAPP_URL}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
-  const prefilled = target.startsWith(`${WHATSAPP_URL}?`);
-
-  const applyPrefill = (e: React.SyntheticEvent<HTMLAnchorElement>) => {
-    if (prefilled) e.currentTarget.href = target;
-  };
 
   return (
     <a
-      href={prefilled ? WHATSAPP_URL : target}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={hydrated ? target : FALLBACK_HREF}
+      {...(hydrated && { target: "_blank", rel: "noopener noreferrer" })}
       {...rest}
-      onPointerDown={(e) => {
-        applyPrefill(e);
-        rest.onPointerDown?.(e);
-      }}
       onClick={(e) => {
-        applyPrefill(e);
         trackWhatsAppClick(source);
         rest.onClick?.(e);
       }}

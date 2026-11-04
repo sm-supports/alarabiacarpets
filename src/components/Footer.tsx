@@ -4,7 +4,7 @@ import { MessageCircle, Mail, MapPin, Instagram, Facebook, ArrowUpRight } from "
 import Link from "next/link";
 import { categories } from "@/data/categories";
 import { services } from "@/data/services";
-import { trackWhatsAppClick } from "@/lib/analytics";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import { WHATSAPP_URL } from "@/lib/seo";
 
 export default function Footer() {
@@ -58,16 +58,13 @@ export default function Footer() {
             
             {/* Contact Info */}
             <div className="space-y-2.5 sm:space-y-3">
-              <a 
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackWhatsAppClick("footer_contact")}
+              <WhatsAppLink
+                source="footer_contact"
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-forest-900 transition-colors"
               >
                 <MessageCircle className="w-4 h-4 flex-shrink-0" />
                 <span>+974 5551 2858</span>
-              </a>
+              </WhatsAppLink>
               <a 
                 href="mailto:info@alarabiacarpets.com"
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-forest-900 transition-colors"
@@ -127,31 +124,33 @@ export default function Footer() {
             <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
               Ready to transform your space? Get in touch for a free consultation.
             </p>
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackWhatsAppClick("footer_get_quote")}
+            <WhatsAppLink
+              source="footer_get_quote"
               className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-forest-900 text-white text-xs sm:text-sm font-medium rounded-full transition-all duration-300 hover:bg-forest-700 active:scale-[0.98]"
             >
               Get Quote
               <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </a>
+            </WhatsAppLink>
             
             {/* Social Links */}
             <div className="flex items-center gap-2 sm:gap-3 mt-5 sm:mt-6">
               {footerLinks.social.map((social) => {
                 const Icon = social.icon;
+                const className = "w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 transition-all duration-300 hover:bg-forest-900 hover:text-white active:scale-[0.95]";
+                if (social.href === WHATSAPP_URL) {
+                  return (
+                    <WhatsAppLink key={social.label} source="footer_social" className={className} aria-label={social.label}>
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </WhatsAppLink>
+                  );
+                }
                 return (
                   <a
                     key={social.label}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={() => {
-                      if (social.href.includes("wa.me")) trackWhatsAppClick("footer_social");
-                    }}
-                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 transition-all duration-300 hover:bg-forest-900 hover:text-white active:scale-[0.95]"
+                    className={className}
                     aria-label={social.label}
                   >
                     <Icon className="w-4 h-4 sm:w-5 sm:h-5" />

@@ -9,7 +9,8 @@ import Link from "next/link";
 import CloudflareTurnstile, {
   type CloudflareTurnstileHandle,
 } from "@/components/CloudflareTurnstile";
-import { trackFormLead, trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
+import { trackFormLead, trackPhoneClick } from "@/lib/analytics";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import { EMAIL, PHONE, WHATSAPP_URL } from "@/lib/seo";
 
 // Inlined at build time. If the Cloudflare Pages build environment does not
@@ -165,11 +166,8 @@ const ContactSection = memo(function ContactSection() {
           </p>
           
           {/* Primary CTA */}
-          <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackWhatsAppClick("contact_section_primary")}
+          <WhatsAppLink
+            source="contact_section_primary"
             className="group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-gold-500 text-forest-900 text-base sm:text-lg font-semibold rounded-full transition-all duration-300 hover:bg-gold-400 hover:shadow-float active:scale-[0.98] w-full sm:w-auto max-w-sm sm:max-w-none"
           >
             <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -177,7 +175,7 @@ const ContactSection = memo(function ContactSection() {
             </svg>
             Chat on WhatsApp
             <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1" />
-          </a>
+          </WhatsAppLink>
         </div>
 
         {/* Content Grid */}
@@ -196,16 +194,9 @@ const ContactSection = memo(function ContactSection() {
             <div className="space-y-3 sm:space-y-4">
               {contactMethods.map((method, index) => {
                 const Icon = method.icon;
-                return (
-                  <a
-                    key={method.label}
-                    href={method.href}
-                    {...(method.external && { target: "_blank", rel: "noopener noreferrer" })}
-                    onClick={() => {
-                      if (method.hasConversion) trackWhatsAppClick("contact_section_methods");
-                    }}
-                    className="group flex items-center gap-4 sm:gap-5 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 active:scale-[0.98]"
-                  >
+                const className = "group flex items-center gap-4 sm:gap-5 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 active:scale-[0.98]";
+                const content = (
+                  <>
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 flex-shrink-0">
                       <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-gold-400" />
                     </div>
@@ -213,6 +204,23 @@ const ContactSection = memo(function ContactSection() {
                       <p className="text-xs sm:text-sm text-white/60 mb-0.5 sm:mb-1">{method.label}</p>
                       <p className="text-sm sm:text-base text-white font-medium truncate">{method.value}</p>
                     </div>
+                  </>
+                );
+                if (method.hasConversion) {
+                  return (
+                    <WhatsAppLink key={method.label} href={method.href} source="contact_section_methods" className={className}>
+                      {content}
+                    </WhatsAppLink>
+                  );
+                }
+                return (
+                  <a
+                    key={method.label}
+                    href={method.href}
+                    {...(method.external && { target: "_blank", rel: "noopener noreferrer" })}
+                    className={className}
+                  >
+                    {content}
                   </a>
                 );
               })}

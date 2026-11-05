@@ -53,7 +53,7 @@ export default function PageNamePage() {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale="en" />
     </div>
   );
 }

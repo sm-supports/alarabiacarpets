@@ -1,8 +1,18 @@
 "use client";
 
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Toaster } from "@/components/ui/toaster";
-import ImagePreloader from "@/components/ImagePreloader";
+import dynamic from "next/dynamic";
+import { useToast } from "@/hooks/use-toast";
+
+// Only the contact form raises toasts, so Radix Toast stays out of the initial
+// bundle and loads with the first one.
+const Toaster = dynamic(() => import("@/components/ui/toaster").then((m) => m.Toaster), {
+  ssr: false,
+});
+
+function LazyToaster() {
+  const { toasts } = useToast();
+  return toasts.length > 0 ? <Toaster /> : null;
+}
 
 /**
  * Client-side context providers, lifted out of the old src/App.tsx.
@@ -12,10 +22,9 @@ import ImagePreloader from "@/components/ImagePreloader";
  */
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <TooltipProvider>
+    <>
       {children}
-      <Toaster />
-      <ImagePreloader />
-    </TooltipProvider>
+      <LazyToaster />
+    </>
   );
 }

@@ -934,7 +934,7 @@ export const products: Product[] = [
         "src": "/Products/Furniture/Luxury majlis sofa vid 2.mp4"
       }
     ],
-    "imageSrc": "/Products/Furniture/Luxury majlis sofa vid 1.mp4",
+    "imageSrc": "/Products/Furniture/Luxury majlis sofa poster.webp",
     "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Luxury%20majlis%20sofa",
     seoTitle: "Luxury Majlis Sofa Qatar | Custom Made Seating",
     metaDescription: "Luxury majlis sofas custom made in Qatar. Premium fabrics, detailed finishing and seating sized to your majlis, with delivery included across Doha.",
@@ -2158,7 +2158,7 @@ export const products: Product[] = [
         "src": "/Products/barkia&pvc/Spc zigzag barkia installation.mp4"
       }
     ],
-    "imageSrc": "/Products/barkia&pvc/Spc zigzag barkia installation vid.mp4",
+    "imageSrc": "/Products/barkia&pvc/Spc zigzag barkia installation poster.webp",
     "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20SPC%20Zigzag%20Barkia%20Installation",
     seoTitle: "SPC Zigzag Barkia Installation Qatar | Herringbone",
     metaDescription: "SPC barkia fitted in a zigzag herringbone pattern in Qatar. Each plank cut and angled on site by our own installers, with free measurement in Doha.",

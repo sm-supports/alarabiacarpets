@@ -10,10 +10,11 @@ import { CONVERSION_LABELS, CURRENCY, GA_MEASUREMENT_ID, GOOGLE_ADS_ID } from "@
 export default function ThirdPartyScripts() {
   return (
     <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
-      />
+      {/* gtag.js costs about 200 KiB and 400 ms of main thread, so it loads on the first
+          interaction, or 5 s after window.load. The stub below queues every event and
+          conversion in dataLayer until then, so gtagReady() in lib/analytics.ts stays
+          true. A visitor who leaves within those 5 s without touching the page isn't
+          recorded. */}
       <Script id="gtag-init" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
@@ -37,6 +38,24 @@ export default function ThirdPartyScripts() {
             return false;
           }
           window.gtag_report_conversion = gtag_report_conversion;
+
+          (function () {
+            var events = ['pointerdown', 'scroll', 'keydown'];
+            var loaded = false;
+            function loadGtag() {
+              if (loaded) return;
+              loaded = true;
+              events.forEach(function (e) { window.removeEventListener(e, loadGtag); });
+              var s = document.createElement('script');
+              s.async = true;
+              s.src = 'https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}';
+              document.head.appendChild(s);
+            }
+            events.forEach(function (e) { window.addEventListener(e, loadGtag, { passive: true }); });
+            function startTimer() { setTimeout(loadGtag, 5000); }
+            if (document.readyState === 'complete') startTimer();
+            else window.addEventListener('load', startTimer, { once: true });
+          })();
         `}
       </Script>
 

@@ -275,7 +275,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
             <p className="font-poppins max-w-2xl mx-auto mb-8 text-neutral-500">
               {t.category.ctaText}
             </p>
-            <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-white">
+            <Button asChild size="lg" className="bg-green-700 hover:bg-green-800 text-white">
               <WhatsAppLink
                 source={`category:${category.slug}`}
                 message={t.common.quoteMessage(category.label)}

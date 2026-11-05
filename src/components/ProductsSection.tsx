@@ -20,8 +20,7 @@ const showcaseConfig = [
 
 // Resolved from the category data with NO fallback: a bad slug must throw at
 // module scope. The previous `|| products.find(by category)` fallback would
-// silently render a different product with a different image -- including
-// swapping the homepage LCP image that src/app/page.tsx preloads.
+// silently render a different product with a different image.
 const productShowcases = showcaseConfig.map(config => {
   const category = getCategory(config.categorySlug);
   if (!category) throw new Error(`Unknown category slug: ${config.categorySlug}`);
@@ -113,9 +112,8 @@ function ProductShowcase({
                 src={product.imageSrc}
                 alt={copy.name}
                 className="sc-img"
-                loading={index === 0 ? "eager" : "lazy"}
-                fetchPriority={index === 0 ? "high" : "auto"}
-                decoding={index === 0 ? "sync" : "async"}
+                loading="lazy"
+                decoding="async"
               />
               {/* Subtle gradient overlay */}
               <div className="sc-shade" />
@@ -161,6 +159,7 @@ function ProductShowcase({
                 className={`group sc-cta ${colorClasses.button}`}
               >
                 {t.showcase.viewRange}
+                <span className="sr-only">: {copy.name}</span>
                 <ArrowRight className="arrow-go" />
               </Link>
               <WhatsAppLink
@@ -255,7 +254,7 @@ export default function ProductsSection() {
               >
                 <img
                   src={product.imageSrc}
-                  alt={t.showcase.more[product.id]}
+                  alt={t.showcase.moreAlt(t.showcase.more[product.id])}
                   className="more-img"
                   loading="lazy"
                 />

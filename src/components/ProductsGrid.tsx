@@ -30,7 +30,7 @@ export default function ProductsGrid({ products }: { products: Product[] }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
-        {products.map((product, index) => (
+        {products.map((product) => (
           <ProductCard
             key={product.id}
             name={product.name}
@@ -41,7 +41,6 @@ export default function ProductsGrid({ products }: { products: Product[] }) {
             whatsappLink={product.whatsappLink}
             href={lp(`/products/${product.id}`)}
             imageAlt={productImageAlt(product, locale)}
-            priority={index < 4}
           />
         ))}
       </div>

@@ -6,6 +6,7 @@
 export const en = {
   brand: "Al Arabia Carpets",
   common: {
+    logoAlt: "Al Arabia Carpets logo",
     home: "Home",
     products: "Products",
     services: "Services",
@@ -99,6 +100,7 @@ export const en = {
     moreSubtitle: "Discover our complete range of home furnishing solutions.",
     viewAll: "View All Products",
     viewRange: "View Range",
+    moreAlt: (name: string) => `${name} by Al Arabia Carpets in Doha`,
     getQuote: "Get Quote",
     items: {
       carpet: {
@@ -198,6 +200,7 @@ export const en = {
     view: (n: number) => ` (view ${n})`,
     imageUnavailable: "Image unavailable",
     imageNotAvailable: "Image not available",
+    playVideo: "Play video",
   },
   productsGrid: {
     heading: "All products",

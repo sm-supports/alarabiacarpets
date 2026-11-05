@@ -357,6 +357,7 @@ const ContactSection = memo(function ContactSection() {
                           }}
                           theme="dark"
                           language={locale === "ar" ? "ar" : "auto"}
+                          className="min-h-[65px]"
                         />
                         {turnstileFailed && (
                           <p role="alert" className="text-sm text-red-300 text-center">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { categoryLabelFor, categorySlugFor, getProducts } from "@/data/localized";
 import { getDict, localePath, type Locale } from "@/i18n";
+import { cardImagePath } from "@/lib/card-image";
 import { productImageAlt } from "@/lib/seo";
 
 /**
@@ -89,7 +90,7 @@ export default function RelatedProducts({
                   </div>
                 ) : (
                   <img
-                    src={p.imageSrc}
+                    src={cardImagePath(p.imageSrc)}
                     alt={productImageAlt(p, locale)}
                     loading="lazy"
                     decoding="async"

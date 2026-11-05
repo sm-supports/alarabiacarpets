@@ -76,7 +76,7 @@ export default function ProductsView({ locale }: { locale: Locale }) {
                   href={localePath(locale, `/products/${c.slug}`)}
                   className="group block rounded-xl overflow-hidden border border-neutral-200 transition-all duration-300 hover:shadow-md"
                 >
-                  <div className="aspect-[4/3] overflow-hidden bg-neutral-100">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
                     <img
                       src={c.heroImage}
                       alt={c.heroImageAlt}
@@ -86,6 +86,13 @@ export default function ProductsView({ locale }: { locale: Locale }) {
                       decoding="async"
                       className="rel-img"
                     />
+                    {/* Real text, not part of the photo: pricing questions are a large
+                        share of what people ask AI tools about flooring in Qatar. */}
+                    {c.priceFrom && (
+                      <span className="cat-price">
+                        {formatFromPrice(c.priceFrom, c.priceUnit, locale)}
+                      </span>
+                    )}
                   </div>
                   <div className="p-3 sm:p-4">
                     <h3 className="cat-title">
@@ -98,24 +105,8 @@ export default function ProductsView({ locale }: { locale: Locale }) {
           </div>
         </section>
 
-        {/* Prices in plain text: pricing questions are a large share of what people
-            ask AI tools about flooring in Qatar. */}
-        <section className="py-10 md:py-12 bg-white border-b border-neutral-100">
-          <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl font-poppins text-neutral-700 leading-relaxed text-[15px]">
-            <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-4 text-neutral-900">{page.pricingTitle}</h2>
-            <p className="mb-4">{page.pricingText}</p>
-            <ul className="list-disc ps-5 space-y-1">
-              {getCategories(locale).filter((c) => c.priceFrom).map((c) => (
-                <li key={c.slug}>
-                  {c.label}: {formatFromPrice(c.priceFrom!, c.priceUnit, locale)}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
         <section className="py-10 md:py-14 bg-neutral-50">
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 sm:px-5 lg:px-8">
             <ProductsGrid products={products} />
           </div>
         </section>

@@ -165,7 +165,6 @@ const ProductCard = memo(function ProductCard({
         <div
           ref={scrollContainerRef}
           className="pc-track scrollbar-hide"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {(hydrated ? displayMedia : displayMedia.slice(0, 1)).map((item, index) => (
             <div

@@ -8,7 +8,7 @@
     "prebuild": "node scripts/build-card-images.mjs",
     "build": "next build && node scripts/externalize-flight.mjs",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p functions",
     "pages:dev": "npm run build && wrangler pages dev out",
     "pages:preview": "wrangler pages dev out",
     "deploy": "bash scripts/deploy-pages.sh",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, memo, useCallback, useMemo, useRef } from "react";
+import { useState, memo, useCallback, useMemo, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -25,12 +25,25 @@ const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 // any token whose siteverify `action` does not equal this value.
 const TURNSTILE_ACTION = "contact";
 
+// The Function allows 10 s for the bot check and 8 s for the email, so past this the
+// request has stalled somewhere and the visitor should get the error and a retry.
+const REQUEST_TIMEOUT_MS = 20_000;
+// When to tell the visitor a slow send is still in progress.
+const SLOW_SEND_MS = 8_000;
+
 const ContactSection = memo(function ContactSection() {
   const hydrated = useHydrated();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSlow, setIsSlow] = useState(false);
+  // State updates are asynchronous, so a second submit event can arrive before the
+  // button is disabled. This is set synchronously.
+  const inFlight = useRef(false);
+  // One id per message. A retry of the same text sends the same id, and the Function
+  // passes it to Resend so the team isn't emailed twice if only the response was lost.
+  const submission = useRef<{ id: string; content: string } | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileFailed, setTurnstileFailed] = useState(false);
@@ -39,15 +52,45 @@ const ContactSection = memo(function ContactSection() {
   const { locale, t: dict, lp } = useI18n();
   const t = dict.contactSection;
 
+  useEffect(() => {
+    if (!isSubmitting) {
+      setIsSlow(false);
+      return;
+    }
+    const timer = setTimeout(() => setIsSlow(true), SLOW_SEND_MS);
+    return () => clearTimeout(timer);
+  }, [isSubmitting]);
+
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    if (inFlight.current) return;
+    inFlight.current = true;
     setIsSubmitting(true);
+
+    const content = `${name}\n${email}\n${message}`;
+    if (submission.current?.content !== content) {
+      // randomUUID needs a secure context and a 2022 browser; the id is optional.
+      const id = globalThis.crypto?.randomUUID?.();
+      submission.current = id ? { id, content } : null;
+    }
+
+    // AbortController rather than AbortSignal.timeout, which older Safari lacks.
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, turnstileToken, locale }),
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          turnstileToken,
+          locale,
+          submissionId: submission.current?.id,
+        }),
+        signal: controller.signal,
       });
 
       if (!res.ok) {
@@ -66,6 +109,7 @@ const ContactSection = memo(function ContactSection() {
       setEmail("");
       setMessage("");
       setTurnstileToken("");
+      submission.current = null;
     } catch (error) {
       console.error("Form submission error:", error);
       const errorMsg = error instanceof Error ? error.message : "Unknown error";
@@ -84,6 +128,8 @@ const ContactSection = memo(function ContactSection() {
         variant: "destructive",
       });
     } finally {
+      clearTimeout(timeout);
+      inFlight.current = false;
       setIsSubmitting(false);
     }
   }, [name, email, message, turnstileToken, toast, locale, t]);
@@ -276,6 +322,7 @@ const ContactSection = memo(function ContactSection() {
               ) : (
                 <form
                   onSubmit={handleSubmit}
+                  aria-busy={isSubmitting}
                   className="space-y-4 sm:space-y-5"
                 >
 
@@ -287,6 +334,7 @@ const ContactSection = memo(function ContactSection() {
                       name="name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      readOnly={isSubmitting}
                       required
                       maxLength={100}
                       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
@@ -303,6 +351,7 @@ const ContactSection = memo(function ContactSection() {
                       name="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      readOnly={isSubmitting}
                       required
                       maxLength={254}
                       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
@@ -317,6 +366,7 @@ const ContactSection = memo(function ContactSection() {
                       name="message"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
+                      readOnly={isSubmitting}
                       required
                       maxLength={5000}
                       rows={4}
@@ -361,10 +411,23 @@ const ContactSection = memo(function ContactSection() {
                   <button
                     type="submit"
                     disabled={isSubmitting || !turnstileToken}
-                    className="w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:bg-gray-100 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:bg-gray-100 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                   >
+                    {isSubmitting && (
+                      <span
+                        aria-hidden="true"
+                        className="w-4 h-4 rounded-full border-2 border-forest-900/30 border-t-forest-900 animate-spin"
+                      />
+                    )}
                     {isSubmitting ? t.sending : t.send}
                   </button>
+                  {/* Success is only ever shown once the server confirms the send:
+                      this is a lead form, and a message that failed must not look sent. */}
+                  {isSlow && (
+                    <p role="status" className="text-xs sm:text-sm text-white/70 text-center">
+                      {t.stillSending}
+                    </p>
+                  )}
                 </form>
               )}
             </div>

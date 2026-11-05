@@ -96,6 +96,7 @@ export const arClient: ClientDict = {
     unavailable: (phone, email) =>
       `النموذج غير متاح مؤقتًا. تواصل معنا على الواتساب ${phone} أو عبر البريد ${email}.`,
     sending: "جاري الإرسال...",
+    stillSending: "الإرسال ما زال جاريًا، وقد يأخذ لحظات إذا كان الاتصال بطيئًا.",
     send: "إرسال الرسالة",
     sentTitle: "تم إرسال رسالتك!",
     sentText: (name) => `شكرًا ${name}، بنتواصل معك قريبًا.`,

@@ -100,6 +100,7 @@ export const enClient = {
     unavailable: (phone: string, email: string) =>
       `This form is temporarily unavailable. Please reach us on WhatsApp at ${phone} or email ${email}.`,
     sending: "Sending...",
+    stillSending: "Still sending. This can take a moment on a slow connection.",
     send: "Send Message",
     sentTitle: "Message sent successfully!",
     sentText: (name: string) => `Thank you ${name}, we'll contact you soon.`,

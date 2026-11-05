@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import { Resend, type CreateEmailOptions, type CreateEmailRequestOptions } from "resend";
 import { generateAcknowledgmentEmail } from "../email-templates/acknowledgment";
 
 interface Env {
@@ -31,7 +31,18 @@ const PRODUCTION_HOSTNAMES = [
 interface CFContext {
   request: Request;
   env: Env;
+  /** Keeps the Function alive for work that finishes after the response is sent. */
+  waitUntil(promise: Promise<unknown>): void;
 }
+
+// Resend usually answers in well under a second. Without a limit a stalled call
+// would hold the visitor on "Sending..." until the platform killed the Function.
+const RESEND_TIMEOUT_MS = 8_000;
+
+// The form sends one id per message, and the same id again when the visitor retries
+// the same text. Resend drops a second send with the same key, so a retry after a
+// lost response doesn't email the team twice.
+const SUBMISSION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Length caps. Keep in sync with the maxLength attributes in ContactSection.tsx.
 const MAX_NAME_LENGTH = 100;
@@ -150,7 +161,54 @@ async function verifyTurnstileToken(
   return { ok: true };
 }
 
+/**
+ * resend.emails.send with a time limit. The SDK spreads its options into fetch(),
+ * so the signal cancels the request, but its types don't list `signal` -- hence the
+ * cast, and the race as a second limit that doesn't depend on that SDK detail. Like
+ * the SDK, this reports failure in `error` and never throws.
+ */
+async function sendEmail(
+  resend: Resend,
+  payload: CreateEmailOptions,
+  idempotencyKey: string | undefined
+): Promise<{ error: unknown }> {
+  const options = {
+    ...(idempotencyKey && { idempotencyKey }),
+    signal: AbortSignal.timeout(RESEND_TIMEOUT_MS),
+  } as CreateEmailRequestOptions;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const limit = new Promise<{ error: unknown }>((resolve) => {
+    timer = setTimeout(() => resolve({ error: "timed out" }), RESEND_TIMEOUT_MS + 500);
+  });
+  try {
+    return await Promise.race([resend.emails.send(payload, options), limit]);
+  } catch (error) {
+    return { error: error ?? "send failed" };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function onRequestPost(context: CFContext): Promise<Response> {
+  // One log line and a Server-Timing header per request, so a slow submission can be
+  // traced to the step that was slow. No names, addresses or message text.
+  const started = Date.now();
+  const timing: { verify_ms?: number; email_ms?: number } = {};
+  let locale: "en" | "ar" = "en";
+  const respond = (status: number, body: Record<string, string>, outcome: string): Response => {
+    const total_ms = Date.now() - started;
+    console.log(JSON.stringify({ evt: "contact", outcome, status, ...timing, total_ms, locale }));
+    const serverTiming = [
+      timing.verify_ms !== undefined && `verify;dur=${timing.verify_ms}`,
+      timing.email_ms !== undefined && `email;dur=${timing.email_ms}`,
+      `total;dur=${total_ms}`,
+    ].filter(Boolean).join(", ");
+    return new Response(JSON.stringify(body), {
+      status,
+      headers: { ...headers, "Server-Timing": serverTiming },
+    });
+  };
+
   try {
     let body: unknown;
     try {
@@ -159,34 +217,27 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       body = null;
     }
     if (body === null || typeof body !== "object" || Array.isArray(body)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid request body" }),
-        { status: 400, headers }
-      );
+      return respond(400, { error: "Invalid request body" }, "bad-body");
     }
     const { turnstileToken, ...fields } = body as Record<string, unknown>;
 
     // Verify Turnstile token
     if (!turnstileToken) {
-      return new Response(
-        JSON.stringify({ error: "Bot verification required" }),
-        { status: 400, headers }
-      );
+      return respond(400, { error: "Bot verification required" }, "no-token");
     }
 
     const clientIp = context.request.headers.get("CF-Connecting-IP");
+    const verifyStarted = Date.now();
     const verification = await verifyTurnstileToken(
       turnstileToken,
       context.env,
       clientIp
     );
+    timing.verify_ms = Date.now() - verifyStarted;
 
     if (!verification.ok) {
       console.warn("Turnstile verification rejected:", verification.reason);
-      return new Response(
-        JSON.stringify({ error: "Bot verification failed" }),
-        { status: 403, headers }
-      );
+      return respond(403, { error: "Bot verification failed" }, "bot-check-failed");
     }
 
     // Validate required fields. The JSON body is untrusted, so check the types
@@ -196,10 +247,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       typeof fields.email !== "string" ||
       typeof fields.message !== "string"
     ) {
-      return new Response(
-        JSON.stringify({ error: "Name, email, and message are required" }),
-        { status: 400, headers }
-      );
+      return respond(400, { error: "Name, email, and message are required" }, "invalid");
     }
 
     // The name goes into the subject line, so collapse line breaks and other
@@ -209,10 +257,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
     const message = fields.message.trim();
 
     if (!name || !email || !message) {
-      return new Response(
-        JSON.stringify({ error: "Name, email, and message are required" }),
-        { status: 400, headers }
-      );
+      return respond(400, { error: "Name, email, and message are required" }, "invalid");
     }
 
     if (
@@ -220,10 +265,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       email.length > MAX_EMAIL_LENGTH ||
       message.length > MAX_MESSAGE_LENGTH
     ) {
-      return new Response(
-        JSON.stringify({ error: "One or more fields are too long" }),
-        { status: 400, headers }
-      );
+      return respond(400, { error: "One or more fields are too long" }, "invalid");
     }
 
     // Bare addresses only: no display-name syntax and no address lists, since
@@ -231,20 +273,24 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
     const emailRegex = /^[^\s@<>",;]+@[^\s@<>",;]+\.[^\s@<>",;]+$/;
 
     if (!emailRegex.test(email)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid email format" }),
-        { status: 400, headers }
-      );
+      return respond(400, { error: "Invalid email format" }, "invalid");
     }
 
     // Untrusted, so only an exact match selects the Arabic acknowledgment.
-    const locale = fields.locale === "ar" ? "ar" : "en";
+    locale = fields.locale === "ar" ? "ar" : "en";
+
+    // Optional: a tab opened before this field existed doesn't send it.
+    const submissionId =
+      typeof fields.submissionId === "string" && SUBMISSION_ID.test(fields.submissionId)
+        ? fields.submissionId.toLowerCase()
+        : undefined;
 
     const resend = new Resend(context.env.RESEND_API_KEY);
 
-    // Send admin notification (critical). The SDK reports API failures in
-    // `error` instead of throwing, so it has to be checked explicitly.
-    const { error: adminError } = await resend.emails.send({
+    // Send admin notification (critical). Failures come back in `error`, not as a
+    // throw, so it has to be checked explicitly.
+    const emailStarted = Date.now();
+    const { error: adminError } = await sendEmail(resend, {
       from: "Al Arabia Carpets <noreply@alarabiacarpets.com>",
       to: "info@alarabiacarpets.com",
       replyTo: email,
@@ -256,19 +302,20 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
         <p><strong>Message:</strong></p>
         <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
       `,
-    });
+    }, submissionId && `contact-admin/${submissionId}`);
+    timing.email_ms = Date.now() - emailStarted;
 
     if (adminError) {
       console.error("Admin notification failed:", adminError);
-      return new Response(
-        JSON.stringify({ error: "Failed to send email" }),
-        { status: 502, headers }
-      );
+      return respond(502, { error: "Failed to send email" }, "admin-email-failed");
     }
 
-    // Send acknowledgment to submitter (non-critical)
-    try {
-      const { error: ackError } = await resend.emails.send({
+    // Acknowledgment to the submitter (non-critical). The team already has the
+    // message, so the visitor gets their answer now and this finishes afterwards.
+    // Only after the admin email succeeded: never thank someone for a message that
+    // didn't arrive.
+    context.waitUntil(
+      sendEmail(resend, {
         from: "Al Arabia Carpets <noreply@alarabiacarpets.com>",
         to: email,
         subject:
@@ -276,24 +323,15 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
             ? "شكرًا لتواصلك مع سجاد العربية"
             : "Thank you for contacting Al Arabia Carpets",
         html: generateAcknowledgmentEmail(name, locale),
-      });
-      if (ackError) {
-        console.error("Acknowledgment email failed:", ackError);
-      }
-    } catch (ackError) {
-      console.error("Acknowledgment email failed:", ackError);
-    }
-
-    return new Response(
-      JSON.stringify({ message: "Email sent successfully" }),
-      { status: 200, headers }
+      }, submissionId && `contact-ack/${submissionId}`).then(({ error: ackError }) => {
+        if (ackError) console.error("Acknowledgment email failed:", ackError);
+      })
     );
+
+    return respond(200, { message: "Email sent successfully" }, "sent");
   } catch (error) {
     console.error("Email send error:", error);
-    return new Response(
-      JSON.stringify({ error: "Failed to send email" }),
-      { status: 500, headers }
-    );
+    return respond(500, { error: "Failed to send email" }, "error");
   }
 }
 

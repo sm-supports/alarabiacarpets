@@ -1,7 +1,6 @@
 "use client";
 
 import { Truck, Wrench, Headphones, Shield } from "@/components/icons";
-import { useEffect, useRef, useState } from "react";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { useI18n } from "@/i18n/LocaleProvider";
@@ -14,26 +13,7 @@ const services = [
 ] as const;
 
 export default function ServicesSection() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
   const { t } = useI18n();
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.15 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   const colorClasses = {
     forest: {
@@ -52,16 +32,13 @@ export default function ServicesSection() {
 
   return (
     <section
-      ref={sectionRef}
       id="services"
       className="py-12 sm:py-16 lg:py-24 bg-gray-50/50"
     >
       <div className="container mx-auto px-4 sm:px-5 lg:px-8">
         {/* Header */}
         <div
-          className={`text-center mb-10 sm:mb-12 lg:mb-16 transition-all duration-1000 ease-out-expo ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
+          className="reveal text-center mb-10 sm:mb-12 lg:mb-16"
         >
           <p className="text-xs sm:text-sm font-medium text-gold-600 uppercase tracking-wider mb-2 sm:mb-3">
             {t.whyUs.eyebrow}
@@ -76,7 +53,7 @@ export default function ServicesSection() {
 
         {/* Services Grid - 1 column on mobile, 2 on tablet, 4 on desktop */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
-          {services.map((service, index) => {
+          {services.map((service) => {
             const Icon = service.icon;
             const colors = colorClasses[service.color];
             const copy = t.whyUs.items[service.key];
@@ -84,10 +61,7 @@ export default function ServicesSection() {
             return (
               <div
                 key={service.key}
-                className={`group why-card ${
-                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                className="group why-card reveal"
               >
                 <div className={`w-11 h-11 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl ${colors.iconBg} flex items-center justify-center mb-4 sm:mb-5 lg:mb-6 transition-transform duration-300 group-hover:scale-110`}>
                   <Icon className={`w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 ${colors.iconColor}`} />
@@ -105,10 +79,7 @@ export default function ServicesSection() {
 
         {/* Bottom CTA */}
         <div
-          className={`mt-10 sm:mt-12 lg:mt-16 text-center transition-all duration-1000 ease-out-expo ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-          style={{ transitionDelay: '500ms' }}
+          className="reveal mt-10 sm:mt-12 lg:mt-16 text-center"
         >
           <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
             {t.whyUs.question}

@@ -784,6 +784,11 @@
   .more-label { @apply absolute inset-0 flex items-end p-3 sm:p-4 lg:p-5; }
   .pc-play { @apply relative block w-full h-full; }
   .pc-play-badge { @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white; }
+  .ct-skel { @apply min-h-[420px] space-y-4 sm:space-y-5; }
+  .ct-skel-label { @apply text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2; }
+  .ct-skel-field { @apply h-11 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
+  .ct-skel-area { @apply h-[98px] sm:h-[106px] rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
+  .ct-skel-btn { @apply w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl text-center opacity-50; }
   .cat-price { @apply absolute bottom-2 start-2 max-w-[calc(100%-1rem)] rounded-lg bg-primary px-2 py-1 font-poppins text-[11px] font-medium leading-tight text-white sm:text-xs; }
 }
 
@@ -800,4 +805,25 @@
 .hero-fade { animation: hero-fade 700ms ease-out both; }
 @media (prefers-reduced-motion: reduce) {
   .hero-in, .hero-fade { animation: none; }
+}
+
+/* Scroll reveal. CSS only, so nothing waits for hydration: content is visible by
+   default (no JavaScript, slow phones, Firefox) and fades in only where scroll-driven
+   animations exist. Uses `translate`, not `transform`, so it can't fight the Tailwind
+   hover transforms on the same element. Never put .reveal inside an overflow-hidden
+   ancestor: that ancestor becomes the view() scroller and the element can stay
+   transparent. Longhands only, so animation-duration keeps its `auto` default. */
+@keyframes reveal {
+  from { opacity: 0; translate: 0 2rem; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation-name: reveal;
+      animation-timing-function: linear;
+      animation-fill-mode: backwards;
+      animation-timeline: view();
+      animation-range: entry 0% entry 75%;
+    }
+  }
 }

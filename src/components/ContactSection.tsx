@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, memo, useCallback, useMemo, useRef, useEffect } from "react";
+import { useState, memo, useCallback, useMemo, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -34,29 +34,10 @@ const ContactSection = memo(function ContactSection() {
   const [submitted, setSubmitted] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileFailed, setTurnstileFailed] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
   const turnstileRef = useRef<CloudflareTurnstileHandle>(null);
   const { toast } = useToast();
   const { locale, t: dict, lp } = useI18n();
   const t = dict.contactSection;
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,7 +120,6 @@ const ContactSection = memo(function ContactSection() {
 
   return (
     <section
-      ref={sectionRef}
       id="contact"
       className="relative py-16 sm:py-20 lg:py-28 bg-forest-900 overflow-hidden"
     >
@@ -163,11 +143,10 @@ const ContactSection = memo(function ContactSection() {
 
       <div className="relative z-10 container mx-auto px-4 sm:px-5 lg:px-8">
         {/* CTA Header */}
-        <div
-          className={`text-center mb-10 sm:mb-12 lg:mb-16 transition-all duration-1000 ease-out-expo ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-        >
+        {/* No scroll reveal in this section: it is the whole body of /contact, so it
+            must be visible from the first paint. Its overflow-hidden would also
+            capture a .reveal timeline. */}
+        <div className="text-center mb-10 sm:mb-12 lg:mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-white mb-4 sm:mb-6 leading-tight">
             {t.titleTop}
             <br />
@@ -191,12 +170,7 @@ const ContactSection = memo(function ContactSection() {
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 max-w-6xl mx-auto">
           {/* Contact Methods */}
-          <div
-            className={`transition-all duration-1000 ease-out-expo ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-            style={{ transitionDelay: '200ms' }}
-          >
+          <div>
             <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-6 sm:mb-8">
               {t.getInTouch}
             </h3>
@@ -264,12 +238,7 @@ const ContactSection = memo(function ContactSection() {
           </div>
 
           {/* Contact Form */}
-          <div
-            className={`transition-all duration-1000 ease-out-expo ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-            style={{ transitionDelay: '400ms' }}
-          >
+          <div>
             <div className="p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
               <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-5 sm:mb-6">
                 {t.sendMessage}
@@ -286,7 +255,24 @@ const ContactSection = memo(function ContactSection() {
                   <p className="text-sm sm:text-base text-white/70">{t.thanksText}</p>
                 </div>
               ) : !hydrated ? (
-                <div className="min-h-[420px]" />
+                // Stand-in for the form until it hydrates. The form itself is
+                // interactive-only markup, so it stays out of the static HTML.
+                <div className="ct-skel" aria-hidden="true">
+                  <div>
+                    <p className="ct-skel-label">{t.name}</p>
+                    <div className="ct-skel-field" />
+                  </div>
+                  <div>
+                    <p className="ct-skel-label">{t.emailLabel}</p>
+                    <div className="ct-skel-field" />
+                  </div>
+                  <div>
+                    <p className="ct-skel-label">{t.message}</p>
+                    <div className="ct-skel-area" />
+                  </div>
+                  <div className="h-[65px]" />
+                  <div className="ct-skel-btn">{t.send}</div>
+                </div>
               ) : (
                 <form
                   onSubmit={handleSubmit}

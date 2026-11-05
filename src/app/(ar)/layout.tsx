@@ -4,6 +4,7 @@ import "@/index.css";
 import Providers from "@/app/providers";
 import Analytics from "@/components/Analytics";
 import ThirdPartyScripts from "@/components/ThirdPartyScripts";
+import WebVitals from "@/components/WebVitals";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import LocaleProviderAr from "@/i18n/LocaleProviderAr";
 import { rootMetadata, rootViewport } from "@/lib/root-metadata";
@@ -42,6 +43,7 @@ export default function ArabicRootLayout({ children }: { children: React.ReactNo
           <WhatsAppFloat />
         </LocaleProviderAr>
         <Analytics />
+        <WebVitals />
         <ThirdPartyScripts />
       </body>
     </html>

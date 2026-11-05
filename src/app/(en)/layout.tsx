@@ -5,6 +5,7 @@ import Providers from "@/app/providers";
 import AdLanguage from "@/components/AdLanguage";
 import Analytics from "@/components/Analytics";
 import ThirdPartyScripts from "@/components/ThirdPartyScripts";
+import WebVitals from "@/components/WebVitals";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import LocaleProviderEn from "@/i18n/LocaleProviderEn";
 import { rootMetadata, rootViewport } from "@/lib/root-metadata";
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </LocaleProviderEn>
         <AdLanguage />
         <Analytics />
+        <WebVitals />
         <ThirdPartyScripts />
       </body>
     </html>

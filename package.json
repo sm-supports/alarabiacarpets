@@ -13,7 +13,8 @@
     "pages:preview": "wrangler pages dev out",
     "deploy": "bash scripts/deploy-pages.sh",
     "llms": "node scripts/generate-llms-txt.mjs",
-    "check": "node scripts/check-text-ratio.mjs && node scripts/check-arabic.mjs"
+    "check": "node scripts/check-text-ratio.mjs && node scripts/check-arabic.mjs && node scripts/check-page-weight.mjs",
+    "perf": "node scripts/check-perf.mjs"
   },
   "dependencies": {
     "@radix-ui/react-aspect-ratio": "^1.1.15",

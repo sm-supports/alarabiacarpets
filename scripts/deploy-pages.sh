@@ -54,6 +54,7 @@ fi
 
 node scripts/check-text-ratio.mjs || die "pages under the 10% text-to-HTML ratio"
 node scripts/check-arabic.mjs || die "Arabic pages failed their checks"
+node scripts/check-page-weight.mjs || die "pages failed their weight checks"
 
 # Is out/ on a case-insensitive filesystem?
 probe="$OUT/.case-probe-$$"

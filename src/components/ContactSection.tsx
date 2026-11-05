@@ -14,7 +14,7 @@ import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
-import { EMAIL, PHONE, WHATSAPP_URL } from "@/lib/seo";
+import { EMAIL, PHONE, WHATSAPP_URL } from "@/lib/site";
 
 // Inlined at build time. If the Cloudflare Pages build environment does not
 // define it, the Turnstile widget cannot render and the form can never be

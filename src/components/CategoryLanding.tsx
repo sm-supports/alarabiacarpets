@@ -288,7 +288,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

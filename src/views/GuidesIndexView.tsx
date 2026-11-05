@@ -103,7 +103,7 @@ export default function GuidesIndexView({ locale }: { locale: Locale }) {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

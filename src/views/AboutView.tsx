@@ -125,7 +125,7 @@ export default function AboutView({ locale }: { locale: Locale }) {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

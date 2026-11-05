@@ -112,7 +112,7 @@ export default function ServicesIndexView({ locale }: { locale: Locale }) {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

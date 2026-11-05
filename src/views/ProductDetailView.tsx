@@ -112,7 +112,12 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg shadow-md overflow-hidden">
-              <ProductMedia product={product} alt={productImageAlt(product, locale)} />
+              <ProductMedia
+                name={product.name}
+                alt={productImageAlt(product, locale)}
+                imageSrc={product.imageSrc}
+                videoSrc={product.media?.[0]?.type === "video" ? product.media[0].src : undefined}
+              />
 
               <div className="p-6 md:p-8 flex flex-col justify-between">
                 <div>
@@ -229,7 +234,7 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import AdLanguage from "@/components/AdLanguage";
 import Analytics from "@/components/Analytics";
 import ThirdPartyScripts from "@/components/ThirdPartyScripts";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
-import { LocaleProvider } from "@/i18n/LocaleProvider";
+import LocaleProviderEn from "@/i18n/LocaleProviderEn";
 import { rootMetadata, rootViewport } from "@/lib/root-metadata";
 
 // Self-hosted at build time into out/_next/static/media/, replacing the
@@ -33,10 +33,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${playfair.variable} ${poppins.variable}`}>
       <body>
-        <LocaleProvider locale="en">
+        <LocaleProviderEn>
           <Providers>{children}</Providers>
           <WhatsAppFloat />
-        </LocaleProvider>
+        </LocaleProviderEn>
         <AdLanguage />
         <Analytics />
         <ThirdPartyScripts />

@@ -288,7 +288,7 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

@@ -107,7 +107,7 @@ export default function ProductsView({ locale }: { locale: Locale }) {
 
         <section className="py-10 md:py-14 bg-neutral-50">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
-            <ProductsGrid products={products} />
+            <ProductsGrid products={products} locale={locale} />
           </div>
         </section>
 
@@ -133,7 +133,7 @@ export default function ProductsView({ locale }: { locale: Locale }) {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

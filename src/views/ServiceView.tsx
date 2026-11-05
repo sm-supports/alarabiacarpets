@@ -385,7 +385,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

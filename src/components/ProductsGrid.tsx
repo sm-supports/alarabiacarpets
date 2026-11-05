@@ -1,8 +1,6 @@
-"use client";
-
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/data/products";
-import { useI18n } from "@/i18n/LocaleProvider";
+import { getDict, localePath, type Locale } from "@/i18n";
 import { productImageAlt } from "@/lib/seo";
 
 /**
@@ -10,11 +8,12 @@ import { productImageAlt } from "@/lib/seo";
  *
  * Category browsing lives in the "Shop by category" image cards above this on
  * the page, which link to the real category landing pages, so there is no
- * in-page filter here. `products` crosses the server/client boundary as plain
- * serializable JSON.
+ * in-page filter here. Server component, so only the few fields each ProductCard
+ * needs reach the page's hydration data, not the whole product records.
  */
-export default function ProductsGrid({ products }: { products: Product[] }) {
-  const { locale, t, lp } = useI18n();
+export default function ProductsGrid({ products, locale }: { products: Product[]; locale: Locale }) {
+  const t = getDict(locale);
+  const lp = (path: string) => localePath(locale, path);
   return (
     <>
       <h2 className="h2-sec6">
@@ -38,7 +37,9 @@ export default function ProductsGrid({ products }: { products: Product[] }) {
             description={product.description}
             imageSrc={product.imageSrc}
             media={product.media}
-            whatsappLink={product.whatsappLink}
+            // Arabic cards build the same link from the name: the percent-encoded
+            // Arabic text is several times longer than the name itself.
+            whatsappLink={locale === "ar" ? undefined : product.whatsappLink}
             href={lp(`/products/${product.id}`)}
             imageAlt={productImageAlt(product, locale)}
           />

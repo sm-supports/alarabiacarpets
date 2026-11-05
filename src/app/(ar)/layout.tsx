@@ -5,7 +5,7 @@ import Providers from "@/app/providers";
 import Analytics from "@/components/Analytics";
 import ThirdPartyScripts from "@/components/ThirdPartyScripts";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
-import { LocaleProvider } from "@/i18n/LocaleProvider";
+import LocaleProviderAr from "@/i18n/LocaleProviderAr";
 import { rootMetadata, rootViewport } from "@/lib/root-metadata";
 
 // Mapped onto the same CSS variables as the English fonts, so the existing
@@ -33,10 +33,10 @@ export default function ArabicRootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ar-QA" dir="rtl" className={`${elMessiri.variable} ${tajawal.variable}`}>
       <body>
-        <LocaleProvider locale="ar">
+        <LocaleProviderAr>
           <Providers>{children}</Providers>
           <WhatsAppFloat />
-        </LocaleProvider>
+        </LocaleProviderAr>
         <Analytics />
         <ThirdPartyScripts />
       </body>

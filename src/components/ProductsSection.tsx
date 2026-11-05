@@ -1,12 +1,10 @@
-"use client";
-
 import { ArrowRight, ArrowUpRight } from "@/components/icons";
 import Link from "next/link";
 import { products } from "@/data/products";
 import { getCategory } from "@/data/categories";
-import { WHATSAPP_URL } from "@/lib/seo";
+import { WHATSAPP_URL } from "@/lib/site";
 import WhatsAppLink from "@/components/WhatsAppLink";
-import { useI18n } from "@/i18n/LocaleProvider";
+import { getDict, localePath, type Locale } from "@/i18n";
 
 // Showcase presentation config. Each entry points at a CATEGORY landing page --
 // these were category-hub products until they became real category pages.
@@ -64,12 +62,15 @@ const additionalProducts = additionalProductConfig.map(config => {
 function ProductShowcase({
   product,
   index,
+  locale,
 }: {
   product: typeof productShowcases[0];
   index: number;
+  locale: Locale;
 }) {
   const isReversed = index % 2 === 1;
-  const { t, lp } = useI18n();
+  const t = getDict(locale);
+  const lp = (path: string) => localePath(locale, path);
   const copy = t.showcase.items[product.id];
   const whatsappLink = `${WHATSAPP_URL}?text=${encodeURIComponent(t.common.interestedMessage(copy.name))}`;
 
@@ -169,8 +170,10 @@ function ProductShowcase({
   );
 }
 
-export default function ProductsSection() {
-  const { t, lp } = useI18n();
+/** Server component: the product and category data it reads stays out of the browser. */
+export default function ProductsSection({ locale }: { locale: Locale }) {
+  const t = getDict(locale);
+  const lp = (path: string) => localePath(locale, path);
 
   return (
     <section id="products" className="relative">
@@ -188,7 +191,7 @@ export default function ProductsSection() {
 
       {/* Product Showcases */}
       {productShowcases.map((product, index) => (
-        <ProductShowcase key={product.id} product={product} index={index} />
+        <ProductShowcase key={product.id} product={product} index={index} locale={locale} />
       ))}
 
       {/* Additional Products Grid */}

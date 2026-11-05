@@ -1,10 +1,10 @@
 "use client";
 
-import { localePath } from "@/i18n";
+import { localePath } from "@/i18n/config";
 import { useLocale } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { trackWhatsAppClick } from "@/lib/analytics";
-import { WHATSAPP_URL } from "@/lib/seo";
+import { WHATSAPP_URL } from "@/lib/site";
 
 interface WhatsAppLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   /** Where the click came from, e.g. "products_page". */

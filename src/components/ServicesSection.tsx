@@ -1,9 +1,7 @@
-"use client";
-
 import { Truck, Wrench, Headphones, Shield } from "@/components/icons";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
-import { useI18n } from "@/i18n/LocaleProvider";
+import { getDict, type Locale } from "@/i18n";
 
 const services = [
   { icon: Truck, key: "delivery", color: "forest" },
@@ -12,8 +10,8 @@ const services = [
   { icon: Shield, key: "guarantee", color: "forest" },
 ] as const;
 
-export default function ServicesSection() {
-  const { t } = useI18n();
+export default function ServicesSection({ locale }: { locale: Locale }) {
+  const t = getDict(locale);
 
   const colorClasses = {
     forest: {

@@ -8,6 +8,9 @@
 
 import { HTML_LANG, localePath, type Locale } from "@/i18n/config";
 import { localizedCategoryLabel } from "@/i18n/labels";
+import { EMAIL, PHONE, PHONE_E164, WHATSAPP_URL } from "@/lib/site";
+
+export { EMAIL, PHONE, PHONE_E164, WHATSAPP_URL };
 
 export const SITE_NAME = "Al Arabia Carpets";
 export const SITE_NAME_AR = "سجاد العربية";
@@ -19,15 +22,6 @@ export const DEFAULT_TITLE = `${SITE_NAME} | Carpets, Barkia & Interior Design Q
 export const DEFAULT_DESCRIPTION =
   "Qatar's provider of premium Barkia, PVC flooring, carpets, sofas, curtains & interior design. Free installation & delivery across Doha.";
 
-export const PHONE = "+974 5551 2858";
-export const PHONE_E164 = "+97455512858";
-/**
- * WhatsApp click-to-chat link. wa.me's documented format is the number without
- * "+", spaces or dashes; the "+" form redirects too, but audit crawlers report it
- * as a broken external link.
- */
-export const WHATSAPP_URL = `https://wa.me/${PHONE_E164.replace(/\D/g, "")}`;
-export const EMAIL = "info@alarabiacarpets.com";
 export const STREET = "Al Mansoura St";
 export const CITY = "Doha";
 export const COUNTRY = "Qatar";

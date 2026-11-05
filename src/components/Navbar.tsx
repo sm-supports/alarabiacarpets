@@ -9,7 +9,7 @@ import WhatsAppIcon from "@/components/WhatsAppIcon";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { stripLocale } from "@/i18n";
+import { stripLocale } from "@/i18n/config";
 
 const Navbar = memo(function Navbar() {
   const hydrated = useHydrated();

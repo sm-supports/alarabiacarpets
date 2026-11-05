@@ -46,8 +46,8 @@ export default function HomeView({ locale }: { locale: Locale }) {
       <main className="flex-grow">
         <HeroSection />
         <TrustedBy />
-        <ProductsSection />
-        <ServicesSection />
+        <ProductsSection locale={locale} />
+        <ServicesSection locale={locale} />
         {/* States who we are and what things cost in plain text. AI tools quote this
             kind of passage; the sections above are mostly images and short labels. */}
         <section className="py-14 md:py-16 bg-gray-50/50">
@@ -80,7 +80,7 @@ export default function HomeView({ locale }: { locale: Locale }) {
         </section>
         <ContactSection />
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

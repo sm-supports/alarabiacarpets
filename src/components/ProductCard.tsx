@@ -3,7 +3,7 @@
 
 import { ShoppingCart, ExternalLink, ImageIcon, Video, ChevronLeft, ChevronRight, Play } from "@/components/icons";
 import { memo, useCallback, useState, useRef, useEffect } from "react";
-import { ProductMedia } from "@/data/products";
+import type { ProductMedia } from "@/data/products";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import WhatsAppLink from "@/components/WhatsAppLink";
@@ -18,7 +18,8 @@ interface ProductCardProps {
   description: string;
   imageSrc: string; // Fallback/Preview
   media?: ProductMedia[];
-  whatsappLink: string;
+  /** Prefilled WhatsApp link. When omitted, built from the name in the page's language. */
+  whatsappLink?: string;
   onClick?: () => void;
   /** Product detail URL. When set the title renders as a real crawlable anchor. */
   href?: string;
@@ -253,6 +254,7 @@ const ProductCard = memo(function ProductCard({
         </p>
         <WhatsAppLink
           href={whatsappLink}
+          message={t.common.interestedMessage(name)}
           source={`product_card:${analyticsName ?? name}`}
           className="pc-cta"
           onClick={handleWhatsAppClick}

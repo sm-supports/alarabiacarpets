@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "@/components/icons";
 import type { CategorySection } from "@/data/categories";
 import { findCategory, getCategories, getProducts, guidesForCategoryL } from "@/data/localized";
+import { cardImage } from "@/lib/card-image";
 import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
 import {
   buildBreadcrumb,
@@ -176,7 +177,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
                         </div>
                       ) : (
                         <img
-                          src={p.imageSrc}
+                          {...cardImage(p.imageSrc, "(min-width:1024px) 25vw, 33vw")}
                           alt={productImageAlt(p, locale)}
                           loading="lazy"
                           decoding="async"

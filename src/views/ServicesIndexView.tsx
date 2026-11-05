@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import { getServices } from "@/data/localized";
+import { fullImagePath } from "@/lib/card-image";
 import { getDict, localePath, type Locale } from "@/i18n";
 import {
   buildBreadcrumb,
@@ -80,7 +81,7 @@ export default function ServicesIndexView({ locale }: { locale: Locale }) {
                       <Link href={href} className="block group">
                         <div className="aspect-[16/9] overflow-hidden bg-neutral-100">
                           <img
-                            src={service.heroImage}
+                            src={fullImagePath(service.heroImage)}
                             alt={service.heroImageAlt ?? service.heading}
                             loading="lazy"
                             decoding="async"

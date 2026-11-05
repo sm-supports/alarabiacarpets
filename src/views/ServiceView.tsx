@@ -11,6 +11,7 @@ import HeroQuoteCta from "@/components/HeroQuoteCta";
 import { Button } from "@/components/ui/button";
 import { Check } from "@/components/icons";
 import { findCategory, findProduct, findService, getServices, guidesForServiceL } from "@/data/localized";
+import { cardImage, fullImage } from "@/lib/card-image";
 import { getDict, localePath, type Locale } from "@/i18n";
 import {
   buildBreadcrumb,
@@ -141,7 +142,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
         {service.heroImage && (
           <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-4xl -mt-8 md:-mt-10 relative">
             <img
-              src={service.heroImage}
+              {...fullImage(service.heroImage, "(min-width:1024px) 896px, 66vw")}
               alt={service.heroImageAlt ?? service.heading}
               loading="eager"
               fetchPriority="high"
@@ -243,7 +244,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
                 {service.gallery.map((img) => (
                   <figure key={img.src} className="overflow-hidden rounded-xl bg-neutral-100">
                     <img
-                      src={img.src}
+                      {...cardImage(img.src, "(min-width:1024px) 25vw, 33vw")}
                       alt={img.alt}
                       loading="lazy"
                       decoding="async"
@@ -277,7 +278,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
                         </div>
                       ) : (
                         <img
-                          src={p.imageSrc}
+                          {...cardImage(p.imageSrc, "(min-width:1024px) 25vw, 33vw")}
                           alt={productImageAlt(p, locale)}
                           loading="lazy"
                           decoding="async"

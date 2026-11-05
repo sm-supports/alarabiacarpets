@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { preload } from "react-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
@@ -13,6 +14,7 @@ import WhatsAppLink from "@/components/WhatsAppLink";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Check, ShoppingCart } from "@/components/icons";
 import { categoryLabelFor, findProduct, getProducts } from "@/data/localized";
+import { fullImage, fullImagePath } from "@/lib/card-image";
 import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
 import {
   absoluteUrl,
@@ -67,6 +69,12 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
   const product = findProduct(locale, productId);
   if (!product) notFound();
 
+  // A product that leads with a video shows its image as the poster. A <video poster>
+  // isn't preloaded the way an eager <img> is, and it is the LCP element.
+  const videoSrc = product.media?.[0]?.type === "video" ? product.media[0].src : undefined;
+  const poster = fullImagePath(product.imageSrc);
+  if (videoSrc) preload(poster, { as: "image", fetchPriority: "high" });
+
   const t = getDict(locale);
   const lp = (path: string) => localePath(locale, path);
   const label = categoryLabelFor(locale, product.category);
@@ -115,8 +123,8 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
               <ProductMedia
                 name={product.name}
                 alt={productImageAlt(product, locale)}
-                imageSrc={product.imageSrc}
-                videoSrc={product.media?.[0]?.type === "video" ? product.media[0].src : undefined}
+                {...(videoSrc ? { src: poster } : fullImage(product.imageSrc, "(min-width:1024px) 50vw, 66vw"))}
+                videoSrc={videoSrc}
               />
 
               <div className="p-6 md:p-8 flex flex-col justify-between">

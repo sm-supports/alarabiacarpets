@@ -2,8 +2,16 @@
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
-/Products/*
+# Sized copies made by scripts/build-card-images.mjs. The name carries a hash of the
+# source photo, so immutable is safe.
+/img/*
   Cache-Control: public, max-age=31536000, immutable
+
+# The four folders below hold files under plain names, so they must NOT be immutable:
+# a photo replaced under the same name would keep serving the old copy for a year.
+# A day in the browser, then served stale for up to a week while it revalidates.
+/Products/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 # Hashed by scripts/externalize-flight.mjs, so immutable is safe.
 /_flight/*
@@ -13,13 +21,13 @@
   Cache-Control: public, max-age=86400
 
 /lovable-uploads/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 /logos/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 /Services/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 # App Router emits per-route RSC flight payloads as .txt alongside the HTML.
 # Keep them out of the index -- they would read as thin duplicate content.

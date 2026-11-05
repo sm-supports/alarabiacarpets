@@ -1,6 +1,7 @@
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/data/products";
 import { getDict, localePath, type Locale } from "@/i18n";
+import { cardImagePath } from "@/lib/card-image";
 import { productImageAlt } from "@/lib/seo";
 
 /**
@@ -35,8 +36,12 @@ export default function ProductsGrid({ products, locale }: { products: Product[]
             name={product.name}
             analyticsName={product.analyticsName ?? product.name}
             description={product.description}
-            imageSrc={product.imageSrc}
-            media={product.media}
+            // One 720px URL per image, not a srcSet: 37 cards of srcSet would take
+            // /ar/products under the 10% text-to-HTML floor.
+            poster={cardImagePath(product.imageSrc)}
+            media={product.media.map((item) =>
+              item.type === "video" ? item : { type: item.type, src: cardImagePath(item.src) }
+            )}
             // Arabic cards build the same link from the name: the percent-encoded
             // Arabic text is several times longer than the name itself.
             whatsappLink={locale === "ar" ? undefined : product.whatsappLink}

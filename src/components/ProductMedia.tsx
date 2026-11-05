@@ -15,13 +15,18 @@ import { useI18n } from "@/i18n/LocaleProvider";
 export default function ProductMedia({
   name,
   alt,
-  imageSrc,
+  src,
+  srcSet,
+  sizes,
   videoSrc,
 }: {
   name: string;
   alt: string;
-  /** The hero image, or the poster when the product leads with a video. */
-  imageSrc: string;
+  /** The hero image, or the poster when the product leads with a video. Sized copies
+      resolved on the server (see ProductDetailView). */
+  src: string;
+  srcSet?: string;
+  sizes?: string;
   videoSrc?: string;
 }) {
   const { t } = useI18n();
@@ -56,13 +61,15 @@ export default function ProductMedia({
           controls
           playsInline
           preload="none"
-          poster={imageSrc}
+          poster={src}
           aria-label={alt}
         />
       ) : (
         <img
           ref={imageRef}
-          src={imageSrc}
+          src={src}
+          srcSet={srcSet}
+          sizes={sizes}
           alt={alt}
           className="w-full h-full object-cover"
           onError={() => setImageError(true)}

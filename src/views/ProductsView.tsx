@@ -6,6 +6,7 @@ import JsonLd from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { Phone } from "@/components/icons";
 import { getCategories, getProducts } from "@/data/localized";
+import { cardImagePath } from "@/lib/card-image";
 import Link from "next/link";
 import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
 import {
@@ -78,11 +79,12 @@ export default function ProductsView({ locale }: { locale: Locale }) {
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
                     <img
-                      src={c.heroImage}
+                      src={cardImagePath(c.heroImage)}
                       alt={c.heroImageAlt}
-                      // The first row or two is above the fold, and holds the LCP image.
-                      loading={index < 4 ? "eager" : "lazy"}
-                      fetchPriority={index < 4 ? "high" : "auto"}
+                      // Only the first row on a phone is above the fold. No fetchPriority:
+                      // React turns each high-priority image into a preload link that
+                      // competes with the CSS and fonts, and the h1 is the likelier LCP.
+                      loading={index < 2 ? "eager" : "lazy"}
                       decoding="async"
                       className="rel-img"
                     />

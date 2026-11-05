@@ -2,6 +2,7 @@ import { ArrowRight, ArrowUpRight } from "@/components/icons";
 import Link from "next/link";
 import { products } from "@/data/products";
 import { getCategory } from "@/data/categories";
+import { cardImagePath, fullImagePath } from "@/lib/card-image";
 import { WHATSAPP_URL } from "@/lib/site";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { getDict, localePath, type Locale } from "@/i18n";
@@ -104,7 +105,7 @@ function ProductShowcase({
           >
             <div className="sc-frame group">
               <img
-                src={product.imageSrc}
+                src={cardImagePath(product.imageSrc)}
                 alt={copy.name}
                 className="sc-img"
                 loading="lazy"
@@ -213,8 +214,9 @@ export default function ProductsSection({ locale }: { locale: Locale }) {
                 href={lp(product.link)}
                 className="group more-tile reveal"
               >
+                {/* Uncropped copy: the tile is 4:5 or square, not 4:3. */}
                 <img
-                  src={product.imageSrc}
+                  src={fullImagePath(product.imageSrc)}
                   alt={t.showcase.moreAlt(t.showcase.more[product.id])}
                   className="more-img"
                   loading="lazy"

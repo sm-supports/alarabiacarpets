@@ -784,6 +784,7 @@
   .more-label { @apply absolute inset-0 flex items-end p-3 sm:p-4 lg:p-5; }
   .pc-play { @apply relative block w-full h-full; }
   .pc-play-badge { @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white; }
+  .cat-price { @apply absolute bottom-2 start-2 max-w-[calc(100%-1rem)] rounded-lg bg-primary px-2 py-1 font-poppins text-[11px] font-medium leading-tight text-white sm:text-xs; }
 }
 
 /* Hero entrance. CSS only, so it runs from the first paint and never waits for

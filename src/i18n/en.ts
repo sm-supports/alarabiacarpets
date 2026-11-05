@@ -264,9 +264,6 @@ export const en = {
       intro:
         "Browse our complete collection of premium home furnishings and decor products. All products come with free installation and delivery in Qatar.",
       byCategory: "Shop by category",
-      pricingTitle: "Starting prices at Al Arabia Carpets",
-      pricingText:
-        "These are our starting prices in Qatari riyal. The final price depends on the product and the area, and we measure and quote free of charge anywhere in Qatar. Delivery and installation are free.",
       ctaTitle: "Can't Find What You're Looking For?",
       ctaText:
         "Contact us directly through WhatsApp and our team will help you find the perfect solution for your home.",

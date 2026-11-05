@@ -108,7 +108,13 @@ export function trackPageView(path: string): void {
  * gtag.js loads on the first interaction or after 5 s (see ThirdPartyScripts), and
  * these are queued in dataLayer until then. A visitor who leaves before that with no
  * interaction is not recorded.
+ *
+ * `page_path` is the page the visit loaded on, not the address at the time of the
+ * report: CLS and INP are sent when the tab is hidden, by which point an in-site
+ * link may have changed the address, and the measurement still belongs to the load.
  */
+const LOADED_PATH = typeof window === "undefined" ? "" : window.location.pathname;
+
 export function trackWebVital(metric: {
   name: string;
   value: number;
@@ -123,7 +129,7 @@ export function trackWebVital(metric: {
     metric_value: metric.value,
     metric_delta: metric.delta,
     metric_rating: metric.rating,
-    page_path: window.location.pathname,
+    page_path: LOADED_PATH,
     non_interaction: true,
   });
 }

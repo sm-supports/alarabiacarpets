@@ -165,7 +165,7 @@ Verified on every build; do not regress these:
 
 - One `<h1>` per page, no skipped heading levels
 - `check-page-weight` (run by `npm run check` and `npm run deploy`): no `opacity-0` in the
-  static HTML, no full-size catalog photo, at most 4 font preloads and 2 high-priority images
+  static HTML, no full-size catalog photo, at most 8 font preloads (English pages have 3, Arabic 8) and 2 high-priority images
   per page, hydration data under 90 KB
 - Every page at or above 10% text-to-HTML (`check-text-ratio`, run by `npm run deploy`).
   `scripts/externalize-flight.mjs` moves Next's hydration data out of the HTML, and must

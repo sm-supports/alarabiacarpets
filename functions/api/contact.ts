@@ -221,6 +221,10 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
     }
     const { turnstileToken, ...fields } = body as Record<string, unknown>;
 
+    // Untrusted, so only an exact match selects Arabic. Read first so the log line
+    // for a rejected request carries the right language too.
+    locale = fields.locale === "ar" ? "ar" : "en";
+
     // Verify Turnstile token
     if (!turnstileToken) {
       return respond(400, { error: "Bot verification required" }, "no-token");
@@ -275,9 +279,6 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
     if (!emailRegex.test(email)) {
       return respond(400, { error: "Invalid email format" }, "invalid");
     }
-
-    // Untrusted, so only an exact match selects the Arabic acknowledgment.
-    locale = fields.locale === "ar" ? "ar" : "en";
 
     // Optional: a tab opened before this field existed doesn't send it.
     const submissionId =

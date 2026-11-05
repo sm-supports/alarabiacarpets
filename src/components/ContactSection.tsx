@@ -322,7 +322,6 @@ const ContactSection = memo(function ContactSection() {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  aria-busy={isSubmitting}
                   className="space-y-4 sm:space-y-5"
                 >
 
@@ -423,11 +422,11 @@ const ContactSection = memo(function ContactSection() {
                   </button>
                   {/* Success is only ever shown once the server confirms the send:
                       this is a lead form, and a message that failed must not look sent. */}
-                  {isSlow && (
-                    <p role="status" className="text-xs sm:text-sm text-white/70 text-center">
-                      {t.stillSending}
-                    </p>
-                  )}
+                  {/* Always rendered and only its text changes: a live region that is
+                      inserted already holding its text is often not announced. */}
+                  <p role="status" className="text-xs sm:text-sm text-white/70 text-center empty:hidden">
+                    {isSlow ? t.stillSending : ""}
+                  </p>
                 </form>
               )}
             </div>

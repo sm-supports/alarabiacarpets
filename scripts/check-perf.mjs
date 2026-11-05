@@ -77,7 +77,8 @@ function resolveFile(pathname) {
   const candidates = clean === "" ? ["index.html"] : [clean, `${clean}.html`, `${clean}/index.html`];
   for (const candidate of candidates) {
     const file = path.join(root, candidate);
-    if (file.startsWith(root) && fs.existsSync(file) && fs.statSync(file).isFile()) return file;
+    // With the separator: a bare prefix test would also accept a sibling like out-old/.
+    if (file.startsWith(root + path.sep) && fs.existsSync(file) && fs.statSync(file).isFile()) return file;
   }
   return null;
 }
@@ -114,17 +115,27 @@ const LIGHTHOUSE_TIMEOUT_MS = 180_000;
 /** Runs a command without blocking: the server above has to keep answering Chrome. */
 function run(command, commandArgs) {
   return new Promise((resolve) => {
-    const child = spawn(command, commandArgs, { stdio: ["ignore", "ignore", "pipe"] });
+    // Its own process group: npx starts Lighthouse, which starts Chrome, and killing
+    // only npx would leave those two running and holding the stderr pipe open.
+    const child = spawn(command, commandArgs, { stdio: ["ignore", "ignore", "pipe"], detached: true });
     let stderr = "";
     child.stderr.on("data", (chunk) => (stderr += chunk));
-    const timer = setTimeout(() => child.kill("SIGKILL"), LIGHTHOUSE_TIMEOUT_MS);
+    const timer = setTimeout(() => {
+      stderr += `\ntimed out after ${LIGHTHOUSE_TIMEOUT_MS / 1000} s`;
+      try {
+        process.kill(-child.pid, "SIGKILL");
+      } catch {
+        child.kill("SIGKILL");
+      }
+    }, LIGHTHOUSE_TIMEOUT_MS);
     child.on("error", (error) => {
       clearTimeout(timer);
       resolve({ status: 1, stderr: String(error) });
     });
-    child.on("close", (status) => {
+    // 'exit', not 'close': 'close' waits for every holder of the pipe.
+    child.on("exit", (status) => {
       clearTimeout(timer);
-      resolve({ status, stderr });
+      resolve({ status: status ?? 1, stderr });
     });
   });
 }

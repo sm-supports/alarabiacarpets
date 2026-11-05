@@ -787,7 +787,7 @@
   .ct-skel { @apply min-h-[420px] space-y-4 sm:space-y-5; }
   .ct-skel-label { @apply text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2; }
   .ct-skel-field { @apply h-11 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
-  .ct-skel-area { @apply h-[98px] sm:h-[106px] rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
+  .ct-skel-area { @apply h-[98px] sm:h-[114px] rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
   .ct-skel-btn { @apply w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl text-center opacity-50; }
   .cat-price { @apply absolute bottom-2 start-2 max-w-[calc(100%-1rem)] rounded-lg bg-primary px-2 py-1 font-poppins text-[11px] font-medium leading-tight text-white sm:text-xs; }
 }
@@ -812,12 +812,13 @@
    animations exist. Uses `translate`, not `transform`, so it can't fight the Tailwind
    hover transforms on the same element. Never put .reveal inside an overflow-hidden
    ancestor: that ancestor becomes the view() scroller and the element can stay
-   transparent. Longhands only, so animation-duration keeps its `auto` default. */
+   transparent. Longhands only, so animation-duration keeps its `auto` default.
+   Screen only: a printed page has no scroll position to drive it. */
 @keyframes reveal {
   from { opacity: 0; translate: 0 2rem; }
 }
 @supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
+  @media screen and (prefers-reduced-motion: no-preference) {
     .reveal {
       animation-name: reveal;
       animation-timing-function: linear;

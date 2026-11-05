@@ -53,7 +53,15 @@ export function cardImagePath(src: string, width: 400 | 720 = 720): string {
   return list ? pick(list, width) : src;
 }
 
-/** 4:3 `src`, `srcSet` and `sizes` to spread onto an <img>. */
+/**
+ * 4:3 `src`, `srcSet` and `sizes` to spread onto an <img>.
+ *
+ * Callers pass a phone `sizes` value of about two-thirds of the real slot (66vw for a
+ * full-width hero, 33vw for a two-column grid). That is deliberate: it makes a 3x phone
+ * take the smaller copy, which still gives it over two device pixels per CSS pixel, for
+ * about half the bytes on the connections where bytes matter most. Raise it if photos
+ * ever look soft on a phone.
+ */
 export function cardImage(src: string, sizes: string): ImageAttrs {
   return attrs(variants(src, "c"), src, sizes);
 }

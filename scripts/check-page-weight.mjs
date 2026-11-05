@@ -15,7 +15,8 @@
 import fs from "node:fs";
 
 const SITE = "https://alarabiacarpets.com";
-const MAX_FONT_PRELOADS = 4;
+// English pages preload 3 files. Arabic pages preload 8: both scripts are on screen.
+const MAX_FONT_PRELOADS = 8;
 const MAX_HIGH_PRIORITY = 2;
 // The largest page is about 73 KB (an Arabic category page). Before the product
 // grid became a server component, /ar/products was 173 KB.

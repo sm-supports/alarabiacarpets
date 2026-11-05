@@ -87,7 +87,7 @@ const Navbar = memo(function Navbar() {
               <div className="relative w-9 h-9 md:w-10 md:h-10 overflow-hidden rounded-lg">
                 <img
                   src="/lovable-uploads/tran-golden-logo.webp"
-                  alt={t.brand}
+                  alt={t.common.logoAlt}
                   className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
                   loading="eager"
                   decoding="async"
@@ -198,7 +198,7 @@ const Navbar = memo(function Navbar() {
             >
               <img
                 src="/lovable-uploads/tran-golden-logo.webp"
-                alt={t.brand}
+                alt={t.common.logoAlt}
                 className="w-8 h-8 object-contain"
               />
               <span className="font-display text-lg font-semibold text-forest-900">

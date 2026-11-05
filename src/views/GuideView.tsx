@@ -276,7 +276,7 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
             <p className="font-poppins max-w-2xl mx-auto mb-8 text-neutral-500">
               {t.guide.ctaText}
             </p>
-            <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-white">
+            <Button asChild size="lg" className="bg-green-700 hover:bg-green-800 text-white">
               <WhatsAppLink
                 source={`guide:${guide.slug}`}
                 message={t.guide.adviceMessage(guide.title)}

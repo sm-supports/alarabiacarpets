@@ -19,7 +19,7 @@ const elMessiri = El_Messiri({
 
 const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
-  weight: ["300", "400", "500", "700"],
+  weight: ["400", "500", "700"],
   variable: "--font-poppins",
   display: "swap",
 });

@@ -26,7 +26,7 @@ export default function HeroQuoteCta({
       <WhatsAppLink
         source={source}
         message={message}
-        className="inline-flex items-center gap-2 rounded-md bg-green-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-700"
+        className="inline-flex items-center gap-2 rounded-md bg-green-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-800"
       >
         <MessageCircle size={16} aria-hidden="true" />
         <span>{getDict(locale).common.heroQuote}</span>

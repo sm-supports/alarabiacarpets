@@ -53,7 +53,7 @@ export default function Footer() {
             <Link href={lp("/")} className="inline-flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
               <img
                 src="/lovable-uploads/tran-golden-logo.webp"
-                alt={t.brand}
+                alt={t.common.logoAlt}
                 className="w-9 h-9 sm:w-10 sm:h-10 object-contain"
               />
               <span className="font-display text-lg sm:text-xl font-semibold text-forest-900">
@@ -178,7 +178,7 @@ export default function Footer() {
               {t.footer.rights(currentYear)}
             </p>
             <div className="flex items-center gap-4 sm:gap-6">
-              <span className="text-[10px] sm:text-xs text-gray-400">
+              <span className="text-[10px] sm:text-xs text-gray-500">
                 {t.footer.freeDelivery}
               </span>
             </div>

@@ -217,7 +217,7 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
             <p className="font-poppins max-w-2xl mx-auto mb-8">
               {t.productDetail.needHelpText}
             </p>
-            <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-white">
+            <Button asChild size="lg" className="bg-green-700 hover:bg-green-800 text-white">
               <WhatsAppLink
                 source={`product_detail_bottom:${product.id}`}
                 className="flex items-center gap-2"

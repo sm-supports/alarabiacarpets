@@ -8,6 +8,7 @@ import type { Dict } from "./en";
 export const ar: Dict = {
   brand: "سجاد العربية",
   common: {
+    logoAlt: "شعار سجاد العربية",
     home: "الرئيسية",
     products: "المنتجات",
     services: "الخدمات",
@@ -100,6 +101,7 @@ export const ar: Dict = {
     moreSubtitle: "تعرّف على مجموعتنا الكاملة من حلول المفروشات المنزلية.",
     viewAll: "شوف كل المنتجات",
     viewRange: "شوف التشكيلة",
+    moreAlt: (name: string) => `${name} من سجاد العربية في الدوحة`,
     getQuote: "اطلب عرض سعر",
     items: {
       carpet: {
@@ -197,6 +199,7 @@ export const ar: Dict = {
     view: (n) => ` (صورة ${n})`,
     imageUnavailable: "الصورة غير متوفرة",
     imageNotAvailable: "الصورة غير متوفرة",
+    playVideo: "شغّل الفيديو",
   },
   productsGrid: {
     heading: "كل المنتجات",

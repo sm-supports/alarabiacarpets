@@ -118,6 +118,9 @@ Use logical Tailwind classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-` over
 - Plain `<img>` only, not `next/image`: product paths contain `&`, which breaks `/_next/image`
 - Path alias `@` maps to `src/`
 - Product images live in `public/Products/<CategoryFolder>/`
+- Product and related cards show smaller 4:3 copies from `public/Products/cards/` via
+  `cardImagePath()`. `scripts/build-card-images.mjs` makes them before dev and build, and the
+  folder is gitignored. A card with a different aspect ratio needs the script's crop changed
 - Container pattern: `<div className="container mx-auto px-4 sm:px-5 lg:px-8">`
 - Scroll-reveal: IntersectionObserver → `isVisible` state → transition classes
 

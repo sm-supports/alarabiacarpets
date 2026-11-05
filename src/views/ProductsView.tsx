@@ -70,7 +70,7 @@ export default function ProductsView({ locale }: { locale: Locale }) {
               {page.byCategory}
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-              {getCategories(locale).map((c) => (
+              {getCategories(locale).map((c, index) => (
                 <Link
                   key={c.slug}
                   href={localePath(locale, `/products/${c.slug}`)}
@@ -80,7 +80,9 @@ export default function ProductsView({ locale }: { locale: Locale }) {
                     <img
                       src={c.heroImage}
                       alt={c.heroImageAlt}
-                      loading="lazy"
+                      // The first row or two is above the fold, and holds the LCP image.
+                      loading={index < 4 ? "eager" : "lazy"}
+                      fetchPriority={index < 4 ? "high" : "auto"}
                       decoding="async"
                       className="rel-img"
                     />
@@ -130,7 +132,7 @@ export default function ProductsView({ locale }: { locale: Locale }) {
             <Button
               asChild
               size="lg"
-              className="bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-green-700 hover:bg-green-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <WhatsAppLink source="products_page" className="flex items-center gap-2">
                 <Phone size={16} />

@@ -138,14 +138,15 @@ export default function TrustedBy() {
                   <img
                     src={logo.src}
                     alt={logo.alt}
-                    className={`object-contain transition-all duration-300 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 ${
+                    width={200}
+                    height={200}
+                    className={`w-auto object-contain transition-all duration-300 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 ${
                       isLarger
                         ? 'max-h-14 sm:max-h-18 lg:max-h-24'
                         : 'max-h-10 sm:max-h-14 lg:max-h-18'
                     }`}
-                    loading="eager"
+                    loading="lazy"
                     decoding="async"
-                    fetchPriority="low"
                   />
                 </div>
               );

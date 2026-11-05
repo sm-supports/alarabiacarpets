@@ -100,44 +100,21 @@ export default function CloudflareTurnstile({
     }
   }, [siteKey, action, theme, language]);
 
+  // Turnstile downloads about 1.6 MB, so it waits until the form is near the
+  // viewport. Submit stays disabled until there is a token, so nothing gets through
+  // before it loads.
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
     let mounted = true;
+    let script: HTMLScriptElement | null = null;
 
     const initWidget = () => {
       if (mounted) {
         renderWidget();
       }
     };
-
-    if (window.turnstile) {
-      renderWidget();
-      return () => {
-        mounted = false;
-        if (widgetIdRef.current && window.turnstile) {
-          window.turnstile.remove(widgetIdRef.current);
-          widgetIdRef.current = null;
-        }
-      };
-    }
-
-    const scriptId = "cf-turnstile-script";
-    let script = document.getElementById(scriptId) as HTMLScriptElement | null;
-
-    if (!script) {
-      script = document.createElement("script");
-      script.id = scriptId;
-      script.src =
-        "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-      script.async = true;
-      script.defer = true;
-      // A failed script never fires `load` or `error` again, so leaving it in
-      // the DOM would make every later mount wait on it forever. Drop it so
-      // the next mount creates a fresh one. Registered here rather than in
-      // handleScriptError so it still runs if this component has unmounted.
-      const created = script;
-      created.addEventListener("error", () => created.remove(), { once: true });
-      document.head.appendChild(script);
-    }
 
     // A blocked script (ad-blocker, network) never fires `load`, so without
     // this the form would sit with a disabled button and no explanation.
@@ -147,11 +124,48 @@ export default function CloudflareTurnstile({
       }
     };
 
-    script.addEventListener("load", initWidget);
-    script.addEventListener("error", handleScriptError);
+    const load = () => {
+      if (window.turnstile) {
+        renderWidget();
+        return;
+      }
+
+      const scriptId = "cf-turnstile-script";
+      script = document.getElementById(scriptId) as HTMLScriptElement | null;
+
+      if (!script) {
+        script = document.createElement("script");
+        script.id = scriptId;
+        script.src =
+          "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+        script.async = true;
+        script.defer = true;
+        // A failed script never fires `load` or `error` again, so leaving it in
+        // the DOM would make every later mount wait on it forever. Drop it so
+        // the next mount creates a fresh one. Registered here rather than in
+        // handleScriptError so it still runs if this component has unmounted.
+        const created = script;
+        created.addEventListener("error", () => created.remove(), { once: true });
+        document.head.appendChild(script);
+      }
+
+      script.addEventListener("load", initWidget);
+      script.addEventListener("error", handleScriptError);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        load();
+      },
+      { rootMargin: "400px" }
+    );
+    observer.observe(container);
 
     return () => {
       mounted = false;
+      observer.disconnect();
       script?.removeEventListener("load", initWidget);
       script?.removeEventListener("error", handleScriptError);
       if (widgetIdRef.current && window.turnstile) {

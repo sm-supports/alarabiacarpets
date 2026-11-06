@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { El_Messiri, Tajawal } from "next/font/google";
 import "@/index.css";
-import Providers from "@/app/providers";
-import Analytics from "@/components/Analytics";
 import ThirdPartyScripts from "@/components/ThirdPartyScripts";
-import WebVitals from "@/components/WebVitals";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
-import LocaleProviderAr from "@/i18n/LocaleProviderAr";
+// Client components come from ./client, never directly: see (en)/client.ts for why.
+import { Analytics, LocaleProvider, Providers, Script, WebVitals, WhatsAppFloat } from "./client";
 import { rootMetadata, rootViewport } from "@/lib/root-metadata";
 
 // Mapped onto the same CSS variables as the English fonts, so the existing
@@ -40,13 +37,13 @@ export default function ArabicRootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ar-QA" dir="rtl" className={`${elMessiri.variable} ${tajawal.variable}`}>
       <body>
-        <LocaleProviderAr>
+        <LocaleProvider>
           <Providers>{children}</Providers>
           <WhatsAppFloat />
-        </LocaleProviderAr>
+        </LocaleProvider>
         <Analytics />
         <WebVitals />
-        <ThirdPartyScripts />
+        <ThirdPartyScripts Script={Script} />
       </body>
     </html>
   );

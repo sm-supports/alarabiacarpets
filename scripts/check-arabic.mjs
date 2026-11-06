@@ -6,9 +6,10 @@
  * long for search results. It cannot judge whether the Arabic reads naturally.
  *
  * The first loop covers every page in both languages. Besides titles, descriptions
- * and headings, it fails when a title is identical to the h1, or when structured
- * data carries inLanguage on a type that does not define it. Both came from a site
- * audit, and neither shows up when looking at the page.
+ * and headings, it fails when a title is identical to the h1, when structured data
+ * carries inLanguage on a type that does not define it, or when a Product lacks an
+ * offer, a price or an offerCount. These came from a site audit and from Search
+ * Console, and none shows up when looking at the page.
  */
 import fs from "node:fs";
 
@@ -36,6 +37,28 @@ const fileFor = (url) => `out${url === "/" ? "/index" : url}.html`;
 // as a structured data error. Add a type here only after checking schema.org.
 const IN_LANGUAGE_OK = new Set(["WebSite", "WebPage", "CollectionPage", "FAQPage", "Article"]);
 
+// Search Console's Product snippets report. A Product with no offer is invalid there
+// (we have no reviews to mark up instead), and an AggregateOffer without offerCount is
+// reported as a warning on every priced page.
+function productProblems(product) {
+  const offers = [product.offers].flat().filter(Boolean);
+  if (!offers.length) return ["structured data has a Product with no offers"];
+  const problems = [];
+  for (const offer of offers) {
+    if ([offer["@type"]].flat().includes("AggregateOffer")) {
+      if (typeof offer.lowPrice !== "number" || !offer.priceCurrency) {
+        problems.push("structured data has an AggregateOffer without lowPrice or priceCurrency");
+      }
+      if (typeof offer.offerCount !== "number") {
+        problems.push("structured data has an AggregateOffer without offerCount");
+      }
+    } else if (typeof offer.price !== "number" && typeof offer.priceSpecification?.price !== "number") {
+      problems.push("structured data has a Product offer without a price");
+    }
+  }
+  return problems;
+}
+
 function jsonLdProblems(html) {
   const problems = [];
   const walk = (node) => {
@@ -45,6 +68,7 @@ function jsonLdProblems(html) {
     if ("inLanguage" in node && !types.some((t) => IN_LANGUAGE_OK.has(t))) {
       problems.push(`structured data has inLanguage on ${types.join("/") || "an untyped node"}`);
     }
+    if (types.includes("Product")) problems.push(...productProblems(node));
     Object.values(node).forEach(walk);
   };
   for (const [, json] of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {

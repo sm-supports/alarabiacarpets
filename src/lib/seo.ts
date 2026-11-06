@@ -401,6 +401,16 @@ const UNIT_TEXT_AR: Record<string, string> = {
  * - without one, emit a Service offered by the business -- no price required,
  *   and true for these items, which are quoted and installed on site.
  * Never emit a price-less Offer or a fake price of 0 (it reads as "free").
+ *
+ * The AggregateOffer carries `offerCount: 1`: each page is one offer from one
+ * seller, and Search Console warns on every priced page without the field. It
+ * stays an AggregateOffer because the price is a "from" price; a plain Offer would
+ * state it as exact and enrol the page as a merchant listing, which then asks for
+ * shipping and return policies we do not have.
+ *
+ * No `review` or `aggregateRating`: Google requires them to match real customer
+ * reviews shown on the same page. Search Console lists both as optional warnings;
+ * leave them until the site has real reviews. check-arabic guards the rest.
  */
 export function buildProductJsonLd(product: Product, locale: Locale = "en") {
   const url = absoluteUrl(localePath(locale, productPath(product)));
@@ -435,6 +445,7 @@ export function buildProductJsonLd(product: Product, locale: Locale = "en") {
       priceCurrency: "QAR",
       lowPrice: product.priceFrom,
       highPrice: product.priceTo ?? product.priceFrom,
+      offerCount: 1,
       availability: "https://schema.org/InStock",
       url,
       seller: { "@id": `${SITE_URL}/#organization` },

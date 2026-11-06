@@ -184,7 +184,9 @@ Verified on every build; do not regress these:
 - `public/_redirects` must NOT contain an SPA fallback (`/* /index.html 200`) — it causes soft-404s
 - `public/_routes.json` stays pinned to `{"include": ["/api/*"]}`
 - Product JSON-LD: items with `priceFrom` emit `Product` + `AggregateOffer`; items without it emit `Service`
-  (Google rejects a `Product` with no offers/review/rating). Never emit a price-less `Offer`
+  (Google rejects a `Product` with no offers/review/rating). Never emit a price-less `Offer`.
+  The `AggregateOffer` carries `offerCount: 1` (Search Console warns without it; `check-arabic`).
+  Never emit `review` or `aggregateRating` without real customer reviews shown on that page
 - `robots.ts` must not set `host` (it is emitted as a full URL, which audits flag as invalid robots.txt)
 - `sitemap.ts` / `robots.ts` need `export const dynamic = "force-static"`
 - Category slugs in `src/data/categories.ts` are indexed URLs — never rename one

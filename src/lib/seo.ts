@@ -175,11 +175,18 @@ const POSTAL_ADDRESS_AR = {
 /** Name fields shared by the Organization, LocalBusiness and WebSite nodes. */
 function nameFields(locale: Locale) {
   return locale === "ar"
-    ? { name: SITE_NAME_AR, alternateName: SITE_NAME, inLanguage: HTML_LANG.ar }
+    ? { name: SITE_NAME_AR, alternateName: SITE_NAME }
     : { name: SITE_NAME, alternateName: SITE_NAME_AR };
 }
 
-/** Adds inLanguage to Arabic nodes and leaves English output untouched. */
+/**
+ * Adds inLanguage to Arabic nodes and leaves English output untouched.
+ *
+ * Only for creative works: WebSite, FAQPage, CollectionPage, Article. schema.org
+ * does not define inLanguage on Product, Service, Organization or LocalBusiness,
+ * and site audits report it there as a structured data error. check-arabic fails
+ * the build if it comes back.
+ */
 function langField(locale: Locale) {
   return locale === "ar" ? { inLanguage: HTML_LANG.ar } : {};
 }
@@ -245,6 +252,7 @@ export function buildWebSite(locale: Locale = "en") {
     "@type": "WebSite",
     "@id": `${SITE_URL}/#website`,
     ...nameFields(locale),
+    ...langField(locale),
     url: locale === "ar" ? `${SITE_URL}/ar` : SITE_URL,
     publisher: { "@id": `${SITE_URL}/#organization` },
   };
@@ -402,7 +410,6 @@ export function buildProductJsonLd(product: Product, locale: Locale = "en") {
       "@context": "https://schema.org",
       "@type": "Service",
       "@id": `${url}#service`,
-      ...langField(locale),
       name: product.name,
       description: product.metaDescription ?? product.description,
       image: absoluteUrl(productImage(product)),
@@ -417,7 +424,6 @@ export function buildProductJsonLd(product: Product, locale: Locale = "en") {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
-    ...langField(locale),
     name: product.name,
     description: product.metaDescription ?? product.description,
     image: absoluteUrl(productImage(product)),
@@ -549,7 +555,6 @@ export function buildServiceJsonLd(
     "@context": "https://schema.org",
     "@type": "Service",
     "@id": `${url}#service`,
-    ...langField(locale),
     name: service.heading,
     serviceType: service.label,
     description: service.metaDescription,

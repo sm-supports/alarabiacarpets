@@ -24,7 +24,11 @@ export interface GuideFaq {
 export interface Guide {
   slug: string;
   title: string;
-  /** <title> override. Keep under 60 characters. */
+  /**
+   * <title> override, 60 characters at most. " | Al Arabia Carpets" is added only
+   * when the result still fits in 60, so an override over 40 characters must differ
+   * from `title`, or the <title> comes out identical to the <h1>.
+   */
   seoTitle?: string;
   /** Meta description, 150-160 characters. */
   metaDescription: string;
@@ -877,7 +881,7 @@ export const guides: Guide[] = [
   {
     slug: "curtain-design-ideas-qatar",
     title: "Modern Curtain Design Ideas for Qatar Homes",
-    seoTitle: "Modern Curtain Design Ideas for Qatar Homes",
+    seoTitle: "Modern Curtain Design Ideas for Qatar",
     metaDescription:
       "Modern curtain designs for Qatar homes: layered sheers, blackout for bedrooms, roller blinds and full-height drapes, with advice from Al Arabia Carpets.",
     excerpt:
@@ -962,7 +966,7 @@ export const guides: Guide[] = [
   {
     slug: "modern-carpet-design-qatar",
     title: "Modern Carpet Design Ideas for Qatar Homes",
-    seoTitle: "Modern Carpet Design Ideas for Qatar Homes",
+    seoTitle: "Modern Carpet Design Ideas for Qatar",
     metaDescription:
       "Modern carpet designs for Qatar homes: plain neutrals, subtle geometrics and textured piles, plus which rooms suit each, from Al Arabia Carpets in Doha.",
     excerpt:

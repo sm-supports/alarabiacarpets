@@ -175,6 +175,12 @@ Verified on every build; do not regress these:
 - Each Arabic page has an English twin, hreflang pairs, a self canonical and the same
   numbers as the English (`check-arabic`)
 - Titles ≤ 60 chars, descriptions ≤ 160, no duplicates across pages
+- A `<title>` is never identical to the page's `<h1>` (`check-arabic`). `buildTitle` adds the
+  brand only when the result fits in 60 characters, so a `seoTitle` over 40 characters must
+  differ from the heading
+- JSON-LD `inLanguage` goes only on WebSite, FAQPage, CollectionPage and Article nodes
+  (`langField` in `src/lib/seo.ts`). schema.org does not define it on Product, Service,
+  Organization or LocalBusiness, and audits report it there as a markup error (`check-arabic`)
 - `public/_redirects` must NOT contain an SPA fallback (`/* /index.html 200`) — it causes soft-404s
 - `public/_routes.json` stays pinned to `{"include": ["/api/*"]}`
 - Product JSON-LD: items with `priceFrom` emit `Product` + `AggregateOffer`; items without it emit `Service`

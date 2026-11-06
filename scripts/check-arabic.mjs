@@ -4,6 +4,11 @@
  * Fails on what would be invisible in review: a price or measurement that changed
  * in translation, English left on an Arabic page, broken hreflang, or a title too
  * long for search results. It cannot judge whether the Arabic reads naturally.
+ *
+ * The first loop covers every page in both languages. Besides titles, descriptions
+ * and headings, it fails when a title is identical to the h1, or when structured
+ * data carries inLanguage on a type that does not define it. Both came from a site
+ * audit, and neither shows up when looking at the page.
  */
 import fs from "node:fs";
 
@@ -26,6 +31,32 @@ const decode = (s) =>
 
 const fileFor = (url) => `out${url === "/" ? "/index" : url}.html`;
 
+// schema.org defines inLanguage for creative works (pages, articles), not for things
+// or businesses. On Product, Service, Organization or LocalBusiness, audits report it
+// as a structured data error. Add a type here only after checking schema.org.
+const IN_LANGUAGE_OK = new Set(["WebSite", "WebPage", "CollectionPage", "FAQPage", "Article"]);
+
+function jsonLdProblems(html) {
+  const problems = [];
+  const walk = (node) => {
+    if (Array.isArray(node)) return node.forEach(walk);
+    if (!node || typeof node !== "object") return;
+    const types = [node["@type"]].flat().filter(Boolean);
+    if ("inLanguage" in node && !types.some((t) => IN_LANGUAGE_OK.has(t))) {
+      problems.push(`structured data has inLanguage on ${types.join("/") || "an untyped node"}`);
+    }
+    Object.values(node).forEach(walk);
+  };
+  for (const [, json] of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
+    try {
+      walk(JSON.parse(json));
+    } catch {
+      problems.push("a structured data block is not valid JSON");
+    }
+  }
+  return problems;
+}
+
 function read(url) {
   const html = fs.readFileSync(fileFor(url), "utf8");
   const main = /<main\b[\s\S]*<\/main>/.exec(html)?.[0] ?? "";
@@ -41,6 +72,13 @@ function read(url) {
     title: decode(/<title>([^<]*)<\/title>/.exec(html)?.[1] ?? ""),
     description: decode(/<meta name="description" content="([^"]*)"/.exec(html)?.[1] ?? ""),
     h1s: (main.match(/<h1\b/g) ?? []).length,
+    h1: decode(
+      (/<h1\b[^>]*>([\s\S]*?)<\/h1>/.exec(main)?.[1] ?? "")
+        .replace(/<!--[\s\S]*?-->/g, "")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+    ),
     headings: [...main.matchAll(/<h([1-6])\b/g)].map((m) => Number(m[1])),
     numbers: (text.match(/\d+(?:[.,]\d+)*/g) ?? []).sort(),
   };
@@ -66,6 +104,9 @@ for (const url of urls) {
   seenTitle.set(page.title, url);
   seenDescription.set(page.description, url);
   if (page.h1s !== 1) errors.push(`${url}: ${page.h1s} h1 tags`);
+  // With the brand after it the title is fine; a bare copy of the heading is not.
+  if (page.h1 && page.title === page.h1) errors.push(`${url}: title is identical to the h1: ${page.title}`);
+  for (const problem of jsonLdProblems(page.html)) errors.push(`${url}: ${problem}`);
   page.headings.forEach((level, i) => {
     if (i > 0 && level > page.headings[i - 1] + 1) errors.push(`${url}: heading skips h${page.headings[i - 1]} to h${level}`);
   });

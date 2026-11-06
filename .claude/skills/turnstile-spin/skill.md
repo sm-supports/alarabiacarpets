@@ -62,18 +62,16 @@ To test locally you must first add `localhost` and `127.0.0.1` to the widget's d
 ## The in-app browser pane cannot verify this widget
 
 Do not try to confirm the widget renders using the Claude browser pane. It reports
-`window.innerHeight === 0`, so nothing can ever intersect the viewport. `ContactSection.tsx`
-wraps the form in a scroll-reveal wrapper that stays `opacity-0` until an IntersectionObserver
-fires, and Turnstile refuses to mount into a hidden container. The result looks alarming and is
-entirely a harness artifact:
+`window.innerHeight === 0`, so nothing can ever intersect the viewport, and the widget loads
+only when the form is near it. The result looks alarming and is entirely a harness artifact:
 
 - `window.turnstile` is an object and the `cf-turnstile-response` input exists, but its inner div
   is empty, no `challenges.cloudflare.com` iframe mounts, the token stays empty, and the submit
   button stays disabled.
 - `scrollIntoView()` does not change `getBoundingClientRect()` — a tell that the page is not
   painting at all.
-- Forcing `opacity: 1 !important` on the wrapper does not help; the zero-height viewport is the
-  root cause.
+- The form no longer has a scroll-reveal wrapper, so there is no `opacity` to force; the
+  zero-height viewport is the root cause.
 
 Verify the widget in a real browser with a real viewport instead, or infer it from the Turnstile
 dashboard's "Likely human" score, which is only populated when real traffic is being scored.

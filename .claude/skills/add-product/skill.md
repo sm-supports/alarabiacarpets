@@ -15,7 +15,8 @@ Place images/videos in the correct category folder under `public/Products/`:
 - Preferred image format: `.webp` (`.jpeg` acceptable)
 - Video format: `.mp4`
 - Use descriptive filenames (product name + number if multiple)
-- Card images are generated from these files by `scripts/build-card-images.mjs`, which runs before `npm run dev` and `npm run build`. Don't create them by hand. The script fails if `products.ts` points at an image that doesn't exist.
+- The sized copies pages show are generated from these files into `public/img/` by `scripts/build-card-images.mjs`, which runs before `npm run dev` and `npm run build` and updates `src/data/image-manifest.json` (commit that file). Don't create them by hand. The script fails if a data file points at an image or video that doesn't exist.
+- To replace a photo, add it under a new filename and update `products.ts`. The originals are cached for a day under their plain names.
 
 ## Step 2: Generate the Product ID
 

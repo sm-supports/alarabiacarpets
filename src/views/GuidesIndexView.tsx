@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import { getGuides } from "@/data/localized";
+import { fullImagePath } from "@/lib/card-image";
 import { getDict, localePath, type Locale } from "@/i18n";
 import {
   buildBreadcrumb,
@@ -72,7 +73,7 @@ export default function GuidesIndexView({ locale }: { locale: Locale }) {
                     <Link href={href} className="block group">
                       <div className="aspect-[16/9] overflow-hidden bg-neutral-100">
                         <img
-                          src={guide.heroImage}
+                          src={fullImagePath(guide.heroImage)}
                           alt={guide.heroImageAlt}
                           loading="lazy"
                           decoding="async"
@@ -103,7 +104,7 @@ export default function GuidesIndexView({ locale }: { locale: Locale }) {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

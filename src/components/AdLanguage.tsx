@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { rememberLocale } from "@/i18n";
+import { rememberLocale } from "@/i18n/config";
 
 /**
  * Keeps visitors from English ads on the English site.

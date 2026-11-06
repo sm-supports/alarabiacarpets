@@ -97,3 +97,39 @@ export function trackPageView(path: string): void {
     page_title: document.title,
   });
 }
+
+/**
+ * A Core Web Vital measured in a real visitor's browser, sent as a GA4 event named
+ * after the metric (LCP, INP, CLS), in the shape Google's web-vitals guide uses:
+ * `value` is the delta so GA4's sums stay correct when a metric reports more than
+ * once, and `metric_id` groups those reports. To chart them, register `metric_value`
+ * as a custom metric and `metric_rating` as a custom dimension in GA4.
+ *
+ * gtag.js loads on the first interaction or after 5 s (see ThirdPartyScripts), and
+ * these are queued in dataLayer until then. A visitor who leaves before that with no
+ * interaction is not recorded.
+ *
+ * `page_path` is the page the visit loaded on, not the address at the time of the
+ * report: CLS and INP are sent when the tab is hidden, by which point an in-site
+ * link may have changed the address, and the measurement still belongs to the load.
+ */
+const LOADED_PATH = typeof window === "undefined" ? "" : window.location.pathname;
+
+export function trackWebVital(metric: {
+  name: string;
+  value: number;
+  delta: number;
+  id: string;
+  rating?: string;
+}): void {
+  if (metric.name !== "LCP" && metric.name !== "INP" && metric.name !== "CLS") return;
+  gtagEvent(metric.name, {
+    value: metric.delta,
+    metric_id: metric.id,
+    metric_value: metric.value,
+    metric_delta: metric.delta,
+    metric_rating: metric.rating,
+    page_path: LOADED_PATH,
+    non_interaction: true,
+  });
+}

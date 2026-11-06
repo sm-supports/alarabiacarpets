@@ -68,6 +68,8 @@ const logos = [
 ];
 
 export default function TrustedBy() {
+  // Drives the count-up only. The fade-in is the CSS `.reveal` class, so the
+  // section is visible before hydration.
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { t } = useI18n();
@@ -101,9 +103,7 @@ export default function TrustedBy() {
       <div className="container mx-auto px-4 sm:px-5 lg:px-8">
         {/* Header */}
         <div
-          className={`text-center mb-8 sm:mb-12 lg:mb-14 transition-all duration-1000 ease-out-expo ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
+          className="reveal text-center mb-8 sm:mb-12 lg:mb-14"
         >
           <p className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider mb-2 sm:mb-3">
             {t.trusted.eyebrow}
@@ -116,10 +116,7 @@ export default function TrustedBy() {
         {/* Logo Marquee. Stays LTR in Arabic: its keyframes translate to the left. */}
         <div
           dir="ltr"
-          className={`relative overflow-hidden transition-all duration-1000 ease-out-expo ${
-            isVisible ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{ transitionDelay: '200ms' }}
+          className="reveal relative overflow-hidden"
         >
           {/* Gradient Masks */}
           <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 lg:w-40 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
@@ -156,10 +153,7 @@ export default function TrustedBy() {
 
         {/* Stats - 2x2 grid on mobile, 4 columns on desktop */}
         <div
-          className={`mt-10 sm:mt-14 lg:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 transition-all duration-1000 ease-out-expo ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-          style={{ transitionDelay: '400ms' }}
+          className="reveal mt-10 sm:mt-14 lg:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8"
         >
           {[
             { value: '1000+', label: t.trusted.stats.customers },

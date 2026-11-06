@@ -14,7 +14,7 @@ import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
-import { EMAIL, PHONE, WHATSAPP_URL } from "@/lib/seo";
+import { EMAIL, PHONE, WHATSAPP_URL } from "@/lib/site";
 
 // Inlined at build time. If the Cloudflare Pages build environment does not
 // define it, the Turnstile widget cannot render and the form can never be
@@ -25,48 +25,72 @@ const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 // any token whose siteverify `action` does not equal this value.
 const TURNSTILE_ACTION = "contact";
 
+// The Function allows 10 s for the bot check and 8 s for the email, so past this the
+// request has stalled somewhere and the visitor should get the error and a retry.
+const REQUEST_TIMEOUT_MS = 20_000;
+// When to tell the visitor a slow send is still in progress.
+const SLOW_SEND_MS = 8_000;
+
 const ContactSection = memo(function ContactSection() {
   const hydrated = useHydrated();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSlow, setIsSlow] = useState(false);
+  // State updates are asynchronous, so a second submit event can arrive before the
+  // button is disabled. This is set synchronously.
+  const inFlight = useRef(false);
+  // One id per message. A retry of the same text sends the same id, and the Function
+  // passes it to Resend so the team isn't emailed twice if only the response was lost.
+  const submission = useRef<{ id: string; content: string } | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileFailed, setTurnstileFailed] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
   const turnstileRef = useRef<CloudflareTurnstileHandle>(null);
   const { toast } = useToast();
   const { locale, t: dict, lp } = useI18n();
   const t = dict.contactSection;
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    if (!isSubmitting) {
+      setIsSlow(false);
+      return;
     }
-
-    return () => observer.disconnect();
-  }, []);
+    const timer = setTimeout(() => setIsSlow(true), SLOW_SEND_MS);
+    return () => clearTimeout(timer);
+  }, [isSubmitting]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    if (inFlight.current) return;
+    inFlight.current = true;
     setIsSubmitting(true);
+
+    const content = `${name}\n${email}\n${message}`;
+    if (submission.current?.content !== content) {
+      // randomUUID needs a secure context and a 2022 browser; the id is optional.
+      const id = globalThis.crypto?.randomUUID?.();
+      submission.current = id ? { id, content } : null;
+    }
+
+    // AbortController rather than AbortSignal.timeout, which older Safari lacks.
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, turnstileToken, locale }),
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          turnstileToken,
+          locale,
+          submissionId: submission.current?.id,
+        }),
+        signal: controller.signal,
       });
 
       if (!res.ok) {
@@ -85,6 +109,7 @@ const ContactSection = memo(function ContactSection() {
       setEmail("");
       setMessage("");
       setTurnstileToken("");
+      submission.current = null;
     } catch (error) {
       console.error("Form submission error:", error);
       const errorMsg = error instanceof Error ? error.message : "Unknown error";
@@ -103,6 +128,8 @@ const ContactSection = memo(function ContactSection() {
         variant: "destructive",
       });
     } finally {
+      clearTimeout(timeout);
+      inFlight.current = false;
       setIsSubmitting(false);
     }
   }, [name, email, message, turnstileToken, toast, locale, t]);
@@ -139,7 +166,6 @@ const ContactSection = memo(function ContactSection() {
 
   return (
     <section
-      ref={sectionRef}
       id="contact"
       className="relative py-16 sm:py-20 lg:py-28 bg-forest-900 overflow-hidden"
     >
@@ -163,11 +189,10 @@ const ContactSection = memo(function ContactSection() {
 
       <div className="relative z-10 container mx-auto px-4 sm:px-5 lg:px-8">
         {/* CTA Header */}
-        <div
-          className={`text-center mb-10 sm:mb-12 lg:mb-16 transition-all duration-1000 ease-out-expo ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-        >
+        {/* No scroll reveal in this section: it is the whole body of /contact, so it
+            must be visible from the first paint. Its overflow-hidden would also
+            capture a .reveal timeline. */}
+        <div className="text-center mb-10 sm:mb-12 lg:mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-white mb-4 sm:mb-6 leading-tight">
             {t.titleTop}
             <br />
@@ -191,12 +216,7 @@ const ContactSection = memo(function ContactSection() {
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 max-w-6xl mx-auto">
           {/* Contact Methods */}
-          <div
-            className={`transition-all duration-1000 ease-out-expo ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-            style={{ transitionDelay: '200ms' }}
-          >
+          <div>
             <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-6 sm:mb-8">
               {t.getInTouch}
             </h3>
@@ -264,12 +284,7 @@ const ContactSection = memo(function ContactSection() {
           </div>
 
           {/* Contact Form */}
-          <div
-            className={`transition-all duration-1000 ease-out-expo ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-            style={{ transitionDelay: '400ms' }}
-          >
+          <div>
             <div className="p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
               <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-5 sm:mb-6">
                 {t.sendMessage}
@@ -286,7 +301,24 @@ const ContactSection = memo(function ContactSection() {
                   <p className="text-sm sm:text-base text-white/70">{t.thanksText}</p>
                 </div>
               ) : !hydrated ? (
-                <div className="min-h-[420px]" />
+                // Stand-in for the form until it hydrates. The form itself is
+                // interactive-only markup, so it stays out of the static HTML.
+                <div className="ct-skel" aria-hidden="true">
+                  <div>
+                    <p className="ct-skel-label">{t.name}</p>
+                    <div className="ct-skel-field" />
+                  </div>
+                  <div>
+                    <p className="ct-skel-label">{t.emailLabel}</p>
+                    <div className="ct-skel-field" />
+                  </div>
+                  <div>
+                    <p className="ct-skel-label">{t.message}</p>
+                    <div className="ct-skel-area" />
+                  </div>
+                  <div className="h-[65px]" />
+                  <div className="ct-skel-btn">{t.send}</div>
+                </div>
               ) : (
                 <form
                   onSubmit={handleSubmit}
@@ -301,6 +333,7 @@ const ContactSection = memo(function ContactSection() {
                       name="name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      readOnly={isSubmitting}
                       required
                       maxLength={100}
                       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
@@ -317,6 +350,7 @@ const ContactSection = memo(function ContactSection() {
                       name="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      readOnly={isSubmitting}
                       required
                       maxLength={254}
                       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
@@ -331,6 +365,7 @@ const ContactSection = memo(function ContactSection() {
                       name="message"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
+                      readOnly={isSubmitting}
                       required
                       maxLength={5000}
                       rows={4}
@@ -375,10 +410,23 @@ const ContactSection = memo(function ContactSection() {
                   <button
                     type="submit"
                     disabled={isSubmitting || !turnstileToken}
-                    className="w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:bg-gray-100 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:bg-gray-100 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                   >
+                    {isSubmitting && (
+                      <span
+                        aria-hidden="true"
+                        className="w-4 h-4 rounded-full border-2 border-forest-900/30 border-t-forest-900 animate-spin"
+                      />
+                    )}
                     {isSubmitting ? t.sending : t.send}
                   </button>
+                  {/* Success is only ever shown once the server confirms the send:
+                      this is a lead form, and a message that failed must not look sent. */}
+                  {/* Always rendered and only its text changes: a live region that is
+                      inserted already holding its text is often not announced. */}
+                  <p role="status" className="text-xs sm:text-sm text-white/70 text-center empty:hidden">
+                    {isSlow ? t.stillSending : ""}
+                  </p>
                 </form>
               )}
             </div>

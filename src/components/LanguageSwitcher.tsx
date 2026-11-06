@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useI18n } from "@/i18n/LocaleProvider";
-import { HTML_LANG, localePath, rememberLocale, stripLocale } from "@/i18n";
+import { HTML_LANG, localePath, rememberLocale, stripLocale } from "@/i18n/config";
 
 /**
  * Link to this page in the other language.

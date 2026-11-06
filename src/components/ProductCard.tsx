@@ -3,22 +3,24 @@
 
 import { ShoppingCart, ExternalLink, ImageIcon, Video, ChevronLeft, ChevronRight, Play } from "@/components/icons";
 import { memo, useCallback, useState, useRef, useEffect } from "react";
-import { ProductMedia } from "@/data/products";
+import type { ProductMedia } from "@/data/products";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { cardImagePath } from "@/lib/card-image";
 
 interface ProductCardProps {
   name: string;
   /** English name, so the analytics source is the same in both languages. */
   analyticsName?: string;
   description: string;
-  imageSrc: string; // Fallback/Preview
+  /** Card-sized image shown for a video slide until it is played. */
+  poster: string;
+  /** Slides. Image `src` values are already the card-sized copies (see ProductsGrid). */
   media?: ProductMedia[];
-  whatsappLink: string;
+  /** Prefilled WhatsApp link. When omitted, built from the name in the page's language. */
+  whatsappLink?: string;
   onClick?: () => void;
   /** Product detail URL. When set the title renders as a real crawlable anchor. */
   href?: string;
@@ -30,7 +32,7 @@ const ProductCard = memo(function ProductCard({
   name,
   analyticsName,
   description,
-  imageSrc,
+  poster,
   media = [],
   whatsappLink,
   onClick,
@@ -48,8 +50,8 @@ const ProductCard = memo(function ProductCard({
   const [loadedUpTo, setLoadedUpTo] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // If no media array is provided, create one from imageSrc for backward compatibility
-  const displayMedia = media.length > 0 ? media : [{ type: 'image', src: imageSrc } as ProductMedia];
+  // If no media array is provided, show the poster on its own
+  const displayMedia = media.length > 0 ? media : [{ type: 'image', src: poster } as ProductMedia];
 
   const handleCardClick = useCallback(() => {
     if (href) {
@@ -191,7 +193,7 @@ const ProductCard = memo(function ProductCard({
                   onClick={(e) => { e.stopPropagation(); setPlayingSrc(item.src); }}
                 >
                   <img
-                    src={cardImagePath(imageSrc)}
+                    src={poster}
                     alt={imageAlt ?? name}
                     loading="lazy"
                     decoding="async"
@@ -215,7 +217,7 @@ const ProductCard = memo(function ProductCard({
                   )}
 
                   <img
-                    src={cardImagePath(item.src)}
+                    src={item.src}
                     alt={imageAlt ? `${imageAlt}${index > 0 ? t.productCard.view(index + 1) : ""}` : `${name} - ${index + 1}`}
                     loading="lazy"
                     decoding="async"
@@ -253,6 +255,7 @@ const ProductCard = memo(function ProductCard({
         </p>
         <WhatsAppLink
           href={whatsappLink}
+          message={t.common.interestedMessage(name)}
           source={`product_card:${analyticsName ?? name}`}
           className="pc-cta"
           onClick={handleWhatsAppClick}

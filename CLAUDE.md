@@ -22,7 +22,7 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 | `src/app/(en)/` | English routes at the unprefixed, indexed URLs. Thin `page.tsx` files over `src/views/` |
 | `src/app/(ar)/ar/` | Arabic routes at `/ar/...`, same slugs, own root layout with `lang="ar-QA" dir="rtl"` |
 | `src/views/` | Page bodies and metadata functions, each taking `locale` |
-| `src/i18n/` | `en.ts` / `ar.ts` interface strings (`ar` is typed against `en`), `config.ts` routing, `labels.ts`, `LocaleProvider` |
+| `src/i18n/` | `en.ts` / `ar.ts` interface strings (`ar` is typed against `en`); `en.client.ts` / `ar.client.ts` hold the sections client components read; `config.ts` routing, `labels.ts`, `LocaleProviderEn` / `LocaleProviderAr` |
 | `src/data/ar/` | Arabic overlays of the English data, keyed by id or slug |
 | `src/data/localized.ts` | Content by locale; throws at build on a missing translation. Server components only |
 | `src/data/guides.ts` | Guide/blog content — `Guide` interface + `guides` array |
@@ -31,13 +31,15 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 | `src/components/` | Reusable components (Navbar, Footer, HeroSection, ProductCard, etc.) |
 | `src/components/ui/` | shadcn/ui primitives (Button, Card, Input, etc.) |
 | `src/data/products.ts` | Product catalog — `Product` interface + `products` array |
-| `src/hooks/` | Custom hooks (use-toast, use-mobile) |
+| `src/hooks/` | Custom hooks (use-toast, use-hydrated) |
 | `src/lib/utils.ts` | Utility functions (cn helper) |
 | `functions/api/` | Cloudflare Workers API endpoints |
 | `functions/email-templates/` | HTML email template generators |
 | `public/Products/` | Product images/videos organized by category folder |
 | `src/app/layout.tsx` | Root metadata, fonts, third-party scripts (replaces the old index.html) |
 | `src/lib/seo.ts` | SEO constants + JSON-LD builders |
+| `src/lib/site.ts` | Phone, WhatsApp and email constants with no imports, for client components |
+| `src/lib/card-image.ts` | Sized copies of catalog photos (`cardImage`, `fullImage`). Server only |
 | `src/lib/analytics.ts` | GA4 + Google Ads events — all tracking goes through here |
 
 ## Commands
@@ -46,9 +48,10 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 npm run dev          # Next dev server (frontend only)
 npm run build        # Static export → out/
 npm run pages:dev    # Full-stack local dev (build + Workers + static)
-npx tsc --noEmit     # TypeScript type check
+npm run typecheck    # TypeScript type check: the site, then functions/ (its own tsconfig)
 npm run llms         # Regenerate public/llms.txt from out/ (run after a build)
-npm run check        # Text-to-HTML ratio and Arabic checks against out/ (run after a build)
+npm run check        # Text-to-HTML ratio, Arabic and page-weight checks against out/ (run after a build)
+npm run perf         # Lighthouse on a simulated slow phone against out/ (needs Chrome; not a deploy gate)
 npm run deploy       # Build, stage on a case-sensitive image, deploy (prod only on main)
 ```
 
@@ -72,7 +75,9 @@ the regenerated file into `out/`).
 
 English keeps today's URLs; Arabic mirrors every page under `/ar`. A new page needs a
 route in both trees, and new content needs an entry in `src/data/ar/` or the build
-throws. Interface text goes in `src/i18n/en.ts` and `ar.ts`, never inline. Arabic is
+throws. Interface text goes in `src/i18n/en.ts` and `ar.ts`, never inline; a string a
+`"use client"` component reads goes in `en.client.ts` and `ar.client.ts` instead, which
+is all the browser downloads (`tsc` fails if a client component reaches outside them). Arabic is
 "Gulf blend": formal Arabic with Qatari vocabulary in body text, warmer Qatari wording
 on headlines and buttons. The brand is سجاد العربية, grammatically feminine. Digits stay
 Western and prices stay QAR (`formatFromPrice` in `src/i18n`).
@@ -109,20 +114,34 @@ Use logical Tailwind classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-` over
 
 ## Conventions
 
-- All pages wrap content in `<Navbar />` + `<main className="flex-grow">` + `<Footer />`
+- All pages wrap content in `<Navbar />` + `<main className="flex-grow">` + `<Footer locale={locale} />`
 - Every `page.tsx` stays a **server component** exporting `metadata` or `generateMetadata`;
-  push interactivity into `"use client"` leaf components (see `ProductsGrid`, `ProductMedia`)
+  push interactivity into `"use client"` leaf components (see `ProductCard`, `ProductMedia`)
+- A client component's props are serialised into the page's hydration data. Pass the few
+  fields it shows, never a whole product, service or category record (`ProductsGrid` is a
+  server component for this reason). Client components must not import `@/data/*`,
+  `@/lib/seo` or `@/i18n` (use `@/i18n/config` and `@/lib/site`): any of them pulls the
+  catalog or both dictionaries into every page's JavaScript
 - New routes are new directories under `src/app/` — there is no central route table
 - Dynamic routes need `generateStaticParams()`; `params` is a Promise and must be awaited
 - Never use `useSearchParams` without a Suspense boundary — it hard-fails under static export
 - Plain `<img>` only, not `next/image`: product paths contain `&`, which breaks `/_next/image`
 - Path alias `@` maps to `src/`
 - Product images live in `public/Products/<CategoryFolder>/`
-- Product and related cards show smaller 4:3 copies from `public/Products/cards/` via
-  `cardImagePath()`. `scripts/build-card-images.mjs` makes them before dev and build, and the
-  folder is gitignored. A card with a different aspect ratio needs the script's crop changed
+- Pages never show a catalog photo at full size. `scripts/build-card-images.mjs` makes WebP
+  copies in `public/img/` (gitignored, hashed names) before dev and build, for every image
+  the data files reference, and writes `src/data/image-manifest.json` (committed).
+  `src/lib/card-image.ts` resolves them, server side only: `cardImage` / `cardImagePath` for
+  4:3 grid slots, `fullImage` / `fullImagePath` (uncropped) for hero images and any slot that
+  is not 4:3. The `*Path` forms return one URL; use them on pages near the 10% text-to-HTML
+  floor, where a `srcSet` on every card would not fit. og:image and JSON-LD keep the originals
+- `/img/*` is cached forever because its names are hashed. `/Products`, `/Services`, `/logos`
+  and `/lovable-uploads` hold plain names and are cached for a day: give a replaced file a new
+  name anyway, and never mark those folders `immutable` again
 - Container pattern: `<div className="container mx-auto px-4 sm:px-5 lg:px-8">`
-- Scroll-reveal: IntersectionObserver → `isVisible` state → transition classes
+- Scroll-reveal: add the CSS class `reveal` (end of `src/index.css`). Never render `opacity-0`
+  and remove it from JavaScript: the content then stays invisible until the page hydrates.
+  Not inside an `overflow-hidden` ancestor, and not on content above the fold
 
 ## Product Categories
 
@@ -145,6 +164,9 @@ See `.claude/skills/README.md` for the full skills index.
 Verified on every build; do not regress these:
 
 - One `<h1>` per page, no skipped heading levels
+- `check-page-weight` (run by `npm run check` and `npm run deploy`): no `opacity-0` in the
+  static HTML, no full-size catalog photo, at most 8 font preloads (English pages have 3, Arabic 8) and 2 high-priority images
+  per page, hydration data under 90 KB
 - Every page at or above 10% text-to-HTML (`check-text-ratio`, run by `npm run deploy`).
   `scripts/externalize-flight.mjs` moves Next's hydration data out of the HTML, and must
   emit a plain blocking `<script>`: `defer` throws "Connection closed" and stops hydration.

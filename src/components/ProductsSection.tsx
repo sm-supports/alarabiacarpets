@@ -1,13 +1,11 @@
-"use client";
-
 import { ArrowRight, ArrowUpRight } from "@/components/icons";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
 import { products } from "@/data/products";
 import { getCategory } from "@/data/categories";
-import { WHATSAPP_URL } from "@/lib/seo";
+import { cardImagePath, fullImagePath } from "@/lib/card-image";
+import { WHATSAPP_URL } from "@/lib/site";
 import WhatsAppLink from "@/components/WhatsAppLink";
-import { useI18n } from "@/i18n/LocaleProvider";
+import { getDict, localePath, type Locale } from "@/i18n";
 
 // Showcase presentation config. Each entry points at a CATEGORY landing page --
 // these were category-hub products until they became real category pages.
@@ -65,14 +63,15 @@ const additionalProducts = additionalProductConfig.map(config => {
 function ProductShowcase({
   product,
   index,
-  isVisible
+  locale,
 }: {
   product: typeof productShowcases[0];
   index: number;
-  isVisible: boolean;
+  locale: Locale;
 }) {
   const isReversed = index % 2 === 1;
-  const { t, lp } = useI18n();
+  const t = getDict(locale);
+  const lp = (path: string) => localePath(locale, path);
   const copy = t.showcase.items[product.id];
   const whatsappLink = `${WHATSAPP_URL}?text=${encodeURIComponent(t.common.interestedMessage(copy.name))}`;
 
@@ -102,14 +101,11 @@ function ProductShowcase({
         >
           {/* Image - Shows first on mobile */}
           <div
-            className={`order-1 ${isReversed ? 'lg:order-2' : 'lg:order-1'} transition-all duration-1000 ease-out-expo ${
-              isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
-            }`}
-            style={{ transitionDelay: `${index * 100}ms` }}
+            className={`reveal order-1 ${isReversed ? 'lg:order-2' : 'lg:order-1'}`}
           >
             <div className="sc-frame group">
               <img
-                src={product.imageSrc}
+                src={cardImagePath(product.imageSrc)}
                 alt={copy.name}
                 className="sc-img"
                 loading="lazy"
@@ -122,10 +118,7 @@ function ProductShowcase({
 
           {/* Content */}
           <div
-            className={`order-2 ${isReversed ? 'lg:order-1' : 'lg:order-2'} transition-all duration-1000 ease-out-expo ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-            }`}
-            style={{ transitionDelay: `${index * 100 + 150}ms` }}
+            className={`reveal order-2 ${isReversed ? 'lg:order-1' : 'lg:order-2'}`}
           >
             <span className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 mb-4 sm:mb-6 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded-full ${colorClasses.badge}`}>
               {copy.name}
@@ -178,32 +171,13 @@ function ProductShowcase({
   );
 }
 
-export default function ProductsSection() {
-  const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
-  const sectionRef = useRef<HTMLElement>(null);
-  const { t, lp } = useI18n();
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const index = parseInt(entry.target.getAttribute('data-index') || '0');
-          if (entry.isIntersecting) {
-            setVisibleItems(prev => new Set([...prev, index]));
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: '-30px' }
-    );
-
-    const items = sectionRef.current?.querySelectorAll('[data-index]');
-    items?.forEach(item => observer.observe(item));
-
-    return () => observer.disconnect();
-  }, []);
+/** Server component: the product and category data it reads stays out of the browser. */
+export default function ProductsSection({ locale }: { locale: Locale }) {
+  const t = getDict(locale);
+  const lp = (path: string) => localePath(locale, path);
 
   return (
-    <section ref={sectionRef} id="products" className="relative">
+    <section id="products" className="relative">
       {/* Section Header */}
       <div className="py-12 sm:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-5 lg:px-8 text-center">
@@ -218,13 +192,7 @@ export default function ProductsSection() {
 
       {/* Product Showcases */}
       {productShowcases.map((product, index) => (
-        <div key={product.id} data-index={index}>
-          <ProductShowcase
-            product={product}
-            index={index}
-            isVisible={visibleItems.has(index)}
-          />
-        </div>
+        <ProductShowcase key={product.id} product={product} index={index} locale={locale} />
       ))}
 
       {/* Additional Products Grid */}
@@ -240,23 +208,19 @@ export default function ProductsSection() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-            {additionalProducts.map((product, index) => (
+            {additionalProducts.map((product) => (
               <Link
                 key={product.id}
                 href={lp(product.link)}
-                data-index={productShowcases.length + index}
-                className={`group more-tile ${
-                  visibleItems.has(productShowcases.length + index)
-                    ? 'opacity-100 translate-y-0'
-                    : 'opacity-0 translate-y-8'
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                className="group more-tile reveal"
               >
+                {/* Uncropped copy: the tile is 4:5 or square, not 4:3. */}
                 <img
-                  src={product.imageSrc}
+                  src={fullImagePath(product.imageSrc)}
                   alt={t.showcase.moreAlt(t.showcase.more[product.id])}
                   className="more-img"
                   loading="lazy"
+                  decoding="async"
                 />
                 <div className="more-shade" />
                 <div className="more-label">

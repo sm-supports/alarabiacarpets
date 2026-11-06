@@ -1,17 +1,20 @@
-"use client";
-
 import { MessageCircle, Mail, MapPin, Instagram, Facebook, ArrowUpRight } from "@/components/icons";
 import Link from "next/link";
 import { categories } from "@/data/categories";
 import { services } from "@/data/services";
 import WhatsAppLink from "@/components/WhatsAppLink";
-import { useI18n } from "@/i18n/LocaleProvider";
+import { getDict, localePath, type Locale } from "@/i18n";
 import { localizedCategoryLabel, localizedServiceLabel } from "@/i18n/labels";
-import { WHATSAPP_URL } from "@/lib/seo";
+import { WHATSAPP_URL } from "@/lib/site";
 
-export default function Footer() {
+/**
+ * Server component: the link lists come from the category and service data, which
+ * would otherwise ship to every page as JavaScript. The year is the build year.
+ */
+export default function Footer({ locale }: { locale: Locale }) {
   const currentYear = new Date().getFullYear();
-  const { locale, t, lp } = useI18n();
+  const t = getDict(locale);
+  const lp = (path: string) => localePath(locale, path);
 
   const footerLinks = {
     // Straight from the category data -- every link is a category landing page.

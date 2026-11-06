@@ -14,9 +14,8 @@
 ## Step 3: Follow This Structure
 
 ```tsx
-import { useEffect, useRef, useState } from "react";
 // Import UI primitives from @/components/ui/ as needed
-// Import icons from lucide-react as needed
+// Import icons from @/components/icons (not lucide-react)
 
 interface <ComponentName>Props {
   // Define typed props
@@ -56,32 +55,21 @@ Key patterns from existing components:
 
 ## Step 5: Scroll-Reveal Pattern (for section components)
 
-```tsx
-const [isVisible, setIsVisible] = useState(false);
-const sectionRef = useRef<HTMLElement>(null);
+Add the `reveal` class. It is a CSS scroll-driven animation defined at the end of
+`src/index.css`, so the component needs no state, effect or `"use client"` for it:
 
-useEffect(() => {
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting) {
-        setIsVisible(true);
-      }
-    },
-    { threshold: 0.15 }
-  );
-  if (sectionRef.current) observer.observe(sectionRef.current);
-  return () => observer.disconnect();
-}, []);
+```tsx
+<div className="reveal text-center mb-10">
 ```
 
-Apply to elements:
-```tsx
-className={`transition-all duration-1000 ease-out-expo ${
-  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-}`}
-```
+Do not render `opacity-0` and switch it off from an IntersectionObserver. That was the old
+pattern: the content sat invisible in the static HTML until the page hydrated, which on a
+slow phone is seconds, and `npm run check` now fails on it. Two limits: never put `reveal`
+inside an `overflow-hidden` ancestor (the ancestor captures the scroll timeline), and never
+on content that is above the fold.
 
-For staggered children, add `style={{ transitionDelay: `${index * 100}ms` }}`.
+A section that needs no hooks should stay a server component and take `locale` as a prop
+(`getDict(locale)`), like `ServicesSection`.
 
 ## Step 6: Verify
 

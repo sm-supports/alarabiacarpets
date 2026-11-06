@@ -8,6 +8,7 @@ import FaqList from "@/components/FaqList";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { Button } from "@/components/ui/button";
 import { categoryLabelFor, findCategory, findGuide, findProduct, getGuides } from "@/data/localized";
+import { cardImage, fullImage } from "@/lib/card-image";
 import { getDict, HTML_LANG, localePath, type Locale } from "@/i18n";
 import {
   SITE_URL,
@@ -146,7 +147,7 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
           <div className="py-12 md:py-16 bg-white">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
               <img
-                src={guide.heroImage}
+                {...fullImage(guide.heroImage, "(min-width:1024px) 768px, 66vw")}
                 alt={guide.heroImageAlt}
                 loading="eager"
                 fetchPriority="high"
@@ -245,7 +246,7 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
                         </div>
                       ) : (
                         <img
-                          src={p.imageSrc}
+                          {...cardImage(p.imageSrc, "(min-width:1024px) 25vw, 33vw")}
                           alt={productImageAlt(p, locale)}
                           loading="lazy"
                           decoding="async"
@@ -288,7 +289,7 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 }

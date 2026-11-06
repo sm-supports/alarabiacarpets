@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ImageIcon } from "@/components/icons";
-import type { Product } from "@/data/products";
 import { useI18n } from "@/i18n/LocaleProvider";
 
 /**
@@ -14,11 +13,21 @@ import { useI18n } from "@/i18n/LocaleProvider";
  * tie LCP to hydration.
  */
 export default function ProductMedia({
-  product,
+  name,
   alt,
+  src,
+  srcSet,
+  sizes,
+  videoSrc,
 }: {
-  product: Product;
+  name: string;
   alt: string;
+  /** The hero image, or the poster when the product leads with a video. Sized copies
+      resolved on the server (see ProductDetailView). */
+  src: string;
+  srcSet?: string;
+  sizes?: string;
+  videoSrc?: string;
 }) {
   const { t } = useI18n();
   const [imageError, setImageError] = useState(false);
@@ -31,9 +40,6 @@ export default function ProductMedia({
     if (image?.complete && image.naturalWidth === 0) setImageError(true);
   }, []);
 
-  const firstMedia = product.media?.[0];
-  const isVideo = firstMedia?.type === "video";
-
   return (
     <div className="h-[300px] md:h-[500px] relative overflow-hidden bg-gray-100">
       {imageError && (
@@ -41,27 +47,29 @@ export default function ProductMedia({
           <div className="text-gray-500 text-center p-6">
             <ImageIcon size={64} className="mx-auto mb-4 text-gray-400" />
             <div className="text-lg font-medium mb-2">{t.productCard.imageNotAvailable}</div>
-            <div className="text-sm text-gray-400">{product.name}</div>
+            <div className="text-sm text-gray-400">{name}</div>
           </div>
         </div>
       )}
 
-      {isVideo ? (
+      {videoSrc ? (
         // Plays on request: autoplay made every visitor download the whole file, up to
         // 11 MB, during page load. The poster paints straight away and is the LCP element.
         <video
-          src={firstMedia.src}
+          src={videoSrc}
           className="w-full h-full object-cover"
           controls
           playsInline
           preload="none"
-          poster={product.imageSrc}
+          poster={src}
           aria-label={alt}
         />
       ) : (
         <img
           ref={imageRef}
-          src={product.imageSrc}
+          src={src}
+          srcSet={srcSet}
+          sizes={sizes}
           alt={alt}
           className="w-full h-full object-cover"
           onError={() => setImageError(true)}

@@ -59,18 +59,47 @@ export default function ThirdPartyScripts() {
         `}
       </Script>
 
-      {/* Chat widget. lazyOnload defers to after window.load, matching the
-          intent of the old hand-rolled requestIdleCallback shim and keeping it
-          off the LCP path. */}
-      <Script id="tawk-to" strategy="lazyOnload">
+      {/* Chat widget. Tawk costs several hundred KB of script, so it loads on the first
+          interaction, or 10 s after window.load so the bubble still appears for someone
+          who is only reading. The listeners are armed after load, not before: a scroll
+          during loading would otherwise start Tawk while the page's own images are
+          still coming in. On Save-Data or a 2G connection there is no timer, only the
+          interaction. Tawk reads window.Tawk_API, so it has to be set on window here:
+          a `var` inside this function would be local. */}
+      <Script id="tawk-to" strategy="afterInteractive">
         {`
-          var Tawk_API = Tawk_API || {};
-          var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
-          s1.async = true;
-          s1.src = 'https://embed.tawk.to/68a5dfd1f412351925ef40a3/1j33v4jea';
-          s1.charset = 'UTF-8';
-          s1.setAttribute('crossorigin', '*');
-          s0.parentNode.insertBefore(s1, s0);
+          (function () {
+            var events = ['pointerdown', 'scroll', 'keydown'];
+            var loaded = false;
+            var timer;
+            function inject() {
+              window.Tawk_API = window.Tawk_API || {};
+              window.Tawk_LoadStart = new Date();
+              var s1 = document.createElement('script');
+              s1.async = true;
+              s1.src = 'https://embed.tawk.to/68a5dfd1f412351925ef40a3/1j33v4jea';
+              s1.charset = 'UTF-8';
+              s1.setAttribute('crossorigin', '*');
+              document.head.appendChild(s1);
+            }
+            function loadTawk() {
+              if (loaded) return;
+              loaded = true;
+              clearTimeout(timer);
+              events.forEach(function (e) { window.removeEventListener(e, loadTawk); });
+              // Not in the same task as the tap or scroll that triggered it.
+              if ('requestIdleCallback' in window) requestIdleCallback(inject, { timeout: 2000 });
+              else setTimeout(inject, 300);
+            }
+            function arm() {
+              events.forEach(function (e) { window.addEventListener(e, loadTawk, { passive: true }); });
+              var c = navigator.connection;
+              var slow = c && (c.saveData || /2g/.test(c.effectiveType || ''));
+              if (!slow) timer = setTimeout(loadTawk, 10000);
+            }
+            if (document.readyState === 'complete') arm();
+            else window.addEventListener('load', arm, { once: true });
+          })();
         `}
       </Script>
     </>

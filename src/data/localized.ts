@@ -117,3 +117,7 @@ export function guidesForCategoryL(locale: Locale, slug: string): Guide[] {
 export function guidesForServiceL(locale: Locale, slug: string): Guide[] {
   return getGuides(locale).filter((g) => g.relatedServiceSlugs?.includes(slug));
 }
+/** Service pages that list this product as related work. */
+export function servicesForProductL(locale: Locale, productId: string): Service[] {
+  return getServices(locale).filter((s) => s.relatedProductIds.includes(productId));
+}

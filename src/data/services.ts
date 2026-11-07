@@ -81,6 +81,12 @@ export interface Service {
   heroImageAlt?: string;
   /** Further project photos, shown as a gallery under the intro. */
   gallery?: ServiceImage[];
+  /** Starting price in QAR, shown on the page and in the Service schema. Only with a
+   *  price the owner has confirmed; most jobs are quoted after measuring and have none. */
+  priceFrom?: number;
+  priceUnit?: string;
+  /** ISO date of the last real content edit; the sitemap's lastmod. */
+  updatedAt?: string;
 }
 
 const AREAS =
@@ -91,16 +97,18 @@ export const services: Service[] = [
     slug: "wallpaper",
     heading: "Wallpaper Installation in Qatar",
     label: "Wallpaper",
-    seoTitle: "Wallpaper Installation in Qatar | Doha Fitting",
+    updatedAt: "2026-11-07",
+    seoTitle: "Wallpaper Installation in Qatar | Supply & Fixing",
     metaDescription:
       "Wallpaper supply and installation across Qatar. Wall preparation, precise pattern matching and clean seams, fitted by our own team in Doha.",
     excerpt:
       "Supply and installation, including the wall preparation that determines whether the finish lasts.",
     intro: [
       "Wallpaper lives or dies on preparation. Most of the failures we are called to fix — lifting seams, bubbles, a pattern that drifts out of true across a wall — trace back to a wall that was not made good before hanging, not to the paper itself.",
-      "We prepare the surface, hang the paper and finish the edges, working across homes, offices, majlis and retail spaces in Qatar. " + AREAS,
+      "We supply the wallpaper as well as fit it, so one team answers for the paper, the wall underneath and the finish. We prepare the surface, hang the paper and finish the edges, working across homes, offices, majlis and retail spaces in Qatar. " + AREAS,
     ],
     offers: [
+      "Wallpaper supplied and fitted by the same team",
       "Feature walls and full-room installations",
       "Textured, vinyl and washable papers",
       "Patterned papers requiring drop matching",
@@ -110,6 +118,7 @@ export const services: Service[] = [
     ],
     includes: [
       "On-site survey and measurement before ordering",
+      "Supply of the wallpaper you choose",
       "Wall preparation: filling, sanding and sizing",
       "Removal of old wallpaper where present",
       "Hanging, pattern matching and seam finishing",
@@ -130,6 +139,7 @@ export const services: Service[] = [
       { title: "Installation", body: "Our team preps, hangs and finishes, then clears the waste. Most single rooms are completed in a day." },
     ],
     faqs: [
+      { q: "Do you supply the wallpaper as well as fit it?", a: "Yes. We supply and fit wallpaper across Qatar. Because the same team orders the paper and prepares the wall, the roll count, the pattern repeat and the wall condition are all checked before anything is bought." },
       { q: "Do you prepare the wall before hanging wallpaper?", a: "Yes, and it is included. We fill, sand and size the surface first. Skipping that step is the single most common cause of seams lifting and bubbles appearing later, so we do not quote without it." },
       { q: "Can you remove existing wallpaper?", a: "Yes. Stripping the old paper and making the wall good is part of the quote when there is existing wallpaper in place. We would rather strip it than hang over it." },
       { q: "How much wallpaper will my room need?", a: "It depends on the pattern repeat as much as the wall area — a large drop match wastes considerably more than a plain paper. We calculate the roll count during the survey so you are not left short mid-wall." },
@@ -139,8 +149,6 @@ export const services: Service[] = [
     ],
     relatedProductIds: [
       "indoor-wall-panel-design",
-      "outdoor-wall-panel-products",
-      "gypsum-board-work-design",
     ],
     relatedCategorySlugs: ["interior"],
     relatedServiceSlugs: ["tv-unit-design", "gypsum-c-board-fixing", "cabinets"],
@@ -152,6 +160,7 @@ export const services: Service[] = [
     slug: "kitchen-cabinets",
     heading: "Kitchen Cabinets in Qatar",
     label: "Kitchen Cabinets",
+updatedAt: "2026-11-07",
     seoTitle: "Kitchen Cabinets in Qatar | Made to Measure",
     metaDescription:
       "Made-to-measure kitchen cabinets in Qatar. Designed to your kitchen's real dimensions, built and installed by our own team in Doha.",
@@ -191,6 +200,7 @@ export const services: Service[] = [
       { title: "Build and install", body: "Units are built to the measured sizes, then delivered, installed and levelled by our team." },
     ],
     faqs: [
+      { q: "How much do kitchen cabinets cost in Qatar?", a: "It depends on the length of the cabinet runs, the board and door finish you choose, and the hardware that goes with them, so we quote after measuring rather than giving a figure that may not fit your kitchen. The survey and the written quotation are free." },
       { q: "Why choose made-to-measure over standard units?", a: "Standard-width units almost never add up to the length of a real wall, so the gaps get hidden behind filler panels. Building to measure uses the full run and turns corners into usable storage rather than dead space." },
       { q: "Can you replace a kitchen without redoing the whole room?", a: "Usually yes. If the plumbing and electrical positions are staying put, we can remove the old units and install new cabinetry without touching the rest of the room." },
       { q: "Do you handle the flooring at the same time?", a: "Yes, and it is generally easier. We supply barkia, SPC and vinyl flooring as well, so the floor and the cabinetry can be sequenced properly rather than coordinated between two contractors." },
@@ -201,7 +211,6 @@ export const services: Service[] = [
     relatedProductIds: [
       "cabinet-and-gypsum-board-work",
       "cabin-interior-design",
-      "television-decore-with-cabin-box",
     ],
     relatedCategorySlugs: ["interior", "barkia"],
     relatedServiceSlugs: ["cabinets", "wardrobes", "tv-unit-design"],
@@ -213,6 +222,7 @@ export const services: Service[] = [
     slug: "wardrobes",
     heading: "Wardrobes & Room Cabinets in Qatar",
     label: "Wardrobes & Cabinets",
+updatedAt: "2026-11-07",
     seoTitle: "Wardrobes & Room Cabinets in Qatar | Doha",
     metaDescription:
       "Built-in wardrobes and room cabinets in Qatar. Made to your room's height and width, with interiors planned around what you actually store.",
@@ -252,6 +262,7 @@ export const services: Service[] = [
       { title: "Build and install", body: "Built to the measured sizes, then installed and scribed to the walls so there are no gaps." },
     ],
     faqs: [
+      { q: "How much does a built-in wardrobe cost in Qatar?", a: "It depends on the wall width and height, the door type and how much internal fitting you want, so we quote after measuring the room. The survey and the written quotation are free." },
       { q: "How much extra storage does a built-in wardrobe give?", a: "Usually a good deal. A freestanding unit wastes the space between its top and the ceiling and leaves gaps at each side. Running floor to ceiling and wall to wall recovers all of it, and the recovered area is genuinely usable with a proper interior." },
       { q: "Sliding or hinged doors?", a: "Sliding doors need no clearance in front, which matters in a bedroom where the bed sits close to the wardrobe. Hinged doors let you see the whole interior at once and cost less. We will recommend based on how much floor clearance the room actually has." },
       { q: "Can you fit a wardrobe to a sloped or uneven wall?", a: "Yes. We scribe the unit to the wall and ceiling during installation, which closes the gaps that make a built-in look like a freestanding unit pushed into place." },
@@ -320,16 +331,18 @@ export const services: Service[] = [
     slug: "parquet-flooring",
     heading: "Parquet & Laminate Flooring in Qatar",
     label: "Parquet & Laminate",
-    seoTitle: "Parquet & Laminate Flooring in Qatar",
+    updatedAt: "2026-11-07",
+    seoTitle: "Parquet Flooring in Qatar | Wood & Laminate",
     metaDescription:
-      "Parquet and laminate flooring in Qatar. Herringbone, chevron and plank formats supplied and laid by our own fitters across Doha.",
+      "Real wood parquet and laminate flooring in Qatar. Herringbone, chevron and plank formats supplied and laid by our own fitters across Doha.",
     excerpt:
       "Herringbone, chevron and plank formats — chosen on laying pattern as much as on colour.",
     intro: [
       "Parquet is a decision about pattern before it is a decision about colour. Herringbone, chevron and basketweave each change how a room reads: they draw the eye along a particular line, and in a hallway or a formal room that effect does more work than the shade of the wood.",
-      "We supply and lay parquet and laminate across Qatar in all the common formats. Where a room needs to be fully waterproof, our SPC range covers the same looks in a format that tolerates water — worth comparing before you decide.",
+      "We supply and lay real wood parquet and laminate across Qatar in all the common formats. Where a room needs to be fully waterproof, our SPC range covers the same looks in a format that tolerates water — worth comparing before you decide.",
     ],
     offers: [
+      "Real wood parquet supplied and laid",
       "Herringbone, chevron and basketweave patterns",
       "Straight and random-length plank laying",
       "Laminate flooring in wood and stone decors",
@@ -347,7 +360,7 @@ export const services: Service[] = [
     ],
     specs: [
       { label: "Patterns", value: "Herringbone, chevron, basketweave, plank" },
-      { label: "Formats", value: "Parquet blocks and laminate planks" },
+      { label: "Materials", value: "Real wood parquet and laminate" },
       { label: "Pattern direction", value: "Set on site before laying" },
       { label: "Waterproof alternative", value: "See our SPC range" },
       { label: "Service area", value: "All of Qatar" },
@@ -359,6 +372,7 @@ export const services: Service[] = [
       { title: "Laying", body: "Laid, cut and finished with skirting and threshold bars, then the site is cleared." },
     ],
     faqs: [
+      { q: "Do you supply real wood parquet?", a: "Yes. We supply and lay real wood parquet as well as laminate. Real wood suits dry rooms where you want a genuine timber surface. Where a room sees water, we would point you to SPC instead, which gives a similar look in a waterproof board." },
       { q: "What is the difference between herringbone and chevron?", a: "Herringbone lays rectangular blocks at right angles, so the ends form a stepped zig-zag. Chevron cuts the ends at an angle so they meet in a continuous point, making a cleaner V. Chevron costs more because of the angled cutting." },
       { q: "Which laying pattern suits my room?", a: "Herringbone and chevron are at their best in hallways, dining rooms and formal reception spaces, where the pattern is read as a whole. In a large open-plan room a straight or random-length plank is usually calmer and less expensive to lay." },
       { q: "Is parquet or laminate suitable for wet areas?", a: "Not really. For bathrooms, kitchens and anywhere that regularly sees water we would point you at our SPC range, which offers the same herringbone and plank looks in a fully waterproof board." },
@@ -367,10 +381,7 @@ export const services: Service[] = [
       { q: "Can parquet be laid over existing tiles?", a: "Usually yes, provided the tiles are sound and flat, and it avoids the cost and mess of lifting them. We check for loose tiles and deep grout lines at the survey, because both telegraph through a floating floor if they are not levelled first." },
     ],
     relatedProductIds: [
-      "pearl-grey-herringbone-100-waterproof-spc-qatar",
-      "desert-walnut-classic-luxury-spc-flooring-doha",
-      "royal-mahogany-luxury-waterproof-vinyl-spc",
-      "spc-zigzag-barkia-installation",
+      "skerting-nala-profile",
     ],
     relatedCategorySlugs: ["barkia"],
     relatedServiceSlugs: ["vinyl-flooring", "office-carpet"],
@@ -386,7 +397,10 @@ export const services: Service[] = [
   {
     slug: "event-carpet",
     heading: "Event Carpet Work in Qatar",
-    label: "Event Carpet",
+    label: "Event Carpet Installation",
+    priceFrom: 22,
+    priceUnit: "per sqm",
+    updatedAt: "2026-11-07",
     seoTitle: "Event Carpet Installation in Qatar",
     metaDescription:
       "Event carpet supplied and laid across Qatar for exhibitions, conferences and weddings. Overnight installation, and we lift and clear it afterwards.",
@@ -427,16 +441,17 @@ export const services: Service[] = [
       { title: "Install and lift", body: "We lay overnight or out of hours, hand over a finished floor, then return after the event to lift and clear." },
     ],
     faqs: [
+      { q: "How much does event carpet cost in Qatar?", a: "Event carpet starts from QAR 22 per sqm, supplied and laid. The final price depends on the floor area, the grade and the access window, and we confirm it in a written quote after the site visit." },
       { q: "How quickly can you lay event carpet?", a: "For a single hall we can usually mobilise within 48 hours of confirmation and lay overnight, so the space is ready the following morning. For large exhibition floors we ask for about a week so we can order the colour and put enough fitters on site." },
       { q: "Do you install outside venue opening hours?", a: "Yes, and it is how most event carpet gets laid. Venues rarely give daytime access, so we work overnight or early morning inside whatever window you have been allocated, and hand the floor over finished." },
-      { q: "Is it cheaper to hire event carpet or buy it?", a: "For a one-off event, laying a budget grade and disposing of it afterwards is normally the cheapest route. If you run several events a year, buying a heavier carpet that can be lifted, stored and relaid usually costs less across the year." },
+      { q: "Is a one-off carpet cheaper than a reusable one?", a: "We supply and lay event carpet rather than renting it. For a one-off event, laying a budget grade and disposing of it afterwards is normally the cheapest route. If you run several events a year, buying a heavier carpet that can be lifted, stored and relaid usually costs less across the year." },
       { q: "What colours can I get?", a: "The full commercial range, including the red used for VIP arrivals, plus black, blue, grey, green and neutral tones for exhibition floors. Tell us your brand colour at the survey and we will confirm what can be sourced in time." },
       { q: "Will the carpet damage the venue floor?", a: "No. We fix using tapes appropriate to the venue's floor finish and to whatever the venue permits, and we lift everything afterwards. If the venue has specific rules on adhesives, tell us at the survey and we will work to them." },
       { q: "Do you remove the carpet after the event?", a: "Yes. Lifting, clearing and disposal are quoted in from the start rather than added later. If you are keeping the carpet for reuse we lift it carefully, roll it and leave it ready for storage." },
     ],
-    relatedProductIds: ["event-normal-carpet", "tiles-carpet-office-carpet", "stairs-carpet-installation"],
+    relatedProductIds: ["event-normal-carpet"],
     relatedCategorySlugs: ["carpet"],
-    relatedServiceSlugs: ["office-carpet", "artificial-grass"],
+    relatedServiceSlugs: ["office-carpet"],
     // No heroImage on purpose. The only event-carpet asset we hold is a scanned
     // colour swatch card, which is not a photograph of our work -- see the rule
     // at the top of this file. Text-only until we shoot a real install.
@@ -445,7 +460,10 @@ export const services: Service[] = [
     slug: "office-carpet",
     heading: "Office Carpet in Qatar",
     label: "Office Carpet",
-    seoTitle: "Office Carpet & Carpet Tiles in Qatar",
+    priceFrom: 70,
+    priceUnit: "per sqm",
+    updatedAt: "2026-11-07",
+    seoTitle: "Office Carpet Flooring in Qatar | Supply & Fitting",
     metaDescription:
       "Office carpet and carpet tiles supplied and fitted across Qatar. Hard-wearing, acoustic and easy to patch, installed around your working hours in Doha.",
     excerpt:
@@ -485,6 +503,7 @@ export const services: Service[] = [
       { title: "Installation", body: "We fit around your schedule, usually evenings or weekends for occupied offices, and clear the site before you reopen." },
     ],
     faqs: [
+      { q: "How much does office carpet cost in Qatar?", a: "Office carpet tiles start from QAR 70 per sqm, supplied and fitted. The final price depends on the area, the grade and how the work is phased around your team, and we confirm it in a written quote after a free survey." },
       { q: "Are carpet tiles better than broadloom for an office?", a: "For most offices, yes. A damaged tile is lifted and swapped in minutes, whereas a stain on broadloom means living with it or re-carpeting the room. Broadloom still wins in boardrooms and cellular offices where the seamless look matters more than patch repairs." },
       { q: "Can you fit carpet without closing the office?", a: "Yes. We normally phase the work floor by floor or department by department, and fit in the evenings or at weekends. Desks are moved, the area is laid and put back, and the space is usable the next working morning." },
       { q: "Does office carpet help with noise?", a: "Noticeably, in open-plan space. Carpet absorbs footfall and chair movement rather than reflecting it the way hard flooring does, which lowers the background noise level people are trying to concentrate through. It is one of the main reasons open-plan offices are carpeted." },
@@ -492,7 +511,7 @@ export const services: Service[] = [
       { q: "Do you take the old carpet away?", a: "Yes. Uplift and disposal of the existing floorcovering are included in the quote rather than charged as an extra, and we clear the site at the end of each phase." },
       { q: "Why do you leave spare tiles?", a: "Because dye lots change. A tile bought in two years' time will not match exactly, so we leave attic stock from your own batch. When a tile is later damaged, the replacement is invisible instead of an obvious patch." },
     ],
-    relatedProductIds: ["tiles-carpet-office-carpet", "office-blind-office-roller-vertical-blinds", "stairs-carpet-installation"],
+    relatedProductIds: ["tiles-carpet-office-carpet", "office-blind-office-roller-vertical-blinds"],
     relatedCategorySlugs: ["carpet", "curtain"],
     relatedServiceSlugs: ["event-carpet", "vinyl-flooring"],
     heroImage: "/Products/Carpets/Tiles carpet:office carpet.jpeg",
@@ -503,7 +522,10 @@ export const services: Service[] = [
     slug: "vinyl-flooring",
     heading: "Vinyl Flooring in Qatar",
     label: "Vinyl Flooring",
-    seoTitle: "Vinyl & SPC Flooring in Qatar",
+    priceFrom: 75,
+    priceUnit: "per sqm",
+    updatedAt: "2026-11-07",
+    seoTitle: "Vinyl & SPC Flooring in Qatar | Supply & Fitting",
     metaDescription:
       "Vinyl, PVC and SPC flooring supplied and installed across Qatar. Fully waterproof, hard-wearing wood and stone effects, fitted by our own team in Doha.",
     excerpt:
@@ -543,16 +565,18 @@ export const services: Service[] = [
       { title: "Installation", body: "We prepare the sub-floor, lay the boards, fit trims and clear the offcuts. Most rooms are finished in a day." },
     ],
     faqs: [
+      { q: "How much does vinyl flooring cost in Qatar?", a: "Vinyl and SPC flooring starts from QAR 75 per sqm, supplied and fitted. The final price depends on the board, the laying pattern and whether the existing floor needs levelling, and we confirm it in a written quote after a free survey." },
       { q: "What is the difference between vinyl, PVC and SPC?", a: "They overlap heavily. PVC is the plastic the boards are made from, vinyl is the general trade name, and SPC is a rigid stone-plastic composite core that makes the board harder and more stable underfoot. Everything we fit is a rigid-core board rather than soft sheet vinyl." },
       { q: "Is vinyl flooring genuinely waterproof?", a: "The board itself is. An SPC core will not swell if water sits on it, which is why it works in kitchens and bathrooms where laminate fails. Standing water can still get through the joints to the sub-floor, so a wet room needs sealing at the edges as well." },
       { q: "Can vinyl be laid over existing tiles?", a: "Usually yes, and it saves the cost and mess of removing them. The tiles need to be sound and reasonably flat. Deep grout lines can telegraph through a thin board, so we check at the survey and level them first where needed." },
-      { q: "Should I choose vinyl or parquet?", a: "Choose vinyl where water is a factor, or where you want the look at a lower cost. Choose parquet or laminate where the room stays dry and you want a genuine timber surface. We fit both, so we will tell you honestly which suits the room." },
+      { q: "Should I choose vinyl or parquet?", a: "Choose vinyl where water is a factor, or where you want the look at a lower cost. Choose real wood parquet where the room stays dry and you want a genuine timber surface, or laminate for a similar look at a lower cost. We fit both, so we will tell you honestly which suits the room." },
       { q: "How long does vinyl flooring take to install?", a: "A typical room is laid in a day. The variable is preparation, not laying: if the existing floor needs levelling that adds a day and has to cure before boards go down. We confirm this at the survey rather than on the day." },
       { q: "Does vinyl flooring cope with Qatar's heat?", a: "Indoors, yes. In air-conditioned rooms it is very stable. Direct sun through large glazing is the thing to watch, since it can warm a floor unevenly, so we leave the correct expansion gap at the perimeter to allow for movement." },
     ],
     secondary: {
-      heading: "Barkia, and how it relates to vinyl",
+      heading: "SPC flooring and barkia, and how they relate to vinyl",
       intro: [
+        "SPC is the rigid-core board most of our vinyl floors use. It comes in ten colours, shown below with the skirting that finishes them, and a zigzag laying pattern is available as well.",
         "Barkia is the name most commonly used in Qatar for the click-together plastic flooring sold in wood and stone effects. In practice it is the same family of product as the vinyl and SPC boards above, so if you have been quoted for barkia by one company and vinyl by another, you are usually comparing similar things.",
         "What actually separates a cheap board from a good one is the thickness of the core and the wear layer on top. A thin board over an uneven floor will show every dip and the joints will open up. We quote on the board grade rather than the name it is sold under.",
       ],
@@ -566,6 +590,15 @@ export const services: Service[] = [
       "pvc-barkia",
       "doha-coastal-grey-premium-rigid-core-spc-vinyl",
       "qatar-sand-oak-luxury-waterproof-spc-flooring",
+      "al-wakra-white-ultra-modern-waterproof-spc-flooring",
+      "arabian-night-espresso-high-end-waterproof-spc",
+      "desert-walnut-classic-luxury-spc-flooring-doha",
+      "pearl-grey-herringbone-100-waterproof-spc-qatar",
+      "qatar-breeze-oak-bright-waterproof-spc-flooring",
+      "royal-mahogany-luxury-waterproof-vinyl-spc",
+      "scandinavian-white-oak-modern-waterproof-spc-doha",
+      "sunset-teak-gold-elegant-spc-vinyl-flooring-qatar",
+      "spc-zigzag-barkia-installation",
       "skerting-nala-profile",
     ],
     relatedCategorySlugs: ["barkia"],
@@ -575,76 +608,19 @@ export const services: Service[] = [
       "Chevron wood-effect vinyl SPC flooring laid in a dining room with panelled walls",
   },
   {
-    slug: "artificial-grass",
-    heading: "Artificial Grass & Grass Carpet in Qatar",
-    label: "Artificial Grass",
-    seoTitle: "Artificial Grass & Grass Carpet in Qatar",
-    metaDescription:
-      "Artificial grass and grass carpet supplied and laid across Qatar. Villa gardens, roof terraces, majlis surrounds and play areas, with proper drainage.",
-    excerpt:
-      "Grass carpet for gardens, terraces and play areas, laid over a drained base so it stays flat and drains after rain.",
-    intro: [
-      "A real lawn in Qatar is a full-time job and a standing water bill. Artificial grass gives the same green without either, and the current generation looks far more convincing than the flat plastic turf people remember, because the blades are cut to different lengths and mixed with a brown thatch at the base.",
-      "The part that decides whether it looks good in three years is underneath it. Grass laid straight onto sand moves and dips; grass laid over a properly compacted, free-draining base stays flat and sheds water after rain instead of holding puddles.",
-      "We supply and lay artificial grass across Qatar for villa gardens, roof terraces, majlis surrounds, play areas and entrance steps. " + AREAS,
-    ],
-    offers: [
-      "Villa gardens and courtyards",
-      "Roof terraces and balconies",
-      "Entrance steps and pathways",
-      "Children's play areas and nurseries",
-      "Majlis and seating area surrounds",
-      "Indoor grass carpet for events and displays",
-    ],
-    includes: [
-      "Free on-site measurement and site assessment",
-      "Base preparation and compaction",
-      "Drainage layer so water does not sit on the surface",
-      "Supply, laying, joining and edge fixing",
-      "Cutting around trees, planters, steps and drains",
-      "Removal of waste and site clean-up",
-    ],
-    specs: [
-      { label: "Pile heights", value: "Short landscape to long garden pile" },
-      { label: "Drainage", value: "Perforated backing over a drained base" },
-      { label: "UV stability", value: "UV-stabilised for Gulf sunlight" },
-      { label: "Suitable for", value: "Gardens, terraces, play areas, steps" },
-      { label: "Service area", value: "All of Qatar" },
-    ],
-    steps: [
-      { title: "Send us the area", body: "Message us on WhatsApp with photos and rough dimensions, and tell us what is under it now: sand, tile or concrete all change the preparation." },
-      { title: "Free survey", body: "We measure, check levels and work out how water will leave the area. On a roof terrace this matters more than anything else." },
-      { title: "Quotation", body: "A written quote covering base preparation, grass and fitting, with the pile height agreed so you know what you are getting." },
-      { title: "Installation", body: "We prepare and compact the base, lay and join the grass, fix the edges and clear the site." },
-    ],
-    faqs: [
-      { q: "How long does artificial grass last in Qatar?", a: "A UV-stabilised grass over a properly built base holds its colour and shape for many years of Gulf sun. What shortens that life is almost always the base rather than the grass: poor compaction shows as dips and ripples long before the fibres wear out." },
-      { q: "Does artificial grass get hot in the sun?", a: "It does warm up in direct sun, like any surface. A lighter grass with a shorter pile runs cooler, shaded areas stay comfortable, and rinsing it down brings the temperature straight back. For play areas in full sun we will talk through pile and colour with you." },
-      { q: "How does the water drain away?", a: "The backing is perforated and sits on a compacted free-draining base, so rain and hose water pass through and away rather than pooling on top. On roof terraces and balconies we set the falls to the existing outlets, which is the part that needs surveying properly." },
-      { q: "What maintenance does it need?", a: "Very little. Brush the pile occasionally to keep it standing upright, rinse it down to remove dust, and clear leaves from planted areas. There is no mowing, no watering and no fertiliser, which is the main reason people move to it here." },
-      { q: "Can you lay grass carpet on a roof or balcony?", a: "Yes, and it is one of the most common jobs we do. The critical part is not blocking the existing drainage outlets, so we survey the falls first and build the base to keep water moving toward them rather than sitting under the grass." },
-      { q: "Is it safe for children and pets?", a: "Yes. The grass is non-toxic and drains freely, so it does not hold water. For play areas we can lay a shock-absorbing layer under the grass, and pet waste rinses off the surface rather than soaking in as it would with a real lawn." },
-    ],
-    relatedProductIds: ["grass-carpet", "artificial-grass-installation-work", "artificial-flowers-grass"],
-    relatedCategorySlugs: ["carpet"],
-    relatedServiceSlugs: ["event-carpet"],
-    heroImage: "/Products/Carpets/Artificial grass installation work.jpeg",
-    heroImageAlt:
-      "Artificial grass laid over the entrance steps and forecourt of a villa in Qatar",
-  },
-  {
     slug: "gypsum-c-board-fixing",
     heading: "Gypsum & C-Board Fixing in Qatar",
     label: "Gypsum & C-Board",
-    seoTitle: "Gypsum & C-Board Fixing in Qatar",
+    updatedAt: "2026-11-07",
+    seoTitle: "Gypsum, Cement & C-Board Fixing in Qatar",
     metaDescription:
-      "Gypsum and C-board fixing across Qatar. False ceilings, partitions, coves and bulkheads built around your lighting and AC, finished ready for paint.",
+      "Gypsum, cement board and C-board fixing across Qatar. False ceilings, partitions and coves finished ready for paint, plus outdoor and wet-area boarding.",
     excerpt:
       "False ceilings, partitions, coves and bulkheads, set out around the lighting and AC and finished ready for paint.",
     intro: [
       "Most of what makes a ceiling look expensive is board work. The coves that hide the lighting, the recess a linear AC diffuser sits in, the dropped bulkhead that defines a seating area: all of it is gypsum board, cut and fixed on site.",
       "It is also the trade where setting out matters most. Ceilings are read from across the room, so a cove that is a few millimetres out of parallel with the wall is visible from the door. We set out to the finished room rather than to the structure above it, which is not always the same line.",
-      "We fix gypsum and C-board across Qatar for villas, apartments, offices and retail, and we coordinate with the electrical and AC trades rather than boarding over their work. " + AREAS,
+      "We fix gypsum board and cement board across Qatar for villas, apartments, offices and retail, and we coordinate with the electrical and AC trades rather than boarding over their work. " + AREAS,
     ],
     offers: [
       "False and suspended ceilings",
@@ -652,7 +628,8 @@ export const services: Service[] = [
       "Recesses for linear AC diffusers and track lighting",
       "Partition walls and room divisions",
       "Boxing in for pipework, ducting and columns",
-      "Moisture-resistant board for kitchens and wet areas",
+      "Moisture-resistant board for kitchens and steamy rooms",
+      "Cement board for outdoor ceilings, wet areas and tile backing",
     ],
     includes: [
       "Site survey and setting out from finished levels",
@@ -663,9 +640,9 @@ export const services: Service[] = [
       "Removal of offcuts and site clean-up",
     ],
     specs: [
-      { label: "Board types", value: "Standard, moisture-resistant, fire-rated" },
+      { label: "Board types", value: "Gypsum (standard, moisture-resistant, fire-rated) and cement board" },
       { label: "Typical work", value: "Ceilings, coves, bulkheads, partitions" },
-      { label: "Finish level", value: "Taped and filled, ready for paint" },
+      { label: "Finish level", value: "Gypsum: taped and filled, ready for paint" },
       { label: "Coordination", value: "Set out around lighting and AC" },
       { label: "Service area", value: "All of Qatar" },
     ],
@@ -676,13 +653,26 @@ export const services: Service[] = [
       { title: "Fixing and finishing", body: "We frame, board, form the openings, then tape and fill ready for the painter, and clear the site." },
     ],
     faqs: [
-      { q: "What is C-board fixing?", a: "It is the on-site fixing of board to a metal or timber frame to form ceilings, partitions and details such as coves and bulkheads. The term is used more or less interchangeably with gypsum board and drywall work in Qatar, and it covers the same scope." },
+      { q: "What is C-board fixing?", a: "It is the on-site fixing of board to a metal or timber frame. In Qatar people use the name for two different materials: gypsum board for indoor ceilings, partitions and coves, and cement board for outdoor and wet areas. We fix both, so tell us where the board is going and we will confirm which one the job needs." },
       { q: "How much ceiling height will a false ceiling take?", a: "It depends on what has to pass above it. A plain flat ceiling can drop as little as 10 centimetres, but a run of AC ducting or a linear diffuser recess needs considerably more. We confirm the realistic drop at the survey rather than promising a figure first." },
       { q: "Can you build the ceiling around the AC and lighting?", a: "That is the normal way we work. We set out the diffuser recesses and light positions before framing, and coordinate with the AC and electrical trades so nothing is boarded over. Retrofitting an opening after the ceiling is finished is far more disruptive." },
-      { q: "Which board should be used in a kitchen or bathroom?", a: "Moisture-resistant board in any room that sees steam or splashing, and standard board elsewhere. The cost difference is small next to the cost of taking a ceiling down again, so we specify moisture-resistant wherever there is any doubt." },
+      { q: "Which board should be used in a kitchen or bathroom?", a: "Moisture-resistant board in any room that sees steam or splashing, and standard board elsewhere. The cost difference is small next to the cost of taking a ceiling down again, so we specify moisture-resistant wherever there is any doubt. Where board will get wet or be tiled, such as shower walls, we use cement board instead." },
       { q: "Do you finish ready for painting?", a: "Yes. We tape, joint and fill so the surface is ready for the painter to prime. We do not paint, but we hand over at a standard where the painter is not fixing our work before they start." },
       { q: "How long does a false ceiling take?", a: "A single room is usually framed and boarded within a few days, with jointing and filling after that. Whole-villa ceilings run to a few weeks and are sequenced room by room so other trades can keep working alongside us." },
     ],
+    secondary: {
+      heading: "Cement board or gypsum board: which goes where",
+      intro: [
+        "Gypsum board is the right choice for most indoor ceilings and partitions. It is light, it cuts cleanly, and it takes curves, coves and fine detail well. Its weakness is water, and even the moisture-resistant grade is meant for steam and splashes rather than for getting wet.",
+        "Cement board does not soften when it gets wet, so it is what we use where gypsum would fail: outdoor ceilings and soffits, wet areas, and walls that will be tiled. It is heavier and harder to cut than gypsum, so it suits flat runs better than detailed coves.",
+      ],
+      specs: [
+        { label: "Indoor ceilings and partitions", value: "Gypsum board" },
+        { label: "Kitchens and steamy rooms", value: "Moisture-resistant gypsum board" },
+        { label: "Outdoor ceilings and soffits", value: "Cement board" },
+        { label: "Wet areas and tile backing", value: "Cement board" },
+      ],
+    },
     relatedProductIds: ["gypsum-board-work-design", "cabinet-and-gypsum-board-work", "indoor-wall-panel-design"],
     relatedCategorySlugs: ["interior"],
     relatedServiceSlugs: ["cabinets", "tv-unit-design", "wallpaper"],
@@ -700,7 +690,10 @@ export const services: Service[] = [
     slug: "sofa-making",
     heading: "Custom Sofa Making in Qatar",
     label: "Sofa Making",
-    seoTitle: "Custom Sofa Making in Qatar",
+    priceFrom: 850,
+    priceUnit: "per piece",
+    updatedAt: "2026-11-07",
+    seoTitle: "Sofa Making in Qatar | Custom Sofas to Measure",
     metaDescription:
       "Sofas and majlis seating made to your room's measurements in Qatar. Your choice of fabric, frame and firmness, built and delivered by our workshop in Doha.",
     excerpt:
@@ -740,6 +733,7 @@ export const services: Service[] = [
       { title: "Making and delivery", body: "We build in our workshop, then deliver and position the pieces. Typical lead times run to a few weeks depending on the fabric." },
     ],
     faqs: [
+      { q: "How much does a custom sofa cost in Qatar?", a: "Custom sofas and majlis seating start from QAR 850 per piece. The final price depends on the size of each piece, the fabric and the frame, and we confirm it in a written quote after measuring the room for free." },
       { q: "Is a custom sofa more expensive than buying one?", a: "Not as much as people assume, and for majlis seating it is often cheaper than buying enough standard pieces to fill the same walls. You are paying for materials and labour rather than for a showroom and shipping, and nothing is wasted on gaps that do not fit." },
       { q: "How long does a made-to-measure sofa take?", a: "Usually a few weeks from the confirmed order, and the fabric is normally what sets the pace rather than the frame. If a fabric has to be ordered in, we tell you that at quotation stage instead of after you have committed." },
       { q: "Can I choose how firm the seats are?", a: "Yes, and it is worth taking time over. Majlis seating that people sit on for hours generally wants a firmer foam than a living room sofa people sink into. We bring samples of different densities so you decide by sitting on them, not from a description." },
@@ -749,16 +743,77 @@ export const services: Service[] = [
     ],
     relatedProductIds: ["luxury-majlis-sofa", "modern-majlis", "khema-majlis-sofa", "majlis-and-cabinets-majlis-sofa"],
     relatedCategorySlugs: ["majlis-sofa"],
-    relatedServiceSlugs: ["cabinets"],
+    relatedServiceSlugs: ["sofa-upholstery", "cabinets"],
     heroImage: "/Products/Furniture/Modern majlis.jpeg",
     heroImageAlt:
       "Custom-made majlis seating running along three walls of a Qatari living room with a matching low table",
   },
   {
+    slug: "sofa-upholstery",
+    heading: "Sofa Upholstery & Repair in Qatar",
+    label: "Sofa Upholstery",
+    updatedAt: "2026-11-07",
+    seoTitle: "Sofa Upholstery in Qatar | Reupholstery & Repair",
+    metaDescription:
+      "Sofa upholstery and repair in Qatar. New fabric, new foam and frame repairs for sofas and majlis seating, checked and quoted free by our team in Doha.",
+    excerpt:
+      "New fabric, new foam and repairs for the sofas and majlis seating you already own, with an honest check of the frame first.",
+    intro: [
+      "A sofa usually wears out from the outside in. The fabric fades and frays, the seat foam loses its shape, and the piece starts to look tired, while the frame underneath is still perfectly sound. When that is the case, reupholstering usually costs less than replacing it, and you keep a piece that already fits the room.",
+      "The frame decides whether it is worth doing. Before we quote we check the frame, the springs and the joints. If the frame has failed, we will tell you, because new fabric on a broken frame is money spent on something that will fail again.",
+      "We reupholster and repair sofas and majlis seating for homes, offices and majlis across Qatar. " + AREAS,
+    ],
+    offers: [
+      "Reupholstery of sofas and corner units",
+      "Reupholstery of majlis seating, including floor-level and raised",
+      "Replacement of worn or flattened seat foam",
+      "New cushions, bolsters and back supports",
+      "Repairs to frames, springs and joints",
+      "Fabric change to suit a redecorated room",
+    ],
+    includes: [
+      "Free check of the frame, springs and foam",
+      "Fabric selection from samples",
+      "Removal of the old covering",
+      "New foam where the old foam has lost its shape",
+      "Fitting of the new fabric and finishing of the seams",
+      "A written quote before any work starts",
+    ],
+    specs: [
+      { label: "Work on", value: "Sofas, corner units, majlis seating" },
+      { label: "Services", value: "Reupholstery, foam replacement, repairs" },
+      { label: "Before quoting", value: "Frame, springs and joints checked" },
+      { label: "Fabrics", value: "Chosen by you from samples" },
+      { label: "Service area", value: "All of Qatar" },
+    ],
+    steps: [
+      { title: "Send us photos", body: "Message us on WhatsApp with photos of the sofa or majlis, including any damage, and tell us what you want changed." },
+      { title: "Free check", body: "We check the frame, springs and foam and bring fabric samples, so you can see them in the room's own light." },
+      { title: "Quotation", body: "A written quote listing the fabric, the foam and any repairs, so you can compare it with the cost of a new piece." },
+      { title: "Upholstery and return", body: "We carry out the work and leave the finished piece in place in the room. We confirm where the work is done and how long it takes when we quote." },
+    ],
+    faqs: [
+      { q: "Is it cheaper to reupholster a sofa or buy a new one?", a: "If the frame is sound, reupholstering usually costs less than replacing a sofa of the same quality, and it keeps a piece that already fits your room. If the frame has failed, a new sofa is normally the better spend, and we will say so." },
+      { q: "How much does sofa upholstery cost in Qatar?", a: "It depends on the size of the piece, how much fabric it takes and whether the foam or frame needs work, so we quote after checking it. The check and the written quotation are free." },
+      { q: "Can you reupholster majlis seating?", a: "Yes, both floor-level and raised majlis. Majlis seating is often the best candidate, because the pieces are built for the room and a replacement set would have to be made to measure anyway." },
+      { q: "Can you repair a sagging sofa?", a: "Usually, yes. Sagging normally comes from tired foam or from springs that have given way, and both can be replaced. If the frame itself has cracked, we check whether it can be repaired before quoting." },
+      { q: "Can you only replace the foam?", a: "Yes. If the fabric still looks good but the seats have lost their shape, new foam on its own brings most of the comfort back. We can bring samples of different densities so you choose the firmness by sitting on them." },
+      { q: "Can I use the same frame and change the style?", a: "To a degree. New fabric, new cushions and a change of firmness can change how a sofa looks and feels, but the basic shape stays the same as the frame. For a different shape, a made-to-measure piece is usually the better route." },
+    ],
+    relatedProductIds: ["luxury-majlis-sofa", "modern-majlis", "khema-majlis-sofa", "majlis-and-cabinets-majlis-sofa"],
+    relatedCategorySlugs: ["majlis-sofa"],
+    relatedServiceSlugs: ["sofa-making", "cabinets"],
+    // No heroImage on purpose: we hold no before-and-after photo of upholstery work
+    // yet, and a finished majlis photo would not show this service.
+  },
+  {
     slug: "tv-unit-design",
     heading: "TV Unit Design in Qatar",
     label: "TV Unit Design",
-    seoTitle: "TV Unit Design & Wall Decor in Qatar",
+    priceFrom: 4500,
+    priceUnit: "per project",
+    updatedAt: "2026-11-07",
+    seoTitle: "TV Unit Design & TV Decoration in Qatar",
     metaDescription:
       "Custom TV units and feature wall decoration in Qatar. Fluted panelling, concealed lighting and cabinetry built to your wall, with the cabling hidden.",
     excerpt:
@@ -769,7 +824,7 @@ export const services: Service[] = [
       "We design and build TV units and feature walls across Qatar, coordinating with the electrical trade so the sockets land where the unit needs them. " + AREAS,
     ],
     offers: [
-      "Fluted and slatted wood panel feature walls",
+      "TV wall decoration with fluted and slatted wood panels",
       "Concealed LED lighting behind screens and shelving",
       "Low cabinet runs and floating consoles",
       "Display niches and lit shelving units",
@@ -798,7 +853,7 @@ export const services: Service[] = [
       { title: "Installation", body: "We fit the panelling and cabinets, route the cabling, wire the lighting and clear the site. Most units are installed in one to two days." },
     ],
     faqs: [
-      { q: "How much does a custom TV unit cost in Qatar?", a: "It depends on the wall width and the finishes rather than on a fixed rate. A panelled wall with concealed lighting and a cabinet run costs considerably more than plain panelling alone. We quote after measuring, with the finishes itemised so you can adjust the specification." },
+      { q: "How much does a custom TV unit cost in Qatar?", a: "Custom TV units start from QAR 4,500 per project. The final price depends on the wall width and the finishes: a panelled wall with concealed lighting and a cabinet run costs considerably more than plain panelling alone. We quote after measuring, with the finishes itemised so you can adjust the specification." },
       { q: "Can you hide the cables?", a: "Yes, and it is one of the main reasons to build the wall rather than buy a stand. Power, HDMI and aerial runs are routed inside the panelling and cabinets. Tell us at the survey what will be connected so we allow enough capacity for later additions." },
       { q: "Do I need to move the power socket?", a: "Often the existing socket can be enclosed within the unit, which avoids electrical work altogether. Where the screen position means the socket ends up in the wrong place, we coordinate with an electrician to relocate it before the panelling goes on." },
       { q: "How long does installation take?", a: "The cabinets and panels are made in the workshop first, so the disruption at your home is short: most units are fitted in one to two days. Lead time from order to installation is usually a few weeks, depending on the finishes chosen." },
@@ -923,7 +978,7 @@ export const services: Service[] = [
       { q: "Can you make a mat to a specific size?", a: "Yes. Send us the measurements and we will tell you what can be cut to fit the space." },
       { q: "Do you supply gym and game room mats?", a: "Yes. We supply PVC gym mats and indoor game mats for home gyms, fitness rooms and play areas." },
     ],
-    relatedProductIds: ["pvc-gym-mat-indoor-game-mat", "tiles-carpet-office-carpet", "grass-carpet"],
+    relatedProductIds: ["pvc-gym-mat-indoor-game-mat", "tiles-carpet-office-carpet"],
     relatedCategorySlugs: ["carpet", "barkia"],
     relatedServiceSlugs: ["office-carpet", "vinyl-flooring"],
   },

@@ -5,9 +5,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import FaqList from "@/components/FaqList";
+import ServiceLinks from "@/components/ServiceLinks";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { Button } from "@/components/ui/button";
-import { categoryLabelFor, findCategory, findGuide, findProduct, getGuides } from "@/data/localized";
+import { categoryLabelFor, findCategory, findGuide, findProduct, findService, getGuides } from "@/data/localized";
 import { cardImage, fullImage } from "@/lib/card-image";
 import { getDict, HTML_LANG, localePath, type Locale } from "@/i18n";
 import {
@@ -83,6 +84,12 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
   if (relatedCategories.length !== (guide.relatedCategorySlugs ?? []).length) {
     throw new Error(`Guide "${guide.slug}" references an unknown category slug`);
   }
+
+  const relatedServices = (guide.relatedServiceSlugs ?? []).map((slug) => {
+    const service = findService(locale, slug);
+    if (!service) throw new Error(`Guide "${guide.slug}" references unknown service slug: ${slug}`);
+    return service;
+  });
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -224,6 +231,8 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
             </div>
           </section>
         )}
+
+        <ServiceLinks locale={locale} services={relatedServices} />
 
         {/* Cluster link into the money pages */}
         {related.length > 0 && (

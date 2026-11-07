@@ -13,7 +13,7 @@
     "pages:preview": "wrangler pages dev out",
     "deploy": "bash scripts/deploy-pages.sh",
     "llms": "node scripts/generate-llms-txt.mjs",
-    "check": "node scripts/check-text-ratio.mjs && node scripts/check-arabic.mjs && node scripts/check-page-weight.mjs",
+    "check": "node scripts/check-text-ratio.mjs && node scripts/check-arabic.mjs && node scripts/check-page-weight.mjs && node scripts/check-internal-links.mjs",
     "perf": "node scripts/check-perf.mjs"
   },
   "dependencies": {

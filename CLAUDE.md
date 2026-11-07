@@ -185,7 +185,8 @@ that page, not a sibling. `npm run check` fails if one has fewer than 4 linking 
 
 Facts the owner confirmed on 2026-11-07: event carpet is sold and laid, not rented (never
 write "hire" or تأجير as an offer); "C-board" covers both gypsum and cement board; real wood
-parquet, wallpaper supply and sofa reupholstery and repair are all offered.
+parquet, wallpaper supply and sofa reupholstery and repair are all offered; the quote is free
+on every job, including floor mats and ceramic tiles.
 
 ## Agent Skills
 

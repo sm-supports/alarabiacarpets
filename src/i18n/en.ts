@@ -117,6 +117,9 @@ export const en = {
   category: {
     whatWeOffer: "What we offer",
     weSupply: (label: string) => `${label} we supply`,
+    priceGuide: "Starting prices",
+    priceGuideProduct: "Type",
+    priceGuidePrice: "Price, fitted",
     exploreOther: "Explore our other ranges",
     ctaTitle: "Get a free measurement and quote",
     ctaText:
@@ -124,12 +127,15 @@ export const en = {
   },
   service: {
     whatWeDo: "What we do",
-    priceIncludes: "What the price includes",
+    workIncludes: "What the work includes",
+    pricedSummary: (label: string, price: string) =>
+      `${label} in Qatar: ${price}. Al Arabia Carpets in Doha offers a free site survey and quotation.`,
     howItWorks: "How it works",
     projects: (label: string) => `Our ${label} projects`,
     relatedWork: "Related work",
     browse: (label: string) => `Browse ${label}`,
     relatedServices: "Related services",
+    grassCarpet: "Artificial Grass Carpet",
     ctaTitle: "Get a free survey and quote",
     ctaText: "Message us on WhatsApp and our team in Doha will visit, measure and quote at no cost.",
     viewDetails: (label: string) => `View ${label} details`,
@@ -280,6 +286,7 @@ export const en = {
   home: {
     faqTitle: "Questions about Al Arabia Carpets",
     aboutTitle: "Carpets, flooring, curtains and furniture in Qatar",
+    moreWorkTitle: "Also supplied and fitted across Qatar",
     aboutIntro:
       "Al Arabia Carpets is a home furnishing and flooring company in Doha, with a showroom on Al Mansoura St. For more than 10 years we have supplied and installed the products below for villas, majlis, offices, mosques and shops across Qatar, with free delivery and installation.",
     aboutItems: (prices: Record<string, string>) => [

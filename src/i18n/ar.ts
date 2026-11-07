@@ -115,19 +115,25 @@ export const ar: Dict = {
   },
   category: {
     whatWeOffer: "ماذا نقدم",
-    weSupply: (label) => `${label} التي نوفرها`,
+    weSupply: (label) => `ما نوفره من ${label}`,
+    priceGuide: "دليل الأسعار",
+    priceGuideProduct: "النوع",
+    priceGuidePrice: "السعر مع التركيب",
     exploreOther: "استكشف تشكيلاتنا الأخرى",
     ctaTitle: "احصل على قياس وعرض سعر مجاني",
     ctaText: "أرسل لنا رسالة على الواتساب، وفريقنا في الدوحة يناقش معك الخيارات ويقيس مساحتك ويعطيك عرض السعر بدون أي تكلفة.",
   },
   service: {
     whatWeDo: "ماذا نقدم",
-    priceIncludes: "ماذا يشمل السعر",
+    workIncludes: "ماذا يشمل العمل",
+    pricedSummary: (label, price) =>
+      `${label} في قطر: ${price}. وتقدم سجاد العربية في الدوحة معاينة وعرض سعر مجانيين.`,
     howItWorks: "كيف نشتغل",
     projects: (label) => `مشاريعنا في ${label}`,
     relatedWork: "أعمال ذات صلة",
     browse: (label) => `تصفّح ${label}`,
     relatedServices: "خدمات ذات صلة",
+    grassCarpet: "سجاد العشب الصناعي",
     ctaTitle: "احصل على معاينة وعرض سعر مجاني",
     ctaText: "راسلنا على الواتساب، وفريقنا في الدوحة يزورك ويقيس ويعطيك عرض السعر بدون أي تكلفة.",
     viewDetails: (label) => `تفاصيل ${label}`,
@@ -269,6 +275,7 @@ export const ar: Dict = {
   home: {
     faqTitle: "أسئلة عن سجاد العربية",
     aboutTitle: "سجاد وموكيت وأرضيات وستائر وأثاث في قطر",
+    moreWorkTitle: "نورّد ونركّب أيضًا في جميع أنحاء قطر",
     aboutIntro:
       "سجاد العربية شركة مفروشات منزلية وأرضيات في الدوحة، ولها معرض في شارع المنصورة. منذ أكثر من 10 سنوات نوفر ونركّب المنتجات التالية للفلل والمجالس والمكاتب والمساجد والمحلات في جميع أنحاء قطر، مع توصيل وتركيب مجاني.",
     aboutItems: (prices) => [

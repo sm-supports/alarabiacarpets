@@ -108,6 +108,7 @@ const SERVICES = [
   ["Artificial Grass Installation", "Artificial grass and grass carpet laid over a compacted, free-draining base"],
   ["Gypsum & C-Board Fixing", "False ceilings, coves, bulkheads and partitions boarded and finished ready for paint"],
   ["Custom Sofa Making", "Sofas and majlis seating made to the room's measurements in your choice of fabric"],
+  ["Sofa Upholstery & Repair", "New fabric, new foam and frame repairs for existing sofas and majlis seating"],
   ["TV Unit Design", "Built-in TV units and panelled feature walls with concealed lighting and cabling"],
   ["Custom Cabinets", "Made-to-measure cabinetry for kitchens, bedrooms, living rooms and offices"],
 ];
@@ -139,7 +140,8 @@ const SERVICES_AR = [
   ["سجاد المكاتب ومربعات الموكيت", "مربعات الموكيت والموكيت التجاري، توريد وتركيب خارج ساعات الدوام"],
   ["أرضيات الفينيل و SPC", "توريد وتركيب أرضيات الفينيل و PVC و SPC المقاومة للماء"],
   ["تركيب العشب الصناعي", "فرش العشب الصناعي وسجاد العشب فوق قاعدة مدكوكة جيدة التصريف"],
-  ["أعمال الجبس وألواح C-Board", "أسقف مستعارة وكرانيش وفواصل جاهزة للدهان"],
+  ["تركيب جبس بورد وألواح C-Board", "أسقف مستعارة وكرانيش وفواصل جاهزة للدهان"],
+  ["تنجيد الكنب وإصلاحه", "قماش جديد وإسفنج جديد وإصلاح الهياكل للكنب وجلسات المجالس القائمة"],
   ["تفصيل الكنب", "كنب وجلسات مجالس حسب مقاس الغرفة وبالقماش الذي تختاره"],
   ["تصميم وحدات التلفزيون", "وحدات تلفزيون مدمجة وجدران ديكورية مع إضاءة وتمديدات مخفية"],
   ["الخزائن حسب الطلب", "خزائن حسب المقاس للمطابخ وغرف النوم والمعيشة والمكاتب"],
@@ -218,14 +220,8 @@ export function buildLocalBusiness(locale: Locale = "en") {
     image: absoluteUrl(DEFAULT_IMAGE),
     sameAs: SOCIAL_PROFILES,
     serviceArea: { "@type": "GeoCircle", geoMidpoint: GEO, geoRadius: "50000" },
-    hasOfferCatalog: {
-      "@type": "OfferCatalog",
-      name: isAr ? "خدمات المفروشات المنزلية" : "Home Furnishing Services",
-      itemListElement: (isAr ? SERVICES_AR : SERVICES).map(([name, description]) => ({
-        "@type": "Offer",
-        itemOffered: { "@type": "Service", name, description },
-      })),
-    },
+    // Plain names, not Offers: the project never emits a price-less Offer.
+    knowsAbout: (isAr ? SERVICES_AR : SERVICES).map(([name]) => name),
   };
 }
 
@@ -547,9 +543,9 @@ export function buildCategoryMetadata(category: Category, locale: Locale = "en")
 /**
  * Service schema.
  *
- * Emits `image` only when the service has real project photography, and never
- * `offers` (there is no price). Same discipline as Product: assert nothing we
- * cannot back up.
+ * Emits `image` only when the service has real project photography, and `offers`
+ * only when the page shows a starting price. Same discipline as Product: assert
+ * nothing we cannot back up.
  */
 export function buildServiceJsonLd(
   service: {
@@ -558,6 +554,7 @@ export function buildServiceJsonLd(
     label: string;
     metaDescription: string;
     heroImage?: string;
+    priceFrom?: number;
   },
   locale: Locale = "en"
 ) {
@@ -575,5 +572,16 @@ export function buildServiceJsonLd(
     // Only when a real project photo exists -- never the brand logo, which
     // would assert imagery of work we cannot show.
     ...(service.heroImage ? { image: absoluteUrl(service.heroImage) } : {}),
+    ...(service.priceFrom
+      ? {
+          offers: {
+            "@type": "AggregateOffer",
+            priceCurrency: "QAR",
+            lowPrice: service.priceFrom,
+            offerCount: 1,
+            url,
+          },
+        }
+      : {}),
   };
 }

@@ -24,3 +24,8 @@
 /products/curtains        /products/curtain      301
 /products/majlis-sets     /products/majlis-sofa  301
 /products/roller-blinds   /products/roller       301
+
+# Merged into the product page Google already showed (2026-11). These must also be in
+# the Cloudflare Redirect Rule exclusions; see Languages in CLAUDE.md.
+/services/artificial-grass /products/grass-carpet 301
+/ar/services/artificial-grass /ar/products/grass-carpet 301

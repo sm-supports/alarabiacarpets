@@ -52,6 +52,8 @@ export interface Product {
 
   /** Set on translated records: the English name, so analytics sources match across languages. */
   analyticsName?: string;
+  /** ISO date of the last real content edit; the sitemap's lastmod. */
+  updatedAt?: string;
 }
 
 /**
@@ -155,7 +157,7 @@ export const products: Product[] = [
     "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Artificial%20grass%20installation%20work",
     seoTitle: "Artificial Grass Installation Qatar | Doha Fitting",
     metaDescription: "Professional artificial grass installation across Qatar. Base preparation, drainage and seam-free finishing for gardens, terraces and play areas in Doha.",
-    imageAlt: "Artificial grass installation in progress on a Doha garden",
+    imageAlt: "Artificial grass carpet fitted to the entrance steps of a villa in Qatar",
     longDescription: [
       "How artificial grass is installed matters as much as the grass itself. A poorly prepared base leads to visible seams, dips and water sitting on the surface.",
       "Our installers prepare and level the base, lay a free-draining sub-layer, join the grass so seams are not visible, and secure and trim the edges. We install on gardens, terraces, balconies, play areas and pool surrounds throughout Qatar.",
@@ -205,9 +207,10 @@ export const products: Product[] = [
     ],
     "imageSrc": "/Products/Carpets/Event:normal carpet.jpeg",
     "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Event%20Carpet",
-    seoTitle: "Event Carpet Hire & Supply in Qatar | Doha",
+    updatedAt: "2026-11-07",
+    seoTitle: "Event Carpet Supply & Laying in Qatar | Exhibitions",
     metaDescription: "Event and exhibition carpet in Qatar. Fast supply and laying for conferences, weddings and stands, lifted and cleared afterwards. Doha-based.",
-    imageAlt: "Event carpet laid for an exhibition stand in Doha, Qatar",
+    imageAlt: "Colour swatch card showing the shades of event carpet available in Qatar",
     longDescription: [
       "Event carpet is judged on turnaround, not on lifespan. A stand build, a conference hall or a wedding venue needs covering to a deadline, looking sharp for a few days, and clearing again without leaving marks on the floor underneath.",
       "We supply and lay for exhibitions, conferences, weddings and openings across Qatar, working to the venue's access window \u2014 which for most halls in Doha means overnight or early morning. Lifting and disposal afterwards is part of the job.",
@@ -235,6 +238,10 @@ export const products: Product[] = [
       },
     ],
     faqs: [
+      {
+        q: "Do you rent event carpet?",
+        a: "No. We supply and lay it for your event, then lift and dispose of it afterwards, so you do not have to store or return anything. It starts from QAR 22 per sqm.",
+      },
       {
         q: "How quickly can event carpet be laid?",
         a: "Usually within the venue's access window, which for most Doha halls means overnight or early morning before the build starts. Tell us the deadline and the area and we will confirm whether it is achievable before you commit.",
@@ -630,22 +637,37 @@ export const products: Product[] = [
     "media": [
       {
         "type": "image",
-        "src": "/Products/Carpets/grass-carpet.webp"
+        "src": "/Products/Carpets/Artificial grass installation work.jpeg"
       }
     ],
-    "imageSrc": "/Products/Carpets/grass-carpet.webp",
+    "imageSrc": "/Products/Carpets/Artificial grass installation work.jpeg",
+    updatedAt: "2026-11-07",
     "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Artificial%20Grass%20Carpet",
     seoTitle: "Artificial Grass Carpet Qatar | Supply & Fitting",
     metaDescription: "Artificial grass carpet in Qatar for gardens, terraces, balconies and play areas. UV-stable, free-draining, and installed across Doha with free delivery.",
-    imageAlt: "Artificial grass carpet laid on a Doha terrace by Al Arabia Carpets",
+    imageAlt: "Artificial grass carpet laid over the entrance steps and landing of a villa in Qatar",
     longDescription: [
-      "Artificial grass gives you a green surface all year round without irrigation, mowing or fertiliser, which makes it well suited to Qatar's climate. We install it on gardens, roof terraces, balconies, play areas and around pools.",
-      "Our grass is UV-stabilised so it holds its colour under strong sun, and it is laid over a free-draining base so rain and hose water pass straight through rather than pooling.",
+      "Artificial grass gives you a green surface all year round without irrigation, mowing or fertiliser, which makes it well suited to Qatar's climate. We supply and lay it across Qatar on villa gardens, roof terraces, balconies, majlis surrounds, play areas, entrance steps and around pools. It also works indoors as grass carpet for events and displays, and in courtyards, pathways and nurseries.",
+      "The current generation looks far more convincing than the flat plastic turf people remember, because the blades are cut to different lengths and mixed with a brown thatch at the base. Our grass is UV-stabilised so it holds its colour under strong sun.",
+      "The part that decides whether it still looks good in three years is underneath it. Grass laid straight onto sand moves and dips; grass laid over a properly compacted, free-draining base stays flat and lets rain and hose water pass through rather than pooling.",
+      "We work across Doha, Al Wakra, Al Khor, Lusail, Al Rayyan and the rest of Qatar. Send us photos and rough dimensions on WhatsApp and tell us what is under the area now, because sand, tile and concrete each need different preparation.",
     ],
     specs: [
       {
         label: "Best for",
         value: "Gardens, terraces, balconies, play areas",
+      },
+      {
+        label: "Pile heights",
+        value: "Short landscape to long garden pile",
+      },
+      {
+        label: "Base",
+        value: "Prepared and compacted before laying",
+      },
+      {
+        label: "Site work",
+        value: "Joining, edge fixing, cutting around trees, planters, steps and drains, waste removed",
       },
       {
         label: "UV stability",
@@ -665,6 +687,22 @@ export const products: Product[] = [
       },
     ],
     faqs: [
+      {
+        q: "How long does artificial grass last in Qatar?",
+        a: "A UV-stabilised grass over a properly built base holds its colour and shape for many years of Gulf sun. What shortens that life is almost always the base rather than the grass: poor compaction shows as dips and ripples long before the fibres wear out.",
+      },
+      {
+        q: "Does artificial grass get hot in the sun?",
+        a: "It does warm up in direct sun, like any surface. A lighter grass with a shorter pile runs cooler, shaded areas stay comfortable, and rinsing it down brings the temperature straight back. For play areas in full sun we will talk through pile and colour with you.",
+      },
+      {
+        q: "How does the water drain away?",
+        a: "The backing is perforated and sits on a compacted free-draining base, so rain and hose water pass through and away rather than pooling on top. On roof terraces and balconies we set the falls to the existing outlets, which is the part that needs surveying properly.",
+      },
+      {
+        q: "Is artificial grass safe for children and pets?",
+        a: "Yes. The grass is non-toxic and drains freely, so it does not hold water. For play areas we can lay a shock-absorbing layer under the grass, and pet waste rinses off the surface rather than soaking in as it would with a real lawn.",
+      },
       {
         q: "Does artificial grass fade in Qatar's sun?",
         a: "Our artificial grass is UV-stabilised specifically for Gulf conditions, so it holds its colour far longer than non-stabilised alternatives. We can show you samples that have been in service outdoors.",
@@ -1438,7 +1476,8 @@ export const products: Product[] = [
     ],
     "imageSrc": "/Products/Interior Design/Television decore with cabin box 1.jpeg",
     "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20TV%20Unit%20with%20Cabinet%20Box",
-    seoTitle: "TV Unit & Feature Wall Design in Qatar",
+    updatedAt: "2026-11-07",
+    seoTitle: "Built-In TV Unit with Cabinet Box in Qatar",
     metaDescription: "TV feature walls with built-in cabinetry in Qatar. Concealed cabling, integrated storage and lighting, designed and installed across Doha.",
     imageAlt: "TV feature wall with built-in cabinetry and concealed lighting in a Doha living room",
     longDescription: [

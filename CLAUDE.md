@@ -50,7 +50,7 @@ npm run build        # Static export → out/
 npm run pages:dev    # Full-stack local dev (build + Workers + static)
 npm run typecheck    # TypeScript type check: the site, then functions/ (its own tsconfig)
 npm run llms         # Regenerate public/llms.txt from out/ (run after a build)
-npm run check        # Text-to-HTML ratio, Arabic and page-weight checks against out/ (run after a build)
+npm run check        # Text-to-HTML ratio, Arabic, page-weight and internal-link checks against out/ (run after a build)
 npm run perf         # Lighthouse on a simulated slow phone against out/ (needs Chrome; not a deploy gate)
 npm run deploy       # Build, stage on a case-sensitive image, deploy (prod only on main)
 ```
@@ -158,6 +158,35 @@ Use logical Tailwind classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-` over
 | `interior` | Interior Design | `public/Products/Interior Design/` |
 | `barkia` | Barkia & PVC | `public/Products/barkia&pvc/` |
 
+## Keyword pages
+
+Each keyword has one page meant to rank for it. Links, titles and new copy should push
+that page, not a sibling. `npm run check` fails if one has fewer than 4 linking pages inside
+`<main>` in either language (`scripts/check-internal-links.mjs`; keep its list in step).
+
+| Keyword | Page |
+|---------|------|
+| Carpet | `/products/carpet` |
+| Event carpet | `/products/event-normal-carpet` (the page Google favours; `/services/event-carpet` covers installation) |
+| Office carpet | `/services/office-carpet` |
+| Vinyl and, for now, SPC | `/services/vinyl-flooring` |
+| PVC | `/products/pvc-barkia` |
+| Wood parquet | `/services/parquet-flooring` |
+| Wallpaper | `/services/wallpaper` |
+| C-board, gypsum and cement board fixing | `/services/gypsum-c-board-fixing` |
+| Grass carpet | `/products/grass-carpet` |
+| Sofa making | `/services/sofa-making` |
+| Sofa upholstery and repair | `/services/sofa-upholstery` |
+| Curtains | `/products/curtain` |
+| Cabinet | `/services/cabinets` |
+| Kitchen cabinets | `/services/kitchen-cabinets` |
+| Room cabinets, wardrobes | `/services/wardrobes` |
+| TV decoration, TV units | `/services/tv-unit-design` |
+
+Facts the owner confirmed on 2026-11-07: event carpet is sold and laid, not rented (never
+write "hire" or تأجير as an offer); "C-board" covers both gypsum and cement board; real wood
+parquet, wallpaper supply and sofa reupholstery and repair are all offered.
+
 ## Agent Skills
 
 For specialized workflows, read the relevant skill in `.claude/skills/`. Each folder contains a `skill.md` with step-by-step instructions.
@@ -205,6 +234,10 @@ Verified on every build; do not regress these:
   asset we hold is a colour swatch scan, not a photo of our work
 - `Television decore with cabin box 2.jpeg` is a watermarked third-party 3D render, not
   our project work — keep it out of any gallery
+- Service JSON-LD carries `offers` only for a service with `priceFrom`, which the page shows.
+  Set it only from a price the owner confirmed. `lastModified` in the sitemap comes from
+  `updatedAt` on the record: change that date when the content really changes, and never stamp
+  pages with the build date
 - New keyword landing pages are entries in `src/data/services.ts`, not new routes:
   `/services/[slug]` prerenders them and `sitemap.ts`/`Footer.tsx` pick them up. Each
   also needs an overlay in `src/data/ar/` and a label in `src/i18n/labels.ts`

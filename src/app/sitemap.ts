@@ -15,33 +15,36 @@ import { SITE_URL } from "@/lib/seo";
 // as dynamic and refuses to emit it as a static file.
 export const dynamic = "force-static";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+// lastModified appears only where a record says when its content really changed.
+// Stamping every page with the build date tells Google nothing, and Google stops
+// trusting a lastmod that is always "now".
+const lastModified = (updatedAt?: string) => (updatedAt ? { lastModified: new Date(updatedAt) } : {});
 
+export default function sitemap(): MetadataRoute.Sitemap {
   const pages: MetadataRoute.Sitemap = [
-    { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "weekly", priority: 1.0 },
-    { url: `${SITE_URL}/products`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${SITE_URL}/guides`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${SITE_URL}/`, changeFrequency: "weekly", priority: 1.0 },
+    { url: `${SITE_URL}/products`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${SITE_URL}/guides`, changeFrequency: "weekly", priority: 0.7 },
     // Category landing pages -- the transactional money pages, ranked highest
     // after the homepage.
     ...categories.map((c) => ({
       url: `${SITE_URL}/products/${c.slug}`,
-      lastModified: now,
+      ...lastModified(c.updatedAt),
       changeFrequency: "weekly" as const,
       priority: 0.9,
     })),
-    { url: `${SITE_URL}/services`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/services`, changeFrequency: "monthly", priority: 0.7 },
     ...services.map((s) => ({
       url: `${SITE_URL}/services/${s.slug}`,
-      lastModified: now,
+      ...lastModified(s.updatedAt),
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
-    { url: `${SITE_URL}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${SITE_URL}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/about`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/contact`, changeFrequency: "monthly", priority: 0.5 },
     ...products.map((p) => ({
       url: `${SITE_URL}/products/${p.id}`,
-      lastModified: now,
+      ...lastModified(p.updatedAt),
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),

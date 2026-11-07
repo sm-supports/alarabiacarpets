@@ -48,6 +48,12 @@ export interface Category {
    */
   priceFrom?: number;
   priceUnit?: string;
+  /** Service pages this category links to. An unknown slug throws at build. */
+  relatedServiceSlugs?: string[];
+  /** Products whose "from" prices appear in a table on the page, cheapest first. */
+  priceGuideProductIds?: string[];
+  /** ISO date of the last real content edit; the sitemap's lastmod. */
+  updatedAt?: string;
 }
 
 export const categories: Category[] = [
@@ -58,7 +64,10 @@ export const categories: Category[] = [
     key: "carpet",
     label: "Carpets",
     heading: "Carpets in Qatar",
-    seoTitle: "Carpets in Qatar | Supply & Fitting in Doha",
+    updatedAt: "2026-11-07",
+    relatedServiceSlugs: ["office-carpet", "event-carpet", "floor-mats"],
+    priceGuideProductIds: ["event-normal-carpet", "mosque-masjid-carpet", "tiles-carpet-office-carpet", "luxury-home-carpet"],
+    seoTitle: "Carpets in Qatar | Carpet Shop & Fitting in Doha",
     metaDescription:
       "Premium carpets supplied and fitted across Qatar. Wall-to-wall, rugs, mosque, office and stair carpet with free measurement and installation in Doha.",
     heroImage: "/Products/Carpets/carpet.webp",
@@ -146,6 +155,7 @@ export const categories: Category[] = [
     key: "barkia",
     label: "Barkia & PVC",
     heading: "Barkia & PVC Flooring in Qatar",
+    relatedServiceSlugs: ["vinyl-flooring", "parquet-flooring", "ceramic-tiles", "floor-mats"],
     seoTitle: "Barkia Flooring in Qatar | Supply & Installation",
     metaDescription:
       "Barkia flooring supplied and installed across Qatar. Waterproof, hard-wearing floors for majlis, villas and offices, with free measurement and fitting.",
@@ -268,6 +278,7 @@ export const categories: Category[] = [
     key: "furniture",
     label: "Furniture",
     heading: "Majlis Sofas & Furniture in Qatar",
+    relatedServiceSlugs: ["sofa-making", "sofa-upholstery", "cabinets"],
     seoTitle: "Majlis Sofas in Qatar | Custom Made in Doha",
     metaDescription:
       "Custom majlis sofas made in Qatar to your room measurements. Traditional floor seating and raised majlis in your choice of fabric, delivered across Doha.",
@@ -356,6 +367,7 @@ export const categories: Category[] = [
     key: "interior",
     label: "Interior Design",
     heading: "Interior Design in Qatar",
+    relatedServiceSlugs: ["wallpaper", "kitchen-cabinets", "wardrobes", "gypsum-c-board-fixing", "tv-unit-design", "cabinets", "room-dividers"],
     seoTitle: "Interior Design in Qatar | Doha Fit-Out Services",
     metaDescription:
       "Interior design and fit-out in Qatar. Gypsum work, wall panelling, cabinetry, flooring and furnishing delivered as one project by Al Arabia Carpets.",

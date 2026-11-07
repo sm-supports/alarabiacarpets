@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Check } from "@/components/icons";
 import { findCategory, findProduct, findService, getServices, guidesForServiceL } from "@/data/localized";
 import { cardImage, fullImage } from "@/lib/card-image";
-import { getDict, localePath, type Locale } from "@/i18n";
+import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
 import {
   buildBreadcrumb,
   buildFaq,
@@ -95,6 +95,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
   // A folded-in sub-topic contributes its questions to the same FAQPage rather
   // than to a second one -- same handling as Category.secondary.
   const allFaqs = [...service.faqs, ...(service.secondary?.faqs ?? [])];
+  const price = service.priceFrom ? formatFromPrice(service.priceFrom, service.priceUnit, locale) : null;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -129,12 +130,11 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
               {service.heading}
             </h1>
             <p className="font-poppins max-w-2xl text-white font-medium text-sm md:text-base mb-2">
-              {t.facts.serviceSummary(service.label)}
+              {price ? t.service.pricedSummary(service.label, price) : t.facts.serviceSummary(service.label)}
             </p>
             <p className="font-poppins max-w-2xl text-white/80 text-sm md:text-base">
               {service.excerpt}
             </p>
-            {/* No price here: services are quoted per job and have no priceFrom. */}
             <HeroQuoteCta locale={locale} source={`service:${service.slug}:hero`} message={t.common.quoteMessage(service.label)} />
           </div>
         </div>
@@ -168,7 +168,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
             </ul>
 
             <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
-              {t.service.priceIncludes}
+              {t.service.workIncludes}
             </h2>
             <ul className="font-poppins text-neutral-700 text-[15px] space-y-2">
               {service.includes.map((inc) => (

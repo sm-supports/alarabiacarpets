@@ -7,10 +7,11 @@ import BusinessFacts from "@/components/BusinessFacts";
 import FaqList from "@/components/FaqList";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import HeroQuoteCta from "@/components/HeroQuoteCta";
+import ServiceLinks from "@/components/ServiceLinks";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "@/components/icons";
 import type { CategorySection } from "@/data/categories";
-import { findCategory, getCategories, getProducts, guidesForCategoryL } from "@/data/localized";
+import { findCategory, findProduct, findService, getCategories, getProducts, guidesForCategoryL } from "@/data/localized";
 import { cardImage } from "@/lib/card-image";
 import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
 import {
@@ -58,6 +59,16 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
   const items = getProducts(locale).filter((p) => p.category === category.key);
   const guides = guidesForCategoryL(locale, category.slug);
   const siblings = getCategories(locale).filter((c) => c.slug !== category.slug);
+  const relatedServices = (category.relatedServiceSlugs ?? []).map((s) => {
+    const service = findService(locale, s);
+    if (!service) throw new Error(`Category "${category.slug}" references unknown service slug: ${s}`);
+    return service;
+  });
+  const priceGuide = (category.priceGuideProductIds ?? []).map((id) => {
+    const product = findProduct(locale, id);
+    if (!product?.priceFrom) throw new Error(`Category "${category.slug}" price guide needs a priced product: ${id}`);
+    return { id, name: product.name, price: formatFromPrice(product.priceFrom, product.priceUnit, locale) };
+  });
   const path = `/products/${category.slug}`;
   const fromPrice = category.priceFrom ? formatFromPrice(category.priceFrom, category.priceUnit, locale) : undefined;
 
@@ -200,6 +211,32 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
           </section>
         )}
 
+        {priceGuide.length > 0 && (
+          <section className="py-12 md:py-14 bg-white">
+            <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
+              <h2 className="h2-sec6">{t.category.priceGuide}</h2>
+              <table className="w-full font-poppins text-sm border-y border-neutral-100">
+                <thead>
+                  <tr className="text-neutral-500 text-start border-b border-neutral-100">
+                    <th scope="col" className="py-2.5 font-medium text-start">{t.category.priceGuideProduct}</th>
+                    <th scope="col" className="py-2.5 font-medium text-end">{t.category.priceGuidePrice}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-100">
+                  {priceGuide.map((row) => (
+                    <tr key={row.id}>
+                      <td className="py-2.5">
+                        <Link href={lp(`/products/${row.id}`)} className="font-medium text-primary hover:underline">{row.name}</Link>
+                      </td>
+                      <td className="py-2.5 text-end text-neutral-900 font-medium">{row.price}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
         {/* FAQs -- native <details> so answers stay in the HTML for crawlers */}
         {category.faqs?.length ? (
           <section className="py-12 md:py-14 bg-white">
@@ -239,6 +276,8 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
             </div>
           </section>
         )}
+
+        <ServiceLinks locale={locale} services={relatedServices} />
 
         {/* Sibling categories -- keeps every landing page one hop from the others */}
         <section className="py-12 md:py-14 bg-white">

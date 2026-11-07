@@ -37,6 +37,7 @@ export default function Footer({ locale }: { locale: Locale }) {
         label: localizedServiceLabel(locale, s.slug, s.label),
         href: lp(`/services/${s.slug}`),
       })),
+      { label: t.service.grassCarpet, href: lp('/products/grass-carpet') },
     ],
     social: [
       { label: 'Instagram', href: 'https://instagram.com/alarabiacarpet', icon: Instagram },

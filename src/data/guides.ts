@@ -132,7 +132,6 @@ export const guides: Guide[] = [
     ],
     relatedProductIds: ["home-curtains", "roller", "office-blind-office-roller-vertical-blinds"],
     relatedCategorySlugs: ["curtain"],
-    relatedServiceSlugs: ["office-carpet"],
   },
   {
     slug: "interior-design-guide-qatar",
@@ -447,7 +446,7 @@ export const guides: Guide[] = [
     ],
     relatedProductIds: ["luxury-majlis-sofa"],
     relatedCategorySlugs: ["majlis-sofa", "interior", "curtain"],
-    relatedServiceSlugs: ["sofa-making", "cabinets"],
+    relatedServiceSlugs: ["sofa-making", "sofa-upholstery", "cabinets"],
   },
   {
     slug: "vinyl-vs-parquet-flooring-qatar",
@@ -459,7 +458,7 @@ export const guides: Guide[] = [
       "Which one belongs in which room: water resistance, cost, how each feels underfoot, and what happens when a board gets damaged.",
     heroImage: "/Products/barkia&pvc/barkia.webp",
     heroImageAlt: "Wood-effect SPC vinyl flooring laid through an open-plan villa room in Qatar",
-    updatedAt: "2026-09-08",
+    updatedAt: "2026-11-07",
     intro: [
       "Almost every flooring conversation we have in Doha comes down to the same question, even when it is not asked directly: should this room have a plastic floor that looks like wood, or a wood floor?",
       "Both are good products. They fail in completely different ways, though, and the room usually decides which one is right long before taste does. Here is the comparison as we would give it on a survey.",
@@ -468,7 +467,7 @@ export const guides: Guide[] = [
       {
         heading: "The short answer",
         body: [
-          "If water is a realistic possibility in the room, fit vinyl or SPC. If the room stays dry and you want a genuine timber surface underfoot, fit parquet or laminate.",
+          "If water is a realistic possibility in the room, fit vinyl or SPC. If the room stays dry and you want a genuine timber surface underfoot, fit real wood parquet, or laminate for a similar look at a lower cost.",
           "That single rule settles most rooms. Kitchens, bathrooms, laundry rooms, entrance halls and ground floors that open onto a garden all go to vinyl. Bedrooms, majlis, formal reception rooms and upstairs living areas can go either way.",
         ],
       },
@@ -610,7 +609,7 @@ export const guides: Guide[] = [
     excerpt:
       "Pile height, drainage, heat and UV: what to specify, and why the base underneath decides how it looks in three years.",
     heroImage: "/Products/Carpets/Artificial grass installation work.jpeg",
-    heroImageAlt: "Artificial grass laid over the entrance steps and forecourt of a villa in Qatar",
+    heroImageAlt: "Artificial grass laid over the entrance steps and landing of a villa in Qatar",
     updatedAt: "2026-09-08",
     intro: [
       "Artificial grass makes obvious sense in Qatar. A real lawn here needs constant water and constant attention, and still struggles through the summer. Grass carpet stays green with almost no input.",
@@ -677,19 +676,18 @@ export const guides: Guide[] = [
     ],
     relatedProductIds: ["grass-carpet", "artificial-grass-installation-work", "artificial-flowers-grass"],
     relatedCategorySlugs: ["carpet"],
-    relatedServiceSlugs: ["artificial-grass"],
   },
   {
     slug: "event-carpet-guide-qatar",
     title: "Planning Event Carpet for a Venue in Qatar",
     seoTitle: "Event Carpet Planning Guide for Qatar",
     metaDescription:
-      "Planning event carpet in Qatar: access windows, hire versus purchase, colours, taping rules and lifting. What venues expect and what to brief your fitter.",
+      "Planning event carpet in Qatar: access windows, one-off or reusable grades, colours, taping rules and lifting. What venues expect and how to brief a fitter.",
     excerpt:
-      "Access windows, hire versus buy, venue taping rules, and the questions to settle before the night of the install.",
+      "Access windows, one-off or reusable grades, venue taping rules, and the questions to settle before the night of the install.",
     heroImage: "/Products/Carpets/carpet.webp",
     heroImageAlt: "Wall-to-wall carpet laid across a large open floor",
-    updatedAt: "2026-09-08",
+    updatedAt: "2026-11-07",
     intro: [
       "Event carpet is one of the few flooring jobs where the schedule matters more than the product. The carpet is rarely the hard part. The hard part is that a venue will give you a five-hour window in the middle of the night and expect a finished floor by morning.",
       "This guide covers what to settle before that night, so the install is a logistics exercise rather than an emergency.",
@@ -703,7 +701,7 @@ export const guides: Guide[] = [
         ],
       },
       {
-        heading: "Hire or buy",
+        heading: "One-off or reusable carpet",
         body: [
           "For a one-off event, laying an economy grade and disposing of it afterwards is normally the cheapest route, and it avoids storage and cleaning entirely.",
           "If you run several events a year, buying a heavier carpet that can be lifted, rolled, stored and relaid usually works out lower across the year. The trade-off is that someone has to store it and it needs cleaning between uses.",

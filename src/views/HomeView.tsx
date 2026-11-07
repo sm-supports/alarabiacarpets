@@ -9,7 +9,7 @@ import ContactSection from "@/components/ContactSection";
 import JsonLd from "@/components/JsonLd";
 import FaqList from "@/components/FaqList";
 import Link from "next/link";
-import { findCategory } from "@/data/localized";
+import { findCategory, findProduct, findService } from "@/data/localized";
 import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
 import { buildFaq, buildLocalBusiness, buildOrganization, buildWebSite, pageAlternates } from "@/lib/seo";
 
@@ -18,6 +18,36 @@ export function homeMetadata(locale: Locale): Metadata {
   return {
     alternates: pageAlternates("/", locale),
   };
+}
+
+// One link for each keyword page with no tile higher up the home page.
+const KEYWORD_LINKS: Array<{ service: string } | { product: string }> = [
+  { product: "event-normal-carpet" },
+  { service: "office-carpet" },
+  { service: "vinyl-flooring" },
+  { product: "pvc-barkia" },
+  { service: "parquet-flooring" },
+  { service: "wallpaper" },
+  { service: "gypsum-c-board-fixing" },
+  { service: "sofa-making" },
+  { service: "sofa-upholstery" },
+  { service: "cabinets" },
+  { service: "kitchen-cabinets" },
+  { service: "wardrobes" },
+  { service: "tv-unit-design" },
+];
+
+function keywordLinks(locale: Locale) {
+  return KEYWORD_LINKS.map((link) => {
+    if ("service" in link) {
+      const service = findService(locale, link.service);
+      if (!service) throw new Error(`Unknown service slug: ${link.service}`);
+      return { href: `/services/${service.slug}`, label: service.label };
+    }
+    const product = findProduct(locale, link.product);
+    if (!product) throw new Error(`Unknown product id: ${link.product}`);
+    return { href: `/products/${product.id}`, label: product.name };
+  });
 }
 
 function categoryPrice(locale: Locale, slug: string): string {
@@ -58,7 +88,7 @@ export default function HomeView({ locale }: { locale: Locale }) {
               {aboutItems.map((item) => (
                 <li key={item.slug}>
                   <Link href={localePath(locale, `/products/${item.slug}`)} className="font-medium text-primary hover:underline">
-                    {findCategory(locale, item.slug)?.label}
+                    {findCategory(locale, item.slug)?.heading}
                   </Link>
                   {": "}
                   {item.text}
@@ -67,6 +97,14 @@ export default function HomeView({ locale }: { locale: Locale }) {
             </ul>
             <p className="mt-4">{t.facts.whereText}</p>
             <p className="mt-3">{t.facts.whereTrack}</p>
+            <h3 className="font-playfair text-xl font-bold text-neutral-900 mt-8 mb-4">{t.home.moreWorkTitle}</h3>
+            <div className="flex flex-wrap gap-3">
+              {keywordLinks(locale).map((link) => (
+                <Link key={link.href} href={localePath(locale, link.href)} className="chip-link">
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
         {/* Native <details>, so the answers stay in the static HTML for crawlers. */}

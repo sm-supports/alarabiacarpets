@@ -10,10 +10,11 @@ import FaqList from "@/components/FaqList";
 import ProductMedia from "@/components/ProductMedia";
 import RelatedProducts from "@/components/RelatedProducts";
 import RelatedGuides from "@/components/RelatedGuides";
+import ServiceLinks from "@/components/ServiceLinks";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Check, ShoppingCart } from "@/components/icons";
-import { categoryLabelFor, findProduct, getProducts } from "@/data/localized";
+import { categoryLabelFor, findProduct, getProducts, servicesForProductL } from "@/data/localized";
 import { fullImage, fullImagePath } from "@/lib/card-image";
 import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
 import {
@@ -219,6 +220,8 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
         <RelatedGuides locale={locale} productId={product.id} />
 
         <RelatedProducts locale={locale} currentId={product.id} category={product.category} />
+
+        <ServiceLinks locale={locale} services={servicesForProductL(locale, product.id).slice(0, 3)} />
 
         <BusinessFacts locale={locale} title={t.facts.whereTitle(product.name)} />
 

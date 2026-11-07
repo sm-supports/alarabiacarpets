@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Poppins } from "next/font/google";
 import "@/index.css";
-import Providers from "@/app/providers";
-import AdLanguage from "@/components/AdLanguage";
-import Analytics from "@/components/Analytics";
 import ThirdPartyScripts from "@/components/ThirdPartyScripts";
-import WebVitals from "@/components/WebVitals";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
-import LocaleProviderEn from "@/i18n/LocaleProviderEn";
+// Client components come from ./client, never directly: see that file for why.
+import { AdLanguage, Analytics, LocaleProvider, Providers, Script, WebVitals, WhatsAppFloat } from "./client";
 import { rootMetadata, rootViewport } from "@/lib/root-metadata";
 
 // Self-hosted at build time into out/_next/static/media/, replacing the
@@ -46,14 +42,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${playfair.variable} ${poppins.variable} ${poppinsHeavy.variable}`}>
       <body>
-        <LocaleProviderEn>
+        <LocaleProvider>
           <Providers>{children}</Providers>
           <WhatsAppFloat />
-        </LocaleProviderEn>
+        </LocaleProvider>
         <AdLanguage />
         <Analytics />
         <WebVitals />
-        <ThirdPartyScripts />
+        <ThirdPartyScripts Script={Script} />
       </body>
     </html>
   );

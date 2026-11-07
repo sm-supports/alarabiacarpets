@@ -1,4 +1,4 @@
-import Script from "next/script";
+import type NextScript from "next/script";
 import { CONVERSION_LABELS, CURRENCY, GA_MEASUREMENT_ID, GOOGLE_ADS_ID } from "@/lib/analytics";
 
 /**
@@ -6,8 +6,13 @@ import { CONVERSION_LABELS, CURRENCY, GA_MEASUREMENT_ID, GOOGLE_ADS_ID } from "@
  *
  * Server component -- next/script handles the client-side loading strategy, so
  * nothing here needs a "use client" boundary.
+ *
+ * next/script arrives as a prop, from the calling layout's own client.ts, and is
+ * imported here as a type only. Importing it directly would make it a client file
+ * shared by both root layouts, and pages of one language would then download the
+ * other language's layout script (see src/app/(en)/client.ts).
  */
-export default function ThirdPartyScripts() {
+export default function ThirdPartyScripts({ Script }: { Script: typeof NextScript }) {
   return (
     <>
       {/* gtag.js costs about 200 KiB and 400 ms of main thread, so it loads on the first

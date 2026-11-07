@@ -122,6 +122,11 @@ Use logical Tailwind classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-` over
   server component for this reason). Client components must not import `@/data/*`,
   `@/lib/seo` or `@/i18n` (use `@/i18n/config` and `@/lib/site`): any of them pulls the
   catalog or both dictionaries into every page's JavaScript
+- A root layout (`src/app/(en)/layout.tsx`, `src/app/(ar)/layout.tsx`) takes its client
+  components, and `next/script`, only from the `client.ts` beside it, and a server component
+  both layouts render gets them as props (`ThirdPartyScripts`). Next files both root layouts
+  under one group, so a client file both import directly is tied to one layout's script and
+  every page of the other language downloads it too (`check-page-weight` fails on this)
 - New routes are new directories under `src/app/` — there is no central route table
 - Dynamic routes need `generateStaticParams()`; `params` is a Promise and must be awaited
 - Never use `useSearchParams` without a Suspense boundary — it hard-fails under static export

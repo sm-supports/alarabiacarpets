@@ -309,8 +309,8 @@ const FORM_TEXT = {
 function readFormState(fields) {
   const values = {};
   for (const [key, selector] of Object.entries(fields)) values[key] = document.querySelector(selector)?.value ?? null;
-  // li[data-state]: an open Radix toast, which holds its text outside the live region.
-  const said = [...document.querySelectorAll('[role="status"], [role="alert"], [aria-live], li[data-state="open"]')]
+  // data-state-panel: the live regions leave out a headline that has taken focus.
+  const said = [...document.querySelectorAll('[role="status"], [role="alert"], [aria-live], [data-state-panel]')]
     .map((element) => element.textContent.replace(/\s+/g, " ").trim())
     .filter(Boolean);
   const submit = document.querySelector('form button[type="submit"]');

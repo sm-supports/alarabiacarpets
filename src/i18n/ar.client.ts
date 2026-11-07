@@ -104,6 +104,13 @@ export const arClient: ClientDict = {
     errorVerification: "فشل التحقق. أكمل التحقق وحاول مرة ثانية.",
     errorGeneric: "حاول مرة ثانية لاحقًا أو تواصل معنا مباشرة.",
   },
+  statePanel: {
+    close: "إغلاق",
+    call: "اتصل",
+    reload: "أعد التحميل",
+    pageFailed: "الصفحة ما انفتحت.",
+    draftSaved: "رسالتك محفوظة.",
+  },
   productCard: {
     inquire: "استفسر على الواتساب",
     previous: "الصورة السابقة",

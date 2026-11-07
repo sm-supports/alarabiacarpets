@@ -9,6 +9,7 @@
 | API endpoint | `functions/api/contact.ts` (Cloudflare Workers) |
 | Email template | `functions/email-templates/acknowledgment.ts` |
 | Turnstile widget | `src/components/CloudflareTurnstile.tsx` |
+| Outcome messages | `showStatus` in `src/lib/status.ts`, shown by `StatusRegion` in `StatePanel` |
 
 ## Current Form Fields
 
@@ -123,7 +124,8 @@ Test:
 - Turnstile widget appears and produces a token
 - Submission sends both admin notification and acknowledgment emails
 - Validation errors display correctly for missing/invalid fields
-- Success toast appears after submission
+- A status panel appears after submission, and stays until closed
+- Offline at send: the panel appears, the page stays, and the text is still in the form
 
 ## Rules
 
@@ -131,3 +133,4 @@ Test:
 - Always escape user input with `escapeHtml()` before inserting into email HTML
 - Never remove the Turnstile verification
 - Never remove the Google Ads conversion tracking without explicit instruction
+- Never load a form message from a lazy chunk: offline, the chunk fails and takes the page with it

@@ -108,6 +108,13 @@ export const enClient = {
     errorVerification: "Verification failed. Please complete the check and try again.",
     errorGeneric: "Please try again later or contact us directly.",
   },
+  statePanel: {
+    close: "Close",
+    call: "Call",
+    reload: "Reload",
+    pageFailed: "This page didn't load.",
+    draftSaved: "Your message is saved.",
+  },
   productCard: {
     inquire: "Inquire on WhatsApp",
     previous: "Previous image",

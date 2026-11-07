@@ -3,13 +3,13 @@
 import { useState, memo, useCallback, useMemo, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, MapPin, Mail, Phone, MessageCircle } from "@/components/icons";
 import Link from "next/link";
 import CloudflareTurnstile, {
   type CloudflareTurnstileHandle,
 } from "@/components/CloudflareTurnstile";
 import { trackFormLead, trackPhoneClick } from "@/lib/analytics";
+import { clearStatus, showStatus } from "@/lib/status";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import WhatsAppLink from "@/components/WhatsAppLink";
@@ -48,7 +48,6 @@ const ContactSection = memo(function ContactSection() {
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileFailed, setTurnstileFailed] = useState(false);
   const turnstileRef = useRef<CloudflareTurnstileHandle>(null);
-  const { toast } = useToast();
   const { locale, t: dict, lp } = useI18n();
   const t = dict.contactSection;
 
@@ -66,6 +65,7 @@ const ContactSection = memo(function ContactSection() {
     if (inFlight.current) return;
     inFlight.current = true;
     setIsSubmitting(true);
+    clearStatus();
 
     const content = `${name}\n${email}\n${message}`;
     if (submission.current?.content !== content) {
@@ -101,10 +101,7 @@ const ContactSection = memo(function ContactSection() {
       trackFormLead();
 
       setSubmitted(true);
-      toast({
-        title: t.sentTitle,
-        description: t.sentText(name),
-      });
+      showStatus({ tone: "ok", headline: t.sentTitle, facts: t.sentText(name) });
       setName("");
       setEmail("");
       setMessage("");
@@ -119,20 +116,19 @@ const ContactSection = memo(function ContactSection() {
       turnstileRef.current?.reset();
       setTurnstileToken("");
 
-      toast({
-        title: t.errorTitle,
-        description:
-          errorMsg.includes("verification")
-            ? t.errorVerification
-            : t.errorGeneric,
-        variant: "destructive",
+      showStatus({
+        tone: "fail",
+        headline: t.errorTitle,
+        facts: errorMsg.includes("verification") ? t.errorVerification : t.errorGeneric,
+        urgent: true,
+        focus: true,
       });
     } finally {
       clearTimeout(timeout);
       inFlight.current = false;
       setIsSubmitting(false);
     }
-  }, [name, email, message, turnstileToken, toast, locale, t]);
+  }, [name, email, message, turnstileToken, locale, t]);
 
   const contactMethods = useMemo(() => [
     {

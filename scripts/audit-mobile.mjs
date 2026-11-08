@@ -32,8 +32,9 @@
  * scenarios are the keys of CONTACT_SCENARIOS plus: network, hang, offline, and ts:<mode>
  * for a Turnstile mode (error, timeout, unsupported, expire, pending, challenge,
  * script-fail, script-hang). flow:<name> runs one of FLOWS: early press, a challenge
- * pausing the 15 s clock, the 15 s S8, retries after a lost response, a Resend 409 and a
- * 20 s abort, offline then online, Correct and resend, field errors, a long prefill. The
+ * pausing the 15 s clock, the 15 s S8 and a token after it, retries after a lost response,
+ * a Resend 409 and a 20 s abort, offline then online, Correct and resend, field errors, a
+ * long prefill, leaving for Home while a send is on its way. The
  * draft flows reload the page: offline mid-form then a language switch, a reload after a
  * lost answer and after Sent, a correction, and storage that is full or blocked.
  * Exits 1 if any run ends somewhere it shouldn't. The helpers are exported from
@@ -492,6 +493,18 @@ function flowTools(page, routes, lang, problems) {
       }
       await Promise.all([page.waitForNavigation({ timeout: 8000 }).catch(() => null), link.click()]);
     },
+    /** Taps the navbar logo: a client-side move to Home, whose contact form mounts fresh. */
+    async goHome() {
+      const home = lang === "ar" ? "/ar" : "/";
+      await page.evaluate((href) => document.querySelector(`header a[href="${href}"]`)?.click(), home);
+      const moved = await page
+        .waitForFunction((href) => location.pathname === href && document.querySelector("#contact-name, [data-form-state]"), { timeout: 8000, polling: 50 }, home)
+        .then(() => true, () => false);
+      if (!moved) problems.push(`never reached the Home form (at ${page.url()})`);
+    },
+    /** generate_lead events in dataLayer: what one lead must fire once. */
+    leads: () =>
+      page.evaluate(() => (window.dataLayer ?? []).filter((entry) => entry?.[0] === "event" && entry?.[1] === "generate_lead").length),
     stored: () => page.evaluate(() => JSON.parse(sessionStorage.getItem("contact-draft") ?? "null")),
     bodies: () => routes.contactRequests.map((request) => request.body),
   };
@@ -519,7 +532,7 @@ const FLOWS = {
     await t.waitState("sent");
     t.expect("posted", t.bodies().length, 1);
   },
-  // S8 after 15 s without a token; a token arriving later clears it.
+  // S8 after 15 s without a token. A token soon after still sends that press, as S5 said.
   async "pending-15s"(t) {
     await t.press();
     await t.waitState("checking");
@@ -527,9 +540,66 @@ const FLOWS = {
     t.expect("focus", (await t.read()).focus, "headline");
     t.expect("posted while waiting", t.bodies().length, 0);
     await t.stub("solve");
+    await t.waitState("sent");
+    t.expect("posted", t.bodies().length, 1);
+    t.expect("focus on Sent", (await t.read()).focus, "headline");
+    t.expect("leads", await t.leads(), 1);
+  },
+  // The text changed after S8: the late token clears S8 and sends nothing; focus stays put.
+  async "pending-15s-edited"(t) {
+    await t.press();
+    await t.waitState("checkDown", 17_000);
+    await t.page.type(FIELDS.message, " +");
+    await t.stub("solve");
     await t.waitState(null);
+    await pause(300);
+    t.expect("posted", t.bodies().length, 0);
+    t.expect("focus", (await t.read()).focus, "#contact-message");
     await t.press();
     await t.waitState("sent");
+  },
+  // The visitor took the panel's Call route after S8: the late token sends nothing, and
+  // focus, on the headline that goes, moves to Send rather than the page.
+  async "pending-15s-call"(t) {
+    await t.press();
+    await t.waitState("checkDown", 17_000);
+    await t.page.evaluate(() => {
+      // Counted as a tap on Call without leaving the page.
+      window.addEventListener("click", (event) => event.preventDefault(), { capture: true, once: true });
+      document.querySelector('[data-state-panel] a[href^="tel:"]').click();
+      document.querySelector("[data-state-panel] .sp-title").focus();
+    });
+    await t.stub("solve");
+    await t.waitState(null);
+    await pause(300);
+    t.expect("posted", t.bodies().length, 0);
+    t.expect("focus", (await t.read()).focus, "#contact-send");
+  },
+  // The visitor leaves for Home while the message is on its way. Home's form restored it,
+  // and says it went once the send finishes: one lead, nothing to send again.
+  async "leave-during-send"(t) {
+    await t.press();
+    await pause(300);
+    await t.goHome();
+    await t.waitState("sentBefore", 6000);
+    t.expect("posted", t.bodies().length, 1);
+    t.expect("leads", await t.leads(), 1);
+    await t.page.click(".sp-close");
+    await pause(200);
+    t.expect("empty after Close", Object.values((await t.read()).values).join(""), "");
+  },
+  // As above, but Send is pressed on Home while the first send is still on its way: both
+  // carry one id, Resend answers both as sent, and the lead counts once.
+  async "leave-and-resend"(t) {
+    await t.press();
+    await pause(300);
+    await t.goHome();
+    await t.waitState("restored");
+    await t.press();
+    await t.waitState("sent", 8000);
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", Boolean(first?.submissionId) && second?.submissionId === first?.submissionId, true);
+    t.expect("leads", await t.leads(), 1);
   },
   // The response was lost: the retry reuses the unused token and the submission id.
   async "lost-retry"(t) {
@@ -775,6 +845,10 @@ const FLOW_SETUP = {
   early: { turnstile: "pending" },
   "challenge-pause": { turnstile: "challenge" },
   "pending-15s": { turnstile: "pending" },
+  "pending-15s-edited": { turnstile: "pending" },
+  "pending-15s-call": { turnstile: "pending" },
+  "leave-during-send": { contact: [{ scenario: "ok", delayMs: 2500 }] },
+  "leave-and-resend": { contact: [{ scenario: "ok", delayMs: 2500 }] },
   "lost-retry": { contact: ["network", "ok"] },
   "resend-409": { contact: ["network", "resend_409"] },
   "abort-retry": { contact: ["hang", "ok"] },

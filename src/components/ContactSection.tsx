@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, memo, useCallback, useMemo, useRef, useEffect, type ComponentProps, type ReactNode } from "react";
+import { Fragment, useState, memo, useCallback, useMemo, useRef, useEffect, type ComponentProps, type ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight, MapPin, Mail, MessageCircle } from "@/components/icons";
@@ -14,7 +14,7 @@ import type { StatePanelAction } from "@/lib/status";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useOnline } from "@/hooks/use-online";
-import { clearDraft, readDraft, readSent, saveDraft, saveSent } from "@/lib/draft";
+import { clearDraft, firstCount, readDraft, readSent, saveDraft, saveSent } from "@/lib/draft";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { EMAIL, PHONE, PHONE_E164, WHATSAPP_URL } from "@/lib/site";
@@ -36,6 +36,9 @@ const SLOW_SEND_MS = 8_000;
 // How long a press of Send waits for the security check before saying it can't run.
 // The clock stops while a challenge is showing: then the visitor is the one taking time.
 const CHECK_WAIT_MS = 15_000;
+// A check that finishes this soon after that wait ran out still sends the press, so long
+// as the text is unchanged and the visitor hasn't taken one of the panel's other routes.
+const LATE_SEND_MS = 60_000;
 // A prefilled wa.me link much past 2 KB fails to open on some phones.
 const PREFILL_MAX_BYTES = 1_800;
 
@@ -103,6 +106,17 @@ interface SentBefore {
 
 /** "Already sent at 7:42 PM" names no day, so it is only said on the same one. */
 const isToday = (time: number) => new Date(time).toDateString() === new Date().toDateString();
+
+/** What one submission id stands for: the cleaned text, and whether it went as a correction. */
+const contentOf = (values: Values, correction: boolean) =>
+  `${values.name}\n${values.email}\n${values.message}\n${correction}`;
+
+/**
+ * Every mounted form hears when a send finishes. A send can finish after its form has
+ * unmounted, when the visitor moved to another page while it was on its way, and the
+ * form on that page may have restored the same message from storage.
+ */
+const sentListeners = new Set<(notice: { id: string; ref?: string; at: Date }) => void>();
 
 function clean(values: Values): Values {
   return {
@@ -172,6 +186,23 @@ function prefill(values: Values): { text: string; cut: boolean } {
   return { text: `${chars.slice(0, low).join("").trimEnd()}…${signature}`, cut: true };
 }
 
+/**
+ * A badge's parts joined by " · ". Each part keeps to one line, separator included, so a
+ * badge too long for a narrow panel wraps between parts and never splits "REF 3F2A9C1E".
+ */
+function badgeParts(parts: ReactNode[]): ReactNode {
+  const shown = parts.filter(Boolean);
+  return shown.map((part, index) => (
+    <Fragment key={index}>
+      {index > 0 && " "}
+      <span className="whitespace-nowrap">
+        {part}
+        {index < shown.length - 1 && " ·"}
+      </span>
+    </Fragment>
+  ));
+}
+
 /** Fills {name}-style slots, each value in <bdi> so it keeps its own direction. */
 function fill(template: string, values: Record<string, ReactNode>): ReactNode {
   return template
@@ -232,6 +263,13 @@ const ContactSection = memo(function ContactSection() {
   const widgetFailed = useRef<false | "offline" | "error">(false);
   // Send was pressed before there was a token; it sends when one arrives.
   const pending = useRef(false);
+  // The text that press would send.
+  const pressed = useRef("");
+  // S8 answered a press: when it showed and the text then. A token within LATE_SEND_MS
+  // still sends that press. Any press, or a tap on one of the panel's routes, drops it.
+  const latePress = useRef<{ at: number; content: string } | null>(null);
+  // The text on screen, for the sent listener, which outlives renders.
+  const live = useRef({ name, email, message, correcting });
   const wait = useRef<{ timer?: ReturnType<typeof setTimeout>; left: number; since: number }>({ left: 0, since: 0 });
   const nextId = useRef(1);
   const focusNext = useRef<string | null>(null);
@@ -257,6 +295,7 @@ const ContactSection = memo(function ContactSection() {
     wait.current.timer = setTimeout(() => {
       wait.current.timer = undefined;
       pending.current = false;
+      latePress.current = { at: Date.now(), content: pressed.current };
       show("checkDown", { focus: true, fromWidget: true });
       trackFormFailed("bot_pending");
     }, Math.max(0, wait.current.left));
@@ -268,6 +307,10 @@ const ContactSection = memo(function ContactSection() {
   }, [stopClock]);
 
   useEffect(() => cancelWait, [cancelWait]);
+
+  useEffect(() => {
+    live.current = { name, email, message, correcting };
+  });
 
   useEffect(() => {
     if (!isSubmitting) {
@@ -322,24 +365,54 @@ const ContactSection = memo(function ContactSection() {
   // What this tab typed comes back after a reload or a language switch (S13), with the id
   // its last send used, so pressing Send again can't email it twice. A message that went
   // says so instead (S6r). Nothing sends by itself: the visitor presses Send.
+  //
+  // A draft read here can be a message still on its way from the page the visitor just
+  // left. When that send finishes, this form says it went (S6r) rather than offer it
+  // again. Subscribed in the same effect as the read, so no send can finish in between.
   useEffect(() => {
+    const onSentElsewhere = ({ id, ref, at }: { id: string; ref?: string; at: Date }) => {
+      const held = submission.current;
+      if (held?.id !== id) return;
+      submission.current = null;
+      cancelWait();
+      latePress.current = null;
+      const now = live.current;
+      // Text changed since it was restored stays, behind the panel, for after Close.
+      if (contentOf(clean(now), now.correcting) === held.content) {
+        setName("");
+        setEmail("");
+        setMessage("");
+        setCorrecting(false);
+        setErrors({});
+      }
+      setDraftSaved(false);
+      setFormState(null);
+      setSentBefore({ ref, at });
+    };
+    sentListeners.add(onSentElsewhere);
+    const unsubscribe = () => {
+      sentListeners.delete(onSentElsewhere);
+    };
+
     const draft = readDraft();
     if (draft) {
       setName(draft.name);
       setEmail(draft.email);
       setMessage(draft.message);
       setCorrecting(draft.correction === true);
+      live.current = { name: draft.name, email: draft.email, message: draft.message, correcting: draft.correction === true };
       submission.current = draft.submission ?? null;
       setDraftSaved(true);
       setFormState(
         (state) => state ?? { kind: "restored", id: nextId.current++, focus: false, reveal: false, fromWidget: false }
       );
-      return;
+      return unsubscribe;
     }
     const before = readSent();
     if (before && isToday(before.sentAt)) setSentBefore({ ref: before.ref, at: new Date(before.sentAt) });
     else if (before) clearDraft();
-  }, []);
+    return unsubscribe;
+  }, [cancelWait]);
 
   /**
    * Writes the text through to this tab's storage. Called from the handlers that change
@@ -371,9 +444,12 @@ const ContactSection = memo(function ContactSection() {
   };
 
   const onSent = (values: Values, id: string | undefined, wasCorrection: boolean) => {
-    // A correction is the same lead, already counted.
-    if (wasCorrection) trackFormCorrection();
-    else trackFormLead();
+    // A correction is the same lead, already counted. So is an id this tab has already
+    // seen sent: one lead fires one formLead.
+    if (!id || firstCount(id)) {
+      if (wasCorrection) trackFormCorrection();
+      else trackFormLead();
+    }
     lastSent.current = values;
     submission.current = null;
     const ref = id?.slice(0, 8).toUpperCase();
@@ -388,6 +464,9 @@ const ContactSection = memo(function ContactSection() {
     setErrors({});
     setCorrecting(false);
     setFormState(null);
+    // Runs even when this form has unmounted. It let go of the id above, so only a form
+    // still holding it, on the page the visitor moved to, reacts.
+    if (id) for (const listener of sentListeners) listener({ id, ref, at });
   };
 
   const send = async (turnstileToken: string, values: Values) => {
@@ -397,7 +476,7 @@ const ContactSection = memo(function ContactSection() {
     token.current = "";
 
     const wasCorrection = correcting;
-    const content = `${values.name}\n${values.email}\n${values.message}\n${wasCorrection}`;
+    const content = contentOf(values, wasCorrection);
     if (submission.current?.content !== content) {
       const id = newSubmissionId();
       submission.current = id ? { id, content } : null;
@@ -494,6 +573,7 @@ const ContactSection = memo(function ContactSection() {
   const press = () => {
     if (inFlight.current) return;
     setArmed(true);
+    latePress.current = null;
     const values = clean({ name, email, message });
     const found = validate(values);
     if (FIELDS.some((field) => found[field])) {
@@ -513,6 +593,8 @@ const ContactSection = memo(function ContactSection() {
     }
     if (!TURNSTILE_SITE_KEY || widgetFailed.current === "error") {
       cancelWait();
+      // Turnstile retries after an error by itself, so a token can still come.
+      if (TURNSTILE_SITE_KEY) latePress.current = { at: Date.now(), content: contentOf(values, correcting) };
       show("checkDown", { focus: true, fromWidget: true });
       trackFormFailed(TURNSTILE_SITE_KEY ? "bot_error" : "bot_no_key");
       return;
@@ -530,6 +612,7 @@ const ContactSection = memo(function ContactSection() {
     // S5: sends when the token arrives, or says the check can't run after 15 s.
     cancelWait();
     pending.current = true;
+    pressed.current = contentOf(values, correcting);
     wait.current.left = CHECK_WAIT_MS;
     show(challenge.current ? "challenge" : "checking", { reveal: true });
     if (!challenge.current) runClock();
@@ -540,16 +623,30 @@ const ContactSection = memo(function ContactSection() {
     challenge.current = false;
     timedOut.current = false;
     widgetFailed.current = false;
+    const late = latePress.current;
+    latePress.current = null;
     if (pending.current) {
       cancelWait();
       press();
       return;
     }
-    setFormState((state) =>
-      state && (state.kind === "checking" || state.kind === "challenge" || (state.kind === "checkDown" && state.fromWidget))
-        ? null
-        : state
-    );
+    // The panel this removes may hold focus, on its headline after S8: it goes to Send.
+    const panelFocused = Boolean(panelRef.current?.contains(document.activeElement));
+    // The check finished after S8 answered a press: send that press, as S5 promised,
+    // unless the text has changed since.
+    if (late && Date.now() - late.at < LATE_SEND_MS && contentOf(clean({ name, email, message }), correcting) === late.content) {
+      if (panelFocused) focusNext.current = "contact-send";
+      press();
+      return;
+    }
+    setFormState((state) => {
+      if (!state || !(state.kind === "checking" || state.kind === "challenge" || (state.kind === "checkDown" && state.fromWidget))) {
+        return state;
+      }
+      // Only when the panel really goes, or the next render would take focus from a field.
+      if (panelFocused) focusNext.current = "contact-send";
+      return null;
+    });
   };
 
   const onWidgetFailed = (code: "bot_error" | "bot_unsupported") => {
@@ -557,6 +654,7 @@ const ContactSection = memo(function ContactSection() {
     challenge.current = false;
     const wasPending = pending.current;
     cancelWait();
+    latePress.current = null;
     if (code === "bot_error" && navigator.onLine === false) {
       // Not the check's fault. Tried again when the connection comes back.
       widgetFailed.current = "offline";
@@ -564,6 +662,8 @@ const ContactSection = memo(function ContactSection() {
       return;
     }
     widgetFailed.current = "error";
+    // Turnstile retries after an error by itself, so a token can still come.
+    if (wasPending && code === "bot_error") latePress.current = { at: Date.now(), content: pressed.current };
     show("checkDown", { focus: wasPending, fromWidget: true });
     trackFormFailed(code);
   };
@@ -594,6 +694,7 @@ const ContactSection = memo(function ContactSection() {
     challenge.current = false;
     const wasPending = pending.current;
     cancelWait();
+    latePress.current = null;
     show("checkRejected", { focus: wasPending });
     trackFormFailed("bot_timeout");
     // S9 says "press Send to retry", so the new challenge waits for that press.
@@ -601,9 +702,12 @@ const ContactSection = memo(function ContactSection() {
   };
 
   const closeSent = () => {
-    clearDraft();
+    // Removes the record of the send. Stores the text only when there is some: text the
+    // visitor changed after a draft came back, when that draft's send then finished.
+    persist({ name, email, message }, correcting);
     setSent(null);
     setSentBefore(null);
+    setFormState(null);
     focusNext.current = "contact-send";
   };
 
@@ -709,16 +813,11 @@ const ContactSection = memo(function ContactSection() {
         tone="ok"
         headingAs="h4"
         focusHeadline
-        badge={
-          <>
-            {f.sentBadge} · <bdi>{time}</bdi>
-            {sent.ref && (
-              <>
-                {" "}· {f.refLabel} <bdi>{sent.ref}</bdi>
-              </>
-            )}
-          </>
-        }
+        badge={badgeParts([
+          f.sentBadge,
+          <bdi key="time">{time}</bdi>,
+          sent.ref && <Fragment key="ref">{f.refLabel} <bdi>{sent.ref}</bdi></Fragment>,
+        ])}
         headline={fill(f.sent, { name: sent.name })}
         onClose={closeSent}
         closeLabel={s.close}
@@ -746,16 +845,10 @@ const ContactSection = memo(function ContactSection() {
         variant="inline"
         tone="ok"
         headingAs="h4"
-        badge={
-          <>
-            {f.sentBadge}
-            {sentBefore.ref && (
-              <>
-                {" "}· {f.refLabel} <bdi>{sentBefore.ref}</bdi>
-              </>
-            )}
-          </>
-        }
+        badge={badgeParts([
+          f.sentBadge,
+          sentBefore.ref && <Fragment key="ref">{f.refLabel} <bdi>{sentBefore.ref}</bdi></Fragment>,
+        ])}
         headline={headline}
         onClose={closeSent}
         closeLabel={s.close}
@@ -1087,11 +1180,24 @@ const ContactSection = memo(function ContactSection() {
                   </p>
 
                   {/* data-form-state names the state for scripts/audit-mobile.mjs. */}
-                  {panel && <div ref={panelRef} data-form-state={formState?.kind}>{panel}</div>}
+                  {/* A tap on one of the panel's routes is the visitor's choice: a late
+                      token no longer sends the press that led to S8. */}
+                  {panel && (
+                    <div
+                      ref={panelRef}
+                      data-form-state={formState?.kind}
+                      className="ct-reveal"
+                      onClickCapture={(event) => {
+                        if ((event.target as Element).closest("a, button")) latePress.current = null;
+                      }}
+                    >
+                      {panel}
+                    </div>
+                  )}
 
                   {/* Below the panel, which tells the visitor to tap the box below. */}
                   {TURNSTILE_SITE_KEY && (
-                    <div ref={checkRef}>
+                    <div ref={checkRef} className="ct-reveal">
                     <CloudflareTurnstile
                       key={widgetKey}
                       ref={turnstileRef}

@@ -27,10 +27,11 @@
    with its error strings in `formStates` in both `src/i18n/*.client.ts`.
 2. Add state and an input following the existing ones: `{...fieldProps("x")}`, `INPUT_CLASS`
    (16px text, so iOS doesn't zoom), an `autoComplete`, and `{fieldError("x")}` under it.
-3. Add it to the `Values` that `press()` builds and `send()` posts, and to the `content`
-   string in `send()`, so an edit gets a new submission id.
-4. Clear it in `onSent()` and restore it in `correct()`. Set it through `edit()`, which writes
-   the draft, and add it to `Draft` in `src/lib/draft.ts` and to the restore effect.
+3. Add it to the `Values` that `press()` builds and `send()` posts, and to `contentOf()`,
+   so an edit gets a new submission id.
+4. Clear it in `onSent()` and in `onSentElsewhere` (the restore effect), and restore it in
+   `correct()`. Set it through `edit()`, which writes the draft, and add it to `Draft` in
+   `src/lib/draft.ts`, to the restore effect and to the `live` ref.
 
 ### Backend (`functions/api/contact.ts`)
 

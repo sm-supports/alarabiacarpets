@@ -112,6 +112,28 @@ export function clearDraft(): void {
   write(null);
 }
 
+// Under its own key, so a draft or Sent write can't drop it.
+const COUNTED_KEY = "contact-counted";
+
+/**
+ * Whether this send's lead still has to be counted, and records it as counted. One id can
+ * come back sent twice: a form that restored the message while its first send was still
+ * on its way sends the same id, and Resend answers the replay as sent. True when storage
+ * can't tell, so a lead is never lost to blocked storage.
+ */
+export function firstCount(submissionId: string): boolean {
+  try {
+    const raw = sessionStorage.getItem(COUNTED_KEY);
+    const stored: unknown = raw ? JSON.parse(raw) : [];
+    const ids = Array.isArray(stored) ? stored.filter(isText) : [];
+    if (ids.includes(submissionId)) return false;
+    sessionStorage.setItem(COUNTED_KEY, JSON.stringify([...ids, submissionId].slice(-20)));
+  } catch {
+    // Blocked or full: count it.
+  }
+  return true;
+}
+
 /** False when there is no draft with text in it and when storage is blocked. */
 export function hasStoredDraft(): boolean {
   return readDraft() !== null;

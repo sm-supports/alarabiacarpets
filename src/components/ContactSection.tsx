@@ -13,6 +13,8 @@ import { trackFormCorrection, trackFormFailed, trackFormLead, trackPhoneClick } 
 import type { StatePanelAction } from "@/lib/status";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { useOnline } from "@/hooks/use-online";
+import { clearDraft, readDraft, readSent, saveDraft, saveSent } from "@/lib/draft";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { EMAIL, PHONE, PHONE_E164, WHATSAPP_URL } from "@/lib/site";
@@ -71,7 +73,8 @@ type Kind =
   | "checkDown" // S8: the check can't run
   | "checkRejected" // S9: the check ran and didn't pass
   | "offline" // S11
-  | "online"; // S12
+  | "online" // S12
+  | "restored"; // S13: this tab's draft came back after a reload or a language switch
 
 interface FormState {
   kind: Kind;
@@ -91,6 +94,15 @@ interface Sent {
   ref?: string;
   at: Date;
 }
+
+/** S6r: this tab sent a message earlier today and the page has loaded again since. */
+interface SentBefore {
+  ref?: string;
+  at: Date;
+}
+
+/** "Already sent at 7:42 PM" names no day, so it is only said on the same one. */
+const isToday = (time: number) => new Date(time).toDateString() === new Date().toDateString();
 
 function clean(values: Values): Values {
   return {
@@ -189,8 +201,13 @@ const ContactSection = memo(function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSlow, setIsSlow] = useState(false);
   const [sent, setSent] = useState<Sent | null>(null);
+  const [sentBefore, setSentBefore] = useState<SentBefore | null>(null);
   // Sending from the Sent panel's "Correct and resend".
   const [correcting, setCorrecting] = useState(false);
+  // Whether the last write of the text to this tab's storage read back. The offline
+  // badge only says DRAFT SAVED when it did.
+  const [draftSaved, setDraftSaved] = useState(false);
+  const online = useOnline();
   // Below md the widget loads on the first focus in the form or press of Send.
   const [armed, setArmed] = useState(false);
   // Changing it remounts the widget: only when the connection comes back after the
@@ -302,14 +319,56 @@ const ContactSection = memo(function ContactSection() {
     };
   }, [cancelWait, show]);
 
+  // What this tab typed comes back after a reload or a language switch (S13), with the id
+  // its last send used, so pressing Send again can't email it twice. A message that went
+  // says so instead (S6r). Nothing sends by itself: the visitor presses Send.
+  useEffect(() => {
+    const draft = readDraft();
+    if (draft) {
+      setName(draft.name);
+      setEmail(draft.email);
+      setMessage(draft.message);
+      setCorrecting(draft.correction === true);
+      submission.current = draft.submission ?? null;
+      setDraftSaved(true);
+      setFormState(
+        (state) => state ?? { kind: "restored", id: nextId.current++, focus: false, reveal: false, fromWidget: false }
+      );
+      return;
+    }
+    const before = readSent();
+    if (before && isToday(before.sentAt)) setSentBefore({ ref: before.ref, at: new Date(before.sentAt) });
+    else if (before) clearDraft();
+  }, []);
+
+  /**
+   * Writes the text through to this tab's storage. Called from the handlers that change
+   * it, not from an effect, so the empty first render can never overwrite a draft before
+   * it has been read back.
+   */
+  const persist = (values: Values, isCorrection: boolean) => {
+    setDraftSaved(
+      saveDraft({
+        ...values,
+        ...(isCorrection && { correction: true }),
+        ...(submission.current && { submission: submission.current }),
+      })
+    );
+  };
+
+  const edit = (field: Field, value: string) => {
+    if (field === "name") setName(value);
+    else if (field === "email") setEmail(value);
+    else setMessage(value);
+    setErrors((current) => (current[field] ? { ...current, [field]: undefined } : current));
+    persist({ name, email, message, [field]: value }, correcting);
+  };
+
   const showFieldErrors = (found: FieldErrors) => {
     setErrors(found);
     const first = FIELDS.find((field) => found[field]);
     if (first) focusNext.current = `contact-${first}`;
   };
-
-  const clearError = (field: Field) =>
-    setErrors((current) => (current[field] ? { ...current, [field]: undefined } : current));
 
   const onSent = (values: Values, id: string | undefined, wasCorrection: boolean) => {
     // A correction is the same lead, already counted.
@@ -317,7 +376,12 @@ const ContactSection = memo(function ContactSection() {
     else trackFormLead();
     lastSent.current = values;
     submission.current = null;
-    setSent({ name: values.name, email: values.email, ref: id?.slice(0, 8).toUpperCase(), at: new Date() });
+    const ref = id?.slice(0, 8).toUpperCase();
+    const at = new Date();
+    // The text goes from storage; a reload now says when it was sent (S6r).
+    saveSent({ sentAt: at.getTime(), ref });
+    setDraftSaved(false);
+    setSent({ name: values.name, email: values.email, ref, at });
     setName("");
     setEmail("");
     setMessage("");
@@ -339,6 +403,9 @@ const ContactSection = memo(function ContactSection() {
       submission.current = id ? { id, content } : null;
     }
     const submissionId = submission.current?.id;
+    // Stored before the request leaves: if its answer is lost and the visitor reloads,
+    // the next send uses this id again.
+    persist({ name, email, message }, wasCorrection);
 
     // AbortController rather than AbortSignal.timeout, which older Safari lacks.
     const controller = new AbortController();
@@ -438,6 +505,8 @@ const ContactSection = memo(function ContactSection() {
     setErrors({});
     if (navigator.onLine === false) {
       cancelWait();
+      // Written again here, so the badge's DRAFT SAVED is true at the moment it shows.
+      persist({ name, email, message }, correcting);
       show("offline", { reveal: true });
       trackFormFailed("offline");
       return;
@@ -532,7 +601,9 @@ const ContactSection = memo(function ContactSection() {
   };
 
   const closeSent = () => {
+    clearDraft();
     setSent(null);
+    setSentBefore(null);
     focusNext.current = "contact-send";
   };
 
@@ -542,6 +613,7 @@ const ContactSection = memo(function ContactSection() {
       setName(last.name);
       setEmail(last.email);
       setMessage(last.message);
+      persist(last, true);
     }
     setCorrecting(true);
     setSent(null);
@@ -620,11 +692,10 @@ const ContactSection = memo(function ContactSection() {
   let panel: ReactNode = null;
   let spoken: ReactNode = null;
   let urgent = false;
+  const clock = (at: Date) =>
+    new Intl.DateTimeFormat(locale === "ar" ? "ar-QA-u-nu-latn" : "en-US", { hour: "numeric", minute: "2-digit" }).format(at);
   if (sent) {
-    const time = new Intl.DateTimeFormat(locale === "ar" ? "ar-QA-u-nu-latn" : "en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(sent.at);
+    const time = clock(sent.at);
     const facts = (
       <>
         <p>{fill(f.sentReply, { email: sent.email })}</p>
@@ -665,6 +736,30 @@ const ContactSection = memo(function ContactSection() {
       >
         {facts}
       </StatePanel>
+    );
+  } else if (sentBefore) {
+    // S6r. Not the answer to a press, so focus stays where it is.
+    const headline = fill(f.alreadySent, { time: clock(sentBefore.at) });
+    spoken = headline;
+    panel = (
+      <StatePanel
+        variant="inline"
+        tone="ok"
+        headingAs="h4"
+        badge={
+          <>
+            {f.sentBadge}
+            {sentBefore.ref && (
+              <>
+                {" "}· {f.refLabel} <bdi>{sentBefore.ref}</bdi>
+              </>
+            )}
+          </>
+        }
+        headline={headline}
+        onClose={closeSent}
+        closeLabel={s.close}
+      />
     );
   } else if (formState) {
     const failed = ["refused", "unreachable", "checkDown", "checkRejected"].includes(formState.kind);
@@ -730,7 +825,7 @@ const ContactSection = memo(function ContactSection() {
       },
       offline: {
         tone: "fail",
-        badge: f.offlineBadge,
+        badge: draftSaved ? `${f.offlineBadge} · ${f.draftSavedBadge}` : f.offlineBadge,
         headline: f.kept,
         children: <p>{f.offline} {f.calls} {f.open}</p>,
         primary: call,
@@ -741,6 +836,7 @@ const ContactSection = memo(function ContactSection() {
         children: <p>{f.onlineNext}</p>,
         primary: sendButton(f.send),
       },
+      restored: { headline: f.restored },
     };
     const { urgent: isUrgent = false, children, ...view } = views[formState.kind];
     urgent = isUrgent;
@@ -904,8 +1000,8 @@ const ContactSection = memo(function ContactSection() {
                     </p>
                   </noscript>
                 </>
-              ) : sent ? (
-                <div data-form-state="sent">{panel}</div>
+              ) : sent || sentBefore ? (
+                <div data-form-state={sent ? "sent" : "sentBefore"}>{panel}</div>
               ) : (
                 <form
                   noValidate
@@ -923,10 +1019,7 @@ const ContactSection = memo(function ContactSection() {
                       type="text"
                       autoComplete="name"
                       value={name}
-                      onChange={(e) => {
-                        setName(e.target.value);
-                        clearError("name");
-                      }}
+                      onChange={(e) => edit("name", e.target.value)}
                       className={INPUT_CLASS}
                       placeholder={t.namePlaceholder}
                     />
@@ -941,10 +1034,7 @@ const ContactSection = memo(function ContactSection() {
                       dir="ltr"
                       autoComplete="email"
                       value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        clearError("email");
-                      }}
+                      onChange={(e) => edit("email", e.target.value)}
                       className={INPUT_CLASS}
                       placeholder={t.emailPlaceholder}
                     />
@@ -956,16 +1046,23 @@ const ContactSection = memo(function ContactSection() {
                     <Textarea
                       {...fieldProps("message")}
                       value={message}
-                      onChange={(e) => {
-                        setMessage(e.target.value);
-                        clearError("message");
-                      }}
+                      onChange={(e) => edit("message", e.target.value)}
                       rows={4}
                       className={TEXTAREA_CLASS}
                       placeholder={t.messagePlaceholder}
                     />
                     {fieldError("message")}
                   </div>
+
+                  {/* Offline mid-form, a word that the text is safe. At Send it becomes S11, which
+                      carries the same badge. Always rendered, like the status line below. */}
+                  <p role="status" className="text-center empty:hidden">
+                    {!online && formState?.kind !== "offline" && (
+                      <span className="sp-badge sp-badge-fail mb-0">
+                        {draftSaved ? `${f.offlineBadge} · ${f.draftSavedBadge}` : f.offlineBadge}
+                      </span>
+                    )}
+                  </p>
 
                   <button
                     id="contact-send"

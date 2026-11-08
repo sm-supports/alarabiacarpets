@@ -33,7 +33,9 @@
  * for a Turnstile mode (error, timeout, unsupported, expire, pending, challenge,
  * script-fail, script-hang). flow:<name> runs one of FLOWS: early press, a challenge
  * pausing the 15 s clock, the 15 s S8, retries after a lost response, a Resend 409 and a
- * 20 s abort, offline then online, Correct and resend, field errors, a long prefill.
+ * 20 s abort, offline then online, Correct and resend, field errors, a long prefill. The
+ * draft flows reload the page: offline mid-form then a language switch, a reload after a
+ * lost answer and after Sent, a correction, and storage that is full or blocked.
  * Exits 1 if any run ends somewhere it shouldn't. The helpers are exported from
  * lib/browser.mjs for anything more specific.
  */
@@ -315,6 +317,11 @@ const LABELS = {
   en: { tryAgain: "Try again", send: "Send", correct: "Correct and resend", copy: "Copy", copied: "Copied" },
   ar: { tryAgain: "حاول مرة ثانية", send: "إرسال", correct: "عدّل وأعد الإرسال", copy: "انسخ", copied: "تم النسخ" },
 };
+// The offline badge, alone and with the draft saved.
+const OFFLINE = {
+  en: { alone: "OFFLINE", saved: "OFFLINE · DRAFT SAVED" },
+  ar: { alone: "بدون إنترنت", saved: "بدون إنترنت · المسودة محفوظة" },
+};
 
 /**
  * One press of Send and the state it must end in (data-form-state in ContactSection), with
@@ -338,7 +345,7 @@ const SINGLE = {
   unknown_code: { state: "refused", focus: "headline" },
   not_json: { state: "refused", focus: "headline" },
   network: { state: "unreachable", focus: "headline" },
-  offline: { state: "offline", focus: "#contact-send", posted: 0 },
+  offline: { state: "offline", focus: "#contact-send", posted: 0, badge: "saved" },
   hang: { state: "noReply", focus: "headline", settle: 21_000 },
   "ts:error": { state: "checkDown", focus: "headline", posted: 0 },
   "ts:timeout": { state: "checkRejected", focus: "headline", posted: 0 },
@@ -378,7 +385,28 @@ function readFormState(fields) {
     said: [...new Set(said)],
     online: navigator.onLine,
     hasForm: Boolean(document.querySelector("form")),
+    // The badge above Send while offline mid-form.
+    offlineLine: clean(document.querySelector("form > p[role='status'] .sp-badge")),
+    path: location.pathname,
   };
+}
+
+/**
+ * Runs in the page before any of its scripts: sessionStorage full (every write throws)
+ * or blocked (touching it throws, as with cookies blocked).
+ */
+function breakStorage(mode) {
+  if (mode === "full") {
+    Storage.prototype.setItem = function () {
+      throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
+    };
+  } else {
+    Object.defineProperty(window, "sessionStorage", {
+      get() {
+        throw new DOMException("Access is denied for this document.", "SecurityError");
+      },
+    });
+  }
 }
 
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -424,7 +452,8 @@ function flowTools(page, routes, lang, problems) {
       return reached;
     },
     expect(label, actual, wanted) {
-      if (actual !== wanted) problems.push(`${label}: ${JSON.stringify(actual)}, wanted ${JSON.stringify(wanted)}`);
+      // By value, so the fields and the button list compare too.
+      if (JSON.stringify(actual) !== JSON.stringify(wanted)) problems.push(`${label}: ${JSON.stringify(actual)}, wanted ${JSON.stringify(wanted)}`);
     },
     /** Presses the panel button with this label. */
     async action(key) {
@@ -441,6 +470,29 @@ function flowTools(page, routes, lang, problems) {
     async waitToken() {
       await page.waitForFunction(() => (window.__turnstileStub?.tokens ?? 0) > 0, { timeout: 4000, polling: 50 }).catch(() => {});
     },
+    /** Reloads, as the visitor's own reload button would, and waits for the form or a panel. */
+    async reload() {
+      await page.reload({ waitUntil: "load" }).catch(() => null);
+      const ready = await page
+        .waitForFunction(() => document.querySelector("#contact-name, [data-form-state]"), { timeout: 8000, polling: 50 })
+        .then(() => true, () => false);
+      if (!ready) problems.push(`no form after reload (at ${page.url()})`);
+      await pause(300);
+    },
+    /** Taps the navbar's language link: a full page load, so offline it ends on the browser's error page. */
+    async switchLanguage() {
+      const link = (
+        await page.evaluateHandle(() =>
+          [...document.querySelectorAll("a[hreflang]")].find((a) => a.checkVisibility() && a.getBoundingClientRect().width > 0)
+        )
+      ).asElement();
+      if (!link) {
+        problems.push("no visible language link");
+        return;
+      }
+      await Promise.all([page.waitForNavigation({ timeout: 8000 }).catch(() => null), link.click()]);
+    },
+    stored: () => page.evaluate(() => JSON.parse(sessionStorage.getItem("contact-draft") ?? "null")),
     bodies: () => routes.contactRequests.map((request) => request.body),
   };
   return tools;
@@ -609,6 +661,102 @@ const FLOWS = {
       t.expect("working clipboard says Copied", (await t.read()).actions.includes(LABELS[t.lang].copied), true);
     }
   },
+  // Offline mid-form the badge says the draft is saved. The language link then lands on
+  // the browser's offline page; back online, its reload opens the other language with the
+  // text back (S13), and nothing is sent until Send is pressed.
+  async "draft-switch"(t) {
+    await t.routes.setOffline(true);
+    await pause(200);
+    t.expect("offline line", (await t.read()).offlineLine, OFFLINE[t.lang].saved);
+    await t.switchLanguage();
+    t.expect("form gone while offline", await t.page.evaluate(() => Boolean(document.querySelector("#contact-name"))), false);
+    await t.routes.setOffline(false);
+    await t.reload();
+    const after = await t.read();
+    t.expect("path", after.path, t.lang === "ar" ? "/contact" : "/ar/contact");
+    t.expect("state", after.state, "restored");
+    t.expect("text", after.values, t.text);
+    t.expect("offline line once online", after.offlineLine, null);
+    await pause(1000);
+    t.expect("posted by itself", t.bodies().length, 0);
+    await t.press();
+    await t.waitState("sent", 6000);
+    t.expect("posted", t.bodies().length, 1);
+  },
+  // The answer to a send was lost and the visitor reloads: the text is back (S13) and the
+  // next send carries the same submissionId, so Resend can't email the team twice.
+  async "reload-lost"(t) {
+    await t.press();
+    await t.waitState("unreachable");
+    await t.reload();
+    const after = await t.read();
+    t.expect("state", after.state, "restored");
+    t.expect("text", after.values, t.text);
+    await pause(500);
+    t.expect("posted by itself", t.bodies().length, 1);
+    await t.press();
+    await t.waitState("sent", 6000);
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", Boolean(first?.submissionId) && second?.submissionId === first?.submissionId, true);
+  },
+  // A reload after Sent says when it went (S6r) rather than offer an empty form. The text
+  // left storage with the send; Close forgets the rest.
+  async "reload-sent"(t) {
+    await t.press();
+    await t.waitState("sent");
+    const ref = (await t.read()).badge?.match(/[0-9A-F]{8}/)?.[0];
+    const stored = await t.stored();
+    t.expect("text out of storage", stored?.draft, undefined);
+    t.expect("REF stored", stored?.sent?.ref, ref);
+    await t.reload();
+    const after = await t.read();
+    t.expect("state", after.state, "sentBefore");
+    t.expect("REF", Boolean(ref) && after.badge?.includes(ref), true);
+    t.expect("headline", /^(Already sent at|انرسلت الساعة) \S+/.test(after.headline ?? ""), true);
+    t.expect("actions", after.actions, []);
+    t.expect("Close", after.hasClose, true);
+    t.expect("focus left alone", after.focus === "headline", false);
+    await t.page.click(".sp-close");
+    await pause(200);
+    const closed = await t.read();
+    t.expect("empty after Close", Object.values(closed.values).join(""), "");
+    t.expect("focus after Close", closed.focus, "#contact-send");
+    await t.reload();
+    t.expect("state after Close and reload", (await t.read()).state, null);
+    t.expect("posted", t.bodies().length, 1);
+  },
+  // A correction in progress survives a reload and still goes as a correction.
+  async "correction-reload"(t) {
+    await t.press();
+    await t.waitState("sent");
+    await t.action("correct");
+    await t.waitState(null);
+    await setField(t.page, FIELDS.message, `${t.text.message} +`);
+    await t.reload();
+    const after = await t.read();
+    t.expect("state", after.state, "restored");
+    t.expect("corrected text", after.values.message, `${t.text.message} +`);
+    await t.press();
+    await t.waitState("sent", 6000);
+    const [first, second] = t.bodies();
+    t.expect("second is a correction", second?.correction, true);
+    t.expect("new submissionId", second?.submissionId !== first?.submissionId, true);
+  },
+  // Storage full or blocked: the form works, and nothing claims the draft is saved.
+  async "storage-full"(t) {
+    await t.routes.setOffline(true);
+    await pause(200);
+    t.expect("offline line", (await t.read()).offlineLine, OFFLINE[t.lang].alone);
+    await t.press();
+    await t.waitState("offline");
+    t.expect("badge", (await t.read()).badge, OFFLINE[t.lang].alone);
+    await t.routes.setOffline(false);
+    await t.waitState("online");
+    await t.action("send");
+    await t.waitState("sent", 6000);
+    await t.reload();
+    t.expect("state after reload", (await t.read()).state, null);
+  },
   // S9 from the challenge timing out, before any press; Send resets the widget.
   async "timeout-retry"(t) {
     await t.waitState("checkRejected");
@@ -620,6 +768,8 @@ const FLOWS = {
     t.expect("focus after the press", (await t.read()).focus, "headline");
   },
 };
+
+FLOWS["storage-blocked"] = FLOWS["storage-full"];
 
 const FLOW_SETUP = {
   early: { turnstile: "pending" },
@@ -634,6 +784,12 @@ const FLOW_SETUP = {
   fields: { type: false },
   "long-prefill": { contact: "send_failed" },
   "timeout-retry": { turnstile: "timeout" },
+  "draft-switch": {},
+  "reload-lost": { contact: ["network", "ok"] },
+  "reload-sent": {},
+  "correction-reload": {},
+  "storage-full": { storage: "full" },
+  "storage-blocked": { storage: "blocked" },
 };
 
 async function runForm(browser, origin) {
@@ -654,6 +810,7 @@ async function runForm(browser, origin) {
         const turnstile = setup.turnstile ?? (scenario.startsWith("ts:") ? scenario.slice(3) : "pass");
         const contact = setup.contact ?? (flow || scenario === "offline" || scenario.startsWith("ts:") ? "ok" : scenario);
         const routes = await installRoutes(page, { origin, turnstile, contact });
+        if (setup.storage) await page.evaluateOnNewDocument(breakStorage, setup.storage);
         await gotoSettled(page, `${origin}${localized(lang, "/contact")}`);
         await page.waitForSelector(FIELDS.name, { timeout: 8000 });
         await page.evaluate((selector) => document.querySelector(selector).scrollIntoView({ block: "center", behavior: "instant" }), FIELDS.name);
@@ -681,6 +838,9 @@ async function runForm(browser, origin) {
           }
           const kept = Object.keys(FIELDS).every((key) => state.values[key] === text[key]);
           if (single.state !== "sent" && !kept) problems.push("text lost");
+          if (single.badge && state.badge !== OFFLINE[lang][single.badge]) {
+            problems.push(`badge ${state.badge}, wanted ${OFFLINE[lang][single.badge]}`);
+          }
         }
         if (routes.errors.length) problems.push(...routes.errors.map((error) => `page error: ${error}`));
         if (shots) await screenshot(page, `form-${scenario.replace(":", "-")}-${lang}-${width}`);

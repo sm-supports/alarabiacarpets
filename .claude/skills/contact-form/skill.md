@@ -10,6 +10,7 @@
 | Email template | `functions/email-templates/acknowledgment.ts` |
 | Turnstile widget | `src/components/CloudflareTurnstile.tsx` |
 | Outcome messages | Inline `StatePanel`s in `ContactSection.tsx` (`data-form-state`), strings in `formStates` in `src/i18n/*.client.ts`, one per API `code` |
+| Draft | `src/lib/draft.ts`: the text in this tab's sessionStorage (`contact-draft`), with the submission id, or the sent time and REF after a send. Import-free, because `app/global-error.tsx` reads it |
 
 ## Current Form Fields
 
@@ -28,7 +29,8 @@
    (16px text, so iOS doesn't zoom), an `autoComplete`, and `{fieldError("x")}` under it.
 3. Add it to the `Values` that `press()` builds and `send()` posts, and to the `content`
    string in `send()`, so an edit gets a new submission id.
-4. Clear it in `onSent()` and restore it in `correct()`.
+4. Clear it in `onSent()` and restore it in `correct()`. Set it through `edit()`, which writes
+   the draft, and add it to `Draft` in `src/lib/draft.ts` and to the restore effect.
 
 ### Backend (`functions/api/contact.ts`)
 

@@ -98,8 +98,8 @@ export const enClient = {
     send: "Send Message",
   },
   /**
-   * What the contact form says after Send: the plan's state catalogue (S5 to S12, S19).
-   * {name}, {email} and {ref} are filled in by ContactSection, inside <bdi>.
+   * What the contact form says: the plan's state catalogue (S5 to S13, S19).
+   * {name}, {email}, {ref} and {time} are filled in by ContactSection, inside <bdi>.
    */
   formStates: {
     sentBadge: "SENT",
@@ -107,6 +107,7 @@ export const enClient = {
     notSentBadge: "NOT SENT",
     noReplyBadge: "NO REPLY",
     offlineBadge: "OFFLINE",
+    draftSavedBadge: "DRAFT SAVED",
     kept: "Your text is still here.",
     open: "We're open every day, 8:00 AM to 10:00 PM.",
     calls: "Calls don't need internet.",
@@ -125,6 +126,8 @@ export const enClient = {
     offline: "Turn on Wi-Fi or mobile data, then press Send.",
     online: "You're back online.",
     onlineNext: "Press Send when ready.",
+    restored: "Draft restored.",
+    alreadySent: "Already sent at {time}.",
     addName: "Add your name.",
     addEmail: "Add the full email, like name@gmail.com.",
     addMessage: "Add your message.",

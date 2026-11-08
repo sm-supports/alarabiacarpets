@@ -13,6 +13,7 @@ import { onTap, type Tap } from "@/lib/tap";
  *
  * Below md only. One status at a time: a form state in view outranks all of these, then
  * S4, S2, S1, S3, and a lower one never replaces a higher one or a status raised elsewhere.
+ * A new tap clears what an earlier tap raised, and S4 goes when the connection comes back.
  * A tap inside a form or page state (the Sent panel's follow-up, a failure's "Send this on
  * WhatsApp", the error page's Call) gets nothing here: that state already says what
  * happened and what comes next. So S1 never follows the follow-up, and never follows S4.
@@ -111,12 +112,12 @@ export function forgetTap() {
 
 /**
  * A WhatsApp link was tapped (after hydration, when it points at wa.me). Never stops the
- * tap, offline included: S4 only warns, and the app may open anyway.
- * @param conversion false for the Sent panel's follow-up, which gets no feedback.
+ * tap, offline included: S4 only warns, and the app may open anyway. Whether the tap
+ * counts for Ads plays no part: the Sent panel's follow-up, which doesn't, is form-bound.
  */
-function noteWhatsAppTap(link: Element, tap: WhatsAppTap, conversion: boolean) {
+function noteWhatsAppTap(link: Element, tap: WhatsAppTap) {
   forgetTap();
-  if (!narrow() || !conversion || bound(link)) return;
+  if (!narrow() || bound(link)) return;
   if (navigator.onLine === false) {
     raise("s4", tap);
     return;
@@ -139,8 +140,11 @@ function noteCallTap(link: Element) {
 }
 
 function onTapped(tap: Tap) {
+  // What was said about an earlier tap is out of date now: an S4 from before the
+  // connection came back would otherwise outrank this tap's S2 or S1.
+  dismiss();
   if (tap.kind === "call") noteCallTap(tap.link);
-  else noteWhatsAppTap(tap.link, { href: tap.href, source: tap.source }, tap.conversion);
+  else noteWhatsAppTap(tap.link, { href: tap.href, source: tap.source });
 }
 
 function onVisibility() {
@@ -167,9 +171,23 @@ function onVisibility() {
   else if (now - tap.hiddenAt < CALL_BACK_MS) raise("s3", null);
 }
 
-/** The visitor has moved on: typing, sending the form, or opening the menu. */
+/**
+ * The visitor has moved on: typing, sending the form, or opening the menu. The tap is
+ * dropped too, so its S2 or S1 can't come later, over the menu or a field in use. Not a
+ * tap whose page went to the background: focus coming back with the visitor is no move.
+ */
+function movedOn() {
+  if (pending?.hiddenAt === null) forgetTap();
+  dismiss();
+}
+
 function onFocusIn(event: FocusEvent) {
-  if (event.target instanceof Element && event.target.closest('input, textarea, select, [role="dialog"]')) dismiss();
+  if (event.target instanceof Element && event.target.closest('input, textarea, select, [role="dialog"]')) movedOn();
+}
+
+/** S4's warning is out of date once the connection is back. */
+function onOnline() {
+  if (shown?.kind === "s4") dismiss();
 }
 
 function onWide(event: MediaQueryListEvent) {
@@ -186,13 +204,15 @@ export function installTapFeedback(nextView: FeedbackView): () => void {
   document.addEventListener("visibilitychange", onVisibility);
   // A real navigation away (bfcache included) ends the tap; switching apps doesn't fire it.
   window.addEventListener("pagehide", forgetTap);
-  document.addEventListener("submit", dismiss, true);
+  window.addEventListener("online", onOnline);
+  document.addEventListener("submit", movedOn, true);
   document.addEventListener("focusin", onFocusIn, true);
   wide.addEventListener("change", onWide);
   return () => {
     document.removeEventListener("visibilitychange", onVisibility);
     window.removeEventListener("pagehide", forgetTap);
-    document.removeEventListener("submit", dismiss, true);
+    window.removeEventListener("online", onOnline);
+    document.removeEventListener("submit", movedOn, true);
     document.removeEventListener("focusin", onFocusIn, true);
     wide.removeEventListener("change", onWide);
     forgetTap();

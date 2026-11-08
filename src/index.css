@@ -792,9 +792,11 @@
   .ct-skel-area { @apply h-[114px] rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
   .ct-skel-btn { @apply w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl text-center opacity-50; }
   .ct-error { @apply mt-1.5 text-sm text-red-300; }
-  /* The form's stand-in without JavaScript: Call and email, each a 44px tap. */
-  .ct-noscript { @apply mt-4 text-white; }
-  .ct-noscript a { @apply inline-flex min-h-11 items-center; }
+  /* The form's stand-in without JavaScript: Call and email, each a 44px tap, side by side
+     where they fit and stacked where they don't, so no separator is left at a line end.
+     The gap keeps "Call" apart from the number, which the flex layout would join. */
+  .ct-noscript { @apply mt-4 flex flex-wrap gap-x-6 text-white; }
+  .ct-noscript a { @apply inline-flex min-h-11 items-center gap-1; }
   /* What a press of Send scrolls into view (a form state, the Turnstile box) stops clear
      of what is fixed at the bottom, so it never covers their buttons. Below md that is
      the action bar, which html's scroll-padding-bottom already clears (end of this
@@ -891,6 +893,13 @@
   .site-header.is-scrolled { @apply border-b bg-white/80 shadow-subtle backdrop-blur-xl max-md:bg-white max-md:backdrop-blur-none; }
   .nav-burger { @apply relative flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-200 hover:bg-gray-100; }
   .nav-line { @apply absolute left-0 h-0.5 w-5 bg-forest-900 transition-all duration-300; }
+  /* The phone header's language switch, beside the menu button. */
+  .nav-lang { @apply flex h-11 min-w-11 items-center justify-center rounded-full px-2 text-sm font-semibold text-forest-900; }
+  /* "EN" on an Arabic page is set in Tajawal, which puts Latin capitals 3.5px above the
+     middle of the line: this lines it up with the menu icon and leaves the 44px box where
+     it is. The Arabic letter on an English page comes from each phone's own Arabic font,
+     so it is left alone. */
+  .nav-lang:lang(en) { padding-top: 7px; }
 }
 
 /* The action bar (WhatsAppFloat). Below md: Call (a third) and Get a Free Quote (two

@@ -208,7 +208,7 @@ const Navbar = memo(function Navbar() {
             <div className="md:hidden flex items-center gap-1">
             <LanguageSwitcher
               short
-              className="min-w-11 h-11 px-2 flex items-center justify-center text-sm font-semibold text-forest-900 rounded-full"
+              className="nav-lang"
             />
             {hydrated ? (
               <button

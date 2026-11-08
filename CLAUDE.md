@@ -41,7 +41,7 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 | `src/lib/site.ts` | Phone, WhatsApp and email constants with no imports, for client components |
 | `src/lib/card-image.ts` | Sized copies of catalog photos (`cardImage`, `fullImage`). Server only |
 | `src/lib/analytics.ts` | GA4 + Google Ads events — all tracking goes through here |
-| `src/lib/status.ts` | The overlay status (the plan's S1-S4 tap feedback): `showStatus` puts one `StatePanel` on screen through `StatusRegion` in `providers.tsx`. No caller until the tap-feedback package (WP6). The contact form's states are inline in `ContactSection`, not here. No lazy chunks: a failure has to report itself offline |
+| `src/lib/status.ts` | The overlay status (the plan's S1-S4 tap feedback): `showStatus` puts one `StatePanel` on screen through `StatusRegion` in `providers.tsx`. Its caller is `src/lib/feedback.ts`, installed by `TapFeedback`. The contact form's states are inline in `ContactSection`, not here. No lazy chunks: a failure has to report itself offline |
 
 ## Commands
 

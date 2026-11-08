@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import CallLink from "@/components/CallLink";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { useI18n } from "@/i18n/LocaleProvider";
-import { trackWhatsAppReopen } from "@/lib/analytics";
+import { BAR_SENDS_ADS, trackWhatsAppReopen } from "@/lib/analytics";
 import { barQuoteMessage, getBarIntent } from "@/lib/bar-intent";
 import { forgetTap, installTapFeedback, type FeedbackView } from "@/lib/feedback";
 
@@ -53,10 +53,12 @@ export default function TapFeedback() {
           return {
             headline: f.callBack,
             facts: <p>{t.formStates.open}</p>,
-            // The bar's quote, with the bar's prefill: a new WhatsApp tap, counted as one.
+            // The bar's quote, with the bar's prefill: a new WhatsApp tap, counted for Ads
+            // as the bar's taps are, since it stands in for the bar.
             primary: (
               <WhatsAppLink
                 source="feedback_s3"
+                conversion={BAR_SENDS_ADS}
                 message={barQuoteMessage(t, getBarIntent(), window.location.pathname)}
                 className="cta"
                 onClick={done}

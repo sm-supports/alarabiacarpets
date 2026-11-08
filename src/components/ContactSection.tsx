@@ -682,10 +682,27 @@ const ContactSection = memo(function ContactSection() {
       return;
     }
     widgetFailed.current = "error";
-    // Turnstile retries after an error by itself, so a token can still come.
-    if (wasPending && code === "bot_error") latePress.current = { at: Date.now(), content: pressed.current };
-    show("checkDown", { focus: wasPending, fromWidget: true });
     trackFormFailed(code);
+    if (wasPending) {
+      // Turnstile retries after an error by itself, so a token can still come.
+      if (code === "bot_error") latePress.current = { at: Date.now(), content: pressed.current };
+      show("checkDown", { focus: true, fromWidget: true });
+      return;
+    }
+    // No press is waiting, so the next press answers with S8 (press() reads widgetFailed).
+    // It shows now only in place of news or of a challenge that can no longer finish, and
+    // only over text, so its NOT SENT and "Your text is still here" are true. A failure
+    // the visitor hasn't acted on stays: S8 over S7b would say NOT SENT, and offer
+    // WhatsApp, about a message that may have arrived, and a late token would then clear it.
+    const replaces = (kind?: Kind) => !kind || kind === "restored" || kind === "online" || kind === "challenge";
+    if (!replaces(formState?.kind)) return;
+    const values = clean({ name, email, message });
+    if (FIELDS.some((field) => values[field])) show("checkDown", { fromWidget: true });
+    else if (formState?.kind === "challenge") {
+      // The box it pointed at has failed, so there is nothing left to tap.
+      keepFocus();
+      setFormState(null);
+    }
   };
 
   const onChallengeShown = () => {
@@ -1048,7 +1065,7 @@ const ContactSection = memo(function ContactSection() {
                   {/* Without JavaScript the form never arrives. */}
                   <noscript>
                     <p className="ct-noscript">
-                      <a href={`tel:${PHONE_E164}`}>{s.call} <bdi>{PHONE}</bdi></a> · <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+                      <a href={`tel:${PHONE_E164}`}>{s.call} <bdi dir="ltr">{PHONE}</bdi></a> <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
                     </p>
                   </noscript>
                 </>

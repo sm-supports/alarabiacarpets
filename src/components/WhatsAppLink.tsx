@@ -60,7 +60,7 @@ export default function WhatsAppLink({
       onClick={(e) => {
         trackWhatsAppClick(source, conversion);
         // Before hydration the link goes to the contact page, not WhatsApp.
-        if (hydrated) reportTap({ kind: "whatsapp", link: e.currentTarget, href: target, source, conversion });
+        if (hydrated) reportTap({ kind: "whatsapp", link: e.currentTarget, href: target, source });
         rest.onClick?.(e);
       }}
     >

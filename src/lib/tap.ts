@@ -4,7 +4,7 @@
  * drives stays in the layout's code instead of joining each page's.
  */
 export type Tap =
-  | { kind: "whatsapp"; link: Element; href: string; source: string; conversion: boolean }
+  | { kind: "whatsapp"; link: Element; href: string; source: string }
   | { kind: "call"; link: Element };
 
 let listener: ((tap: Tap) => void) | null = null;

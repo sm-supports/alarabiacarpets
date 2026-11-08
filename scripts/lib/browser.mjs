@@ -64,14 +64,17 @@ export async function newPage(browser, { width = 390, height, javascript = true,
  * Every answer functions/api/contact.ts gives, status and body exactly as it sends them
  * (fail() and respond() there). bot_unavailable is 403 like bot_rejected because
  * verifyTurnstileToken fails closed; the code tells them apart. The Function never
- * answers 409: when Resend says 409 (it already has a send under this submission's
- * idempotency key) the Function answers 200, so `resend_409` is that 200. `unknown_code`
- * and `not_json` are what the form must survive anyway: a code it doesn't know, and a
- * platform error page.
+ * answers 409: when Resend says 409 because it already sent under this submission's
+ * idempotency key, the Function answers 200, so `resend_409` is that 200. When Resend says
+ * the first send under the key is still in progress, the Function asks once more and,
+ * still without an answer, says `send_unknown`, as it does when Resend times out or can't
+ * be reached. `send_failed` is Resend refusing the message. `unknown_code` and `not_json`
+ * are what the form must survive anyway: a code it doesn't know, and a platform error page.
  */
 export const CONTACT_SCENARIOS = {
   ok: { status: 200, body: { message: "Email sent successfully" } },
   resend_409: { status: 200, body: { message: "Email sent successfully" } },
+  send_unknown: { status: 502, body: { error: "No answer from the email service", code: "send_unknown" } },
   bad_body: { status: 400, body: { error: "Invalid request body", code: "bad_body" } },
   bot_required: { status: 400, body: { error: "Bot verification required", code: "bot_required" } },
   bot_rejected: { status: 403, body: { error: "Bot verification failed", code: "bot_rejected" } },

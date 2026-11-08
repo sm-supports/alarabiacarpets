@@ -33,10 +33,12 @@
  * for a Turnstile mode (error, timeout, unsupported, expire, pending, challenge,
  * script-fail, script-hang). flow:<name> runs one of FLOWS: early press, a challenge
  * pausing the 15 s clock, the 15 s S8 and a token after it, retries after a lost response,
- * a Resend 409 and a 20 s abort, offline then online, Correct and resend, field errors, a
- * long prefill, leaving for Home while a send is on its way. The
- * draft flows reload the page: offline mid-form then a language switch, a reload after a
- * lost answer and after Sent, a correction, and storage that is full or blocked.
+ * a connection lost mid-send, a Resend 409, send_unknown and a 20 s abort, Try again from
+ * the keyboard, offline then online, Correct and resend, field errors, a long prefill,
+ * leaving for Home while a send is on its way. The draft flows reload the page: offline
+ * mid-form then a language switch, a reload after a lost answer, with an id past 23 hours
+ * and after Sent, a correction, S13 cleared by an edit or replaced by a challenge, and
+ * storage that is full or blocked.
  * Exits 1 if any run ends somewhere it shouldn't. The helpers are exported from
  * lib/browser.mjs for anything more specific.
  */
@@ -342,6 +344,9 @@ const SINGLE = {
   too_long: { state: "refused", focus: "headline" },
   invalid_email: { state: "field:email", focus: "#contact-email" },
   send_failed: { state: "refused", focus: "headline" },
+  // Resend timed out, couldn't be reached, or was still busy with this key: it may have
+  // arrived, so S7b, whose Try again is safe, not S7, whose WhatsApp would send it twice.
+  send_unknown: { state: "noReply", focus: "headline" },
   server_error: { state: "refused", focus: "headline" },
   unknown_code: { state: "refused", focus: "headline" },
   not_json: { state: "refused", focus: "headline" },
@@ -601,7 +606,8 @@ const FLOWS = {
     t.expect("same submissionId", Boolean(first?.submissionId) && second?.submissionId === first?.submissionId, true);
     t.expect("leads", await t.leads(), 1);
   },
-  // The response was lost: the retry reuses the unused token and the submission id.
+  // The response was lost while online: the request may have reached the Function and
+  // used the token, so the retry gets a new one, with the same submission id.
   async "lost-retry"(t) {
     await t.press();
     await t.waitState("unreachable");
@@ -609,7 +615,55 @@ const FLOWS = {
     await t.waitState("sent");
     const [first, second] = t.bodies();
     t.expect("same submissionId", second?.submissionId, first?.submissionId);
-    t.expect("same token (never redeemed)", second?.turnstileToken, first?.turnstileToken);
+    t.expect("new token", Boolean(first?.turnstileToken) && second?.turnstileToken !== first?.turnstileToken, true);
+  },
+  // The connection dropped while the message was on its way: the request never left, so
+  // the token is unused and the Send after reconnecting reuses it.
+  async "offline-mid-send"(t) {
+    await t.press();
+    await pause(150);
+    await t.routes.setOffline(true);
+    await t.waitState("offline");
+    await t.routes.setOffline(false);
+    await t.waitState("online");
+    await t.action("send");
+    await t.waitState("sent", 6000);
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", second?.submissionId, first?.submissionId);
+    t.expect("same token (never used)", Boolean(first?.turnstileToken) && second?.turnstileToken === first?.turnstileToken, true);
+  },
+  // Try again from the keyboard: the button goes with its panel, and focus goes to Send
+  // rather than to the page, until the next state takes it.
+  async "panel-keyboard"(t) {
+    await t.press();
+    await t.waitState("unreachable");
+    await t.page.waitForFunction(() => window.__turnstileStub.tokens >= 2, { timeout: 4000, polling: 50 }).catch(() => {});
+    const focused = await t.page.evaluate((text) => {
+      const button = [...document.querySelectorAll("[data-state-panel] .sp-actions > button")].find(
+        (element) => element.textContent.trim() === text
+      );
+      button?.focus();
+      return document.activeElement === button;
+    }, LABELS[t.lang].tryAgain);
+    t.expect("Try again focused", focused, true);
+    await t.page.keyboard.press("Enter");
+    await pause(300);
+    t.expect("focus while sending", (await t.read()).focus, "#contact-send");
+    await t.waitState("sent", 6000);
+    t.expect("focus on Sent", (await t.read()).focus, "headline");
+  },
+  // Resend had no answer (timeout, or the first send under the key still in progress): S7b,
+  // and Try again sends the same id, which Resend can't email twice.
+  async "send-unknown-retry"(t) {
+    await t.press();
+    await t.waitState("noReply");
+    t.expect("focus", (await t.read()).focus, "headline");
+    await t.page.waitForFunction(() => window.__turnstileStub.tokens >= 2, { timeout: 4000, polling: 50 }).catch(() => {});
+    await t.action("tryAgain");
+    await t.waitState("sent");
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", Boolean(first?.submissionId) && second?.submissionId === first?.submissionId, true);
+    t.expect("new token", second?.turnstileToken !== first?.turnstileToken, true);
   },
   // Resend already had this submission's key (409): the Function answers 200.
   async "resend-409"(t) {
@@ -769,6 +823,40 @@ const FLOWS = {
     const [first, second] = t.bodies();
     t.expect("same submissionId", Boolean(first?.submissionId) && second?.submissionId === first?.submissionId, true);
   },
+  // Resend keeps an idempotency key for 24 hours. A submission id stored more than 23 hours
+  // ago is replaced, so the send gets a new id and REF rather than a key Resend has dropped.
+  async "reload-stale"(t) {
+    await t.press();
+    await t.waitState("unreachable");
+    const stored = await t.stored();
+    t.expect("createdAt stored", typeof stored?.draft?.submission?.createdAt, "number");
+    await t.page.evaluate(() => {
+      const value = JSON.parse(sessionStorage.getItem("contact-draft"));
+      value.draft.submission.createdAt = Date.now() - 23.5 * 3600_000;
+      sessionStorage.setItem("contact-draft", JSON.stringify(value));
+    });
+    await t.reload();
+    t.expect("state", (await t.read()).state, "restored");
+    await t.press();
+    await t.waitState("sent", 6000);
+    const [first, second] = t.bodies();
+    t.expect("new submissionId", Boolean(first?.submissionId) && Boolean(second?.submissionId) && second.submissionId !== first.submissionId, true);
+  },
+  // S13 is only news: the first edit clears it.
+  async "restored-edit"(t) {
+    await t.reload();
+    await t.waitState("restored");
+    await t.page.type(FIELDS.message, " +");
+    await t.waitState(null);
+  },
+  // S13 doesn't hide a challenge: the box's instruction (S5b) replaces it.
+  async "restored-challenge"(t) {
+    await t.reload();
+    await t.waitState("restored");
+    // Focus arms the widget below md (it loads on first focus) without editing anything.
+    await t.page.focus(FIELDS.name);
+    await t.waitState("challenge");
+  },
   // A reload after Sent says when it went (S6r) rather than offer an empty form. The text
   // left storage with the send; Close forgets the rest.
   async "reload-sent"(t) {
@@ -850,6 +938,12 @@ const FLOW_SETUP = {
   "leave-during-send": { contact: [{ scenario: "ok", delayMs: 2500 }] },
   "leave-and-resend": { contact: [{ scenario: "ok", delayMs: 2500 }] },
   "lost-retry": { contact: ["network", "ok"] },
+  "offline-mid-send": { contact: [{ scenario: "network", delayMs: 800 }, "ok"] },
+  "panel-keyboard": { contact: ["network", { scenario: "ok", delayMs: 1500 }] },
+  "send-unknown-retry": { contact: ["send_unknown", "ok"] },
+  "reload-stale": { contact: ["network", "ok"] },
+  "restored-edit": {},
+  "restored-challenge": { turnstile: "challenge" },
   "resend-409": { contact: ["network", "resend_409"] },
   "abort-retry": { contact: ["hang", "ok"] },
   "offline-online": {},

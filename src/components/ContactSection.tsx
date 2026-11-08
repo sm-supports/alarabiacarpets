@@ -14,7 +14,7 @@ import type { StatePanelAction } from "@/lib/status";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useOnline } from "@/hooks/use-online";
-import { clearDraft, firstCount, readDraft, readSent, saveDraft, saveSent } from "@/lib/draft";
+import { clearDraft, firstCount, isFresh, readDraft, readSent, saveDraft, saveSent, type Submission } from "@/lib/draft";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { EMAIL, PHONE, PHONE_E164, WHATSAPP_URL } from "@/lib/site";
@@ -55,6 +55,7 @@ const API_CODES = new Set([
   "too_long",
   "invalid_email",
   "send_failed",
+  "send_unknown",
 ]);
 
 type Field = keyof typeof FIELD_LIMITS;
@@ -72,7 +73,7 @@ type Kind =
   | "challenge" // S5b: Turnstile wants a tap
   | "refused" // S7: send_failed, bad_body, or a code this form doesn't know
   | "unreachable" // S7: the request never got an answer, while online
-  | "noReply" // S7b: no answer in 20 s, so it may have arrived
+  | "noReply" // S7b: no answer in 20 s, or send_unknown (Resend gave none), so it may have arrived
   | "checkDown" // S8: the check can't run
   | "checkRejected" // S9: the check ran and didn't pass
   | "offline" // S11
@@ -251,7 +252,7 @@ const ContactSection = memo(function ContactSection() {
   const inFlight = useRef(false);
   // One id per message. A retry of the same text sends the same id, and the Function
   // passes it to Resend so the team isn't emailed twice if only the response was lost.
-  const submission = useRef<{ id: string; content: string } | null>(null);
+  const submission = useRef<Submission | null>(null);
   // What the last sent message said, for "Correct and resend".
   const lastSent = useRef<Values | null>(null);
   // An unused token. Refs rather than state: the widget's callbacks and the wait timer
@@ -277,10 +278,22 @@ const ContactSection = memo(function ContactSection() {
   const checkRef = useRef<HTMLDivElement>(null);
   const turnstileRef = useRef<CloudflareTurnstileHandle>(null);
 
+  /**
+   * For a state change that removes or replaces the panel and takes no focus itself: when
+   * focus is in the panel (its own Send or Try again was pressed), it goes to Send rather
+   * than to the page. A focus the same change already planned, on a field, wins.
+   */
+  const keepFocus = useCallback(() => {
+    if (!focusNext.current && panelRef.current?.contains(document.activeElement)) focusNext.current = "contact-send";
+  }, []);
+
   const show = useCallback((kind: Kind, { focus = false, reveal = false, fromWidget = false } = {}) => {
     setCopied(false);
+    // The new panel replaces the old one, with whatever in it had focus.
+    if (focus) focusNext.current = null;
+    else keepFocus();
     setFormState({ kind, id: nextId.current++, focus, reveal, fromWidget });
-  }, []);
+  }, [keepFocus]);
 
   const stopClock = useCallback(() => {
     if (wait.current.timer === undefined) return;
@@ -341,6 +354,7 @@ const ContactSection = memo(function ContactSection() {
   // and gives a widget that failed offline a fresh start. Nothing sends by itself.
   useEffect(() => {
     const online = () => {
+      if (panelRef.current?.dataset.formState === "offline") keepFocus();
       setFormState((state) =>
         state?.kind === "offline" ? { kind: "online", id: nextId.current++, focus: false, reveal: false, fromWidget: false } : state
       );
@@ -360,7 +374,7 @@ const ContactSection = memo(function ContactSection() {
       window.removeEventListener("online", online);
       window.removeEventListener("offline", offline);
     };
-  }, [cancelWait, show]);
+  }, [cancelWait, keepFocus, show]);
 
   // What this tab typed comes back after a reload or a language switch (S13), with the id
   // its last send used, so pressing Send again can't email it twice. A message that went
@@ -434,6 +448,8 @@ const ContactSection = memo(function ContactSection() {
     else if (field === "email") setEmail(value);
     else setMessage(value);
     setErrors((current) => (current[field] ? { ...current, [field]: undefined } : current));
+    // S13 is news about this text, and an edit shows it was read.
+    setFormState((state) => (state?.kind === "restored" ? null : state));
     persist({ name, email, message, [field]: value }, correcting);
   };
 
@@ -472,14 +488,17 @@ const ContactSection = memo(function ContactSection() {
   const send = async (turnstileToken: string, values: Values) => {
     inFlight.current = true;
     setIsSubmitting(true);
+    keepFocus();
     setFormState(null);
     token.current = "";
 
     const wasCorrection = correcting;
     const content = contentOf(values, wasCorrection);
-    if (submission.current?.content !== content) {
+    // A new id for new text, and for an id old enough that Resend may have let its key go.
+    const held = submission.current;
+    if (held?.content !== content || !isFresh(held)) {
       const id = newSubmissionId();
-      submission.current = id ? { id, content } : null;
+      submission.current = id ? { id, content, createdAt: Date.now() } : null;
     }
     const submissionId = submission.current?.id;
     // Stored before the request leaves: if its answer is lost and the visitor reloads,
@@ -491,7 +510,6 @@ const ContactSection = memo(function ContactSection() {
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     // null: sent.
     let code: string | null = null;
-    let neverArrived = false;
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -511,12 +529,8 @@ const ContactSection = memo(function ContactSection() {
         code = controller.signal.aborted ? "no_reply" : typeof raw === "string" && API_CODES.has(raw) ? raw : "unknown";
       }
     } catch {
-      if (controller.signal.aborted) {
-        code = "no_reply";
-      } else {
-        neverArrived = true;
-        code = navigator.onLine === false ? "offline" : "unreachable";
-      }
+      if (controller.signal.aborted) code = "no_reply";
+      else code = navigator.onLine === false ? "offline" : "unreachable";
     } finally {
       clearTimeout(timeout);
       inFlight.current = false;
@@ -527,11 +541,14 @@ const ContactSection = memo(function ContactSection() {
       onSent(values, submissionId, wasCorrection);
       return;
     }
-    if (neverArrived) {
-      // No answer at all, so siteverify most likely never saw the token: keep it.
+    if (code === "offline") {
+      // The connection was gone, so the request never left and the token is unused: the
+      // Send after reconnecting takes it.
       if (!token.current) token.current = turnstileToken;
     } else {
-      // Redeemed, rejected, or maybe still on its way after an abort: retry with a new one.
+      // Redeemed, rejected, or maybe used by a request whose answer was lost (a failure
+      // while online can come after the Function read it): a used token would fail the
+      // retry's check (S9), so it gets a new one.
       turnstileRef.current?.reset();
     }
     trackFormFailed(code);
@@ -556,6 +573,8 @@ const ContactSection = memo(function ContactSection() {
         break;
       }
       case "no_reply":
+      case "send_unknown":
+        // It may have arrived. Try again reuses the id, so it can't go twice.
         show("noReply", { focus: true });
         break;
       case "offline":
@@ -675,8 +694,13 @@ const ContactSection = memo(function ContactSection() {
       show("challenge", { reveal: true });
       return;
     }
-    // Over a failure the visitor hasn't acted on yet, the box just appears below it.
-    setFormState((state) => state ?? { kind: "challenge", id: nextId.current++, focus: false, reveal: false, fromWidget: false });
+    // It replaces news (S13 draft restored, S12 back online). Over a failure the visitor
+    // hasn't acted on yet, the box just appears below it.
+    const replaces = (kind?: Kind) => !kind || kind === "restored" || kind === "online";
+    if (replaces(panelRef.current?.dataset.formState as Kind | undefined)) keepFocus();
+    setFormState((state) =>
+      replaces(state?.kind) ? { kind: "challenge", id: nextId.current++, focus: false, reveal: false, fromWidget: false } : state
+    );
   };
 
   const onChallengeDone = () => {
@@ -992,76 +1016,9 @@ const ContactSection = memo(function ContactSection() {
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 max-w-6xl mx-auto">
-          {/* Contact Methods */}
-          <div>
-            <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-6 sm:mb-8">
-              {t.getInTouch}
-            </h3>
-
-            <div className="space-y-3 sm:space-y-4">
-              {contactMethods.map((method) => {
-                const Icon = method.icon;
-                const className = "group ct-method";
-                const content = (
-                  <>
-                    <div className="ct-icon">
-                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-gold-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs sm:text-sm text-white/60 mb-0.5 sm:mb-1">{method.label}</p>
-                      <p className="text-sm sm:text-base text-white font-medium truncate">{method.ltr ? <bdi dir="ltr">{method.value}</bdi> : method.value}</p>
-                    </div>
-                  </>
-                );
-                if (method.hasConversion) {
-                  return (
-                    <WhatsAppLink key={method.label} href={method.href} source="contact_section_methods" className={className}>
-                      {content}
-                    </WhatsAppLink>
-                  );
-                }
-                return (
-                  <a
-                    key={method.label}
-                    href={method.href}
-                    {...(method.external && { target: "_blank", rel: "noopener noreferrer" })}
-                    className={className}
-                  >
-                    {content}
-                  </a>
-                );
-              })}
-            </div>
-
-            {/* Quick Links */}
-            <div className="mt-8 sm:mt-10 pt-8 sm:pt-10 border-t border-white/10">
-              <p className="text-xs sm:text-sm text-white/60 mb-3 sm:mb-4">{t.quickLinks}</p>
-              <div className="flex flex-wrap gap-2 sm:gap-3">
-                <Link
-                  href={lp("/products")}
-                  className="ct-chip"
-                >
-                  {t.viewProducts}
-                </Link>
-                <Link
-                  href={lp("/about")}
-                  className="ct-chip"
-                >
-                  {t.aboutUs}
-                </Link>
-                <a
-                  href="tel:+97455512858"
-                  onClick={() => trackPhoneClick("contact_section_call")}
-                  className="ct-chip"
-                >
-                  {t.callNow}
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Contact Form: first on phones, where it is what the page is for. */}
-          <div className="order-first lg:order-none">
+          {/* Contact Form: first in the page order, so Tab and a screen reader reach it first, as
+              phones show it. lg:order-last puts it back in the second column on wide screens. */}
+          <div className="lg:order-last">
             <div className="p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
               <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-5 sm:mb-6">
                 {t.sendMessage}
@@ -1088,7 +1045,7 @@ const ContactSection = memo(function ContactSection() {
                   </div>
                   {/* Without JavaScript the form never arrives. */}
                   <noscript>
-                    <p className="mt-4 text-white">
+                    <p className="ct-noscript">
                       <a href={`tel:${PHONE_E164}`}>{s.call} <bdi>{PHONE}</bdi></a> · <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
                     </p>
                   </noscript>
@@ -1230,6 +1187,74 @@ const ContactSection = memo(function ContactSection() {
                   <div role="alert" className="sr-only">{urgent ? spoken : null}</div>
                 </>
               )}
+            </div>
+          </div>
+
+          {/* Contact Methods */}
+          <div>
+            <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-6 sm:mb-8">
+              {t.getInTouch}
+            </h3>
+
+            <div className="space-y-3 sm:space-y-4">
+              {contactMethods.map((method) => {
+                const Icon = method.icon;
+                const className = "group ct-method";
+                const content = (
+                  <>
+                    <div className="ct-icon">
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-gold-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs sm:text-sm text-white/60 mb-0.5 sm:mb-1">{method.label}</p>
+                      <p className="text-sm sm:text-base text-white font-medium truncate">{method.ltr ? <bdi dir="ltr">{method.value}</bdi> : method.value}</p>
+                    </div>
+                  </>
+                );
+                if (method.hasConversion) {
+                  return (
+                    <WhatsAppLink key={method.label} href={method.href} source="contact_section_methods" className={className}>
+                      {content}
+                    </WhatsAppLink>
+                  );
+                }
+                return (
+                  <a
+                    key={method.label}
+                    href={method.href}
+                    {...(method.external && { target: "_blank", rel: "noopener noreferrer" })}
+                    className={className}
+                  >
+                    {content}
+                  </a>
+                );
+              })}
+            </div>
+
+            {/* Quick Links */}
+            <div className="mt-8 sm:mt-10 pt-8 sm:pt-10 border-t border-white/10">
+              <p className="text-xs sm:text-sm text-white/60 mb-3 sm:mb-4">{t.quickLinks}</p>
+              <div className="flex flex-wrap gap-2 sm:gap-3">
+                <Link
+                  href={lp("/products")}
+                  className="ct-chip"
+                >
+                  {t.viewProducts}
+                </Link>
+                <Link
+                  href={lp("/about")}
+                  className="ct-chip"
+                >
+                  {t.aboutUs}
+                </Link>
+                <a
+                  href="tel:+97455512858"
+                  onClick={() => trackPhoneClick("contact_section_call")}
+                  className="ct-chip"
+                >
+                  {t.callNow}
+                </a>
+              </div>
             </div>
           </div>
         </div>

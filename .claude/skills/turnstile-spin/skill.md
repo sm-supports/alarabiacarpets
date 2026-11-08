@@ -68,7 +68,7 @@ The first class is what a visitor can't fix by getting a new token (our configur
 Cloudflare being down). A request with no token at all is 400 `bot_required`, shown like
 `bot_rejected`. When adding a reason to `verifyTurnstileToken()`, decide its class in
 `CHECK_UNAVAILABLE`; the default is `bot_rejected`. The other codes the Function sends
-(`bad_body`, `fields_required`, `too_long`, `invalid_email`, `send_failed`) are documented
+(`bad_body`, `fields_required`, `too_long`, `invalid_email`, `send_failed`, `send_unknown`) are documented
 there and in `CONTACT_SCENARIOS` in `scripts/lib/browser.mjs`, which mocks every answer.
 
 `PRODUCTION_HOSTNAMES` gates which frontend origins are accepted. `TURNSTILE_HOSTNAMES`

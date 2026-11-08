@@ -31,7 +31,7 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 | `src/components/` | Reusable components (Navbar, Footer, HeroSection, ProductCard, etc.) |
 | `src/components/ui/` | shadcn/ui primitives (Button, Card, Input, etc.) |
 | `src/data/products.ts` | Product catalog — `Product` interface + `products` array |
-| `src/hooks/` | Custom hooks (use-hydrated) |
+| `src/hooks/` | Custom hooks (use-hydrated, use-online) |
 | `src/lib/utils.ts` | Utility functions (cn helper) |
 | `functions/api/` | Cloudflare Workers API endpoints |
 | `functions/email-templates/` | HTML email template generators |
@@ -41,7 +41,7 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 | `src/lib/site.ts` | Phone, WhatsApp and email constants with no imports, for client components |
 | `src/lib/card-image.ts` | Sized copies of catalog photos (`cardImage`, `fullImage`). Server only |
 | `src/lib/analytics.ts` | GA4 + Google Ads events — all tracking goes through here |
-| `src/lib/status.ts` | The one status on screen, shown by `StatusRegion` in `StatePanel`. No lazy chunks: a failure has to report itself offline |
+| `src/lib/status.ts` | The overlay status (the plan's S1-S4 tap feedback): `showStatus` puts one `StatePanel` on screen through `StatusRegion` in `providers.tsx`. No caller until the tap-feedback package (WP6). The contact form's states are inline in `ContactSection`, not here. No lazy chunks: a failure has to report itself offline |
 
 ## Commands
 
@@ -130,7 +130,8 @@ Use logical Tailwind classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-` over
   every page of the other language downloads it too (`check-page-weight` fails on this)
 - `src/app/global-error.tsx` is loaded by every page of both languages and replaces the whole
   document, so it stays self-contained: no context, no dictionaries, inline styles. `check-page-weight`
-  can't see a dictionary imported there
+  can't see a dictionary imported there. It imports `src/lib/draft.ts` (to say a typed message is
+  saved), so that file must stay free of imports
 - New routes are new directories under `src/app/` — there is no central route table
 - Dynamic routes need `generateStaticParams()`; `params` is a Promise and must be awaited
 - Never use `useSearchParams` without a Suspense boundary — it hard-fails under static export

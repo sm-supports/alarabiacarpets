@@ -10,7 +10,7 @@
 | Email template | `functions/email-templates/acknowledgment.ts` |
 | Turnstile widget | `src/components/CloudflareTurnstile.tsx` |
 | Outcome messages | Inline `StatePanel`s in `ContactSection.tsx` (`data-form-state`), strings in `formStates` in `src/i18n/*.client.ts`, one per API `code` |
-| Draft | `src/lib/draft.ts`: the text in this tab's sessionStorage (`contact-draft`), with the submission id, or the sent time and REF after a send. Import-free, because `app/global-error.tsx` reads it |
+| Draft | `src/lib/draft.ts`: the text in this tab's sessionStorage (`contact-draft`), with the submission id and when it was made (`createdAt`), or the sent time and REF after a send. An id older than 23 hours is replaced, inside Resend's 24-hour key window. Import-free, because `app/global-error.tsx` reads it |
 
 ## Current Form Fields
 
@@ -88,6 +88,20 @@ Conversion tracking lives in `src/lib/analytics.ts` (`trackFormLead`, `trackWhat
 - Acknowledgment: sent to the submitter's email address
 - Sender: `Al Arabia Carpets <noreply@alarabiacarpets.com>`
 - API key: `context.env.RESEND_API_KEY`
+- The admin email goes under the idempotency key `contact-admin/<submissionId>`, so a retry
+  of the same message can't email the team twice. Resend's answer sets the response
+  (`sendResult()` in `functions/api/contact.ts`):
+
+  | Resend | Function | Form |
+  |--------|----------|------|
+  | Sent | 200 | Sent (S6) |
+  | 409, already sent under this key | 200 | Sent (S6) |
+  | 409 `concurrent_idempotent_requests` (first send still in progress) | asks again once after 1 s, then as that answer; still in progress is `send_unknown` | |
+  | Any other status (422, 429, 5xx…) | 502 `send_failed` | S7, "didn't accept", WhatsApp first |
+  | No answer: the 8 s limit, or a network failure | 502 `send_unknown` | S7b, "may have arrived", Try again first |
+
+  A request without a `submissionId` has no key, so a retry could send twice: there, no
+  answer is `send_failed` too.
 - CORS: allows all origins (`"*"`) — frontend and API are on the same Cloudflare Pages domain
 
 ## Testing

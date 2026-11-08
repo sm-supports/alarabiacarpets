@@ -39,6 +39,10 @@ interface CFContext {
 // would hold the visitor on "Sending..." until the platform killed the Function.
 const RESEND_TIMEOUT_MS = 8_000;
 
+// How long to give a send Resend says is still in progress under this key before asking
+// again, once. Resend answers a finished send's key with that send's own result.
+const IN_PROGRESS_WAIT_MS = 1_000;
+
 // The form sends one id per message, and the same id again when the visitor retries
 // the same text. Resend drops a second send with the same key, so a retry after a
 // lost response doesn't email the team twice.
@@ -54,6 +58,12 @@ const MAX_MESSAGE_LENGTH = 5000;
  * this Function has always returned; `code` only tells apart the cases a status shares.
  * The form maps any code it doesn't know to "send_failed". Keep in step with
  * ContactSection.tsx and CONTACT_SCENARIOS in scripts/lib/browser.mjs.
+ *
+ * send_failed: Resend answered and refused the message, so it didn't go.
+ * send_unknown: Resend gave no answer (timed out, couldn't be reached, or still busy with
+ * the first send under this key), so it may have gone. The form says so and offers Try
+ * again, which the idempotency key makes safe. Only sent with a submission id: without
+ * one a retry could email the team twice, so that case stays send_failed.
  */
 type ContactCode =
   | "bad_body"
@@ -63,7 +73,8 @@ type ContactCode =
   | "fields_required"
   | "too_long"
   | "invalid_email"
-  | "send_failed";
+  | "send_failed"
+  | "send_unknown";
 
 /**
  * Turnstile rejections a visitor can't fix by getting a new token: our configuration,
@@ -87,15 +98,29 @@ function botCode(reason: string): ContactCode {
 }
 
 /**
- * Resend answers 409 when it already has a send under this idempotency key: finished,
- * with a different payload, or still in progress. Either way the message for this
- * submission is already with Resend, so it counts as sent rather than as a failure the
- * visitor would retry.
+ * What one call to Resend came to, from the `error` sendEmail returns.
+ *
+ * - sent: no error.
+ * - duplicate: 409, Resend already sent under this idempotency key (a retry of the same
+ *   submission with a payload that differs). The message is with the team.
+ * - in_progress: 409 concurrent_idempotent_requests, the first send under this key hasn't
+ *   finished. It may still fail, so it isn't counted as sent.
+ * - refused: Resend answered with any other status. The message didn't go.
+ * - unknown: no answer. Our time limit, or the SDK's own catch of a network failure or an
+ *   abort, which it reports with `statusCode: null`. The message may have gone.
  */
-function isDuplicateSend(error: unknown): boolean {
-  if (error === null || typeof error !== "object") return false;
+type SendResult = "sent" | "duplicate" | "in_progress" | "refused" | "unknown";
+
+function sendResult(error: unknown): SendResult {
+  if (!error) return "sent";
+  if (typeof error !== "object" || error instanceof Error) return "unknown";
   const { statusCode, name } = error as { statusCode?: unknown; name?: unknown };
-  return statusCode === 409 || name === "invalid_idempotent_request" || name === "concurrent_idempotent_requests";
+  if (name === "concurrent_idempotent_requests") return "in_progress";
+  if (statusCode === 409 || name === "invalid_idempotent_request") return "duplicate";
+  if (typeof statusCode === "number") return "refused";
+  // A Resend error body that names its cause without a status is still an answer.
+  if (typeof name === "string" && name !== "application_error") return "refused";
+  return "unknown";
 }
 
 // The form is same-origin, so CORS is only relevant to cross-origin callers.
@@ -348,7 +373,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
     // Send admin notification (critical). Failures come back in `error`, not as a
     // throw, so it has to be checked explicitly.
     const emailStarted = Date.now();
-    const { error: adminError } = await sendEmail(resend, {
+    const adminEmail: CreateEmailOptions = {
       from: "Al Arabia Carpets <noreply@alarabiacarpets.com>",
       to: "info@alarabiacarpets.com",
       replyTo: email,
@@ -362,14 +387,31 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
         <p><strong>Message:</strong></p>
         <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
       `,
-    }, submissionId && `contact-admin/${submissionId}`);
+    };
+    const adminKey = submissionId && `contact-admin/${submissionId}`;
+    let { error: adminError } = await sendEmail(resend, adminEmail, adminKey);
+    let result = sendResult(adminError);
+    if (result === "in_progress") {
+      // The visitor's earlier request for this message is still with Resend and may yet
+      // fail. Ask once more with the same key and payload: a finished send answers with
+      // its own result.
+      await new Promise((resolve) => setTimeout(resolve, IN_PROGRESS_WAIT_MS));
+      ({ error: adminError } = await sendEmail(resend, adminEmail, adminKey));
+      const second = sendResult(adminError);
+      // Still in progress: no answer yet, so it may go or not.
+      result = second === "in_progress" ? "unknown" : second === "sent" ? "duplicate" : second;
+    }
     timing.email_ms = Date.now() - emailStarted;
 
-    const duplicate = Boolean(adminError) && isDuplicateSend(adminError);
-    if (adminError && !duplicate) {
+    if (result === "refused" || (result === "unknown" && !submissionId)) {
       console.error("Admin notification failed:", adminError);
       return fail(502, "Failed to send email", "send_failed", "admin-email-failed");
     }
+    if (result === "unknown") {
+      console.error("Admin notification has no answer:", adminError);
+      return fail(502, "No answer from the email service", "send_unknown", "admin-email-unknown");
+    }
+    const duplicate = result === "duplicate";
 
     // Acknowledgment to the submitter (non-critical). The team already has the
     // message, so the visitor gets their answer now and this finishes afterwards.

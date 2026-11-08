@@ -48,6 +48,26 @@ const PLANNED_CTA_LABELS = new Set([
   "استفسر على الواتساب",
   "اتصل الحين",
 ]);
+// One planned heading move. ContactSection's form column comes before its methods column
+// in the HTML (WP2c, WCAG 2.4.3: phones show the form first, so Tab and screen readers
+// reach it first too), and lg:order-last keeps wide screens as they were. So on the pages
+// that render ContactSection, and nowhere else, "Send a Message" may come straight before
+// "Get in Touch" instead of straight after. Every other heading must keep its place.
+const CONTACT_COLUMN_PAGES = new Set(["/", "/ar", "/contact", "/ar/contact"]);
+const CONTACT_COLUMN_PAIRS = [
+  ["h3 Get in Touch", "h3 Send a Message"],
+  ["h3 تواصل معنا", "h3 أرسل لنا رسالة"],
+];
+/** The baseline's headings with that one swap applied, where the page has it. */
+function expectedHeadings(url, headings) {
+  if (!CONTACT_COLUMN_PAGES.has(url)) return headings;
+  const swapped = [...headings];
+  for (const [methods, form] of CONTACT_COLUMN_PAIRS) {
+    const at = swapped.findIndex((heading, index) => heading === methods && swapped[index + 1] === form);
+    if (at >= 0) swapped.splice(at, 2, form, methods);
+  }
+  return swapped;
+}
 const isGuide = (url) => /^(\/ar)?\/guides\//.test(url);
 const isPlannedLabel = (text, url) =>
   PLANNED_CTA_LABELS.has(text) || (ASK_LABELS.has(text) && !isGuide(url));
@@ -190,7 +210,12 @@ function diffSite(baseline, now) {
 
     for (const heading of missingFrom(before.headings, after.headings)) add(failures, "heading removed or changed", heading, url);
     for (const heading of missingFrom(after.headings, before.headings)) add(notes, "heading added", heading, url);
-    const movedHeading = firstMove(before.headings, after.headings);
+    const expected = expectedHeadings(url, before.headings);
+    const swapPlanned = JSON.stringify(expected) !== JSON.stringify(before.headings);
+    if (swapPlanned && JSON.stringify(expected) === JSON.stringify(after.headings)) {
+      add(notes, "contact columns swapped (planned)", "form column's h3 before the methods column's", url);
+    }
+    const movedHeading = firstMove(expected, after.headings);
     if (movedHeading) add(failures, "heading order changed, first at", movedHeading, url);
 
     if (!after.main) {

@@ -14,6 +14,29 @@
 const DRAFT_KEY = "contact-draft";
 const VERSION = 1;
 
+/**
+ * Resend keeps an idempotency key for 24 hours from the first send under it, so an id is
+ * reused for 23 at most. Past that a send takes a new id (and REF) rather than one whose
+ * key may be gone. createdAt is set just before that first send, so it never runs late;
+ * the hour to spare covers the phone's clock being changed in between.
+ */
+const SUBMISSION_MAX_AGE_MS = 23 * 60 * 60 * 1000;
+
+/** The id one send of exactly this content used, and when it was made, in epoch ms. */
+export interface Submission {
+  id: string;
+  content: string;
+  createdAt: number;
+}
+
+/**
+ * Whether a send can still reuse this id. A clock set back since keeps it, so a retry
+ * isn't sent twice; an id dated 23 hours or more ahead doesn't.
+ */
+export function isFresh(submission: Submission, now = Date.now()): boolean {
+  return Math.abs(now - submission.createdAt) < SUBMISSION_MAX_AGE_MS;
+}
+
 export interface Draft {
   name: string;
   email: string;
@@ -22,9 +45,10 @@ export interface Draft {
   correction?: boolean;
   /**
    * The id a send of exactly this content already used. A send after a reload reuses
-   * it, so a message whose response was lost isn't emailed twice.
+   * it, so a message whose response was lost isn't emailed twice. Read back only while
+   * it is fresh.
    */
-  submission?: { id: string; content: string };
+  submission?: Submission;
 }
 
 export interface SentRecord {
@@ -78,8 +102,10 @@ export function readDraft(): Draft | null {
   if (!hasText(result)) return null;
   if (draft.correction === true) result.correction = true;
   const submission = draft.submission as Record<string, unknown> | undefined;
-  if (submission && isText(submission.id) && isText(submission.content)) {
-    result.submission = { id: submission.id, content: submission.content };
+  if (submission && isText(submission.id) && isText(submission.content) && typeof submission.createdAt === "number") {
+    const held = { id: submission.id, content: submission.content, createdAt: submission.createdAt };
+    // A stale one is left out, so the next send makes a new id.
+    if (isFresh(held)) result.submission = held;
   }
   return result;
 }

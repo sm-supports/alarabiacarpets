@@ -203,7 +203,7 @@ export function buildLocalBusiness(locale: Locale = "en") {
   const isAr = locale === "ar";
   return {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": "HomeGoodsStore",
     "@id": `${SITE_URL}/#localbusiness`,
     ...nameFields(locale),
     description: isAr
@@ -219,7 +219,7 @@ export function buildLocalBusiness(locale: Locale = "en") {
     priceRange: "$$",
     image: absoluteUrl(DEFAULT_IMAGE),
     sameAs: SOCIAL_PROFILES,
-    serviceArea: { "@type": "GeoCircle", geoMidpoint: GEO, geoRadius: "50000" },
+    areaServed: areaServed(locale),
     // Plain names, not Offers: the project never emits a price-less Offer.
     knowsAbout: (isAr ? SERVICES_AR : SERVICES).map(([name]) => name),
   };

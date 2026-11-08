@@ -1,24 +1,25 @@
 "use client";
 
-import { useState, memo, useCallback, useMemo, useRef, useEffect } from "react";
+import { useState, memo, useCallback, useMemo, useRef, useEffect, type ComponentProps, type ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, MapPin, Mail, Phone, MessageCircle } from "@/components/icons";
+import { ArrowRight, MapPin, Mail, MessageCircle } from "@/components/icons";
 import Link from "next/link";
 import CloudflareTurnstile, {
   type CloudflareTurnstileHandle,
 } from "@/components/CloudflareTurnstile";
-import { trackFormLead, trackPhoneClick } from "@/lib/analytics";
-import { clearStatus, showStatus } from "@/lib/status";
+import StatePanel from "@/components/StatePanel";
+import { trackFormCorrection, trackFormFailed, trackFormLead, trackPhoneClick } from "@/lib/analytics";
+import type { StatePanelAction } from "@/lib/status";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
-import { EMAIL, PHONE, WHATSAPP_URL } from "@/lib/site";
+import { EMAIL, PHONE, PHONE_E164, WHATSAPP_URL } from "@/lib/site";
 
 // Inlined at build time. If the Cloudflare Pages build environment does not
 // define it, the Turnstile widget cannot render and the form can never be
-// submitted -- so surface that instead of showing a permanently dead button.
+// submitted -- so the form says so (S8) instead of waiting for a token.
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 // Stable Turnstile action for this surface. functions/api/contact.ts rejects
@@ -30,26 +31,226 @@ const TURNSTILE_ACTION = "contact";
 const REQUEST_TIMEOUT_MS = 20_000;
 // When to tell the visitor a slow send is still in progress.
 const SLOW_SEND_MS = 8_000;
+// How long a press of Send waits for the security check before saying it can't run.
+// The clock stops while a challenge is showing: then the visitor is the one taking time.
+const CHECK_WAIT_MS = 15_000;
+// A prefilled wa.me link much past 2 KB fails to open on some phones.
+const PREFILL_MAX_BYTES = 1_800;
+
+// The same caps, cleaning and email rule as functions/api/contact.ts, so the form
+// catches what the Function would reject before anything is sent.
+const FIELD_LIMITS = { name: 100, email: 254, message: 5000 } as const;
+const EMAIL_RULE = /^[^\s@<>",;]+@[^\s@<>",;]+\.[^\s@<>",;]+$/;
+const API_CODES = new Set([
+  "bad_body",
+  "bot_required",
+  "bot_rejected",
+  "bot_unavailable",
+  "fields_required",
+  "too_long",
+  "invalid_email",
+  "send_failed",
+]);
+
+type Field = keyof typeof FIELD_LIMITS;
+const FIELDS: Field[] = ["name", "email", "message"];
+type Values = Record<Field, string>;
+type FieldErrors = Partial<Record<Field, "missing" | "invalid" | "long">>;
+
+/**
+ * What the form is telling the visitor under the Send button, one at a time (the plan's
+ * S5 to S12). The failures stay until the next press resolves them: they sit next to
+ * the visitor's text, so they have no Close.
+ */
+type Kind =
+  | "checking" // S5: pressed before the security check finished
+  | "challenge" // S5b: Turnstile wants a tap
+  | "refused" // S7: send_failed, bad_body, or a code this form doesn't know
+  | "unreachable" // S7: the request never got an answer, while online
+  | "noReply" // S7b: no answer in 20 s, so it may have arrived
+  | "checkDown" // S8: the check can't run
+  | "checkRejected" // S9: the check ran and didn't pass
+  | "offline" // S11
+  | "online"; // S12
+
+interface FormState {
+  kind: Kind;
+  /** Changes on every show, so the same state shown again moves focus again. */
+  id: number;
+  /** Move focus to the headline: a failure the visitor's own press led to. */
+  focus: boolean;
+  /** Scroll it into view: the answer to a press that doesn't move focus. */
+  reveal: boolean;
+  /** S8 from the widget, which a token arriving later resolves. */
+  fromWidget: boolean;
+}
+
+interface Sent {
+  name: string;
+  email: string;
+  ref?: string;
+  at: Date;
+}
+
+function clean(values: Values): Values {
+  return {
+    // eslint-disable-next-line no-control-regex -- the control characters are the point
+    name: values.name.replace(/[\u0000-\u001F\u007F]+/g, " ").trim(),
+    email: values.email.trim(),
+    message: values.message.trim(),
+  };
+}
+
+function validate(values: Values): FieldErrors {
+  const errors: FieldErrors = {};
+  for (const field of FIELDS) {
+    if (!values[field]) errors[field] = "missing";
+    else if (values[field].length > FIELD_LIMITS[field]) errors[field] = "long";
+  }
+  if (!errors.email && !EMAIL_RULE.test(values.email)) errors.email = "invalid";
+  return errors;
+}
+
+/** A v4 UUID, also where randomUUID is missing (it needs a secure context and a 2022 browser). */
+function newSubmissionId(): string | undefined {
+  const cryptoApi = globalThis.crypto;
+  if (cryptoApi?.randomUUID) return cryptoApi.randomUUID();
+  if (!cryptoApi?.getRandomValues) return undefined;
+  const bytes = cryptoApi.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+/** encodeURIComponent throws on half of a surrogate pair, which a paste can leave behind. */
+function wellFormed(text: string): string {
+  let out = "";
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    if (code >= 0xd800 && code <= 0xdbff) {
+      const next = text.charCodeAt(i + 1);
+      if (next >= 0xdc00 && next <= 0xdfff) {
+        out += text[i] + text[i + 1];
+        i++;
+      } else {
+        out += "�";
+      }
+    } else {
+      out += code >= 0xdc00 && code <= 0xdfff ? "�" : text[i];
+    }
+  }
+  return out;
+}
+
+/** The visitor's message for a WhatsApp prefill, cut to fit the link. */
+function prefill(values: Values): { text: string; cut: boolean } {
+  const signature = values.name ? `\n\n${wellFormed(values.name)}` : "";
+  const message = wellFormed(values.message);
+  const fits = (text: string) => encodeURIComponent(text).length <= PREFILL_MAX_BYTES;
+  if (fits(message + signature)) return { text: message + signature, cut: false };
+  const chars = Array.from(message);
+  let low = 0;
+  let high = chars.length;
+  while (low < high) {
+    const mid = Math.ceil((low + high) / 2);
+    if (fits(`${chars.slice(0, mid).join("")}…${signature}`)) low = mid;
+    else high = mid - 1;
+  }
+  return { text: `${chars.slice(0, low).join("").trimEnd()}…${signature}`, cut: true };
+}
+
+/** Fills {name}-style slots, each value in <bdi> so it keeps its own direction. */
+function fill(template: string, values: Record<string, ReactNode>): ReactNode {
+  return template
+    .split(/\{(\w+)\}/)
+    .map((part, index) => (index % 2 ? <bdi key={index}>{values[part]}</bdi> : part));
+}
+
+const INPUT_CLASS =
+  "w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 aria-[invalid=true]:border-red-300 rounded-lg sm:rounded-xl h-11 sm:h-12 text-base";
+const TEXTAREA_CLASS =
+  "w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 aria-[invalid=true]:border-red-300 rounded-lg sm:rounded-xl resize-none text-base";
 
 const ContactSection = memo(function ContactSection() {
   const hydrated = useHydrated();
+  const { locale, t: dict, lp } = useI18n();
+  const t = dict.contactSection;
+  const f = dict.formStates;
+  const s = dict.statePanel;
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [formState, setFormState] = useState<FormState | null>(() =>
+    TURNSTILE_SITE_KEY ? null : { kind: "checkDown", id: 0, focus: false, reveal: false, fromWidget: true }
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSlow, setIsSlow] = useState(false);
-  // State updates are asynchronous, so a second submit event can arrive before the
-  // button is disabled. This is set synchronously.
+  const [sent, setSent] = useState<Sent | null>(null);
+  // Sending from the Sent panel's "Correct and resend".
+  const [correcting, setCorrecting] = useState(false);
+  // Below md the widget loads on the first focus in the form or press of Send.
+  const [armed, setArmed] = useState(false);
+  // Changing it remounts the widget: only when the connection comes back after the
+  // widget failed offline.
+  const [widgetKey, setWidgetKey] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  // State updates are asynchronous, so a second press can arrive before the first
+  // send has shown. This is set synchronously.
   const inFlight = useRef(false);
   // One id per message. A retry of the same text sends the same id, and the Function
   // passes it to Resend so the team isn't emailed twice if only the response was lost.
   const submission = useRef<{ id: string; content: string } | null>(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
-  const [turnstileFailed, setTurnstileFailed] = useState(false);
+  // What the last sent message said, for "Correct and resend".
+  const lastSent = useRef<Values | null>(null);
+  // An unused token. Refs rather than state: the widget's callbacks and the wait timer
+  // read them between renders.
+  const token = useRef("");
+  const challenge = useRef(false);
+  // The visitor let a challenge time out; the widget is reset on the next press.
+  const timedOut = useRef(false);
+  const widgetFailed = useRef<false | "offline" | "error">(false);
+  // Send was pressed before there was a token; it sends when one arrives.
+  const pending = useRef(false);
+  const wait = useRef<{ timer?: ReturnType<typeof setTimeout>; left: number; since: number }>({ left: 0, since: 0 });
+  const nextId = useRef(1);
+  const focusNext = useRef<string | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const checkRef = useRef<HTMLDivElement>(null);
   const turnstileRef = useRef<CloudflareTurnstileHandle>(null);
-  const { locale, t: dict, lp } = useI18n();
-  const t = dict.contactSection;
+
+  const show = useCallback((kind: Kind, { focus = false, reveal = false, fromWidget = false } = {}) => {
+    setCopied(false);
+    setFormState({ kind, id: nextId.current++, focus, reveal, fromWidget });
+  }, []);
+
+  const stopClock = useCallback(() => {
+    if (wait.current.timer === undefined) return;
+    clearTimeout(wait.current.timer);
+    wait.current.timer = undefined;
+    wait.current.left -= Date.now() - wait.current.since;
+  }, []);
+
+  const runClock = useCallback(() => {
+    if (wait.current.timer !== undefined) return;
+    wait.current.since = Date.now();
+    wait.current.timer = setTimeout(() => {
+      wait.current.timer = undefined;
+      pending.current = false;
+      show("checkDown", { focus: true, fromWidget: true });
+      trackFormFailed("bot_pending");
+    }, Math.max(0, wait.current.left));
+  }, [show]);
+
+  const cancelWait = useCallback(() => {
+    pending.current = false;
+    stopClock();
+  }, [stopClock]);
+
+  useEffect(() => cancelWait, [cancelWait]);
 
   useEffect(() => {
     if (!isSubmitting) {
@@ -60,75 +261,304 @@ const ContactSection = memo(function ContactSection() {
     return () => clearTimeout(timer);
   }, [isSubmitting]);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (inFlight.current) return;
+  // Focus moves after the render that shows its target.
+  useEffect(() => {
+    const id = focusNext.current;
+    if (!id) return;
+    focusNext.current = null;
+    document.getElementById(id)?.focus();
+  });
+
+  // Focusing the headline only brings the headline into view; the buttons should come too,
+  // and for S5b the box it points at, just below.
+  useEffect(() => {
+    if (!formState?.reveal && !formState?.focus) return;
+    panelRef.current?.scrollIntoView({ block: "nearest" });
+    if (formState.kind === "challenge") checkRef.current?.scrollIntoView({ block: "nearest" });
+  }, [formState]);
+
+  // Offline at send outranks everything else (S11); coming back offers Send again (S12)
+  // and gives a widget that failed offline a fresh start. Nothing sends by itself.
+  useEffect(() => {
+    const online = () => {
+      setFormState((state) =>
+        state?.kind === "offline" ? { kind: "online", id: nextId.current++, focus: false, reveal: false, fromWidget: false } : state
+      );
+      if (widgetFailed.current === "offline") {
+        widgetFailed.current = false;
+        setWidgetKey((key) => key + 1);
+      }
+    };
+    const offline = () => {
+      if (!pending.current) return;
+      cancelWait();
+      show("offline");
+    };
+    window.addEventListener("online", online);
+    window.addEventListener("offline", offline);
+    return () => {
+      window.removeEventListener("online", online);
+      window.removeEventListener("offline", offline);
+    };
+  }, [cancelWait, show]);
+
+  const showFieldErrors = (found: FieldErrors) => {
+    setErrors(found);
+    const first = FIELDS.find((field) => found[field]);
+    if (first) focusNext.current = `contact-${first}`;
+  };
+
+  const clearError = (field: Field) =>
+    setErrors((current) => (current[field] ? { ...current, [field]: undefined } : current));
+
+  const onSent = (values: Values, id: string | undefined, wasCorrection: boolean) => {
+    // A correction is the same lead, already counted.
+    if (wasCorrection) trackFormCorrection();
+    else trackFormLead();
+    lastSent.current = values;
+    submission.current = null;
+    setSent({ name: values.name, email: values.email, ref: id?.slice(0, 8).toUpperCase(), at: new Date() });
+    setName("");
+    setEmail("");
+    setMessage("");
+    setErrors({});
+    setCorrecting(false);
+    setFormState(null);
+  };
+
+  const send = async (turnstileToken: string, values: Values) => {
     inFlight.current = true;
     setIsSubmitting(true);
-    clearStatus();
+    setFormState(null);
+    token.current = "";
 
-    const content = `${name}\n${email}\n${message}`;
+    const wasCorrection = correcting;
+    const content = `${values.name}\n${values.email}\n${values.message}\n${wasCorrection}`;
     if (submission.current?.content !== content) {
-      // randomUUID needs a secure context and a 2022 browser; the id is optional.
-      const id = globalThis.crypto?.randomUUID?.();
+      const id = newSubmissionId();
       submission.current = id ? { id, content } : null;
     }
+    const submissionId = submission.current?.id;
 
     // AbortController rather than AbortSignal.timeout, which older Safari lacks.
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
+    // null: sent.
+    let code: string | null = null;
+    let neverArrived = false;
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
-          email,
-          message,
+          ...values,
           turnstileToken,
           locale,
-          submissionId: submission.current?.id,
+          submissionId,
+          ...(wasCorrection && { correction: true }),
         }),
         signal: controller.signal,
       });
-
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error || "Failed to send");
+        const data: unknown = await res.json().catch(() => null);
+        const raw = data !== null && typeof data === "object" ? (data as { code?: unknown }).code : undefined;
+        code = controller.signal.aborted ? "no_reply" : typeof raw === "string" && API_CODES.has(raw) ? raw : "unknown";
       }
-
-      trackFormLead();
-
-      setSubmitted(true);
-      showStatus({ tone: "ok", headline: t.sentTitle, facts: t.sentText(name) });
-      setName("");
-      setEmail("");
-      setMessage("");
-      setTurnstileToken("");
-      submission.current = null;
-    } catch (error) {
-      console.error("Form submission error:", error);
-      const errorMsg = error instanceof Error ? error.message : "Unknown error";
-
-      // The token was redeemed (or rejected) by siteverify and cannot be
-      // reused. Reset the widget so the retry submits a fresh token.
-      turnstileRef.current?.reset();
-      setTurnstileToken("");
-
-      showStatus({
-        tone: "fail",
-        headline: t.errorTitle,
-        facts: errorMsg.includes("verification") ? t.errorVerification : t.errorGeneric,
-        urgent: true,
-        focus: true,
-      });
+    } catch {
+      if (controller.signal.aborted) {
+        code = "no_reply";
+      } else {
+        neverArrived = true;
+        code = navigator.onLine === false ? "offline" : "unreachable";
+      }
     } finally {
       clearTimeout(timeout);
       inFlight.current = false;
       setIsSubmitting(false);
     }
-  }, [name, email, message, turnstileToken, locale, t]);
+
+    if (code === null) {
+      onSent(values, submissionId, wasCorrection);
+      return;
+    }
+    if (neverArrived) {
+      // No answer at all, so siteverify most likely never saw the token: keep it.
+      if (!token.current) token.current = turnstileToken;
+    } else {
+      // Redeemed, rejected, or maybe still on its way after an abort: retry with a new one.
+      turnstileRef.current?.reset();
+    }
+    trackFormFailed(code);
+    switch (code) {
+      case "bot_required":
+      case "bot_rejected":
+        show("checkRejected", { focus: true });
+        break;
+      case "bot_unavailable":
+        show("checkDown", { focus: true });
+        break;
+      case "invalid_email":
+        showFieldErrors({ email: "invalid" });
+        break;
+      case "fields_required":
+      case "too_long": {
+        // The form checks the same rules first, so the Function disagreeing means the two
+        // have drifted apart. Point at the field when there is one to point at.
+        const found = validate(values);
+        if (FIELDS.some((field) => found[field])) showFieldErrors(found);
+        else show("refused", { focus: true });
+        break;
+      }
+      case "no_reply":
+        show("noReply", { focus: true });
+        break;
+      case "offline":
+        show("offline", { reveal: true });
+        break;
+      case "unreachable":
+        show("unreachable", { focus: true });
+        break;
+      default:
+        show("refused", { focus: true });
+    }
+  };
+
+  /** Send, and every button that means Send. Never disabled: it always answers. */
+  const press = () => {
+    if (inFlight.current) return;
+    setArmed(true);
+    const values = clean({ name, email, message });
+    const found = validate(values);
+    if (FIELDS.some((field) => found[field])) {
+      cancelWait();
+      setFormState(null);
+      showFieldErrors(found);
+      return;
+    }
+    setErrors({});
+    if (navigator.onLine === false) {
+      cancelWait();
+      show("offline", { reveal: true });
+      trackFormFailed("offline");
+      return;
+    }
+    if (!TURNSTILE_SITE_KEY || widgetFailed.current === "error") {
+      cancelWait();
+      show("checkDown", { focus: true, fromWidget: true });
+      trackFormFailed(TURNSTILE_SITE_KEY ? "bot_error" : "bot_no_key");
+      return;
+    }
+    // A widget that failed offline is remounted by the `online` event, never here.
+    if (timedOut.current) {
+      timedOut.current = false;
+      turnstileRef.current?.reset();
+    }
+    if (token.current) {
+      cancelWait();
+      void send(token.current, values);
+      return;
+    }
+    // S5: sends when the token arrives, or says the check can't run after 15 s.
+    cancelWait();
+    pending.current = true;
+    wait.current.left = CHECK_WAIT_MS;
+    show(challenge.current ? "challenge" : "checking", { reveal: true });
+    if (!challenge.current) runClock();
+  };
+
+  const onToken = (value: string) => {
+    token.current = value;
+    challenge.current = false;
+    timedOut.current = false;
+    widgetFailed.current = false;
+    if (pending.current) {
+      cancelWait();
+      press();
+      return;
+    }
+    setFormState((state) =>
+      state && (state.kind === "checking" || state.kind === "challenge" || (state.kind === "checkDown" && state.fromWidget))
+        ? null
+        : state
+    );
+  };
+
+  const onWidgetFailed = (code: "bot_error" | "bot_unsupported") => {
+    token.current = "";
+    challenge.current = false;
+    const wasPending = pending.current;
+    cancelWait();
+    if (code === "bot_error" && navigator.onLine === false) {
+      // Not the check's fault. Tried again when the connection comes back.
+      widgetFailed.current = "offline";
+      if (wasPending) show("offline", { reveal: true });
+      return;
+    }
+    widgetFailed.current = "error";
+    show("checkDown", { focus: wasPending, fromWidget: true });
+    trackFormFailed(code);
+  };
+
+  const onChallengeShown = () => {
+    challenge.current = true;
+    if (pending.current) {
+      stopClock();
+      show("challenge", { reveal: true });
+      return;
+    }
+    // Over a failure the visitor hasn't acted on yet, the box just appears below it.
+    setFormState((state) => state ?? { kind: "challenge", id: nextId.current++, focus: false, reveal: false, fromWidget: false });
+  };
+
+  const onChallengeDone = () => {
+    challenge.current = false;
+    if (pending.current) {
+      show("checking");
+      runClock();
+      return;
+    }
+    setFormState((state) => (state?.kind === "challenge" ? null : state));
+  };
+
+  const onChallengeTimeout = () => {
+    token.current = "";
+    challenge.current = false;
+    const wasPending = pending.current;
+    cancelWait();
+    show("checkRejected", { focus: wasPending });
+    trackFormFailed("bot_timeout");
+    // S9 says "press Send to retry", so the new challenge waits for that press.
+    timedOut.current = true;
+  };
+
+  const closeSent = () => {
+    setSent(null);
+    focusNext.current = "contact-send";
+  };
+
+  const correct = () => {
+    const last = lastSent.current;
+    if (last) {
+      setName(last.name);
+      setEmail(last.email);
+      setMessage(last.message);
+    }
+    setCorrecting(true);
+    setSent(null);
+    focusNext.current = "contact-name";
+  };
+
+  const copyMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(message);
+      setCopied(true);
+    } catch {
+      // No clipboard (an insecure context, or permission refused): select it instead.
+      const area = document.getElementById("contact-message") as HTMLTextAreaElement | null;
+      area?.focus();
+      area?.select();
+    }
+  };
 
   const contactMethods = useMemo(() => [
     {
@@ -160,6 +590,168 @@ const ContactSection = memo(function ContactSection() {
     },
   ], [t]);
 
+  const fieldText: Record<Field, Partial<Record<"missing" | "invalid" | "long", string>>> = {
+    name: { missing: f.addName, long: f.longName },
+    email: { missing: f.addEmail, invalid: f.addEmail, long: f.longEmail },
+    message: { missing: f.addMessage, long: f.longMessage },
+  };
+  const fieldProps = (field: Field) => {
+    const error = errors[field];
+    return {
+      id: `contact-${field}`,
+      name: field,
+      maxLength: FIELD_LIMITS[field],
+      readOnly: isSubmitting,
+      required: true,
+      "aria-invalid": error ? true : undefined,
+      "aria-describedby": error ? `contact-${field}-error` : undefined,
+    };
+  };
+  const fieldError = (field: Field) => {
+    const error = errors[field];
+    return error ? (
+      <p id={`contact-${field}-error`} className="ct-error">
+        {fieldText[field][error]}
+      </p>
+    ) : null;
+  };
+
+  // The panel for the current state: badge, headline, facts, actions with the primary last.
+  let panel: ReactNode = null;
+  let spoken: ReactNode = null;
+  let urgent = false;
+  if (sent) {
+    const time = new Intl.DateTimeFormat(locale === "ar" ? "ar-QA-u-nu-latn" : "en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(sent.at);
+    const facts = (
+      <>
+        <p>{fill(f.sentReply, { email: sent.email })}</p>
+        <p>{f.sentNext}</p>
+      </>
+    );
+    spoken = facts;
+    panel = (
+      <StatePanel
+        variant="inline"
+        tone="ok"
+        headingAs="h4"
+        focusHeadline
+        badge={
+          <>
+            {f.sentBadge} · <bdi>{time}</bdi>
+            {sent.ref && (
+              <>
+                {" "}· {f.refLabel} <bdi>{sent.ref}</bdi>
+              </>
+            )}
+          </>
+        }
+        headline={fill(f.sent, { name: sent.name })}
+        onClose={closeSent}
+        closeLabel={s.close}
+        secondary={[{ label: f.correct, onClick: correct }]}
+        primary={
+          <WhatsAppLink
+            source="contact_sent_followup"
+            conversion={false}
+            message={sent.ref ? f.followUp.replace("{ref}", sent.ref) : dict.common.floatMessage}
+            className="cta"
+          >
+            {f.continueOnWhatsApp}
+          </WhatsAppLink>
+        }
+      >
+        {facts}
+      </StatePanel>
+    );
+  } else if (formState) {
+    const failed = ["refused", "unreachable", "checkDown", "checkRejected"].includes(formState.kind);
+    const pre = failed ? prefill(clean({ name, email, message })) : null;
+    const shortened = pre?.cut ? <p>{f.shortened}</p> : null;
+    const copy: StatePanelAction[] = pre?.cut ? [{ label: copied ? f.copied : f.copy, onClick: copyMessage }] : [];
+    const call: StatePanelAction = {
+      label: s.call,
+      href: `tel:${PHONE_E164}`,
+      onClick: () => trackPhoneClick("contact_form_failed"),
+    };
+    const whatsApp = (label: string, className: string) => (
+      <WhatsAppLink key="whatsapp" source="contact_form_failed" message={pre?.text} className={className}>
+        {label}
+      </WhatsAppLink>
+    );
+    const sendButton = (label: string): StatePanelAction => ({ label, onClick: press });
+    const fail = { tone: "fail" as const, badge: f.notSentBadge };
+
+    const views: Record<Kind, Omit<ComponentProps<typeof StatePanel>, "variant"> & { urgent?: boolean }> = {
+      checking: { headline: f.checking },
+      challenge: { headline: f.challenge },
+      refused: {
+        ...fail,
+        headline: f.refused,
+        children: <><p>{f.kept}</p>{shortened}</>,
+        secondary: [sendButton(f.tryAgain), call, ...copy],
+        primary: whatsApp(f.sendOnWhatsApp, "cta"),
+        urgent: true,
+      },
+      unreachable: {
+        ...fail,
+        headline: f.unreachable,
+        children: <><p>{f.kept}</p>{shortened}</>,
+        secondary: [sendButton(f.tryAgain), call, ...copy],
+        primary: whatsApp(f.sendOnWhatsApp, "cta"),
+        urgent: true,
+      },
+      noReply: {
+        tone: "fail",
+        badge: f.noReplyBadge,
+        headline: f.noReply,
+        children: <p>{f.noReplyNext}</p>,
+        secondary: [call],
+        primary: sendButton(f.tryAgain),
+        urgent: true,
+      },
+      checkDown: {
+        ...fail,
+        headline: f.checkDown,
+        children: <><p>{f.kept} {f.open}</p>{shortened}</>,
+        secondary: [call, ...copy],
+        primary: whatsApp(t.whatsapp, "cta"),
+        urgent: true,
+      },
+      checkRejected: {
+        ...fail,
+        headline: f.checkRejected,
+        children: <><p>{f.kept} {f.checkRetry}</p>{shortened}</>,
+        secondary: [whatsApp(t.whatsapp, "cta-2"), ...copy],
+        primary: sendButton(f.send),
+        urgent: true,
+      },
+      offline: {
+        tone: "fail",
+        badge: f.offlineBadge,
+        headline: f.kept,
+        children: <p>{f.offline} {f.calls} {f.open}</p>,
+        primary: call,
+        urgent: true,
+      },
+      online: {
+        headline: f.online,
+        children: <p>{f.onlineNext}</p>,
+        primary: sendButton(f.send),
+      },
+    };
+    const { urgent: isUrgent = false, children, ...view } = views[formState.kind];
+    urgent = isUrgent;
+    spoken = formState.focus ? children : <>{view.headline} {children}</>;
+    panel = (
+      <StatePanel key={formState.id} variant="inline" headingAs="h4" focusHeadline={formState.focus} {...view}>
+        {children}
+      </StatePanel>
+    );
+  }
+
   return (
     <section
       id="contact"
@@ -189,7 +781,7 @@ const ContactSection = memo(function ContactSection() {
             must be visible from the first paint. Its overflow-hidden would also
             capture a .reveal timeline. */}
         <div className="text-center mb-10 sm:mb-12 lg:mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-white mb-4 sm:mb-6 leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-white mb-4 sm:mb-6 leading-tight">
             {t.titleTop}
             <br />
             <span className="text-gradient">{t.titleBottom}</span>
@@ -218,7 +810,7 @@ const ContactSection = memo(function ContactSection() {
             </h3>
 
             <div className="space-y-3 sm:space-y-4">
-              {contactMethods.map((method, index) => {
+              {contactMethods.map((method) => {
                 const Icon = method.icon;
                 const className = "group ct-method";
                 const content = (
@@ -279,134 +871,107 @@ const ContactSection = memo(function ContactSection() {
             </div>
           </div>
 
-          {/* Contact Form */}
-          <div>
+          {/* Contact Form: first on phones, where it is what the page is for. */}
+          <div className="order-first lg:order-none">
             <div className="p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
               <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-5 sm:mb-6">
                 {t.sendMessage}
               </h3>
 
-              {submitted ? (
-                <div className="text-center py-8 sm:py-12">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <svg className="w-7 h-7 sm:w-8 sm:h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">{t.thanks}</h3>
-                  <p className="text-sm sm:text-base text-white/70">{t.thanksText}</p>
-                </div>
-              ) : !hydrated ? (
+              {!hydrated ? (
                 // Stand-in for the form until it hydrates. The form itself is
                 // interactive-only markup, so it stays out of the static HTML.
-                <div className="ct-skel" aria-hidden="true">
-                  <div>
-                    <p className="ct-skel-label">{t.name}</p>
-                    <div className="ct-skel-field" />
+                <>
+                  <div className="ct-skel" aria-hidden="true">
+                    <div>
+                      <p className="ct-skel-label">{t.name}</p>
+                      <div className="ct-skel-field" />
+                    </div>
+                    <div>
+                      <p className="ct-skel-label">{t.emailLabel}</p>
+                      <div className="ct-skel-field" />
+                    </div>
+                    <div>
+                      <p className="ct-skel-label">{t.message}</p>
+                      <div className="ct-skel-area" />
+                    </div>
+                    <div className="ct-skel-btn">{t.send}</div>
                   </div>
-                  <div>
-                    <p className="ct-skel-label">{t.emailLabel}</p>
-                    <div className="ct-skel-field" />
-                  </div>
-                  <div>
-                    <p className="ct-skel-label">{t.message}</p>
-                    <div className="ct-skel-area" />
-                  </div>
-                  <div className="h-[65px]" />
-                  <div className="ct-skel-btn">{t.send}</div>
-                </div>
+                  {/* Without JavaScript the form never arrives. */}
+                  <noscript>
+                    <p className="mt-4 text-white">
+                      <a href={`tel:${PHONE_E164}`}>{s.call} <bdi>{PHONE}</bdi></a> · <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+                    </p>
+                  </noscript>
+                </>
+              ) : sent ? (
+                <div data-form-state="sent">{panel}</div>
               ) : (
                 <form
-                  onSubmit={handleSubmit}
+                  noValidate
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    press();
+                  }}
+                  onFocus={() => setArmed(true)}
                   className="space-y-4 sm:space-y-5"
                 >
-
                   <div>
                     <label htmlFor="contact-name" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">{t.name}</label>
                     <Input
-                      id="contact-name"
+                      {...fieldProps("name")}
                       type="text"
-                      name="name"
+                      autoComplete="name"
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      readOnly={isSubmitting}
-                      required
-                      maxLength={100}
-                      className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        clearError("name");
+                      }}
+                      className={INPUT_CLASS}
                       placeholder={t.namePlaceholder}
                     />
+                    {fieldError("name")}
                   </div>
 
                   <div>
                     <label htmlFor="contact-email" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">{t.emailLabel}</label>
                     <Input
-                      id="contact-email"
+                      {...fieldProps("email")}
                       type="email"
                       dir="ltr"
-                      name="email"
+                      autoComplete="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      readOnly={isSubmitting}
-                      required
-                      maxLength={254}
-                      className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        clearError("email");
+                      }}
+                      className={INPUT_CLASS}
                       placeholder={t.emailPlaceholder}
                     />
+                    {fieldError("email")}
                   </div>
 
                   <div>
                     <label htmlFor="contact-message" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">{t.message}</label>
                     <Textarea
-                      id="contact-message"
-                      name="message"
+                      {...fieldProps("message")}
                       value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      readOnly={isSubmitting}
-                      required
-                      maxLength={5000}
+                      onChange={(e) => {
+                        setMessage(e.target.value);
+                        clearError("message");
+                      }}
                       rows={4}
-                      className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl resize-none text-sm sm:text-base"
+                      className={TEXTAREA_CLASS}
                       placeholder={t.messagePlaceholder}
                     />
-                  </div>
-
-                  <div className="flex flex-col items-center gap-3">
-                    {TURNSTILE_SITE_KEY ? (
-                      <>
-                        <CloudflareTurnstile
-                          ref={turnstileRef}
-                          siteKey={TURNSTILE_SITE_KEY}
-                          action={TURNSTILE_ACTION}
-                          onVerify={(token) => {
-                            setTurnstileFailed(false);
-                            setTurnstileToken(token);
-                          }}
-                          onExpire={() => setTurnstileToken("")}
-                          onError={() => {
-                            setTurnstileToken("");
-                            setTurnstileFailed(true);
-                          }}
-                          theme="dark"
-                          language={locale === "ar" ? "ar" : "auto"}
-                          className="min-h-[65px]"
-                        />
-                        {turnstileFailed && (
-                          <p role="alert" className="text-sm text-red-300 text-center">
-                            {t.checkFailed(PHONE, EMAIL)}
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      <p role="alert" className="text-sm text-red-300 text-center">
-                        {t.unavailable(PHONE, EMAIL)}
-                      </p>
-                    )}
+                    {fieldError("message")}
                   </div>
 
                   <button
+                    id="contact-send"
                     type="submit"
-                    disabled={isSubmitting || !turnstileToken}
-                    className="w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:bg-gray-100 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                    aria-busy={isSubmitting || undefined}
+                    className="w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:bg-gray-100 active:scale-[0.98] inline-flex items-center justify-center gap-2"
                   >
                     {isSubmitting && (
                       <span
@@ -423,7 +988,44 @@ const ContactSection = memo(function ContactSection() {
                   <p role="status" className="text-xs sm:text-sm text-white/70 text-center empty:hidden">
                     {isSlow ? t.stillSending : ""}
                   </p>
+
+                  {/* data-form-state names the state for scripts/audit-mobile.mjs. */}
+                  {panel && <div ref={panelRef} data-form-state={formState?.kind}>{panel}</div>}
+
+                  {/* Below the panel, which tells the visitor to tap the box below. */}
+                  {TURNSTILE_SITE_KEY && (
+                    <div ref={checkRef}>
+                    <CloudflareTurnstile
+                      key={widgetKey}
+                      ref={turnstileRef}
+                      siteKey={TURNSTILE_SITE_KEY}
+                      action={TURNSTILE_ACTION}
+                      armed={armed}
+                      onVerify={onToken}
+                      onExpire={() => {
+                        token.current = "";
+                      }}
+                      onError={() => onWidgetFailed("bot_error")}
+                      onUnsupported={() => onWidgetFailed("bot_unsupported")}
+                      onBeforeInteractive={onChallengeShown}
+                      onAfterInteractive={onChallengeDone}
+                      onTimeout={onChallengeTimeout}
+                      theme="dark"
+                      language={locale === "ar" ? "ar" : "auto"}
+                      className="flex justify-center"
+                    />
+                    </div>
+                  )}
                 </form>
+              )}
+
+              {/* Always there once hydrated, for the same reason as the line above. When
+                  focus moves to a headline the reader starts there, so these carry the rest. */}
+              {hydrated && (
+                <>
+                  <div role="status" className="sr-only">{urgent ? null : spoken}</div>
+                  <div role="alert" className="sr-only">{urgent ? spoken : null}</div>
+                </>
               )}
             </div>
           </div>

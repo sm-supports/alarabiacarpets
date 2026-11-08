@@ -57,19 +57,34 @@ export function trackConversion(sendTo: string, params: GtagParams = {}): void {
   gtagEvent("conversion", { send_to: sendTo, value: 1.0, currency: CURRENCY, ...params });
 }
 
-/** Contact form submitted successfully. */
+/** Contact form submitted successfully. Not for a correction of a message already sent. */
 export function trackFormLead(): void {
   trackConversion(CONVERSION_LABELS.formLead);
   gtagEvent("generate_lead", { currency: CURRENCY, value: 1.0, method: "contact_form" });
 }
 
+/** A "Correct and resend" went through. The lead was counted by the first send. */
+export function trackFormCorrection(): void {
+  gtagEvent("form_correction", { method: "contact_form" });
+}
+
+/**
+ * The contact form showed a failure. `code` is the API's code or the form's own
+ * (offline, unreachable, no_reply, bot_*): never anything the visitor typed.
+ */
+export function trackFormFailed(code: string): void {
+  gtagEvent("form_failed", { code, method: "contact_form" });
+}
+
 /**
  * A WhatsApp CTA was clicked.
  * @param source where the click came from, e.g. "navbar", "product_card:carpet"
+ * @param conversion false for a tap that isn't a new lead, such as the follow-up after
+ *   a sent form: GA4 still records it, Google Ads doesn't count it.
  */
-export function trackWhatsAppClick(source: string): void {
-  trackConversion(CONVERSION_LABELS.whatsappClick, { source });
-  gtagEvent("whatsapp_click", { source, method: "whatsapp" });
+export function trackWhatsAppClick(source: string, conversion = true): void {
+  if (conversion) trackConversion(CONVERSION_LABELS.whatsappClick, { source });
+  gtagEvent("whatsapp_click", { source, method: "whatsapp", ...(!conversion && { conversion: false }) });
 }
 
 /** A tel: link was clicked. */

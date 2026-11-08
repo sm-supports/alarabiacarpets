@@ -11,6 +11,8 @@ interface WhatsAppLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement
   source: string;
   /** Prefilled message. Ignored when `href` is given. */
   message?: string;
+  /** False when the tap isn't a new lead (the Sent panel's follow-up): no Ads conversion. */
+  conversion?: boolean;
   children: React.ReactNode;
 }
 
@@ -31,6 +33,7 @@ export default function WhatsAppLink({
   source,
   message,
   href,
+  conversion = true,
   children,
   ...rest
 }: WhatsAppLinkProps) {
@@ -48,7 +51,7 @@ export default function WhatsAppLink({
       {...(hydrated && { target: "_blank", rel: "noopener noreferrer" })}
       {...rest}
       onClick={(e) => {
-        trackWhatsAppClick(source);
+        trackWhatsAppClick(source, conversion);
         rest.onClick?.(e);
       }}
     >

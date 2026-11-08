@@ -784,11 +784,14 @@
   .more-label { @apply absolute inset-0 flex items-end p-3 sm:p-4 lg:p-5; }
   .pc-play { @apply relative block w-full h-full; }
   .pc-play-badge { @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white; }
-  .ct-skel { @apply min-h-[420px] space-y-4 sm:space-y-5; }
+  /* The hydrated form's height, so the card doesn't jump: fields, Send, and the margin
+     before the (usually invisible) Turnstile container. */
+  .ct-skel { @apply min-h-[380px] sm:min-h-[430px] space-y-4 sm:space-y-5; }
   .ct-skel-label { @apply text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2; }
   .ct-skel-field { @apply h-11 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
-  .ct-skel-area { @apply h-[98px] sm:h-[114px] rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
+  .ct-skel-area { @apply h-[114px] rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
   .ct-skel-btn { @apply w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl text-center opacity-50; }
+  .ct-error { @apply mt-1.5 text-sm text-red-300; }
   .cat-price { @apply absolute bottom-2 start-2 max-w-[calc(100%-1rem)] rounded-lg bg-primary px-2 py-1 font-poppins text-[11px] font-medium leading-tight text-white sm:text-xs; }
 }
 

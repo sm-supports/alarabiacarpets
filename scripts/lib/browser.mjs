@@ -7,7 +7,7 @@
  *   - Turnstile's api.js is replaced with a fake window.turnstile, because the real site
  *     key fails on localhost (110200). The test drives it through window.__turnstileStub.
  *   - /api/contact answers with a chosen scenario, using the same status and body the
- *     Function returns for that case, including the `code` field the plan adds.
+ *     Function returns for that case, including its `code` field.
  *
  *   const browser = await launchBrowser();
  *   const page = await newPage(browser, { width: 390 });
@@ -61,13 +61,17 @@ export async function newPage(browser, { width = 390, height, javascript = true,
 }
 
 /**
- * Every outcome of the Function, with the status it returns today (the plan keeps the
- * statuses and adds `code`). bot_unavailable is 403 because verifyTurnstileToken fails
- * closed. A real 409 never comes from the Function today: `conflict_409` is there for
- * the retry case in the plan. `not_json` is a platform error page.
+ * Every answer functions/api/contact.ts gives, status and body exactly as it sends them
+ * (fail() and respond() there). bot_unavailable is 403 like bot_rejected because
+ * verifyTurnstileToken fails closed; the code tells them apart. The Function never
+ * answers 409: when Resend says 409 (it already has a send under this submission's
+ * idempotency key) the Function answers 200, so `resend_409` is that 200. `unknown_code`
+ * and `not_json` are what the form must survive anyway: a code it doesn't know, and a
+ * platform error page.
  */
 export const CONTACT_SCENARIOS = {
   ok: { status: 200, body: { message: "Email sent successfully" } },
+  resend_409: { status: 200, body: { message: "Email sent successfully" } },
   bad_body: { status: 400, body: { error: "Invalid request body", code: "bad_body" } },
   bot_required: { status: 400, body: { error: "Bot verification required", code: "bot_required" } },
   bot_rejected: { status: 403, body: { error: "Bot verification failed", code: "bot_rejected" } },
@@ -78,7 +82,6 @@ export const CONTACT_SCENARIOS = {
   send_failed: { status: 502, body: { error: "Failed to send email", code: "send_failed" } },
   server_error: { status: 500, body: { error: "Failed to send email", code: "send_failed" } },
   unknown_code: { status: 400, body: { error: "Something new", code: "not_a_known_code" } },
-  conflict_409: { status: 409, body: { error: "Failed to send email", code: "send_failed" } },
   not_json: { status: 500, raw: "<html><body>Internal Server Error</body></html>" },
 };
 
@@ -266,9 +269,13 @@ export async function installRoutes(page, { origin, turnstile = "pass", contact 
   };
 }
 
-/** Loads a URL and waits until React has hydrated and the page has stopped fetching. */
-export async function gotoSettled(page, url, { hydrate = true } = {}) {
-  const response = await page.goto(url, { waitUntil: "load" });
+/**
+ * Loads a URL and waits until React has hydrated and the page has stopped fetching.
+ * waitUntil "domcontentloaded" for a page whose load event a hung request holds back
+ * (a script added before load, such as Turnstile at desktop widths, delays it).
+ */
+export async function gotoSettled(page, url, { hydrate = true, waitUntil = "load" } = {}) {
+  const response = await page.goto(url, { waitUntil });
   if (hydrate) {
     await page
       .waitForFunction(

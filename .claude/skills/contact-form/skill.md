@@ -9,7 +9,7 @@
 | API endpoint | `functions/api/contact.ts` (Cloudflare Workers) |
 | Email template | `functions/email-templates/acknowledgment.ts` |
 | Turnstile widget | `src/components/CloudflareTurnstile.tsx` |
-| Outcome messages | `showStatus` in `src/lib/status.ts`, shown by `StatusRegion` in `StatePanel` |
+| Outcome messages | Inline `StatePanel`s in `ContactSection.tsx` (`data-form-state`), strings in `formStates` in `src/i18n/*.client.ts`, one per API `code` |
 
 ## Current Form Fields
 
@@ -22,33 +22,13 @@
 
 ### Frontend (`src/components/ContactSection.tsx`)
 
-1. Add state:
-   ```tsx
-   const [phone, setPhone] = useState("");
-   ```
-
-2. Add input JSX following the existing pattern:
-   ```tsx
-   <div>
-     <label className="...">Phone</label>
-     <Input
-       value={phone}
-       onChange={(e) => setPhone(e.target.value)}
-       placeholder="Your phone number"
-       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
-     />
-   </div>
-   ```
-
-3. Include in the fetch body within `handleSubmit`:
-   ```tsx
-   body: JSON.stringify({ name, email, phone, message, turnstileToken }),
-   ```
-
-4. Reset the field on success:
-   ```tsx
-   setPhone("");
-   ```
+1. Add it to `FIELD_LIMITS` (same cap as the Function), `FIELDS`, `clean()` and `validate()`,
+   with its error strings in `formStates` in both `src/i18n/*.client.ts`.
+2. Add state and an input following the existing ones: `{...fieldProps("x")}`, `INPUT_CLASS`
+   (16px text, so iOS doesn't zoom), an `autoComplete`, and `{fieldError("x")}` under it.
+3. Add it to the `Values` that `press()` builds and `send()` posts, and to the `content`
+   string in `send()`, so an edit gets a new submission id.
+4. Clear it in `onSent()` and restore it in `correct()`.
 
 ### Backend (`functions/api/contact.ts`)
 
@@ -121,10 +101,11 @@ TURNSTILE_SECRET_KEY=xxxxx
 
 Test:
 - Form renders with all fields
-- Turnstile widget appears and produces a token
+- Turnstile produces a token (interaction-only: it shows only when it wants a tap)
 - Submission sends both admin notification and acknowledgment emails
-- Validation errors display correctly for missing/invalid fields
-- A status panel appears after submission, and stays until closed
+- Every outcome, mocked: `node scripts/audit-mobile.mjs --form` (exits 1 on a wrong state,
+  focus, post count or lost text)
+- The Sent panel stays until closed; Close returns to an empty form with focus on Send
 - Offline at send: the panel appears, the page stays, and the text is still in the form
 
 ## Rules

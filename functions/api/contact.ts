@@ -44,10 +44,59 @@ const RESEND_TIMEOUT_MS = 8_000;
 // lost response doesn't email the team twice.
 const SUBMISSION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-// Length caps. Keep in sync with the maxLength attributes in ContactSection.tsx.
+// Length caps. Keep in sync with FIELD_LIMITS in ContactSection.tsx.
 const MAX_NAME_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 254;
 const MAX_MESSAGE_LENGTH = 5000;
+
+/**
+ * What went wrong, for the form to show the right state. The HTTP statuses are the ones
+ * this Function has always returned; `code` only tells apart the cases a status shares.
+ * The form maps any code it doesn't know to "send_failed". Keep in step with
+ * ContactSection.tsx and CONTACT_SCENARIOS in scripts/lib/browser.mjs.
+ */
+type ContactCode =
+  | "bad_body"
+  | "bot_required"
+  | "bot_rejected"
+  | "bot_unavailable"
+  | "fields_required"
+  | "too_long"
+  | "invalid_email"
+  | "send_failed";
+
+/**
+ * Turnstile rejections a visitor can't fix by getting a new token: our configuration,
+ * or siteverify itself being down. They get "bot_unavailable" (call or WhatsApp us);
+ * anything else is "bot_rejected" (press Send to retry). verifyTurnstileToken's reason
+ * is a comma-joined list when siteverify sent several error codes.
+ */
+const CHECK_UNAVAILABLE = new Set([
+  "secret-not-configured",
+  "no-hostnames-configured",
+  "siteverify-unavailable",
+  "missing-input-secret",
+  "invalid-input-secret",
+  "internal-error",
+  "action-mismatch",
+  "hostname-mismatch",
+]);
+
+function botCode(reason: string): ContactCode {
+  return reason.split(",").some((part) => CHECK_UNAVAILABLE.has(part)) ? "bot_unavailable" : "bot_rejected";
+}
+
+/**
+ * Resend answers 409 when it already has a send under this idempotency key: finished,
+ * with a different payload, or still in progress. Either way the message for this
+ * submission is already with Resend, so it counts as sent rather than as a failure the
+ * visitor would retry.
+ */
+function isDuplicateSend(error: unknown): boolean {
+  if (error === null || typeof error !== "object") return false;
+  const { statusCode, name } = error as { statusCode?: unknown; name?: unknown };
+  return statusCode === 409 || name === "invalid_idempotent_request" || name === "concurrent_idempotent_requests";
+}
 
 // The form is same-origin, so CORS is only relevant to cross-origin callers.
 // Preview deployments post to their own origin and are unaffected.
@@ -208,6 +257,8 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       headers: { ...headers, "Server-Timing": serverTiming },
     });
   };
+  const fail = (status: number, error: string, code: ContactCode, outcome: string): Response =>
+    respond(status, { error, code }, outcome);
 
   try {
     let body: unknown;
@@ -217,7 +268,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       body = null;
     }
     if (body === null || typeof body !== "object" || Array.isArray(body)) {
-      return respond(400, { error: "Invalid request body" }, "bad-body");
+      return fail(400, "Invalid request body", "bad_body", "bad-body");
     }
     const { turnstileToken, ...fields } = body as Record<string, unknown>;
 
@@ -227,7 +278,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
 
     // Verify Turnstile token
     if (!turnstileToken) {
-      return respond(400, { error: "Bot verification required" }, "no-token");
+      return fail(400, "Bot verification required", "bot_required", "no-token");
     }
 
     const clientIp = context.request.headers.get("CF-Connecting-IP");
@@ -241,7 +292,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
 
     if (!verification.ok) {
       console.warn("Turnstile verification rejected:", verification.reason);
-      return respond(403, { error: "Bot verification failed" }, "bot-check-failed");
+      return fail(403, "Bot verification failed", botCode(verification.reason), "bot-check-failed");
     }
 
     // Validate required fields. The JSON body is untrusted, so check the types
@@ -251,17 +302,17 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       typeof fields.email !== "string" ||
       typeof fields.message !== "string"
     ) {
-      return respond(400, { error: "Name, email, and message are required" }, "invalid");
+      return fail(400, "Name, email, and message are required", "fields_required", "invalid");
     }
 
     // The name goes into the subject line, so collapse line breaks and other
-    // control characters.
+    // control characters. The form applies the same rules before it sends.
     const name = fields.name.replace(/[\u0000-\u001F\u007F]+/g, " ").trim();
     const email = fields.email.trim();
     const message = fields.message.trim();
 
     if (!name || !email || !message) {
-      return respond(400, { error: "Name, email, and message are required" }, "invalid");
+      return fail(400, "Name, email, and message are required", "fields_required", "invalid");
     }
 
     if (
@@ -269,7 +320,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       email.length > MAX_EMAIL_LENGTH ||
       message.length > MAX_MESSAGE_LENGTH
     ) {
-      return respond(400, { error: "One or more fields are too long" }, "invalid");
+      return fail(400, "One or more fields are too long", "too_long", "invalid");
     }
 
     // Bare addresses only: no display-name syntax and no address lists, since
@@ -277,7 +328,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
     const emailRegex = /^[^\s@<>",;]+@[^\s@<>",;]+\.[^\s@<>",;]+$/;
 
     if (!emailRegex.test(email)) {
-      return respond(400, { error: "Invalid email format" }, "invalid");
+      return fail(400, "Invalid email format", "invalid_email", "invalid");
     }
 
     // Optional: a tab opened before this field existed doesn't send it.
@@ -285,6 +336,12 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       typeof fields.submissionId === "string" && SUBMISSION_ID.test(fields.submissionId)
         ? fields.submissionId.toLowerCase()
         : undefined;
+    // The reference the visitor sees on the Sent panel. Derived from the id, never per
+    // request, so a retry of the same message sends Resend the same payload under the
+    // same key; a different payload would get a 409 instead of the original answer.
+    const ref = submissionId ? submissionId.slice(0, 8).toUpperCase() : undefined;
+    // Sent from the Sent panel's "Correct and resend": a new message replacing the last.
+    const correction = fields.correction === true;
 
     const resend = new Resend(context.env.RESEND_API_KEY);
 
@@ -295,9 +352,11 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       from: "Al Arabia Carpets <noreply@alarabiacarpets.com>",
       to: "info@alarabiacarpets.com",
       replyTo: email,
-      subject: `New Contact Form Message from ${name}`,
+      subject: `${correction ? "Correction: " : ""}New Contact Form Message from ${name}${ref ? ` · REF ${ref}` : ""}`,
       html: `
-        <h2>New Contact Form Submission</h2>
+        <h2>${correction ? "Correction: " : ""}New Contact Form Submission</h2>
+        ${correction ? "<p>This replaces the sender's previous message.</p>" : ""}
+        ${ref ? `<p><strong>REF:</strong> ${ref}</p>` : ""}
         <p><strong>Name:</strong> ${escapeHtml(name)}</p>
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
         <p><strong>Message:</strong></p>
@@ -306,15 +365,16 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
     }, submissionId && `contact-admin/${submissionId}`);
     timing.email_ms = Date.now() - emailStarted;
 
-    if (adminError) {
+    const duplicate = Boolean(adminError) && isDuplicateSend(adminError);
+    if (adminError && !duplicate) {
       console.error("Admin notification failed:", adminError);
-      return respond(502, { error: "Failed to send email" }, "admin-email-failed");
+      return fail(502, "Failed to send email", "send_failed", "admin-email-failed");
     }
 
     // Acknowledgment to the submitter (non-critical). The team already has the
     // message, so the visitor gets their answer now and this finishes afterwards.
     // Only after the admin email succeeded: never thank someone for a message that
-    // didn't arrive.
+    // didn't arrive. On a duplicate it has its own key, so it isn't sent twice either.
     context.waitUntil(
       sendEmail(resend, {
         from: "Al Arabia Carpets <noreply@alarabiacarpets.com>",
@@ -323,16 +383,16 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
           locale === "ar"
             ? "شكرًا لتواصلك مع سجاد العربية"
             : "Thank you for contacting Al Arabia Carpets",
-        html: generateAcknowledgmentEmail(name, locale),
+        html: generateAcknowledgmentEmail(name, locale, ref),
       }, submissionId && `contact-ack/${submissionId}`).then(({ error: ackError }) => {
         if (ackError) console.error("Acknowledgment email failed:", ackError);
       })
     );
 
-    return respond(200, { message: "Email sent successfully" }, "sent");
+    return respond(200, { message: "Email sent successfully" }, duplicate ? "sent-duplicate" : "sent");
   } catch (error) {
     console.error("Email send error:", error);
-    return respond(500, { error: "Failed to send email" }, "error");
+    return fail(500, "Failed to send email", "send_failed", "error");
   }
 }
 

@@ -15,9 +15,21 @@ interface CloudflareTurnstileProps {
   /** Stable surface name (1-32 chars, [A-Za-z0-9_-]). Echoed back by
    *  siteverify as `action` and checked server-side. */
   action: string;
+  /** Load now. Below md the widget waits for this: it downloads about 1.6 MB, so phones
+   *  fetch it on the first focus in the form or the first press of Send. At md and up it
+   *  also loads when the form comes within 400px of the viewport. */
+  armed?: boolean;
   onVerify: (token: string) => void;
   onExpire?: () => void;
+  /** The widget failed, or its script didn't load. */
   onError?: () => void;
+  /** The browser can't run Turnstile. */
+  onUnsupported?: () => void;
+  /** A challenge the visitor has to tap is showing, and when it has gone. */
+  onBeforeInteractive?: () => void;
+  onAfterInteractive?: () => void;
+  /** The visitor didn't finish the challenge in time. Reset to try again. */
+  onTimeout?: () => void;
   theme?: "dark" | "light" | "auto";
   /** Widget language: "auto" follows the browser, "ar" fixes it on Arabic pages. */
   language?: string;
@@ -31,6 +43,11 @@ interface TurnstileRenderOptions {
   callback: (token: string) => void;
   "expired-callback"?: () => void;
   "error-callback"?: () => void;
+  "unsupported-callback"?: () => void;
+  "before-interactive-callback"?: () => void;
+  "after-interactive-callback"?: () => void;
+  "timeout-callback"?: () => void;
+  appearance?: "always" | "execute" | "interaction-only";
   theme?: "dark" | "light" | "auto";
   language?: string;
 }
@@ -46,12 +63,24 @@ declare global {
   }
 }
 
+const SCRIPT_ID = "cf-turnstile-script";
+const DESKTOP = "(min-width: 768px)";
+
+/**
+ * Turnstile, rendered "interaction-only": nothing shows unless Cloudflare wants the
+ * visitor to tap, so the form reserves no space for it.
+ */
 export default function CloudflareTurnstile({
   siteKey,
   action,
+  armed = false,
   onVerify,
   onExpire,
   onError,
+  onUnsupported,
+  onBeforeInteractive,
+  onAfterInteractive,
+  onTimeout,
   theme = "dark",
   language = "auto",
   className = "",
@@ -59,16 +88,14 @@ export default function CloudflareTurnstile({
 }: CloudflareTurnstileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const mountedRef = useRef(false);
+  const startedRef = useRef(false);
 
-  const onVerifyRef = useRef(onVerify);
-  const onExpireRef = useRef(onExpire);
-  const onErrorRef = useRef(onError);
-
+  // The latest callbacks, so the widget (rendered once) always calls the current ones.
+  const callbacks = useRef({ onVerify, onExpire, onError, onUnsupported, onBeforeInteractive, onAfterInteractive, onTimeout });
   useEffect(() => {
-    onVerifyRef.current = onVerify;
-    onExpireRef.current = onExpire;
-    onErrorRef.current = onError;
-  }, [onVerify, onExpire, onError]);
+    callbacks.current = { onVerify, onExpire, onError, onUnsupported, onBeforeInteractive, onAfterInteractive, onTimeout };
+  });
 
   useImperativeHandle(
     ref,
@@ -87,72 +114,80 @@ export default function CloudflareTurnstile({
   );
 
   const renderWidget = useCallback(() => {
-    if (window.turnstile && containerRef.current && !widgetIdRef.current) {
+    if (!mountedRef.current || !window.turnstile || !containerRef.current || widgetIdRef.current) return;
+    try {
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: siteKey,
         action,
-        callback: (token) => onVerifyRef.current(token),
-        "expired-callback": () => onExpireRef.current?.(),
-        "error-callback": () => onErrorRef.current?.(),
+        appearance: "interaction-only",
+        callback: (token) => callbacks.current.onVerify(token),
+        "expired-callback": () => callbacks.current.onExpire?.(),
+        "error-callback": () => callbacks.current.onError?.(),
+        "unsupported-callback": () => callbacks.current.onUnsupported?.(),
+        "before-interactive-callback": () => callbacks.current.onBeforeInteractive?.(),
+        "after-interactive-callback": () => callbacks.current.onAfterInteractive?.(),
+        "timeout-callback": () => callbacks.current.onTimeout?.(),
         theme,
         language,
       });
+    } catch (err) {
+      console.error("Turnstile render failed:", err);
+      callbacks.current.onError?.();
     }
   }, [siteKey, action, theme, language]);
 
-  // Turnstile downloads about 1.6 MB, so it waits until the form is near the
-  // viewport. Submit stays disabled until there is a token, so nothing gets through
-  // before it loads.
+  // Idempotent: the first caller (armed, or the observer) starts it.
+  const load = useCallback(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    if (window.turnstile) {
+      renderWidget();
+      return;
+    }
+    let script = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
+    if (!script) {
+      script = document.createElement("script");
+      script.id = SCRIPT_ID;
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      script.async = true;
+      script.defer = true;
+      // A failed script never fires `load` or `error` again, so leaving it in the DOM
+      // would make every later mount wait on it forever. Drop it so the next mount
+      // (the form remounts the widget when the connection comes back) makes a fresh one.
+      const created = script;
+      created.addEventListener("error", () => created.remove(), { once: true });
+      document.head.appendChild(script);
+    }
+    // A blocked script (ad-blocker, network) never fires `load`, so without this the
+    // form would wait for a token that can never come.
+    script.addEventListener("load", renderWidget, { once: true });
+    script.addEventListener("error", () => mountedRef.current && callbacks.current.onError?.(), { once: true });
+  }, [renderWidget]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    // Strict mode in development unmounts and mounts again, removing the widget.
+    if (startedRef.current) renderWidget();
+    return () => {
+      mountedRef.current = false;
+      if (widgetIdRef.current && window.turnstile) {
+        try {
+          window.turnstile.remove(widgetIdRef.current);
+        } catch {
+          // Already gone.
+        }
+      }
+      widgetIdRef.current = null;
+    };
+  }, [renderWidget]);
+
+  useEffect(() => {
+    if (armed) load();
+  }, [armed, load]);
+
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
-
-    let mounted = true;
-    let script: HTMLScriptElement | null = null;
-
-    const initWidget = () => {
-      if (mounted) {
-        renderWidget();
-      }
-    };
-
-    // A blocked script (ad-blocker, network) never fires `load`, so without
-    // this the form would sit with a disabled button and no explanation.
-    const handleScriptError = () => {
-      if (mounted) {
-        onErrorRef.current?.();
-      }
-    };
-
-    const load = () => {
-      if (window.turnstile) {
-        renderWidget();
-        return;
-      }
-
-      const scriptId = "cf-turnstile-script";
-      script = document.getElementById(scriptId) as HTMLScriptElement | null;
-
-      if (!script) {
-        script = document.createElement("script");
-        script.id = scriptId;
-        script.src =
-          "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-        script.async = true;
-        script.defer = true;
-        // A failed script never fires `load` or `error` again, so leaving it in
-        // the DOM would make every later mount wait on it forever. Drop it so
-        // the next mount creates a fresh one. Registered here rather than in
-        // handleScriptError so it still runs if this component has unmounted.
-        const created = script;
-        created.addEventListener("error", () => created.remove(), { once: true });
-        document.head.appendChild(script);
-      }
-
-      script.addEventListener("load", initWidget);
-      script.addEventListener("error", handleScriptError);
-    };
-
+    if (!container || !window.matchMedia(DESKTOP).matches) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
@@ -162,18 +197,8 @@ export default function CloudflareTurnstile({
       { rootMargin: "400px" }
     );
     observer.observe(container);
-
-    return () => {
-      mounted = false;
-      observer.disconnect();
-      script?.removeEventListener("load", initWidget);
-      script?.removeEventListener("error", handleScriptError);
-      if (widgetIdRef.current && window.turnstile) {
-        window.turnstile.remove(widgetIdRef.current);
-        widgetIdRef.current = null;
-      }
-    };
-  }, [renderWidget]);
+    return () => observer.disconnect();
+  }, [load]);
 
   return <div ref={containerRef} className={className} />;
 }

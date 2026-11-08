@@ -17,6 +17,7 @@ const COPY = {
     received:
       "We&rsquo;ve received your message and truly appreciate you reaching out. Our team will review your inquiry and get back to you as soon as possible &mdash; typically within 24 hours.",
     meantime: "In the meantime, feel free to reach out through any of the channels below.",
+    ref: "Your reference",
     reach: "Reach Us Directly",
     whatsapp: "WhatsApp",
     email: "Email",
@@ -33,6 +34,7 @@ const COPY = {
     received:
       "وصلتنا رسالتك ونقدّر تواصلك معنا. سيراجع فريقنا طلبك ويرد عليك في أقرب وقت، وعادةً خلال 24 ساعة.",
     meantime: "وفي الأثناء، تقدر تتواصل معنا عبر أي من القنوات التالية.",
+    ref: "المرجع",
     reach: "تواصل معنا مباشرة",
     whatsapp: "واتساب",
     email: "البريد الإلكتروني",
@@ -45,7 +47,9 @@ const COPY = {
 // The submitted message is deliberately NOT echoed back: this email goes to
 // whatever address the sender typed, so repeating their text would let anyone
 // send content of their choice from our domain.
-export function generateAcknowledgmentEmail(name: string, locale: "en" | "ar" = "en"): string {
+// `ref` is the reference the form's Sent panel shows, so the visitor can quote it on
+// WhatsApp. Left out when the form sent no submission id.
+export function generateAcknowledgmentEmail(name: string, locale: "en" | "ar" = "en", ref?: string): string {
   const c = COPY[locale];
   const year = new Date().getFullYear();
   const safeName = name ?? "";
@@ -106,6 +110,10 @@ export function generateAcknowledgmentEmail(name: string, locale: "en" | "ar" = 
               <p style="font-family:'Poppins', Arial, Helvetica, sans-serif; font-size:15px; line-height:1.7; color:#444444; margin:0;">
                 ${c.meantime}
               </p>
+${ref ? `
+              <p style="font-family:'Poppins', Arial, Helvetica, sans-serif; font-size:14px; line-height:1.7; color:#444444; margin:24px 0 0 0;">
+                ${c.ref}: <strong dir="ltr" style="color:#0A2A1F;">${escapeHtml(ref)}</strong>
+              </p>` : ""}
             </td>
           </tr>
 

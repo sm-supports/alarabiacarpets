@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import BarIntent from "@/components/BarIntent";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
@@ -100,6 +101,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
       />
       {allFaqs.length > 0 && <JsonLd data={buildFaq(allFaqs, locale)} />}
 
+      <BarIntent name={category.label} type="category" slug={category.slug} />
       <Navbar />
       <main className="flex-grow">
         <div className="bg-primary text-white py-12 md:py-16">

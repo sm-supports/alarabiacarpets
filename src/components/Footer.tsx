@@ -47,7 +47,8 @@ export default function Footer({ locale }: { locale: Locale }) {
   };
 
   return (
-    <footer className="bg-white border-t border-gray-100">
+    // id: the phone header's menu button links here until the menu can open (Navbar).
+    <footer id="footer" className="bg-white border-t border-gray-100">
       <h2 className="sr-only">{t.footer.srTitle}</h2>
       {/* Main Footer */}
       <div className="container mx-auto px-4 sm:px-5 lg:px-8 py-10 sm:py-12 lg:py-16">

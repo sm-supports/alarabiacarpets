@@ -22,6 +22,15 @@ export const CONVERSION_LABELS = {
   phoneClick: null as string | null,
 } as const;
 
+/**
+ * Whether a WhatsApp tap on the action bar (and the pill it becomes at md and up) counts
+ * as the whatsappClick conversion, as the old floating button's taps did. The bar is a
+ * bigger target, so it may bring more taps for the same number of chats: compare the
+ * `sticky_bar:*` sources with real chat counts for 28 days after release. Setting this to
+ * false keeps those taps in GA4 only, which also takes the pill's taps out of bidding.
+ */
+export const BAR_SENDS_ADS = true;
+
 /** Al Arabia Carpets is a Qatar business — conversions are valued in Qatari riyal. */
 export const CURRENCY = "QAR";
 

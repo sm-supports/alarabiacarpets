@@ -1,22 +1,47 @@
 "use client";
 
-import { useState, useEffect, memo, useCallback, useMemo } from "react";
+import { useState, useEffect, memo, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X, ChevronRight } from "@/components/icons";
+import { X, ChevronRight, MessageCircle } from "@/components/icons";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { stripLocale } from "@/i18n/config";
+import { openChat } from "@/lib/tawk";
+
+/** What the menu's Live chat row is saying (S18). */
+type ChatState = "idle" | "opening" | "failed";
+
+const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** The three bars of the menu button, crossed while the menu is open. */
+function Burger({ open }: { open: boolean }) {
+  return (
+    <span className="relative block w-5 h-5" aria-hidden="true">
+      <span className={open ? "nav-line top-2.5 rotate-45" : "nav-line top-1"} />
+      <span className={open ? "nav-line top-2.5 opacity-0" : "nav-line top-2.5"} />
+      <span className={open ? "nav-line top-2.5 -rotate-45" : "nav-line top-4"} />
+    </span>
+  );
+}
 
 const Navbar = memo(function Navbar() {
   const hydrated = useHydrated();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [chat, setChat] = useState<ChatState>("idle");
   const pathname = usePathname();
   const { t, lp } = useI18n();
+  const burgerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  // Whether closing should put focus back on the menu button: yes for Close, the
+  // backdrop and Escape; no when a link navigates or the chat window takes over.
+  const restoreFocus = useRef(false);
+  // The chat attempt the row is showing, so a late answer to an older one is ignored.
+  const chatAttempt = useRef(0);
 
   // Navigation items
   const navigationItems = useMemo(() => [
@@ -38,10 +63,15 @@ const Navbar = memo(function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const close = useCallback((restore: boolean) => {
+    restoreFocus.current = restore;
+    setIsOpen(false);
+  }, []);
+
   // Close mobile menu on route change
   useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
+    close(false);
+  }, [pathname, close]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -55,6 +85,45 @@ const Navbar = memo(function Navbar() {
     };
   }, [isOpen]);
 
+  // While open: focus starts on Close, Tab and Shift+Tab stay inside the panel, and
+  // Escape closes it. On close the row forgets its last chat attempt and, unless a link
+  // or the chat took the visitor elsewhere, focus goes back to the menu button.
+  useEffect(() => {
+    if (!isOpen) return;
+    const panel = panelRef.current;
+    const burger = burgerRef.current;
+    panel?.querySelector<HTMLElement>("[data-menu-close]")?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close(true);
+        return;
+      }
+      if (event.key !== "Tab" || !panel) return;
+      const items = [...panel.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((item) => item.offsetParent !== null);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = panel.contains(document.activeElement);
+      if (event.shiftKey && (!inside || document.activeElement === first)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (!inside || document.activeElement === last)) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      chatAttempt.current += 1;
+      setChat("idle");
+      if (restoreFocus.current) burger?.focus();
+      restoreFocus.current = false;
+    };
+  }, [isOpen, close]);
+
   const isActive = useCallback((path: string) => {
     const current = stripLocale(pathname);
     if (path === '/') {
@@ -67,22 +136,26 @@ const Navbar = memo(function Navbar() {
     setIsOpen(prev => !prev);
   }, []);
 
+  const startChat = useCallback(() => {
+    const attempt = ++chatAttempt.current;
+    setChat("opening");
+    openChat().then((opened) => {
+      if (attempt !== chatAttempt.current) return;
+      if (opened) close(false);
+      else setChat("failed");
+    });
+  }, [close]);
+
   return (
     <>
-      {/* Main Navigation */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ease-out-expo ${
-          isScrolled
-            ? 'bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-subtle'
-            : 'bg-transparent'
-        } ${isOpen ? 'md:z-40 z-30' : 'z-40'}`}
-      >
-        <nav className="container mx-auto px-5 lg:px-8">
+      {/* Main Navigation. Solid white below md, so it reads the same on every page. */}
+      <header className={isScrolled ? "site-header is-scrolled" : "site-header"}>
+        <nav className="container mx-auto px-4 md:px-5 lg:px-8">
           <div className="flex items-center justify-between h-14 md:h-16">
             {/* Logo */}
             <Link
               href={lp("/")}
-              className="flex items-center gap-3 group"
+              className="flex items-center gap-3 group min-h-11"
             >
               <div className="relative w-9 h-9 md:w-10 md:h-10 overflow-hidden rounded-lg">
                 <img
@@ -130,49 +203,42 @@ const Navbar = memo(function Navbar() {
               </WhatsAppLink>
             </div>
 
-            {/* Mobile language switch and menu button */}
+            {/* Mobile language switch and menu button. Until hydration the menu can't
+                open, so the button is a link to the footer's links instead. */}
             <div className="md:hidden flex items-center gap-1">
             <LanguageSwitcher
               short
-              className="min-w-10 h-10 px-2 flex items-center justify-center text-sm font-semibold text-forest-900 rounded-full"
+              className="min-w-11 h-11 px-2 flex items-center justify-center text-sm font-semibold text-forest-900 rounded-full"
             />
-            <button
-              onClick={toggleMenu}
-              className={`md:hidden relative w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 z-50 ${
-                isScrolled ? 'hover:bg-gray-100' : 'hover:bg-white/10'
-              }`}
-              aria-label={t.nav.toggleMenu}
-              aria-expanded={isOpen}
-            >
-              <div className="relative w-5 h-5">
-                <span
-                  className={`absolute left-0 w-5 h-0.5 bg-forest-900 transition-all duration-300 ${
-                    isOpen ? 'top-2.5 rotate-45' : 'top-1'
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 top-2.5 w-5 h-0.5 bg-forest-900 transition-all duration-300 ${
-                    isOpen ? 'opacity-0' : 'opacity-100'
-                  }`}
-                />
-                <span
-                  className={`absolute left-0 w-5 h-0.5 bg-forest-900 transition-all duration-300 ${
-                    isOpen ? 'top-2.5 -rotate-45' : 'top-4'
-                  }`}
-                />
-              </div>
-            </button>
+            {hydrated ? (
+              <button
+                ref={burgerRef}
+                type="button"
+                onClick={toggleMenu}
+                className="nav-burger"
+                aria-label={t.nav.toggleMenu}
+                aria-expanded={isOpen}
+              >
+                <Burger open={isOpen} />
+              </button>
+            ) : (
+              <a href="#footer" className="nav-burger" aria-label={t.nav.toggleMenu}>
+                <Burger open={false} />
+              </a>
+            )}
             </div>
           </div>
         </nav>
       </header>
 
-      {/* Mobile Navigation Overlay - Full screen with higher z-index. Added after
-          hydration: it needs JavaScript to open, and it repeats every nav link. */}
+      {/* Mobile Navigation Overlay - Full screen, above the header and the action bar.
+          Added after hydration: it needs JavaScript to open, and it repeats every nav link.
+          Visible at once on open, so Close can take focus in the same frame, and hidden
+          only once the panel has slid out. */}
       {hydrated && (
       <div
-        className={`fixed inset-0 z-50 md:hidden transition-all duration-300 ${
-          isOpen ? 'visible' : 'invisible'
+        className={`fixed inset-0 z-[60] md:hidden transition-[visibility] duration-0 ${
+          isOpen ? 'visible' : 'invisible delay-300'
         }`}
       >
         {/* Backdrop */}
@@ -180,21 +246,25 @@ const Navbar = memo(function Navbar() {
           className={`absolute inset-0 bg-black/30 transition-opacity duration-300 ${
             isOpen ? 'opacity-100' : 'opacity-0'
           }`}
-          onClick={() => setIsOpen(false)}
+          onClick={() => close(true)}
         />
 
-        {/* Menu Panel - Slides from right, full height */}
+        {/* Menu Panel - Slides from the end, full height */}
         <div
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={t.nav.menu}
           className={`absolute top-0 end-0 w-full max-w-sm h-full bg-white shadow-2xl transform transition-transform duration-300 ease-out-expo ${
             isOpen ? 'translate-x-0' : 'translate-x-full rtl:-translate-x-full'
           }`}
         >
           {/* Menu Header */}
-          <div className="flex items-center justify-between h-14 px-5 border-b border-gray-100 bg-white">
+          <div className="flex items-center justify-between h-14 px-4 border-b border-gray-100 bg-white">
             <Link
               href={lp("/")}
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3"
+              onClick={() => close(false)}
+              className="flex items-center gap-3 min-h-11"
             >
               <img
                 src="/lovable-uploads/tran-golden-logo.webp"
@@ -206,8 +276,10 @@ const Navbar = memo(function Navbar() {
               </span>
             </Link>
             <button
-              onClick={() => setIsOpen(false)}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors -me-2"
+              type="button"
+              data-menu-close=""
+              onClick={() => close(true)}
+              className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors -me-2"
               aria-label={t.nav.closeMenu}
             >
               <X className="w-5 h-5 text-gray-600" />
@@ -227,7 +299,7 @@ const Navbar = memo(function Navbar() {
                 >
                   <Link
                     href={lp(item.path)}
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => close(false)}
                     className={`flex items-center justify-between p-4 rounded-2xl transition-all duration-200 ${
                       isActive(item.path)
                         ? 'bg-forest-50 text-forest-900'
@@ -241,6 +313,32 @@ const Navbar = memo(function Navbar() {
                   </Link>
                 </li>
               ))}
+              {/* Live chat: on phones Tawk loads only from here (src/lib/tawk.ts). */}
+              <li
+                className={`transform transition-all duration-300 ${
+                  isOpen ? 'translate-x-0 opacity-100' : 'translate-x-4 rtl:-translate-x-4 opacity-0'
+                }`}
+                style={{ transitionDelay: isOpen ? `${navigationItems.length * 50 + 100}ms` : '0ms' }}
+              >
+                <button
+                  type="button"
+                  onClick={startChat}
+                  aria-busy={chat === "opening" || undefined}
+                  aria-describedby="menu-chat-status"
+                  className="flex w-full items-center justify-between p-4 rounded-2xl text-start text-gray-700 transition-all duration-200 hover:bg-gray-50 active:bg-gray-100"
+                >
+                  <span className="text-lg font-medium">{t.nav.liveChat}</span>
+                  <MessageCircle className="w-5 h-5 text-gray-400" />
+                </button>
+                {/* Always rendered, so the change of text is announced. */}
+                <p
+                  id="menu-chat-status"
+                  role="status"
+                  className={`px-4 text-sm empty:hidden ${chat === "failed" ? "pb-2 text-red-700" : "text-gray-500"}`}
+                >
+                  {chat === "opening" ? t.nav.chatOpening : chat === "failed" ? t.nav.chatFailed : ""}
+                </p>
+              </li>
             </ul>
 
             {/* Mobile CTA */}
@@ -252,7 +350,7 @@ const Navbar = memo(function Navbar() {
             >
               <WhatsAppLink
                 source="navbar_mobile"
-                onClick={() => setIsOpen(false)}
+                onClick={() => close(false)}
                 className="flex items-center justify-center gap-3 w-full px-6 py-4 bg-forest-900 text-white text-lg font-medium rounded-2xl transition-all duration-300 hover:bg-forest-700 active:scale-[0.98]"
               >
                 <WhatsAppIcon className="w-5 h-5" />
@@ -261,7 +359,7 @@ const Navbar = memo(function Navbar() {
               <p className="mt-4 text-center text-sm text-gray-500">
                 {t.nav.freeDelivery}
               </p>
-              <LanguageSwitcher className="mt-4 block text-center text-sm font-medium text-forest-900 underline underline-offset-4" />
+              <LanguageSwitcher className="mt-2 flex min-h-11 items-center justify-center text-sm font-medium text-forest-900 underline underline-offset-4" />
             </div>
           </nav>
         </div>

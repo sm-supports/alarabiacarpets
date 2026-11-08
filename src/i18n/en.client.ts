@@ -38,9 +38,18 @@ export const enClient = {
     freeDelivery: "Free delivery & installation in Qatar",
     toggleMenu: "Toggle menu",
     closeMenu: "Close menu",
+    menu: "Menu",
     switchLabel: "العربية",
     switchShort: "ع",
     switchAria: "عرض الموقع بالعربية",
+    /** The phone menu's Live chat row (S18 in the plan's state catalogue). */
+    liveChat: "Live chat",
+    chatOpening: "Opening chat…",
+    chatFailed: "Chat didn't open. Use WhatsApp or call.",
+  },
+  /** The action bar's WhatsApp prefill: the quote line, then this line for the visitor to fill in, then the page. */
+  bar: {
+    size: "Size:",
   },
   hero: {
     badge: "Premium Home Furnishings in Qatar",

@@ -1017,8 +1017,9 @@ const ContactSection = memo(function ContactSection() {
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 max-w-6xl mx-auto">
           {/* Contact Form: first in the page order, so Tab and a screen reader reach it first, as
-              phones show it. lg:order-last puts it back in the second column on wide screens. */}
-          <div className="lg:order-last">
+              phones show it. lg:order-last puts it back in the second column on wide screens.
+              The id is where the action bar's quote link points on /contact before hydration. */}
+          <div id="contact-form" className="lg:order-last">
             <div className="p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
               <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-5 sm:mb-6">
                 {t.sendMessage}

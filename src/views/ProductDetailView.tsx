@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { preload } from "react-dom";
 import Navbar from "@/components/Navbar";
+import BarIntent from "@/components/BarIntent";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
@@ -96,6 +97,7 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
       />
       {product.faqs?.length ? <JsonLd data={buildFaq(product.faqs, locale)} /> : null}
 
+      <BarIntent name={product.name} type="product" slug={product.id} />
       <Navbar />
       <main className="flex-grow">
         <section className="py-10 md:py-14 bg-neutral-50">

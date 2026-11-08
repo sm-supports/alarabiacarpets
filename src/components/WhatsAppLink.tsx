@@ -13,6 +13,8 @@ interface WhatsAppLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement
   message?: string;
   /** False when the tap isn't a new lead (the Sent panel's follow-up): no Ads conversion. */
   conversion?: boolean;
+  /** The link before hydration, in place of the contact page: the action bar's in-page anchor on /contact. */
+  staticHref?: string;
   children: React.ReactNode;
 }
 
@@ -34,6 +36,7 @@ export default function WhatsAppLink({
   message,
   href,
   conversion = true,
+  staticHref,
   children,
   ...rest
 }: WhatsAppLinkProps) {
@@ -47,7 +50,7 @@ export default function WhatsAppLink({
 
   return (
     <a
-      href={hydrated ? target : localePath(locale, "/contact")}
+      href={hydrated ? target : staticHref ?? localePath(locale, "/contact")}
       {...(hydrated && { target: "_blank", rel: "noopener noreferrer" })}
       {...rest}
       onClick={(e) => {

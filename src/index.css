@@ -796,9 +796,13 @@
   .ct-noscript { @apply mt-4 text-white; }
   .ct-noscript a { @apply inline-flex min-h-11 items-center; }
   /* What a press of Send scrolls into view (a form state, the Turnstile box) stops clear
-     of the fixed WhatsApp pill, 68px from the bottom, so it never covers their buttons.
-     5.5rem also clears WP5's 64px action bar. */
-  .ct-reveal { scroll-margin-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+     of what is fixed at the bottom, so it never covers their buttons. Below md that is
+     the action bar, which html's scroll-padding-bottom already clears (end of this
+     file), so this adds only a gap; at md and up, the WhatsApp pill, 68px from the bottom. */
+  .ct-reveal { scroll-margin-bottom: 0.5rem; }
+  @media (min-width: 768px) {
+    .ct-reveal { scroll-margin-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+  }
   .cat-price { @apply absolute bottom-2 start-2 max-w-[calc(100%-1rem)] rounded-lg bg-primary px-2 py-1 font-poppins text-[11px] font-medium leading-tight text-white sm:text-xs; }
 }
 
@@ -864,4 +868,60 @@
       animation-range: entry 0% entry 75%;
     }
   }
+}
+
+/* The header (Navbar): solid white below md, so it reads the same on every page; at md
+   and up clear over the page until it scrolls, then frosted, as before. */
+@layer components {
+  .site-header { @apply fixed inset-x-0 top-0 z-40 border-b border-gray-200/50 bg-white transition-all duration-300 ease-out-expo md:border-b-0 md:bg-transparent; }
+  .site-header.is-scrolled { @apply border-b bg-white/80 shadow-subtle backdrop-blur-xl max-md:bg-white max-md:backdrop-blur-none; }
+  .nav-burger { @apply relative flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-200 hover:bg-gray-100; }
+  .nav-line { @apply absolute left-0 h-0.5 w-5 bg-forest-900 transition-all duration-300; }
+}
+
+/* The action bar (WhatsAppFloat). Below md: Call (a third) and Get a Free Quote (two
+   thirds) across the bottom, 64px plus the safe area; the grid mirrors it in Arabic.
+   Stacking below md: bar 30, header 40, menu 60, status 100. At md and up the same
+   markup is the green WhatsApp pill, bottom left in both languages, exactly as before.
+   global-not-found.tsx copies the phone look in its own CSS: change both together. */
+@layer components {
+  /* A grid, not flex: 1fr 2fr splits the whole width, where flex would leave each
+     button's padding out of the split. */
+  .ab { @apply fixed inset-x-0 bottom-0 z-30 grid grid-cols-[1fr_2fr] gap-2 bg-white px-4 pt-2; padding-bottom: calc(0.5rem + env(safe-area-inset-bottom)); box-shadow: 0 -1px 0 #E5E5E5, 0 -4px 12px rgba(0, 0, 0, 0.06); }
+  .ab-call, .ab-wa { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold transition-colors duration-200 active:scale-[0.98]; }
+  .ab-call { @apply border border-forest-900/30 bg-white text-forest-900 hover:bg-neutral-50; }
+  .ab-wa { @apply bg-forest-900 text-white hover:bg-forest-700; }
+  .ab-ico { @apply h-5 w-5 flex-shrink-0; }
+  .ab-p { @apply hidden; }
+  /* At 320 the Arabic label needs 144px of the quote button's 187, so the narrowest
+     phones get less padding and a 13px Arabic label, and it stays on one line. */
+  @media (max-width: 359.98px) {
+    .ab-call, .ab-wa { @apply gap-1.5 px-2; }
+    [dir="rtl"] .ab-q { font-size: 13px; }
+  }
+  @media (min-width: 768px) {
+    .ab { @apply z-50 block bg-transparent p-0 shadow-none; left: 1.25rem; right: auto; bottom: 1.25rem; }
+    .ab-call, .ab-q { @apply hidden; }
+    /* Only what the hover changes animates: a layout switch (a window resized across md,
+       a full-page screenshot) must not tween the padding between bar and pill. */
+    .ab-wa { @apply flex min-h-0 rounded-full bg-[#25D366] px-5 py-3 text-white shadow-lg transition-[background-color,box-shadow,transform] duration-300 hover:bg-[#1ebe5b] hover:shadow-xl active:scale-95; }
+    .ab-wa .ab-ico { @apply h-6 w-6; }
+    .ab-p { @apply inline; }
+  }
+}
+
+/* Below md the page ends above the action bar, and anything scrolled into view (an
+   anchor, a focused field, a form state) stops clear of the header and the bar. */
+@media not all and (min-width: 768px) {
+  html {
+    scroll-padding-top: 3.5rem;
+    scroll-padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
+  body { padding-bottom: calc(4rem + env(safe-area-inset-bottom)); }
+}
+
+/* The keyboard is up: the bar would sit on top of it. A rule of its own, so a browser
+   without :has() drops only this. */
+@media not all and (min-width: 768px) {
+  body:has(input:focus, textarea:focus) .ab { display: none; }
 }

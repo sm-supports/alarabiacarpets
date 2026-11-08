@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
+import { Phone } from "@/components/icons";
 import { categories } from "@/data/categories";
 import { getDict, localePath, type Locale } from "@/i18n";
 import { localizedCategoryLabel } from "@/i18n/labels";
@@ -18,7 +19,8 @@ const ROWS = categories.length + 1;
  * The page's own stylesheet. index.css would cost an 85 KB download for one screen,
  * and a client component here would be filed under one language's layout script, so
  * this page loads neither: plain links, server-only imports, and these rules.
- * Below md the call and quote links are the site's action bar, fixed at the bottom;
+ * Below md the call and quote links are the site's action bar, fixed at the bottom, in
+ * the real bar's order, sizes and colours (.ab in src/index.css: change both together);
  * at md and up they sit under the other buttons.
  */
 const CSS = `
@@ -43,11 +45,8 @@ h1{margin-bottom:16px;color:#171717;font-family:'Playfair Display',Georgia,serif
 .nf-btn,.nf-bar a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 24px;border:1px solid rgba(10,42,31,.3);border-radius:9999px;background:#fff;color:#0A2A1F;font-size:14px;line-height:20px;font-weight:600}
 .nf-btn:active,.nf-bar a:active{transform:scale(.98)}
 .nf-fill,.nf-bar .nf-fill{border-color:#0A2A1F;background:#0A2A1F;color:#fff}
-.nf-bar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;gap:8px;padding:8px 16px calc(8px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -1px 0 #E5E5E5,0 -4px 12px rgba(0,0,0,.06)}
+.nf-bar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:1fr 2fr;gap:8px;padding:8px 16px calc(8px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -1px 0 #E5E5E5,0 -4px 12px rgba(0,0,0,.06)}
 .nf-bar a{padding:4px 12px;line-height:1.25}
-.nf-call{flex:1}
-.nf-bar .nf-call{flex-direction:column;gap:0}
-.nf-quote{flex:2}
 .nf-ico{width:20px;height:20px;flex-shrink:0}
 .nf-two{display:flex;flex-direction:column;align-items:center}
 .nf-two [lang]{font-size:13px;font-weight:500}
@@ -57,7 +56,7 @@ h1{margin-bottom:16px;color:#171717;font-family:'Playfair Display',Georgia,serif
 .nf-nav a{flex:1;display:flex;align-items:center;min-height:44px;padding:6px 0;border-bottom:1px solid #F0F0F0;color:#0A2A1F;font-size:15px;line-height:1.3}
 .nf-nav li:last-child a{border-bottom:0}
 .nf-tel{display:inline-flex;align-items:center;min-height:44px;margin-top:16px;padding:0 12px;color:#0A2A1F;font-weight:600}
-@media (hover:hover){.nf-btn:hover,.nf-bar a:hover{background:#F5F5F5}.nf-fill:hover,.nf-bar .nf-fill:hover{border-color:#1E4B3D;background:#1E4B3D}}
+@media (hover:hover){.nf-btn:hover{background:#F5F5F5}.nf-bar a:hover{background:#FAFAFA}.nf-fill:hover,.nf-bar .nf-fill:hover{border-color:#1E4B3D;background:#1E4B3D}}
 @media (min-width:768px){
 .nf{padding:48px 16px}
 .nf-brand{gap:4px 10px;font-size:17px}
@@ -132,11 +131,14 @@ export default function GlobalNotFound() {
               <a href="/ar" lang="ar-QA" className="nf-btn">الصفحة الرئيسية</a>
             </div>
             <div className="nf-bar" data-action-bar="">
-              <a href={`tel:${PHONE_E164}`} className="nf-call nf-two">
-                <span>{en.statePanel.call}</span>
-                <span lang="ar-QA">{ar.statePanel.call}</span>
+              <a href={`tel:${PHONE_E164}`}>
+                <Phone className="nf-ico" />
+                <span className="nf-two">
+                  <span>{en.statePanel.call}</span>
+                  <span lang="ar-QA">{ar.statePanel.call}</span>
+                </span>
               </a>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="nf-quote nf-fill">
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="nf-fill">
                 <WhatsAppIcon className="nf-ico" />
                 <span className="nf-two">
                   <span>{en.nav.getFreeQuote}</span>

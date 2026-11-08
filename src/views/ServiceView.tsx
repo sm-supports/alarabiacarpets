@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import BarIntent from "@/components/BarIntent";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
@@ -111,6 +112,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
       />
       {allFaqs.length > 0 && <JsonLd data={buildFaq(allFaqs, locale)} />}
 
+      <BarIntent name={service.label} type="service" slug={service.slug} />
       <Navbar />
       <main className="flex-grow">
         {/* Text band. A hero photo follows it when the service has one; the

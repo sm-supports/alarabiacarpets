@@ -35,9 +35,16 @@ export const arClient: ClientDict = {
     freeDelivery: "توصيل وتركيب مجاني في قطر",
     toggleMenu: "فتح القائمة",
     closeMenu: "إغلاق القائمة",
+    menu: "القائمة",
     switchLabel: "English",
     switchShort: "EN",
     switchAria: "View the site in English",
+    liveChat: "محادثة مباشرة",
+    chatOpening: "نفتح المحادثة…",
+    chatFailed: "المحادثة ما انفتحت. كلّمنا على الواتساب أو اتصل.",
+  },
+  bar: {
+    size: "المقاس:",
   },
   hero: {
     badge: "مفروشات منزلية فاخرة في قطر",

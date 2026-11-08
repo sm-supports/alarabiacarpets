@@ -1,12 +1,13 @@
 "use client";
 
 
-import { ShoppingCart, ExternalLink, ImageIcon, Video, ChevronLeft, ChevronRight, Play } from "@/components/icons";
+import { ImageIcon, Video, ChevronLeft, ChevronRight, Play } from "@/components/icons";
 import { memo, useCallback, useState, useRef, useEffect } from "react";
 import type { ProductMedia } from "@/data/products";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 
@@ -19,8 +20,6 @@ interface ProductCardProps {
   poster: string;
   /** Slides. Image `src` values are already the card-sized copies (see ProductsGrid). */
   media?: ProductMedia[];
-  /** Prefilled WhatsApp link. When omitted, built from the name in the page's language. */
-  whatsappLink?: string;
   onClick?: () => void;
   /** Product detail URL. When set the title renders as a real crawlable anchor. */
   href?: string;
@@ -34,7 +33,6 @@ const ProductCard = memo(function ProductCard({
   description,
   poster,
   media = [],
-  whatsappLink,
   onClick,
   href,
   imageAlt
@@ -109,31 +107,33 @@ const ProductCard = memo(function ProductCard({
   };
 
   return (
-    <div className="group product-card pc-card">
+    <div className="group pc-card">
       {/* Media Container - Fixed 4:3 aspect ratio for uniformity. LTR in Arabic too,
           because the slide tracking below assumes a positive scrollLeft. */}
       <div dir="ltr" className="pc-media">
         {/* Navigation Arrows (only if multiple items). These and the extra slides need
-            JavaScript anyway, and on /products they would be most of the static HTML. */}
+            JavaScript anyway, and on /products they would be most of the static HTML.
+            Below md, arrows and dots are hidden: a phone swipes, and the count badge
+            below says where it is. */}
         {hydrated && displayMedia.length > 1 && (
           <>
             <button
               onClick={(e) => { e.stopPropagation(); scroll('left'); }}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm max-md:hidden"
               aria-label={t.productCard.previous}
             >
               <ChevronLeft size={18} />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); scroll('right'); }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm max-md:hidden"
               aria-label={t.productCard.next}
             >
               <ChevronRight size={18} />
             </button>
 
             {/* Dot Indicators */}
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 flex">
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 flex max-md:hidden">
               {displayMedia.map((_, idx) => (
                 // The button is the 24px tap target; the dot inside it stays small.
                 <button
@@ -166,7 +166,7 @@ const ProductCard = memo(function ProductCard({
         {/* Scrollable Media Container */}
         <div
           ref={scrollContainerRef}
-          className="pc-track scrollbar-hide"
+          className="pc-track"
         >
           {(hydrated ? displayMedia : displayMedia.slice(0, 1)).map((item, index) => (
             <div
@@ -235,12 +235,7 @@ const ProductCard = memo(function ProductCard({
       <div className="pc-body">
         <h3 className="pc-title">
           {href ? (
-            <Link
-              href={href}
-              className="hover:text-primary transition-colors"
-            >
-              {name}
-            </Link>
+            <Link href={href}>{name}</Link>
           ) : (
             <span
               className="hover:text-primary transition-colors cursor-pointer"
@@ -254,15 +249,13 @@ const ProductCard = memo(function ProductCard({
           {description}
         </p>
         <WhatsAppLink
-          href={whatsappLink}
-          message={t.common.interestedMessage(name)}
+          message={t.common.quoteMessage(name)}
           source={`product_card:${analyticsName ?? name}`}
-          className="pc-cta"
+          className="cta pc-act"
           onClick={handleWhatsAppClick}
         >
-          <ShoppingCart size={15} />
-          <span>{t.productCard.inquire}</span>
-          <ExternalLink size={13} />
+          <WhatsAppIcon />
+          {t.nav.getFreeQuote}
         </WhatsAppLink>
       </div>
     </div>

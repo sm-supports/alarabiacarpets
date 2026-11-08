@@ -3,6 +3,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { getGuides } from "@/data/localized";
 import { fullImagePath } from "@/lib/card-image";
 import { getDict, localePath, type Locale } from "@/i18n";
@@ -35,9 +36,10 @@ export default function GuidesIndexView({ locale }: { locale: Locale }) {
   const t = getDict(locale);
   const page = t.pages.guides;
   const guides = getGuides(locale);
+  const crumbs: Crumb[] = [[t.common.guides, "/guides"]];
   return (
     <div className="min-h-screen flex flex-col">
-      <JsonLd data={buildBreadcrumb([[t.common.guides, "/guides"]], locale)} />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       <JsonLd
         data={buildItemList(
           guides.map((g) => ({ name: g.title, path: `/guides/${g.slug}` })),
@@ -46,8 +48,9 @@ export default function GuidesIndexView({ locale }: { locale: Locale }) {
       />
       <Navbar />
       <main className="flex-grow">
-        <div className="bg-primary text-white py-14 md:py-16">
-          <div className="container mx-auto px-4 text-center">
+        <div className="bg-primary text-white py-12 md:py-16">
+          <div className="container mx-auto px-4 md:text-center">
+            <Breadcrumb locale={locale} trail={crumbs} dark phoneOnly />
             <h1 className="h1-band">
               {page.heading}
             </h1>
@@ -92,7 +95,7 @@ export default function GuidesIndexView({ locale }: { locale: Locale }) {
                       </p>
                       <Link
                         href={href}
-                        className="font-poppins text-sm font-medium text-primary mt-4 hover:underline"
+                        className="idx-more"
                       >
                         {t.guide.read}
                       </Link>

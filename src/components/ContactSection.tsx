@@ -3,7 +3,7 @@
 import { Fragment, useState, memo, useCallback, useMemo, useRef, useEffect, type ComponentProps, type ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, MapPin, Mail, MessageCircle } from "@/components/icons";
+import { MapPin, Mail, MessageCircle } from "@/components/icons";
 import Link from "next/link";
 import CloudflareTurnstile, {
   type CloudflareTurnstileHandle,
@@ -1022,13 +1022,9 @@ const ContactSection = memo(function ContactSection() {
           </p>
 
           {/* Primary CTA */}
-          <WhatsAppLink
-            source="contact_section_primary"
-            className="group ct-primary"
-          >
-            <WhatsAppIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-            {t.chat}
-            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" />
+          <WhatsAppLink source="contact_section_primary" className="cta-dark ct-go">
+            <WhatsAppIcon />
+            {dict.common.heroQuote}
           </WhatsAppLink>
         </div>
 
@@ -1137,7 +1133,7 @@ const ContactSection = memo(function ContactSection() {
                     id="contact-send"
                     type="submit"
                     aria-busy={isSubmitting || undefined}
-                    className="w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:bg-gray-100 active:scale-[0.98] inline-flex items-center justify-center gap-2"
+                    className="cta-dark cta-l w-full"
                   >
                     {isSubmitting && (
                       <span
@@ -1267,7 +1263,7 @@ const ContactSection = memo(function ContactSection() {
                   {t.aboutUs}
                 </Link>
                 <CallLink source="contact_section_call" className="ct-chip">
-                  {t.callNow}
+                  {s.call}
                 </CallLink>
               </div>
             </div>

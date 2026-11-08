@@ -166,7 +166,9 @@ const Navbar = memo(function Navbar() {
                   decoding="async"
                 />
               </div>
-              <span className="font-display text-lg md:text-xl font-semibold tracking-tight text-forest-900">
+              {/* Between md and lg the six links and the quote button need the room, so
+                  the logo stands alone there (its alt names the brand). */}
+              <span className="font-display text-lg md:text-xl font-semibold tracking-tight text-forest-900 md:max-lg:hidden">
                 {t.brand}
               </span>
             </Link>
@@ -193,13 +195,10 @@ const Navbar = memo(function Navbar() {
 
             {/* Desktop CTA */}
             <div className="hidden md:flex items-center gap-3">
-              <LanguageSwitcher className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-forest-900 transition-colors duration-200 rounded-full" />
-              <WhatsAppLink
-                source="navbar_desktop"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-forest-900 text-white text-sm font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-elevated"
-              >
-                <WhatsAppIcon className="w-4 h-4" />
-                {t.nav.getQuote}
+              <LanguageSwitcher className="nav-switch" />
+              <WhatsAppLink source="navbar_desktop" className="cta cta-s nav-cta">
+                <WhatsAppIcon />
+                {t.nav.getFreeQuote}
               </WhatsAppLink>
             </div>
 
@@ -351,9 +350,9 @@ const Navbar = memo(function Navbar() {
               <WhatsAppLink
                 source="navbar_mobile"
                 onClick={() => close(false)}
-                className="flex items-center justify-center gap-3 w-full px-6 py-4 bg-forest-900 text-white text-lg font-medium rounded-2xl transition-all duration-300 hover:bg-forest-700 active:scale-[0.98]"
+                className="cta w-full"
               >
-                <WhatsAppIcon className="w-5 h-5" />
+                <WhatsAppIcon />
                 {t.nav.getFreeQuote}
               </WhatsAppLink>
               <p className="mt-4 text-center text-sm text-gray-500">

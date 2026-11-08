@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContactSection from "@/components/ContactSection";
 import JsonLd from "@/components/JsonLd";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import Link from "next/link";
 import FaqList from "@/components/FaqList";
 import { findCategory, getCategories } from "@/data/localized";
@@ -43,16 +44,18 @@ export default function ContactView({ locale }: { locale: Locale }) {
     return formatFromPrice(category.priceFrom, category.priceUnit, locale);
   };
   const faqs = t.home.faqs(price("carpet"), price("barkia"));
+  const crumbs: Crumb[] = [[page.breadcrumb, "/contact"]];
   return (
     <div className="min-h-screen flex flex-col">
       <JsonLd data={buildFaq(faqs, locale)} />
-      <JsonLd data={buildBreadcrumb([[page.breadcrumb, "/contact"]], locale)} />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       <Navbar />
       {/* This page previously had no <h1> at all and no <main> wrapper --
           ContactSection starts at <h2>. */}
       <main className="flex-grow">
-        <div className="bg-primary text-white py-14 md:py-16">
-          <div className="container mx-auto px-4 text-center">
+        <div className="bg-primary text-white py-12 md:py-16">
+          <div className="container mx-auto px-4 md:text-center">
+            <Breadcrumb locale={locale} trail={crumbs} dark phoneOnly />
             <h1 className="h1-band">
               {page.heading}
             </h1>
@@ -65,7 +68,7 @@ export default function ContactView({ locale }: { locale: Locale }) {
         <ContactDetails locale={locale} />
         <section className="py-14 md:py-16 bg-neutral-50">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
-            <h2 className="h2-sec">{t.common.faqTitle}</h2>
+            <h2 className="h2-sec faq-h">{t.common.faqTitle}</h2>
             <FaqList faqs={faqs} />
           </div>
         </section>

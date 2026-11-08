@@ -1,8 +1,9 @@
-import { MessageCircle, Mail, MapPin, Instagram, Facebook, ArrowUpRight } from "@/components/icons";
+import { MessageCircle, Mail, MapPin, Instagram, Facebook } from "@/components/icons";
 import Link from "next/link";
 import { categories } from "@/data/categories";
 import { services } from "@/data/services";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { getDict, localePath, type Locale } from "@/i18n";
 import { localizedCategoryLabel, localizedServiceLabel } from "@/i18n/labels";
 import { WHATSAPP_URL } from "@/lib/site";
@@ -137,12 +138,9 @@ export default function Footer({ locale }: { locale: Locale }) {
             <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
               {t.footer.getStartedText}
             </p>
-            <WhatsAppLink
-              source="footer_get_quote"
-              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-forest-900 text-white text-xs sm:text-sm font-medium rounded-full transition-all duration-300 hover:bg-forest-700 active:scale-[0.98]"
-            >
-              {t.nav.getQuote}
-              <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 rtl:-scale-x-100" />
+            <WhatsAppLink source="footer_get_quote" className="cta cta-s ft-cta">
+              <WhatsAppIcon />
+              {t.nav.getFreeQuote}
             </WhatsAppLink>
 
             {/* Social Links */}

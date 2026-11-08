@@ -8,8 +8,9 @@ import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
 import FaqList from "@/components/FaqList";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import HeroQuoteCta from "@/components/HeroQuoteCta";
-import { Button } from "@/components/ui/button";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { Check } from "@/components/icons";
 import { findCategory, findProduct, findService, getServices, guidesForServiceL } from "@/data/localized";
 import { cardImage, fullImage } from "@/lib/card-image";
@@ -97,19 +98,16 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
   // than to a second one -- same handling as Category.secondary.
   const allFaqs = [...service.faqs, ...(service.secondary?.faqs ?? [])];
   const price = service.priceFrom ? formatFromPrice(service.priceFrom, service.priceUnit, locale) : null;
+  // One trail for the visible breadcrumb and the BreadcrumbList.
+  const crumbs: Crumb[] = [
+    [t.common.services, "/services"],
+    [service.label, `/services/${service.slug}`],
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
       <JsonLd data={buildServiceJsonLd(service, locale)} />
-      <JsonLd
-        data={buildBreadcrumb(
-          [
-            [t.common.services, "/services"],
-            [service.label, `/services/${service.slug}`],
-          ],
-          locale
-        )}
-      />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       {allFaqs.length > 0 && <JsonLd data={buildFaq(allFaqs, locale)} />}
 
       <BarIntent name={service.label} type="service" slug={service.slug} />
@@ -119,15 +117,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
             services without photography stay text-only rather than borrowing. */}
         <div className="bg-primary text-white py-12 md:py-16">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
-            <nav aria-label={t.common.breadcrumb} className="mb-5">
-              <ol className="flex flex-wrap items-center gap-2 font-poppins text-sm text-white/70">
-                <li><Link href={lp("/")} className="hover:text-white">{t.common.home}</Link></li>
-                <li aria-hidden="true">/</li>
-                <li><Link href={lp("/services")} className="hover:text-white">{t.common.services}</Link></li>
-                <li aria-hidden="true">/</li>
-                <li className="text-white">{service.label}</li>
-              </ol>
-            </nav>
+            <Breadcrumb locale={locale} trail={crumbs} dark />
             <h1 className="h1-band">
               {service.heading}
             </h1>
@@ -228,7 +218,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
               ))}
             </ol>
 
-            <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-6">
+            <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-6 faq-h">
               {t.common.faqTitle}
             </h2>
             <FaqList faqs={allFaqs} />
@@ -376,15 +366,14 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
             <p className="font-poppins max-w-2xl mx-auto mb-8 text-neutral-500">
               {t.service.ctaText}
             </p>
-            <Button asChild size="lg" className="bg-green-700 hover:bg-green-800 text-white">
-              <WhatsAppLink
-                source={`service:${service.slug}`}
-                message={t.common.quoteMessage(service.label)}
-                className="flex items-center gap-2"
-              >
-                <span>{t.common.askOnWhatsApp}</span>
-              </WhatsAppLink>
-            </Button>
+            <WhatsAppLink
+              source={`service:${service.slug}`}
+              message={t.common.quoteMessage(service.label)}
+              className="cta cta-m"
+            >
+              <WhatsAppIcon />
+              {t.common.heroQuote}
+            </WhatsAppLink>
           </div>
         </section>
       </main>

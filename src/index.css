@@ -651,29 +651,29 @@
 /* ===================================
    Product Card Styles
    =================================== */
-.product-card {
+.pc-card {
   transform: translateY(0);
   transition: transform var(--duration-normal) var(--ease-out-expo),
               box-shadow var(--duration-normal) var(--ease-out-expo);
 }
 
-.product-card:hover {
+.pc-card:hover {
   transform: translateY(-4px);
 }
 
 /* Ensure uniform video display inside product cards */
-.product-card video {
+.pc-card video {
   object-fit: cover;
   background: rgb(var(--color-near-black));
 }
 
 /* Base transition for images inside product cards */
-.product-card img {
+.pc-card img {
   transition: transform var(--duration-normal) var(--ease-out-expo);
 }
 
 /* Smooth image zoom on hover */
-.product-card:hover img {
+.pc-card:hover img {
   transform: scale(1.05);
 }
 
@@ -724,18 +724,22 @@
   .pc-card { @apply overflow-hidden h-full flex flex-col shadow-md hover:shadow-xl transition-all duration-500 rounded-2xl bg-white text-card-foreground; }
   .pc-body { @apply p-4 sm:p-5 flex flex-col flex-grow; }
   .pc-media { @apply relative aspect-[4/3] bg-neutral-100 overflow-hidden rounded-t-2xl; }
-  .pc-track { @apply flex overflow-x-auto snap-x snap-mandatory h-full w-full; }
+  /* Hides its scrollbar itself (was .scrollbar-hide beside it on every card). */
+  .pc-track { @apply flex overflow-x-auto snap-x snap-mandatory h-full w-full; scrollbar-width: none; }
+  .pc-track::-webkit-scrollbar { display: none; }
   .pc-slide { @apply flex-shrink-0 w-full h-full snap-center relative cursor-pointer; }
   .pc-img { @apply h-full w-full object-cover transition-transform duration-700 group-hover:scale-105; }
   .pc-title { @apply font-playfair text-base sm:text-lg font-semibold mb-1.5 text-neutral-900 line-clamp-1; }
+  .pc-title a { @apply transition-colors hover:text-primary; }
   .pc-text { @apply font-poppins text-xs sm:text-sm text-neutral-500 mb-4 flex-grow line-clamp-2 leading-relaxed; }
-  .pc-cta { @apply flex items-center justify-center gap-2 w-full whitespace-nowrap bg-primary hover:bg-primary/90 text-white rounded-xl h-10 sm:h-11 text-sm font-medium transition-all duration-300 hover:shadow-md mt-auto; }
+  /* /products "Shop by category" cards. */
+  .cat-card { @apply block rounded-xl overflow-hidden border border-neutral-200 transition-all duration-300 hover:shadow-md; }
+  .cat-media { @apply relative aspect-[4/3] overflow-hidden bg-neutral-100; }
 }
 
 @layer components {
-  .btn-outline { @apply inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3 bg-white text-forest-900 text-sm font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98]; }
   .ct-method { @apply flex items-center gap-4 sm:gap-5 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 active:scale-[0.98]; }
-  .ct-chip { @apply px-3 sm:px-4 py-2 text-xs sm:text-sm text-white/80 bg-white/5 rounded-full border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-[0.98]; }
+  .ct-chip { @apply px-3 sm:px-4 py-2 text-xs sm:text-sm text-white/80 bg-white/5 rounded-full border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-[0.98] max-md:inline-flex max-md:min-h-11 max-md:items-center; }
   .ft-social { @apply w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 transition-all duration-300 hover:bg-forest-900 hover:text-white active:scale-[0.95]; }
   .sc-pill { @apply inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-gray-200 rounded-full text-xs sm:text-sm text-gray-700 whitespace-nowrap flex-shrink-0; }
   .why-card { @apply p-5 sm:p-6 lg:p-8 bg-white rounded-2xl sm:rounded-3xl border border-gray-100 transition-all duration-700 ease-out-expo hover:shadow-float hover:-translate-y-1 active:scale-[0.98]; }
@@ -758,7 +762,14 @@
   .stat-num { @apply text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-0.5 sm:mb-1; }
   .ft-contact { @apply flex items-center gap-2 text-sm text-gray-600 hover:text-forest-900 transition-colors; }
   .sc-text { @apply text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-lg; }
-  .nav-link { @apply relative px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-full; }
+  /* The header row has to fit on one line with "Get a Free Quote" in it: from 1280 as
+     before, from 1024 with 8px less between links, and between 768 and 1024 (logo
+     without its wordmark, Navbar.tsx) with tighter links and the quote button's icon
+     left out (.nav-cta). Measured in both languages; Arabic is the wider. */
+  .nav-link { @apply relative px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-full md:max-lg:px-2 lg:max-xl:px-3; }
+  .nav-switch { @apply px-3 py-2 text-sm font-medium text-gray-600 hover:text-forest-900 transition-colors duration-200 rounded-full md:max-lg:px-2; }
+  .nav-cta { @apply whitespace-nowrap; }
+  .nav-cta svg { @apply md:max-lg:hidden; }
   .more-img { @apply w-full h-full object-cover transition-transform duration-700 group-hover:scale-110; }
   .sc-img { @apply w-full h-full object-cover transition-transform duration-700 group-hover:scale-105; }
   .rel-img { @apply w-full h-full object-cover transition-transform duration-500 group-hover:scale-105; }
@@ -773,14 +784,11 @@
   .h1-band { @apply font-playfair text-3xl md:text-4xl lg:text-5xl font-bold mb-4; }
   .faq-a { @apply font-poppins text-sm text-neutral-600 mt-3 leading-relaxed; }
   .idx-title { @apply font-playfair text-lg font-semibold text-neutral-900 mb-2; }
+  .idx-h2 { @apply font-playfair text-xl font-semibold text-neutral-900 mb-2; }
+  .idx-more { @apply font-poppins text-sm font-medium text-primary mt-4 hover:underline; }
 }
 
 @layer components {
-  .sc-cta { @apply inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3 text-white text-sm font-medium rounded-full transition-all duration-300 hover:shadow-float active:scale-[0.98]; }
-  .hero-dark { @apply inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-forest-900 text-white text-base font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-float active:scale-[0.98]; }
-  .hero-light { @apply inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-white text-forest-900 text-base font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98]; }
-  .ct-primary { @apply inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-gold-500 text-forest-900 text-base sm:text-lg font-semibold rounded-full transition-all duration-300 hover:bg-gold-400 hover:shadow-float active:scale-[0.98] w-full sm:w-auto max-w-sm sm:max-w-none; }
-  .all-cta { @apply inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-forest-900 text-white text-sm sm:text-base font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-float active:scale-[0.98] w-full sm:w-auto max-w-xs sm:max-w-none mx-auto; }
   .more-label { @apply absolute inset-0 flex items-end p-3 sm:p-4 lg:p-5; }
   .pc-play { @apply relative block w-full h-full; }
   .pc-play-badge { @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white; }
@@ -790,7 +798,8 @@
   .ct-skel-label { @apply text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2; }
   .ct-skel-field { @apply h-11 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
   .ct-skel-area { @apply h-[114px] rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
-  .ct-skel-btn { @apply w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl text-center opacity-50; }
+  /* Send's stand-in: the same size and fill as the hydrated button (.cta-dark .cta-l). */
+  .ct-skel-btn { @apply flex min-h-12 w-full items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-forest-900 opacity-50 md:py-4 md:text-base; }
   .ct-error { @apply mt-1.5 text-sm text-red-300; }
   /* The form's stand-in without JavaScript: Call and email, each a 44px tap, side by side
      where they fit and stacked where they don't, so no separator is left at a line end.
@@ -809,9 +818,39 @@
 }
 
 @layer components {
-  /* The site's button: forest on light, or .cta-2 outlined. */
-  .cta { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-forest-900 px-6 py-3 text-center text-sm font-semibold text-white transition-colors duration-200 hover:bg-forest-700 active:scale-[0.98]; }
-  .cta-2 { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-forest-900/30 bg-white px-6 py-3 text-center text-sm font-semibold text-forest-900 transition-colors duration-200 hover:bg-neutral-50 active:scale-[0.98]; }
+  /* The site's buttons, one family: .cta forest on light, .cta-dark gold on the forest
+     bands, .cta-2 outlined. 48px tall, full radius, 14px semibold. They replace .pc-cta,
+     .sc-cta, .hero-dark, .hero-light, .ct-primary, .all-cta, .btn-outline and the inline
+     button strings; scripts/check-consistency.mjs holds their labels to the plan's CTA
+     vocabulary. A WhatsApp button carries WhatsAppIcon and no other icon. */
+  .cta { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-forest-900 px-4 py-3 md:px-6 text-center text-sm font-semibold text-white transition-colors duration-200 hover:bg-forest-700 active:scale-[0.98]; }
+  .cta-dark { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-gold-500 px-4 py-3 md:px-6 text-center text-sm font-semibold text-forest-900 transition-colors duration-200 hover:bg-gold-400 active:scale-[0.98]; }
+  .cta-2 { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-forest-900/30 bg-white px-4 py-3 md:px-6 text-center text-sm font-semibold text-forest-900 transition-colors duration-200 hover:bg-neutral-50 active:scale-[0.98]; }
+  .cta:focus-visible, .cta-dark:focus-visible, .cta-2:focus-visible { @apply outline outline-2 outline-offset-2 outline-gold-500; }
+  .cta svg, .cta-dark svg, .cta-2 svg { @apply h-4 w-4 flex-shrink-0; }
+  /* The long Arabic quote label needs 287px: on a 320px phone it may take two even lines. */
+  .cta, .cta-dark, .cta-2 { text-wrap: balance; }
+  /* At md and up a button keeps the size its predecessor had there, so desktop layouts
+     don't move: -s 40px (header, footer, hero bands), -m 44px (cards, showcase, closing
+     sections; 46 for .cta-2 with its border), -l 56px (home hero, View All, form Send).
+     Phones always get the 48px above. */
+  .cta-s { @apply md:min-h-10 md:px-5 md:py-2.5; }
+  .cta-m { @apply md:min-h-11; }
+  .cta-l { @apply md:px-8 md:py-4 md:text-base; }
+  /* Full width on phones, up to 320px, and its own width from md. */
+  .cta-wide { @apply w-full max-w-xs md:w-auto md:max-w-none; }
+  /* ContactSection's primary: 60px with a 24px icon from md, as .ct-primary was. */
+  .ct-go { @apply w-full max-w-sm md:w-auto md:max-w-none md:gap-3 md:px-8 md:py-4 md:text-lg; }
+  .ct-go svg { @apply md:h-6 md:w-6; }
+  /* The footer's button, in a column 154px wide at 1024 and 189px at 1280: one line, so
+     from lg without its icon and narrower, and between lg and xl in 12px type. */
+  .ft-cta { @apply whitespace-nowrap md:px-4 lg:max-xl:px-3 lg:max-xl:text-xs; }
+  .ft-cta svg { @apply lg:hidden; }
+  /* A product card's button: the card's last row, one line. */
+  .pc-act { @apply mt-auto w-full whitespace-nowrap md:min-h-11; }
+  /* HeroQuoteCta: the starting price beside the band's button. */
+  .hq { @apply mt-6 flex flex-wrap items-center gap-3 font-poppins; }
+  .price-chip { @apply rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white; }
 
   /* StatePanel. The overlay sits at the right on desktop in both languages, where the
      toast it replaced was, because the WhatsApp pill holds the left in both. Its only
@@ -947,4 +986,53 @@
    without :has() drops only this. */
 @media not all and (min-width: 768px) {
   body:has(input:focus, textarea:focus) .ab { display: none; }
+}
+
+/* Breadcrumb (components/Breadcrumb.tsx). At md and up it wraps, with "/" between the
+   items, as the hand-written trails did. Below md it is one line: the links keep their
+   width and the current page ends in an ellipsis, each link is a 44px tap (the negative
+   margin keeps the text where it was), and the separator is a chevron pointing the way
+   the page reads, mirrored in Arabic. Separators are CSS, so they aren't page text. */
+@layer components {
+  .bc { @apply mb-5 font-poppins text-sm text-neutral-500; }
+  .bc ol { @apply flex flex-wrap items-center gap-2; }
+  .bc a:hover { @apply text-primary; }
+  .bc [aria-current] { @apply font-medium text-neutral-800; }
+  .bc-dark { @apply text-white/70; }
+  .bc-dark a:hover { @apply text-white; }
+  .bc-dark [aria-current] { @apply font-normal text-white; }
+  .bc li + li::before { content: "/"; content: "/" / ""; margin-inline-end: 0.5rem; }
+  /* The separator before the current page keeps the trail's colour and weight. */
+  .bc [aria-current]::before { @apply font-normal text-neutral-500; }
+  .bc-dark [aria-current]::before { @apply text-white/70; }
+  .bc-cur-m li:last-child { @apply md:hidden; }
+}
+@media not all and (min-width: 768px) {
+  .bc { margin-top: -0.75rem; margin-bottom: 0.5rem; }
+  .bc ol { flex-wrap: nowrap; white-space: nowrap; }
+  .bc li { display: flex; flex-shrink: 0; align-items: center; }
+  .bc li:last-child { display: block; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .bc a { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }
+  .bc li + li::before {
+    content: ""; content: "" / "";
+    display: inline-block; flex-shrink: 0; width: 0.375rem; height: 0.375rem; margin-inline-end: 0.625rem;
+    border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor;
+    transform: translateY(-1px) rotate(45deg);
+  }
+  [dir="rtl"] .bc li + li::before { transform: translateY(-1px) scaleX(-1) rotate(45deg); }
+}
+
+/* Type on phones (below md only): h1 30px (every interior h1 already is; Home's hero is
+   its own), h2 24, h3 18, body text 15px at 1.7, Arabic 1.9. Section headings only: the
+   titles of grid tiles keep their own sizes. The :not() raises these above the single
+   utility classes on the headings, and leaves desktop to them. */
+@media not all and (min-width: 768px) {
+  body { font-size: 15px; line-height: 1.7; }
+  [dir="rtl"] body { line-height: 1.9; }
+  main p:not(.x) { line-height: 1.7; }
+  [dir="rtl"] main p:not(.x) { line-height: 1.9; }
+  main h2:not(.sr-only, .idx-title, .idx-h2, .sp-title) { font-size: 1.5rem; line-height: 2rem; }
+  main h3:not(.pc-title, .rel-title, .cat-title, .sp-title) { font-size: 1.125rem; line-height: 1.75rem; }
+  /* One FAQ heading: every "Frequently Asked Questions" h2 (and Home's) the same. */
+  .faq-h { font-weight: 700; color: #171717; margin-bottom: 1.5rem; }
 }

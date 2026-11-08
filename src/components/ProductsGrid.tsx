@@ -42,9 +42,6 @@ export default function ProductsGrid({ products, locale }: { products: Product[]
             media={product.media.map((item) =>
               item.type === "video" ? item : { type: item.type, src: cardImagePath(item.src) }
             )}
-            // Arabic cards build the same link from the name: the percent-encoded
-            // Arabic text is several times longer than the name itself.
-            whatsappLink={locale === "ar" ? undefined : product.whatsappLink}
             href={lp(`/products/${product.id}`)}
             imageAlt={productImageAlt(product, locale)}
           />

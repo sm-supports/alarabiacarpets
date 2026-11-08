@@ -3,8 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductsGrid from "@/components/ProductsGrid";
 import JsonLd from "@/components/JsonLd";
-import { Button } from "@/components/ui/button";
-import { Phone } from "@/components/icons";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { getCategories, getProducts } from "@/data/localized";
 import { cardImagePath } from "@/lib/card-image";
 import Link from "next/link";
@@ -40,9 +40,10 @@ export default function ProductsView({ locale }: { locale: Locale }) {
   const t = getDict(locale);
   const page = t.pages.products;
   const products = getProducts(locale);
+  const crumbs: Crumb[] = [[t.common.products, "/products"]];
   return (
     <div className="min-h-screen flex flex-col">
-      <JsonLd data={buildBreadcrumb([[t.common.products, "/products"]], locale)} />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       <JsonLd
         data={buildItemList(
           products.map((p) => ({ name: p.name, path: productPath(p) })),
@@ -52,8 +53,11 @@ export default function ProductsView({ locale }: { locale: Locale }) {
       <Navbar />
       <main className="flex-grow">
         {/* Hero Header */}
-        <div className="bg-primary text-white py-14 md:py-16">
-          <div className="container mx-auto px-4 text-center">
+        {/* Start-aligned under its breadcrumb on phones, like every interior band;
+            centred at md and up, as before. */}
+        <div className="bg-primary text-white py-12 md:py-16">
+          <div className="container mx-auto px-4 md:text-center">
+            <Breadcrumb locale={locale} trail={crumbs} dark phoneOnly />
             <h1 className="h1-band">
               {page.heading}
             </h1>
@@ -75,9 +79,9 @@ export default function ProductsView({ locale }: { locale: Locale }) {
                 <Link
                   key={c.slug}
                   href={localePath(locale, `/products/${c.slug}`)}
-                  className="group block rounded-xl overflow-hidden border border-neutral-200 transition-all duration-300 hover:shadow-md"
+                  className="group cat-card"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
+                  <div className="cat-media">
                     <img
                       src={cardImagePath(c.heroImage)}
                       alt={c.heroImageAlt}
@@ -122,16 +126,10 @@ export default function ProductsView({ locale }: { locale: Locale }) {
             <p className="font-poppins max-w-2xl mx-auto mb-8 text-neutral-500">
               {page.ctaText}
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="bg-green-700 hover:bg-green-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <WhatsAppLink source="products_page" className="flex items-center gap-2">
-                <Phone size={16} />
-                <span>{t.common.contactOnWhatsApp}</span>
-              </WhatsAppLink>
-            </Button>
+            <WhatsAppLink source="products_page" className="cta cta-m">
+              <WhatsAppIcon />
+              {t.common.heroQuote}
+            </WhatsAppLink>
           </div>
         </section>
       </main>

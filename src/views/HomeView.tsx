@@ -110,7 +110,7 @@ export default function HomeView({ locale }: { locale: Locale }) {
         {/* Native <details>, so the answers stay in the static HTML for crawlers. */}
         <section className="py-14 md:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
-            <h2 className="h2-sec">
+            <h2 className="h2-sec faq-h">
               {t.home.faqTitle}
             </h2>
             <FaqList faqs={faqs} />

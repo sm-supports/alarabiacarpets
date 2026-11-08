@@ -3,8 +3,8 @@ import Link from "next/link";
 import { products } from "@/data/products";
 import { getCategory } from "@/data/categories";
 import { cardImagePath, fullImagePath } from "@/lib/card-image";
-import { WHATSAPP_URL } from "@/lib/site";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { getDict, localePath, type Locale } from "@/i18n";
 
 // Showcase presentation config. Each entry points at a CATEGORY landing page --
@@ -73,23 +73,20 @@ function ProductShowcase({
   const t = getDict(locale);
   const lp = (path: string) => localePath(locale, path);
   const copy = t.showcase.items[product.id];
-  const whatsappLink = `${WHATSAPP_URL}?text=${encodeURIComponent(t.common.interestedMessage(copy.name))}`;
 
+  // The badge and ticks keep each range's colour; the buttons are the one .cta family.
   const colorClasses = {
     forest: {
       badge: 'bg-forest-100 text-forest-700',
       accent: 'text-forest-600',
-      button: 'bg-forest-900 hover:bg-forest-700',
     },
     gold: {
       badge: 'bg-gold-100 text-gold-700',
       accent: 'text-gold-600',
-      button: 'bg-gold-600 hover:bg-gold-500',
     },
     teal: {
       badge: 'bg-teal-100 text-teal-700',
       accent: 'text-teal-600',
-      button: 'bg-teal-600 hover:bg-teal-500',
     },
   }[product.color];
 
@@ -149,19 +146,19 @@ function ProductShowcase({
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link
                 href={lp(product.href)}
-                className={`group sc-cta ${colorClasses.button}`}
+                className="group cta cta-m"
               >
                 {t.showcase.viewRange}
                 <span className="sr-only">: {copy.name}</span>
                 <ArrowRight className="arrow-go" />
               </Link>
               <WhatsAppLink
-                href={whatsappLink}
+                message={t.common.quoteMessage(copy.name)}
                 source={`showcase:${product.id}`}
-                className="btn-outline"
+                className="cta-2 cta-m"
               >
-                {t.showcase.getQuote}
-                <ArrowUpRight className="w-4 h-4 rtl:-scale-x-100" />
+                <WhatsAppIcon />
+                {t.nav.getFreeQuote}
               </WhatsAppLink>
             </div>
           </div>
@@ -239,7 +236,7 @@ export default function ProductsSection({ locale }: { locale: Locale }) {
           <div className="mt-8 sm:mt-12 text-center">
             <Link
               href={lp("/products")}
-              className="group all-cta"
+              className="group cta cta-l cta-wide"
             >
               {t.showcase.viewAll}
               <ArrowRight className="arrow-go" />

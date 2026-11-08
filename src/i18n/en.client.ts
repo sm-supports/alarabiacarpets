@@ -16,13 +16,18 @@ export const enClient = {
     helpfulReading: "Helpful reading",
     specifications: "Specifications",
     allProducts: "All Products",
+    /**
+     * The CTA vocabulary (the plan's Component specs, held by scripts/check-consistency.mjs):
+     * heroQuote in heroes and closing sections, nav.getFreeQuote on the bar, menu, header,
+     * footer and product cards, statePanel.call wherever a button calls. askOnWhatsApp is
+     * the one exception, on guides only, because what a guide offers is advice.
+     */
     askOnWhatsApp: "Ask us on WhatsApp",
-    contactOnWhatsApp: "Contact Us on WhatsApp",
     breadcrumb: "Breadcrumb",
+    /** Every product and service prefill, cards included. */
     quoteMessage: (label: string) => `Hi, I'd like a quote for ${label}.`,
     floatMessage: "Hi Al Arabia Carpets, I'd like a quote.",
     floatLabel: "Chat with Al Arabia Carpets on WhatsApp",
-    interestedMessage: (name: string) => `I'm interested in ${name}`,
     heroQuote: "Get a free quote on WhatsApp",
     notFound: {
       product: "Product Not Found",
@@ -33,7 +38,6 @@ export const enClient = {
   nav: {
     about: "About",
     contact: "Contact",
-    getQuote: "Get Quote",
     getFreeQuote: "Get a Free Quote",
     freeDelivery: "Free delivery & installation in Qatar",
     toggleMenu: "Toggle menu",
@@ -85,7 +89,6 @@ export const enClient = {
     titleBottom: "Your Space?",
     subtitle:
       "Get in touch with our team for personalized recommendations and a free quote. We're here to bring your vision to life.",
-    chat: "Chat on WhatsApp",
     getInTouch: "Get in Touch",
     whatsapp: "WhatsApp",
     email: "Email",
@@ -94,7 +97,6 @@ export const enClient = {
     quickLinks: "Quick Links",
     viewProducts: "View Products",
     aboutUs: "About Us",
-    callNow: "Call Now",
     sendMessage: "Send a Message",
     name: "Name",
     namePlaceholder: "Your name",
@@ -173,7 +175,6 @@ export const enClient = {
     draftSaved: "Your message is saved.",
   },
   productCard: {
-    inquire: "Inquire on WhatsApp",
     previous: "Previous image",
     next: "Next image",
     goToSlide: (n: number) => `Go to slide ${n}`,

@@ -30,23 +30,30 @@ import { serveOut } from "./lib/serve-out.mjs";
 const SITE = "https://alarabiacarpets.com";
 const DEFAULT_BASELINE = "docs/mobile-audit/baseline/seo-snapshot.json";
 
-// The plan's CTA vocabulary replaces these. Exact text of one entry, after whitespace
-// is collapsed. Guides keep "Ask us on WhatsApp" (see isPlannedLabel).
+// The labels the plan's CTA vocabulary replaced (WP7), and the only <main> text allowed
+// to disappear for that reason. Exact text of one entry, after whitespace is collapsed.
+// Guides keep "Ask us on WhatsApp"; other pages lose it (see isPlannedLabel).
+// scripts/check-consistency.mjs fails if any of these comes back.
 const ASK_LABELS = new Set(["Ask us on WhatsApp", "اسألنا على الواتساب"]);
 const PLANNED_CTA_LABELS = new Set([
   "Get Quote",
-  "Get a Free Quote",
-  "Get a free quote on WhatsApp",
   "Contact Us on WhatsApp",
   "Chat on WhatsApp",
   "Inquire on WhatsApp",
   "Call Now",
   "اطلب عرض سعر",
-  "اطلب عرض سعر مجاني",
-  "اطلب عرض سعر مجاني على الواتساب",
   "كلّمنا على الواتساب",
   "استفسر على الواتساب",
   "اتصل الحين",
+]);
+// What replaced them, reported as planned additions rather than as new text.
+const VOCABULARY_LABELS = new Set([
+  "Get a Free Quote",
+  "Get a free quote on WhatsApp",
+  "Call",
+  "اطلب عرض سعر مجاني",
+  "اطلب عرض سعر مجاني على الواتساب",
+  "اتصل",
 ]);
 // One planned heading move. ContactSection's form column comes before its methods column
 // in the HTML (WP2c, WCAG 2.4.3: phones show the form first, so Tab and screen readers
@@ -231,7 +238,7 @@ function diffSite(baseline, now) {
       else add(failures, "text removed", text, url);
     }
     for (const text of added) {
-      if (isPlannedLabel(text, url)) add(notes, "CTA label added (planned)", text, url);
+      if (VOCABULARY_LABELS.has(text)) add(notes, "CTA label added (planned)", text, url);
       else add(notes, "text added", text, url);
     }
     const movedText = firstMove(before.main, after.main);

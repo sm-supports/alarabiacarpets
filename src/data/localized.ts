@@ -38,7 +38,9 @@ const arProductList: Product[] = products.map((p) => {
     ...t,
     analyticsName: p.name,
     price: getDict("ar").price.contact,
-    whatsappLink: `${WHATSAPP_URL}?text=${encodeURIComponent(getDict("ar").common.interestedMessage(t.name))}`,
+    // The pages build their WhatsApp links from quoteMessage; this keeps the record's
+    // field in step with them for anything else that reads it.
+    whatsappLink: `${WHATSAPP_URL}?text=${encodeURIComponent(getDict("ar").common.quoteMessage(t.name))}`,
   };
 });
 

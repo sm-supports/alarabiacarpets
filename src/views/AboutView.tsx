@@ -6,6 +6,8 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import BusinessFacts from "@/components/BusinessFacts";
 import JsonLd from "@/components/JsonLd";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { getDict, localePath, type Locale } from "@/i18n";
 import { buildBreadcrumb, clampDescription, defaultOgImages, ogLocaleFields, pageAlternates } from "@/lib/seo";
 
@@ -28,14 +30,16 @@ export function aboutMetadata(locale: Locale): Metadata {
 export default function AboutView({ locale }: { locale: Locale }) {
   const t = getDict(locale);
   const page = t.pages.about;
+  const crumbs: Crumb[] = [[page.breadcrumb, "/about"]];
   return (
     <div className="min-h-screen flex flex-col">
-      <JsonLd data={buildBreadcrumb([[page.breadcrumb, "/about"]], locale)} />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       <Navbar />
       <main className="flex-grow">
         {/* Hero Banner */}
         <div className="bg-primary text-white py-12">
-          <div className="container mx-auto px-4 text-center">
+          <div className="container mx-auto px-4 md:text-center">
+            <Breadcrumb locale={locale} trail={crumbs} dark phoneOnly />
             <h1 className="font-playfair text-3xl md:text-4xl font-bold mb-4">{page.heading}</h1>
             <p className="font-poppins max-w-2xl mx-auto">{page.intro}</p>
           </div>
@@ -116,11 +120,9 @@ export default function AboutView({ locale }: { locale: Locale }) {
           <div className="container mx-auto px-4 text-center">
             <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-4">{page.ctaTitle}</h2>
             <p className="font-poppins max-w-2xl mx-auto mb-8">{page.ctaText}</p>
-            <WhatsAppLink
-              source="about_page"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-primary rounded-md hover:bg-white/90 transition-colors font-poppins font-medium"
-            >
-              {t.common.contactOnWhatsApp}
+            <WhatsAppLink source="about_page" className="cta-dark">
+              <WhatsAppIcon />
+              {t.common.heroQuote}
             </WhatsAppLink>
           </div>
         </section>

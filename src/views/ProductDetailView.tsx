@@ -13,8 +13,10 @@ import RelatedProducts from "@/components/RelatedProducts";
 import RelatedGuides from "@/components/RelatedGuides";
 import ServiceLinks from "@/components/ServiceLinks";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check, ShoppingCart } from "@/components/icons";
+import { ArrowLeft, Check } from "@/components/icons";
 import { categoryLabelFor, findProduct, getProducts, servicesForProductL } from "@/data/localized";
 import { fullImage, fullImagePath } from "@/lib/card-image";
 import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
@@ -82,19 +84,16 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
   const label = categoryLabelFor(locale, product.category);
   const fromPrice =
     typeof product.priceFrom === "number" ? formatFromPrice(product.priceFrom, product.priceUnit, locale) : undefined;
+  // One trail for the visible breadcrumb and the BreadcrumbList, so the two can't disagree.
+  const crumbs: Crumb[] = [
+    [t.common.products, "/products"],
+    [product.name, `/products/${product.id}`],
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
       <JsonLd data={buildProductJsonLd(product, locale)} />
-      <JsonLd
-        data={buildBreadcrumb(
-          [
-            [t.common.products, "/products"],
-            [product.name, `/products/${product.id}`],
-          ],
-          locale
-        )}
-      />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       {product.faqs?.length ? <JsonLd data={buildFaq(product.faqs, locale)} /> : null}
 
       <BarIntent name={product.name} type="product" slug={product.id} />
@@ -103,15 +102,7 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
         <section className="py-10 md:py-14 bg-neutral-50">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
             {/* Breadcrumb: real anchors, not a JS-only back button */}
-            <nav aria-label={t.common.breadcrumb} className="mb-6">
-              <ol className="flex flex-wrap items-center gap-2 font-poppins text-sm text-neutral-500">
-                <li><Link href={lp("/")} className="hover:text-primary">{t.common.home}</Link></li>
-                <li aria-hidden="true">/</li>
-                <li><Link href={lp("/products")} className="hover:text-primary">{t.common.products}</Link></li>
-                <li aria-hidden="true">/</li>
-                <li className="text-neutral-800 font-medium">{product.name}</li>
-              </ol>
-            </nav>
+            <Breadcrumb locale={locale} trail={crumbs} className="mb-6" />
 
             <div className="mb-6">
               <Button asChild variant="ghost" className="flex items-center gap-2 w-fit">
@@ -187,19 +178,14 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
                 </div>
 
                 <div className="mt-auto">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="w-full bg-primary hover:bg-accent text-white flex items-center justify-center gap-2"
+                  <WhatsAppLink
+                    message={t.common.quoteMessage(product.name)}
+                    source={`product_detail:${product.id}`}
+                    className="cta cta-m w-full"
                   >
-                    <WhatsAppLink
-                      href={product.whatsappLink}
-                      source={`product_detail:${product.id}`}
-                    >
-                      <ShoppingCart size={18} />
-                      <span>{t.productCard.inquire}</span>
-                    </WhatsAppLink>
-                  </Button>
+                    <WhatsAppIcon />
+                    {t.common.heroQuote}
+                  </WhatsAppLink>
                 </div>
               </div>
             </div>
@@ -211,7 +197,7 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
         {product.faqs?.length ? (
           <section className="py-14 md:py-16 bg-white">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
-              <h2 className="h2-sec">
+              <h2 className="h2-sec faq-h">
                 {t.common.faqTitle}
               </h2>
               <FaqList faqs={product.faqs} />
@@ -235,15 +221,14 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
             <p className="font-poppins max-w-2xl mx-auto mb-8">
               {t.productDetail.needHelpText}
             </p>
-            <Button asChild size="lg" className="bg-green-700 hover:bg-green-800 text-white">
-              <WhatsAppLink
-                source={`product_detail_bottom:${product.id}`}
-                className="flex items-center gap-2"
-              >
-                <ShoppingCart size={16} />
-                <span>{t.common.contactOnWhatsApp}</span>
-              </WhatsAppLink>
-            </Button>
+            <WhatsAppLink
+              message={t.common.quoteMessage(product.name)}
+              source={`product_detail_bottom:${product.id}`}
+              className="cta cta-m"
+            >
+              <WhatsAppIcon />
+              {t.common.heroQuote}
+            </WhatsAppLink>
           </div>
         </section>
       </main>

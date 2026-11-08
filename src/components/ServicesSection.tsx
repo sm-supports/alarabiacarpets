@@ -82,12 +82,9 @@ export default function ServicesSection({ locale }: { locale: Locale }) {
           <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
             {t.whyUs.question}
           </p>
-          <WhatsAppLink
-            source="services_section"
-            className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 bg-forest-900 text-white text-sm font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-float active:scale-[0.98] w-full sm:w-auto max-w-xs sm:max-w-none mx-auto"
-          >
-            <WhatsAppIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-            {t.common.contactOnWhatsApp}
+          <WhatsAppLink source="services_section" className="cta cta-m cta-wide">
+            <WhatsAppIcon />
+            {t.common.heroQuote}
           </WhatsAppLink>
         </div>
       </div>

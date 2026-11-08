@@ -38,7 +38,6 @@ export const ar: Dict = {
     viewAll: "شوف كل المنتجات",
     viewRange: "شوف التشكيلة",
     moreAlt: (name: string) => `${name} من سجاد العربية في الدوحة`,
-    getQuote: "اطلب عرض سعر",
     items: {
       carpet: {
         name: "سجاد فاخر",

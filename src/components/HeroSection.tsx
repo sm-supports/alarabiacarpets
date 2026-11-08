@@ -73,16 +73,16 @@ export default function HeroSection() {
           >
             <button
               onClick={() => scrollToSection('products')}
-              className="group hero-dark"
+              className="group cta cta-l"
             >
               {t.hero.explore}
               <ArrowRight className="arrow-go" />
             </button>
             <button
               onClick={() => scrollToSection('services')}
-              className="group hero-light"
+              className="group cta-2 cta-l"
             >
-              <Play className="w-4 h-4" />
+              <Play />
               {t.hero.ourServices}
             </button>
                   </div>

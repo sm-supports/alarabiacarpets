@@ -56,6 +56,7 @@ node scripts/check-text-ratio.mjs || die "pages under the 10% text-to-HTML ratio
 node scripts/check-arabic.mjs || die "Arabic pages failed their checks"
 node scripts/check-page-weight.mjs || die "pages failed their weight checks"
 node scripts/check-internal-links.mjs || die "keyword pages have too few internal links"
+node scripts/check-consistency.mjs || die "CTA labels, breadcrumbs or the self-contained pages' phone and hours are inconsistent"
 
 # Is out/ on a case-insensitive filesystem?
 probe="$OUT/.case-probe-$$"

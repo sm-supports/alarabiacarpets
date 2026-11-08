@@ -38,7 +38,6 @@ export const en = {
     viewAll: "View All Products",
     viewRange: "View Range",
     moreAlt: (name: string) => `${name} by Al Arabia Carpets in Doha`,
-    getQuote: "Get Quote",
     items: {
       carpet: {
         name: "Luxury Carpets",

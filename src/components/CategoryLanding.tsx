@@ -7,10 +7,10 @@ import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
 import FaqList from "@/components/FaqList";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import HeroQuoteCta from "@/components/HeroQuoteCta";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import ServiceLinks from "@/components/ServiceLinks";
-import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "@/components/icons";
 import type { CategorySection } from "@/data/categories";
 import { findCategory, findProduct, findService, getCategories, getProducts, guidesForCategoryL } from "@/data/localized";
 import { cardImage } from "@/lib/card-image";
@@ -71,6 +71,11 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
     return { id, name: product.name, price: formatFromPrice(product.priceFrom, product.priceUnit, locale) };
   });
   const path = `/products/${category.slug}`;
+  // One trail for the visible breadcrumb and the BreadcrumbList.
+  const crumbs: Crumb[] = [
+    [t.common.products, "/products"],
+    [category.label, path],
+  ];
   const fromPrice = category.priceFrom ? formatFromPrice(category.priceFrom, category.priceUnit, locale) : undefined;
 
   // FAQs from the main body and any folded-in secondary section are emitted as
@@ -90,15 +95,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
           locale
         )}
       />
-      <JsonLd
-        data={buildBreadcrumb(
-          [
-            [t.common.products, "/products"],
-            [category.label, path],
-          ],
-          locale
-        )}
-      />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       {allFaqs.length > 0 && <JsonLd data={buildFaq(allFaqs, locale)} />}
 
       <BarIntent name={category.label} type="category" slug={category.slug} />
@@ -106,15 +103,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
       <main className="flex-grow">
         <div className="bg-primary text-white py-12 md:py-16">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
-            <nav aria-label={t.common.breadcrumb} className="mb-5">
-              <ol className="flex flex-wrap items-center gap-2 font-poppins text-sm text-white/70">
-                <li><Link href={lp("/")} className="hover:text-white">{t.common.home}</Link></li>
-                <li aria-hidden="true">/</li>
-                <li><Link href={lp("/products")} className="hover:text-white">{t.common.products}</Link></li>
-                <li aria-hidden="true">/</li>
-                <li className="text-white">{category.label}</li>
-              </ol>
-            </nav>
+            <Breadcrumb locale={locale} trail={crumbs} dark />
             <h1 className="h1-band">
               {category.heading}
             </h1>
@@ -243,7 +232,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
         {category.faqs?.length ? (
           <section className="py-12 md:py-14 bg-white">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
-              <h2 className="h2-sec6">
+              <h2 className="h2-sec6 faq-h">
                 {t.common.faqTitle}
               </h2>
               <FaqList faqs={[...category.faqs, ...(category.secondary?.faqs ?? [])]} />
@@ -317,16 +306,14 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
             <p className="font-poppins max-w-2xl mx-auto mb-8 text-neutral-500">
               {t.category.ctaText}
             </p>
-            <Button asChild size="lg" className="bg-green-700 hover:bg-green-800 text-white">
-              <WhatsAppLink
-                source={`category:${category.slug}`}
-                message={t.common.quoteMessage(category.label)}
-                className="flex items-center gap-2"
-              >
-                <ShoppingCart size={16} />
-                <span>{t.common.askOnWhatsApp}</span>
-              </WhatsAppLink>
-            </Button>
+            <WhatsAppLink
+              source={`category:${category.slug}`}
+              message={t.common.quoteMessage(category.label)}
+              className="cta cta-m"
+            >
+              <WhatsAppIcon />
+              {t.common.heroQuote}
+            </WhatsAppLink>
           </div>
         </section>
       </main>

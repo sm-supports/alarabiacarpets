@@ -379,9 +379,9 @@ export const guides: Guide[] = [
     slug: "majlis-interior-design-ideas",
     title: "Majlis Interior Design Ideas for Qatari Homes",
     // Differs from `title` (the h1) on purpose: an identical h1 and <title> is flagged as duplicate content.
-    seoTitle: "Majlis Design Ideas Qatar: Layout, Seating & Decor",
+    seoTitle: "Majlis Design for Home: Layouts, Seating & Room Plans",
     metaDescription:
-      "Majlis design ideas for Qatari homes: seating layout, floor-level vs raised, fabrics, lighting, curtains and flooring. Guidance from Al Arabia Carpets.",
+      "Planning a majlis at home? Compare seating layouts, floor-level or raised seating, fabrics, lighting, curtains and flooring, with advice from our Doha team.",
     excerpt:
       "How to plan majlis seating that fits the room, choose between floor-level and raised, and coordinate fabric, lighting and flooring.",
     heroImage: "/Products/Furniture/majlis-sofa.webp",

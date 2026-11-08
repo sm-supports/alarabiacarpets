@@ -153,6 +153,18 @@ export const enClient = {
     copied: "Copied",
     followUp: "Hi, I sent a message on your website, REF {ref}. Here are my sizes and photos.",
   },
+  /**
+   * After a WhatsApp or Call tap on a phone (S1 to S4 in the plan's state catalogue,
+   * lib/feedback.ts). S3 adds formStates.open; Call, Close and Get a Free Quote are shared.
+   */
+  tapFeedback: {
+    whatsAppOpened: "WhatsApp opened. Nothing is sent until you press send.",
+    whatsAppOpenedNext: "Add sizes and photos so we can prepare your quote.",
+    backToWhatsApp: "Back to WhatsApp",
+    stillHere: "Still here? WhatsApp may not have opened.",
+    callBack: "Couldn't get through?",
+    offline: "You look offline. WhatsApp may not open.",
+  },
   statePanel: {
     close: "Close",
     call: "Call",

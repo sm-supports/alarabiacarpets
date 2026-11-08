@@ -10,7 +10,7 @@ import { useI18n } from "@/i18n/LocaleProvider";
 import { stripLocale } from "@/i18n/config";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { BAR_SENDS_ADS } from "@/lib/analytics";
-import { useBarIntent } from "@/lib/bar-intent";
+import { barQuoteMessage, useBarIntent } from "@/lib/bar-intent";
 
 const WIDE = "(min-width: 768px)";
 
@@ -51,11 +51,7 @@ export default function WhatsAppFloat() {
     ? undefined
     : wide
       ? t.common.floatMessage
-      : [
-          intent ? t.common.quoteMessage(intent.name) : t.common.floatMessage,
-          t.bar.size,
-          `${window.location.origin}${pathname}`,
-        ].join("\n");
+      : barQuoteMessage(t, intent, pathname);
 
   return (
     <div data-action-bar="" className="ab">

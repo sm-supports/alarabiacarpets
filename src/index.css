@@ -812,7 +812,10 @@
   .cta-2 { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-forest-900/30 bg-white px-6 py-3 text-center text-sm font-semibold text-forest-900 transition-colors duration-200 hover:bg-neutral-50 active:scale-[0.98]; }
 
   /* StatePanel. The overlay sits at the right on desktop in both languages, where the
-     toast it replaced was, because the WhatsApp pill holds the left in both. */
+     toast it replaced was, because the WhatsApp pill holds the left in both. Its only
+     callers today are the tap feedback panels (S1-S4, lib/feedback.ts), which show below
+     md only and are cleared when the screen widens past it. Below md it spans the width,
+     over the action bar, until it is closed or answered. */
   .sp { @apply relative bg-white text-start text-neutral-800; }
   .sp-overlay { @apply fixed inset-x-0 bottom-0 z-[100] max-h-[85vh] overflow-y-auto rounded-t-2xl border-t border-neutral-200 p-5 shadow-float md:inset-x-auto md:bottom-6 md:right-6 md:w-[420px] md:rounded-2xl md:border; padding-bottom: calc(1.25rem + env(safe-area-inset-bottom)); animation: sp-up 240ms cubic-bezier(0.16, 1, 0.3, 1) both; }
   .sp-inline { @apply rounded-2xl p-5; }
@@ -831,6 +834,17 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .sp-overlay { animation: none; }
+}
+
+/* NavProgress: a 2px gold line across the top while a tapped link loads, above the header
+   and the open menu. It grows from the start edge, so Arabic mirrors it, and slows as it
+   goes rather than claiming to finish. Phones only, and never with reduced motion. */
+@layer components {
+  .np { @apply pointer-events-none fixed inset-x-0 top-0 z-[70] h-0.5 origin-left bg-gold-500 rtl:origin-right md:hidden motion-reduce:hidden; animation: np-grow 10s cubic-bezier(0.1, 0.7, 0.2, 1) both; }
+}
+@keyframes np-grow {
+  from { transform: scaleX(0.1); }
+  to { transform: scaleX(0.9); }
 }
 
 /* Hero entrance. CSS only, so it runs from the first paint and never waits for

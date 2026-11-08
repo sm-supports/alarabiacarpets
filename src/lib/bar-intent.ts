@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import type { ClientDict } from "@/i18n/en.client";
 
 /**
  * What the page is about, for the action bar (WhatsAppFloat): its WhatsApp prefill names
@@ -36,6 +37,23 @@ function subscribe(listener: () => void) {
   return () => {
     listeners.delete(listener);
   };
+}
+
+export function getBarIntent(): BarIntent | null {
+  return current;
+}
+
+/**
+ * The bar's WhatsApp prefill below md: the quote line, a size line for the visitor to fill
+ * in, then the page (origin and path only, so gclid and lang=en stay out of the chat).
+ * Also used by the Get a Free Quote of S3 (TapFeedback), which stands in for the bar.
+ */
+export function barQuoteMessage(t: Pick<ClientDict, "common" | "bar">, intent: BarIntent | null, pathname: string): string {
+  return [
+    intent ? t.common.quoteMessage(intent.name) : t.common.floatMessage,
+    t.bar.size,
+    `${window.location.origin}${pathname}`,
+  ].join("\n");
 }
 
 /** Null on the server and while hydrating: the static bar never depends on it. */

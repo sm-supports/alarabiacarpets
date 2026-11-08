@@ -143,6 +143,14 @@ export const arClient: ClientDict = {
     copied: "تم النسخ",
     followUp: "السلام عليكم، أرسلت لكم رسالة من الموقع، المرجع {ref}. هذي المقاسات والصور.",
   },
+  tapFeedback: {
+    whatsAppOpened: "فتحنا الواتساب، والرسالة ما تنرسل إلا إذا ضغطت إرسال.",
+    whatsAppOpenedNext: "أضف المقاسات والصور عشان نجهز عرض السعر.",
+    backToWhatsApp: "ارجع للواتساب",
+    stillHere: "بعدك هنا؟ يمكن الواتساب ما انفتح.",
+    callBack: "ما قدرت توصل لنا؟",
+    offline: "شكلك بدون إنترنت، ويمكن الواتساب ما ينفتح.",
+  },
   statePanel: {
     close: "إغلاق",
     call: "اتصل",

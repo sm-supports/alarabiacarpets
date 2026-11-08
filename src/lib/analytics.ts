@@ -96,6 +96,16 @@ export function trackWhatsAppClick(source: string, conversion = true): void {
   gtagEvent("whatsapp_click", { source, method: "whatsapp", ...(!conversion && { conversion: false }) });
 }
 
+/**
+ * "Back to WhatsApp" on the panel a phone shows on returning from WhatsApp (S1). The chat
+ * was already counted by the tap that first opened it, so this is GA4 only, and not a
+ * whatsapp_click either.
+ * @param source the source of that first tap
+ */
+export function trackWhatsAppReopen(source: string): void {
+  gtagEvent("whatsapp_reopen", { source, method: "whatsapp" });
+}
+
 /** A tel: link was clicked. */
 export function trackPhoneClick(source: string): void {
   if (CONVERSION_LABELS.phoneClick) {

@@ -4,6 +4,7 @@ import { localePath } from "@/i18n/config";
 import { useLocale } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { trackWhatsAppClick } from "@/lib/analytics";
+import { reportTap } from "@/lib/tap";
 import { WHATSAPP_URL } from "@/lib/site";
 
 interface WhatsAppLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
@@ -30,6 +31,9 @@ interface WhatsAppLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement
  * with 429 on any wa.me URL, bare or prefilled, so Semrush (which crawls without
  * JS) reported one broken external link on every page. Visitors get the real
  * link a moment after load, so hover, copy-link and long-press all show it.
+ *
+ * A tap is also reported (lib/tap.ts) to lib/feedback.ts, which on a phone may then say
+ * whether WhatsApp opened (S1, S2, S4). The tap itself is never held back.
  */
 export default function WhatsAppLink({
   source,
@@ -55,6 +59,8 @@ export default function WhatsAppLink({
       {...rest}
       onClick={(e) => {
         trackWhatsAppClick(source, conversion);
+        // Before hydration the link goes to the contact page, not WhatsApp.
+        if (hydrated) reportTap({ kind: "whatsapp", link: e.currentTarget, href: target, source, conversion });
         rest.onClick?.(e);
       }}
     >

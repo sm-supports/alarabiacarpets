@@ -15,6 +15,7 @@ import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useOnline } from "@/hooks/use-online";
 import { clearDraft, firstCount, isFresh, readDraft, readSent, saveDraft, saveSent, type Submission } from "@/lib/draft";
+import CallLink from "@/components/CallLink";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { EMAIL, PHONE, PHONE_E164, WHATSAPP_URL } from "@/lib/site";
@@ -1248,13 +1249,9 @@ const ContactSection = memo(function ContactSection() {
                 >
                   {t.aboutUs}
                 </Link>
-                <a
-                  href="tel:+97455512858"
-                  onClick={() => trackPhoneClick("contact_section_call")}
-                  className="ct-chip"
-                >
+                <CallLink source="contact_section_call" className="ct-chip">
                   {t.callNow}
-                </a>
+                </CallLink>
               </div>
             </div>
           </div>

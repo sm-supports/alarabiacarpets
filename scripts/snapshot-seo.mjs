@@ -108,6 +108,16 @@ const CONTACT_PAGE_REMOVED = {
   ]),
 };
 const isContactPageRemoval = (text, url) => CONTACT_PAGE_REMOVED[url]?.has(text) ?? false;
+// Changes main made after the baseline (2f10125), merged into this branch: the SEO session
+// retitled the majlis guide (4714064). Exact new values, so any other title or description
+// change on this page, or a later edit of these, still fails.
+const MAIN_SINCE_BASELINE = {
+  "/guides/majlis-interior-design-ideas": {
+    title: "Majlis Design for Home: Layouts, Seating & Room Plans",
+    description:
+      "Planning a majlis at home? Compare seating layouts, floor-level or raised seating, fabrics, lighting, curtains and flooring, with advice from our Doha...",
+  },
+};
 // The product price line without a price (WP8, S17): "Contact for Price" gives way to
 // what the free quote takes, on product pages only. The S17 line is reported as a planned
 // addition; services gain it as a line of their own. One line for every job (the owner,
@@ -254,8 +264,11 @@ function diffSite(baseline, now) {
       add(failures, "page gone", url, url);
       continue;
     }
-    if (before.title !== after.title) add(failures, "title changed", `${before.title} -> ${after.title}`, url);
-    if (before.description !== after.description) add(failures, "description changed", `${before.description} -> ${after.description}`, url);
+    for (const field of ["title", "description"]) {
+      if (before[field] === after[field]) continue;
+      const fromMain = MAIN_SINCE_BASELINE[url]?.[field] === after[field];
+      add(fromMain ? notes : failures, fromMain ? `${field} changed on main (planned)` : `${field} changed`, `${before[field]} -> ${after[field]}`, url);
+    }
     if (JSON.stringify(before.h1) !== JSON.stringify(after.h1)) add(failures, "h1 changed", `${before.h1.join(" | ")} -> ${after.h1.join(" | ")}`, url);
 
     for (const heading of missingFrom(before.headings, after.headings)) {

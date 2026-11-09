@@ -12,6 +12,7 @@
  *   ... --screenshots=dir [--full-page] [--format=jpeg --quality=60]
  *   ... --form[=ok,send_failed,offline]            run the contact form through each outcome
  *   ... --form=flows                               only the multi-step flows (flow:<name>)
+ *   ... --max-seconds=180                          close Chrome and exit 2 after this long (default 1800)
  *
  * For each page it records:
  *   - tap targets: every visible control under 44px either way (acceptance 1). A link in
@@ -38,7 +39,8 @@
  * leaving for Home while a send is on its way. The draft flows reload the page: offline
  * mid-form then a language switch, a reload after a lost answer, with an id past 23 hours
  * and after Sent, a correction, S13 cleared by an edit or replaced by a challenge, and
- * storage that is full or blocked.
+ * storage that is full or blocked. The timeout flows: before any press, with nothing typed,
+ * and a challenge a reset brought after S7b or S7 that the visitor ignores.
  * Exits 1 if any run ends somewhere it shouldn't. The helpers are exported from
  * lib/browser.mjs for anything more specific.
  */
@@ -87,6 +89,7 @@ const outFile = option("out", null);
 const strict = flag("strict");
 const javascript = !flag("no-js");
 const formArg = option("form", flag("form") ? "all" : null);
+const maxSeconds = Number(option("max-seconds", "1800"));
 
 const localized = (lang, url) => (lang === "ar" ? (url === "/" ? "/ar" : `/ar${url}`) : url);
 
@@ -516,6 +519,34 @@ function flowTools(page, routes, lang, problems) {
   return tools;
 }
 
+/**
+ * A send fails into `state`; the widget's reset after it brings a challenge, which the
+ * visitor ignores until it times out. The failure must stay, with focus where it was,
+ * and its Try again must reset the widget and send.
+ */
+async function failedThenTimeout(t, state) {
+  await t.waitToken();
+  await t.stub("setMode", "challenge");
+  await t.press();
+  await t.waitState(state);
+  const shown = await t.page
+    .waitForFunction(() => [...document.querySelectorAll("[data-turnstile-stub]")].some((box) => box.style.display === "flex"), { timeout: 4000, polling: 50 })
+    .then(() => true, () => false);
+  t.expect("challenge shown after the reset", shown, true);
+  t.expect("state under the challenge", (await t.read()).state, state);
+  await t.stub("fire", "timeout-callback");
+  await pause(300);
+  const after = await t.read();
+  t.expect("state after the timeout", after.state, state);
+  t.expect("focus after the timeout", after.focus, "headline");
+  await t.stub("setMode", "pass");
+  const resets = await t.page.evaluate(() => window.__turnstileStub.resets);
+  await t.action("tryAgain");
+  await t.waitState("sent", 6000);
+  t.expect("reset on Try again", (await t.page.evaluate(() => window.__turnstileStub.resets)) > resets, true);
+  t.expect("posted", t.bodies().length, 2);
+}
+
 /** Several steps each, for the rules a single press can't show. */
 const FLOWS = {
   // S5: Send pressed before the check finished sends by itself once it does.
@@ -915,10 +946,39 @@ const FLOWS = {
     await t.reload();
     t.expect("state after reload", (await t.read()).state, null);
   },
-  // S9 from the challenge timing out, before any press; Send resets the widget.
+  // Nothing typed when the challenge times out: S9's "Your text is still here" would be
+  // false, so nothing shows. The press after typing resets the widget and answers.
+  async "timeout-empty"(t) {
+    await t.page.focus(FIELDS.name);
+    await pause(400);
+    t.expect("state over an empty form", (await t.read()).state, null);
+    for (const [key, selector] of Object.entries(FIELDS)) await t.page.type(selector, t.text[key]);
+    await t.press();
+    await t.waitState("checkRejected");
+    t.expect("reset on Send", (await t.page.evaluate(() => window.__turnstileStub.resets)) >= 1, true);
+    t.expect("focus after the press", (await t.read()).focus, "headline");
+    t.expect("posted", t.bodies().length, 0);
+  },
+  // A reset after S7b brings a challenge the visitor ignores, and it times out. S7b stays:
+  // S9's NOT SENT would hide that the message may have arrived. Its Try again is a press,
+  // which resets the widget for the timeout and sends under the same id.
+  async "noreply-challenge-timeout"(t) {
+    await failedThenTimeout(t, "noReply");
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", Boolean(first?.submissionId) && second?.submissionId === first?.submissionId, true);
+  },
+  // The same over S7: the failure the visitor hasn't acted on stays.
+  async "refused-challenge-timeout"(t) {
+    await failedThenTimeout(t, "refused");
+  },
+  // S9 from the challenge timing out over typed text, before any press; Send resets the
+  // widget. Fired by hand: at md and up the widget loads with the page, so a timeout in
+  // its own time would come before the typing, over an empty form (timeout-empty).
   async "timeout-retry"(t) {
+    await t.stub("fire", "timeout-callback");
     await t.waitState("checkRejected");
     t.expect("focus before a press", (await t.read()).focus === "headline", false);
+    await t.stub("setMode", "timeout");
     await t.press();
     await pause(300);
     t.expect("reset on Send", (await t.page.evaluate(() => window.__turnstileStub.resets)) >= 1, true);
@@ -951,7 +1011,10 @@ const FLOW_SETUP = {
   correction: {},
   fields: { type: false },
   "long-prefill": { contact: "send_failed" },
-  "timeout-retry": { turnstile: "timeout" },
+  "timeout-retry": { turnstile: "pending" },
+  "timeout-empty": { turnstile: "timeout", type: false },
+  "noreply-challenge-timeout": { contact: ["send_unknown", "ok"] },
+  "refused-challenge-timeout": { contact: ["send_failed", "ok"] },
   "draft-switch": {},
   "reload-lost": { contact: ["network", "ok"] },
   "reload-sent": {},
@@ -1044,6 +1107,14 @@ async function runForm(browser, origin) {
 
 const server = await serveOut({ dir });
 const browser = await launchBrowser();
+// A step that never settles (a page that won't load, a wait with no timeout) must not
+// hold Chrome and this process open: give up, close both, and say so.
+setTimeout(() => {
+  console.error(`audit-mobile: gave up after ${maxSeconds} s`);
+  Promise.race([browser.close(), pause(5000)])
+    .catch(() => {})
+    .finally(() => process.exit(2));
+}, maxSeconds * 1000).unref();
 let exitCode = 0;
 try {
   const results = formArg ? await runForm(browser, server.origin) : await auditPages(browser, server.origin);

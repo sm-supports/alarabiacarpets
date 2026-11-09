@@ -19,6 +19,8 @@ export const arClient: ClientDict = {
     floatMessage: "السلام عليكم سجاد العربية، أبي عرض سعر.",
     floatLabel: "تواصل مع سجاد العربية على الواتساب",
     heroQuote: "اطلب عرض سعر مجاني على الواتساب",
+    imageUnavailable: "الصورة غير متوفرة",
+    videoUnavailable: "الفيديو غير متوفر",
     notFound: {
       product: "المنتج غير موجود",
       service: "الخدمة غير موجودة",
@@ -158,8 +160,6 @@ export const arClient: ClientDict = {
     next: "الصورة التالية",
     goToSlide: (n) => `الانتقال إلى الصورة ${n}`,
     view: (n) => ` (صورة ${n})`,
-    imageUnavailable: "الصورة غير متوفرة",
-    imageNotAvailable: "الصورة غير متوفرة",
     playVideo: "شغّل الفيديو",
   },
 };

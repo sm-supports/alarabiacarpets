@@ -15,6 +15,18 @@ export const en = {
       "per piece": "per piece",
       "per project": "per project",
     } as Record<string, string>,
+    /**
+     * The price line of a product or service with no priceFrom (S17 in the plan's state
+     * catalogue), by the record's quoteKind (src/data/products.ts). Unset is "measure".
+     * Page text only: the JSON-LD of these items carries no offer and no price.
+     */
+    noPrice: {
+      measure: "Free measurement and quote. Send your sizes and a few photos.",
+      quote: "Free quote. Send your sizes and a few photos.",
+      check: "Free check and quote. Send a few photos of the piece.",
+    },
+    /** The short form, for a tile with room for one line in place of a price. */
+    freeQuote: "Free quote",
   },
   footer: {
     srTitle: "Site footer",

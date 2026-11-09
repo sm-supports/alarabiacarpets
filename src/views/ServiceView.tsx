@@ -127,6 +127,8 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
             <p className="font-poppins max-w-2xl text-white/80 text-sm md:text-base">
               {service.excerpt}
             </p>
+            {/* Without a price, what the free quote takes (S17), just above the button. */}
+            {!price && <p className="no-price">{t.price.noPrice[service.quoteKind ?? "measure"]}</p>}
             <HeroQuoteCta locale={locale} source={`service:${service.slug}:hero`} message={t.common.quoteMessage(service.label)} />
           </div>
         </div>

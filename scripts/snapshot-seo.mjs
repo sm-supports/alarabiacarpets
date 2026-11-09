@@ -11,8 +11,9 @@
  *   - a title, description or h1 changed
  *   - a heading removed, changed, or moved relative to the other headings
  *   - text removed from <main>, unless it is a CTA label the plan replaces
- *     (PLANNED_CTA_LABELS below; keep that list as short as the plan allows) or a
- *     separator with no letter or digit in it
+ *     (PLANNED_CTA_LABELS below; keep that list as short as the plan allows), the
+ *     "Contact for Price" an S17 line replaced on a product page, or a separator with
+ *     no letter or digit in it
  * It reports without failing: added text and headings, and text that moved or was
  * merged into another block. Read those: an addition can still be a mistake.
  *
@@ -75,6 +76,19 @@ function expectedHeadings(url, headings) {
   }
   return swapped;
 }
+// The product price line without a price (WP8, S17): "Contact for Price" gives way to
+// what the free quote takes, on product pages only. Each S17 line is reported as a
+// planned addition; services gain it as a line of their own.
+const PLANNED_PRICE_LINES = new Set(["Contact for Price", "تواصل معنا للسعر"]);
+const FREE_QUOTE_LINES = new Set([
+  "Free measurement and quote. Send your sizes and a few photos.",
+  "Free quote. Send your sizes and a few photos.",
+  "Free check and quote. Send a few photos of the piece.",
+  "القياس وعرض السعر مجانًا. أرسل المقاسات وبعض الصور.",
+  "عرض السعر مجاني. أرسل المقاسات وبعض الصور.",
+  "الفحص وعرض السعر مجانًا. أرسل بعض الصور للقطعة.",
+]);
+const isProduct = (url) => /^(\/ar)?\/products\/[^/]+$/.test(url);
 const isGuide = (url) => /^(\/ar)?\/guides\//.test(url);
 const isPlannedLabel = (text, url) =>
   PLANNED_CTA_LABELS.has(text) || (ASK_LABELS.has(text) && !isGuide(url));
@@ -233,12 +247,15 @@ function diffSite(baseline, now) {
     const addedText = added.join(" ");
     for (const text of missingFrom(before.main, after.main)) {
       if (isPlannedLabel(text, url)) add(notes, "CTA label replaced (planned)", text, url);
-      else if (isSeparator(text)) add(notes, "separator removed", text, url);
+      else if (PLANNED_PRICE_LINES.has(text) && isProduct(url) && added.some((line) => FREE_QUOTE_LINES.has(line))) {
+        add(notes, "price line replaced by S17 (planned)", text, url);
+      } else if (isSeparator(text)) add(notes, "separator removed", text, url);
       else if (addedText.includes(text)) add(warnings, "text merged into a new block", text, url);
       else add(failures, "text removed", text, url);
     }
     for (const text of added) {
       if (VOCABULARY_LABELS.has(text)) add(notes, "CTA label added (planned)", text, url);
+      else if (FREE_QUOTE_LINES.has(text)) add(notes, "S17 free-quote line added (planned)", text, url);
       else add(notes, "text added", text, url);
     }
     const movedText = firstMove(before.main, after.main);

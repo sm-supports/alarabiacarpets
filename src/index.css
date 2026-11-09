@@ -888,6 +888,30 @@
   to { transform: scaleX(0.9); }
 }
 
+/* ImageFallback (S16): a catalog photo that failed becomes this tile, placed over the
+   image's own box (the script sets its position and size), with the alt text and "Image
+   unavailable". The image stays in the page for its alt text, transparent. A video keeps
+   its poster and gets the words as a band across its top, above the controls. No
+   z-index, so a card's own overlays (shade, label, play badge) still come above it. A
+   small tile clamps the name to two lines. */
+@layer components {
+  .imgx { @apply pointer-events-none absolute flex flex-col items-center justify-center gap-1 overflow-hidden bg-neutral-100 p-3 text-center font-poppins leading-snug text-neutral-600; container-type: size; }
+  .imgx-n { @apply line-clamp-3 text-sm font-medium text-neutral-700; }
+  .imgx-u { @apply text-xs; }
+  .imgx-v { @apply justify-start bg-black/70 px-4 py-2 text-white/90; container-type: normal; }
+  .imgx-v .imgx-n { @apply line-clamp-1 text-white; }
+  img[data-imgx] { opacity: 0; }
+  [data-imgx-host] { position: relative; }
+  @container (max-height: 7.5rem) {
+    .imgx-n { -webkit-line-clamp: 2; }
+  }
+}
+
+/* S17: a service with no price says what the free quote takes, above the band's button. */
+@layer components {
+  .no-price { @apply mt-3 max-w-2xl font-poppins text-sm font-medium text-gold-300 md:text-base; }
+}
+
 /* Hero entrance. CSS only, so it runs from the first paint and never waits for
    hydration. Don't put these on the h1 or subtitle: they are LCP candidates.
    hero-fade is for elements positioned with a transform, which hero-in would override. */

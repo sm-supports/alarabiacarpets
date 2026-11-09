@@ -737,10 +737,28 @@ const ContactSection = memo(function ContactSection() {
     const wasPending = pending.current;
     cancelWait();
     latePress.current = null;
-    show("checkRejected", { focus: wasPending });
     trackFormFailed("bot_timeout");
-    // S9 says "press Send to retry", so the new challenge waits for that press.
+    // S9 says "press Send to retry", so the new challenge waits for that press. Kept for
+    // the next press either way: it resets the widget whatever is on screen then.
     timedOut.current = true;
+    if (wasPending) {
+      show("checkRejected", { focus: true });
+      return;
+    }
+    // No press is waiting: the same rule as onWidgetFailed. S9 shows only in place of news
+    // or of the challenge that timed out, and only over text, so its "Your text is still
+    // here" is true. A failure the visitor hasn't acted on stays: a reset after S7b can
+    // bring a challenge they ignore, and S9 over S7b would hide that the message may have
+    // arrived. Its Try again is a press, which handles the timeout.
+    const replaces = (kind?: Kind) => !kind || kind === "restored" || kind === "online" || kind === "challenge";
+    if (!replaces(formState?.kind)) return;
+    const values = clean({ name, email, message });
+    if (FIELDS.some((field) => values[field])) show("checkRejected");
+    else if (formState?.kind === "challenge") {
+      // The box it pointed at has timed out; Send brings a new one.
+      keepFocus();
+      setFormState(null);
+    }
   };
 
   const closeSent = () => {

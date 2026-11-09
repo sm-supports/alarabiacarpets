@@ -29,6 +29,9 @@ export const enClient = {
     floatMessage: "Hi Al Arabia Carpets, I'd like a quote.",
     floatLabel: "Chat with Al Arabia Carpets on WhatsApp",
     heroQuote: "Get a free quote on WhatsApp",
+    /** S16: what ImageFallback writes under the alt text of a catalog photo or video that failed. */
+    imageUnavailable: "Image unavailable",
+    videoUnavailable: "Video unavailable",
     notFound: {
       product: "Product Not Found",
       service: "Service Not Found",
@@ -179,8 +182,6 @@ export const enClient = {
     next: "Next image",
     goToSlide: (n: number) => `Go to slide ${n}`,
     view: (n: number) => ` (view ${n})`,
-    imageUnavailable: "Image unavailable",
-    imageNotAvailable: "Image not available",
     playVideo: "Play video",
   },
 };

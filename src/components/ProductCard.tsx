@@ -40,7 +40,6 @@ const ProductCard = memo(function ProductCard({
   const router = useRouter();
   const { t } = useI18n();
   const hydrated = useHydrated();
-  const [hasError, setHasError] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [playingSrc, setPlayingSrc] = useState<string | null>(null);
   // Highest slide allowed to load. Starts at the first: loading="lazy" doesn't help
@@ -61,10 +60,6 @@ const ProductCard = memo(function ProductCard({
 
   const handleWhatsAppClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-  }, []);
-
-  const handleImageError = useCallback(() => {
-    setHasError(true);
   }, []);
 
   // Track active slide on scroll
@@ -175,8 +170,11 @@ const ProductCard = memo(function ProductCard({
               onClick={handleCardClick}
             >
               {index > loadedUpTo ? null : item.type === 'video' && playingSrc === item.src ? (
+                // If the video fails, the poster stays under ImageFallback's band.
                 <video
                   src={item.src}
+                  poster={poster}
+                  aria-label={imageAlt ?? name}
                   className="w-full h-full object-cover"
                   controls
                   autoPlay
@@ -206,25 +204,14 @@ const ProductCard = memo(function ProductCard({
                   )}
                 </button>
               ) : (
-                <>
-                  {hasError && index === 0 && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center">
-                      <div className="text-neutral-400 text-center p-4">
-                        <ImageIcon size={40} className="mx-auto mb-2" />
-                        <div className="text-xs font-medium">{t.productCard.imageUnavailable}</div>
-                      </div>
-                    </div>
-                  )}
-
-                  <img
-                    src={item.src}
-                    alt={imageAlt ? `${imageAlt}${index > 0 ? t.productCard.view(index + 1) : ""}` : `${name} - ${index + 1}`}
-                    loading="lazy"
-                    decoding="async"
-                    onError={index === 0 ? handleImageError : undefined}
-                    className="pc-img"
-                  />
-                </>
+                // A slide that fails becomes a named tile from ImageFallback (providers.tsx).
+                <img
+                  src={item.src}
+                  alt={imageAlt ? `${imageAlt}${index > 0 ? t.productCard.view(index + 1) : ""}` : `${name} - ${index + 1}`}
+                  loading="lazy"
+                  decoding="async"
+                  className="pc-img"
+                />
               )}
             </div>
           ))}

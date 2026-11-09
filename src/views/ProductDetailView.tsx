@@ -115,7 +115,6 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg shadow-md overflow-hidden">
               <ProductMedia
-                name={product.name}
                 alt={productImageAlt(product, locale)}
                 {...(videoSrc ? { src: poster } : fullImage(product.imageSrc, "(min-width:1024px) 50vw, 66vw"))}
                 videoSrc={videoSrc}
@@ -128,8 +127,9 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
                     <h1 className="font-playfair text-3xl md:text-4xl font-bold mb-3">
                       {product.name}
                     </h1>
+                    {/* Without a price, what the free quote takes (S17), never a dead end. */}
                     <p className="font-poppins font-medium text-lg text-primary">
-                      {fromPrice ?? product.price}
+                      {fromPrice ?? t.price.noPrice[product.quoteKind ?? "measure"]}
                     </p>
                   </div>
 

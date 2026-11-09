@@ -15,10 +15,9 @@ interface Product {
   name: string;
   category: string;
   description: string;
-  price: string;
   imageSrc: string;
   media: ProductMedia[];
-  whatsappLink: string;
+  // optional: priceFrom, priceTo, priceUnit, quoteKind, longDescription, specs, faqs, ...
 }
 ```
 
@@ -50,9 +49,10 @@ Defined in `src/components/ProductsGrid.tsx` (the `CATEGORIES` object) and mirro
 
 ## Bulk Price Update
 
-All products currently use `"Contact for Price"`. To add real prices:
-- Update the `price` field on each product
-- Price is a free-form string (e.g., `"QAR 450"`, `"From QAR 200"`)
+A product without `priceFrom` shows the free-quote line picked by its `quoteKind`. To add a real price:
+- Set `priceFrom` (a number, QAR) and `priceUnit` (e.g. `"per sqm"`), only from a price the owner confirmed
+- Remove that product's `quoteKind`: it is never shown beside a price
+- `priceFrom` also emits `Product` + `AggregateOffer` JSON-LD (see the SEO invariants in CLAUDE.md); change `updatedAt`
 
 ## Bulk Description Update
 

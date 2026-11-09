@@ -1,7 +1,5 @@
 import type { Locale } from "@/i18n/config";
-import { getDict } from "@/i18n";
 import { AR_CATEGORY_LABELS, AR_SERVICE_LABELS } from "@/i18n/labels";
-import { WHATSAPP_URL } from "@/lib/seo";
 import { categories, type Category } from "./categories";
 import { guides, type Guide } from "./guides";
 import { products, type Product } from "./products";
@@ -37,10 +35,6 @@ const arProductList: Product[] = products.map((p) => {
     ...p,
     ...t,
     analyticsName: p.name,
-    price: getDict("ar").price.contact,
-    // The pages build their WhatsApp links from quoteMessage; this keeps the record's
-    // field in step with them for anything else that reads it.
-    whatsappLink: `${WHATSAPP_URL}?text=${encodeURIComponent(getDict("ar").common.quoteMessage(t.name))}`,
   };
 });
 

@@ -1,7 +1,6 @@
-"use client";
-
 /**
- * Hero media for a product detail page.
+ * Hero media for a product detail page. A server component: nothing here needs the
+ * browser, so its props stay out of the page's hydration data.
  *
  * The image is never hidden while it loads: it is the page's LCP element, and hiding it
  * until React runs would tie LCP to hydration. A photo or video that fails becomes a

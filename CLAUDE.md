@@ -117,7 +117,7 @@ Use logical Tailwind classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-` over
 
 - All pages wrap content in `<Navbar />` + `<main className="flex-grow">` + `<Footer locale={locale} />`
 - Every `page.tsx` stays a **server component** exporting `metadata` or `generateMetadata`;
-  push interactivity into `"use client"` leaf components (see `ProductCard`, `ProductMedia`)
+  push interactivity into `"use client"` leaf components (see `ProductCard`)
 - A client component's props are serialised into the page's hydration data. Pass the few
   fields it shows, never a whole product, service or category record (`ProductsGrid` is a
   server component for this reason). Client components must not import `@/data/*`,

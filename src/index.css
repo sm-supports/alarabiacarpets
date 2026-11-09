@@ -756,6 +756,8 @@
   .sc-frame { @apply relative aspect-[4/3] sm:aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-elevated sm:shadow-float; }
   .rel-card { @apply block bg-white rounded-xl overflow-hidden border border-neutral-200 transition-all duration-300 hover:shadow-md; }
   .sc-title { @apply text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-forest-900 mb-3 sm:mb-4 leading-tight; }
+  /* Home's "More to Explore": an h3 that heads its grid like a section h2, and is sized as one. */
+  .sc-more { @apply text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-3 sm:mb-4; }
   .cat-title { @apply font-playfair text-sm sm:text-base font-semibold text-neutral-900 group-hover:text-primary transition-colors; }
   .faq-q { @apply font-poppins font-medium text-neutral-900 cursor-pointer list-none flex justify-between items-center gap-4; }
   .why-title { @apply text-base sm:text-lg lg:text-xl font-display font-semibold text-forest-900 mb-2 sm:mb-3; }
@@ -826,7 +828,10 @@
   .cta { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-forest-900 px-4 py-3 md:px-6 text-center text-sm font-semibold text-white transition-colors duration-200 hover:bg-forest-700 active:scale-[0.98]; }
   .cta-dark { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-gold-500 px-4 py-3 md:px-6 text-center text-sm font-semibold text-forest-900 transition-colors duration-200 hover:bg-gold-400 active:scale-[0.98]; }
   .cta-2 { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-forest-900/30 bg-white px-4 py-3 md:px-6 text-center text-sm font-semibold text-forest-900 transition-colors duration-200 hover:bg-neutral-50 active:scale-[0.98]; }
-  .cta:focus-visible, .cta-dark:focus-visible, .cta-2:focus-visible { @apply outline outline-2 outline-offset-2 outline-gold-500; }
+  /* The focus ring takes the colour that holds 3:1 on the surface the button sits on:
+     forest on light (gold there is 2.3:1), gold on the forest bands. */
+  .cta:focus-visible, .cta-2:focus-visible { @apply outline outline-2 outline-offset-2 outline-forest-900; }
+  .cta-dark:focus-visible { @apply outline outline-2 outline-offset-2 outline-gold-500; }
   .cta svg, .cta-dark svg, .cta-2 svg { @apply h-4 w-4 flex-shrink-0; }
   /* The long Arabic quote label needs 287px: on a 320px phone it may take two even lines. */
   .cta, .cta-dark, .cta-2 { text-wrap: balance; }
@@ -892,8 +897,8 @@
    image's own box (the script sets its position and size), with the alt text and "Image
    unavailable". The image stays in the page for its alt text, transparent. A video keeps
    its poster and gets the words as a band across its top, above the controls. No
-   z-index, so a card's own overlays (shade, label, play badge) still come above it. A
-   small tile clamps the name to two lines. */
+   z-index, so a card's own overlays (shade, label, count badge) still come above it. A
+   small tile clamps the name to two lines, a smaller one to one. */
 @layer components {
   .imgx { @apply pointer-events-none absolute flex flex-col items-center justify-center gap-1 overflow-hidden bg-neutral-100 p-3 text-center font-poppins leading-snug text-neutral-600; container-type: size; }
   .imgx-n { @apply line-clamp-3 text-sm font-medium text-neutral-700; }
@@ -905,6 +910,17 @@
   @container (max-height: 7.5rem) {
     .imgx-n { -webkit-line-clamp: 2; }
   }
+  /* Under the 59px a two-line name and the note take. */
+  @container (max-height: 3.6875rem) {
+    .imgx-n { -webkit-line-clamp: 1; }
+  }
+  /* The two overlays that would cover the words. A category card's price chip holds the
+     bottom, two lines on a narrow phone, so the words centre in the space above it, with
+     side padding that keeps the note on one line in a 136px tile. A video card's play
+     badge sat on the poster, which is gone: the card still plays on a tap, and its count
+     badge still shows the video icon. */
+  .cat-media .imgx { padding: 0.5rem 0.5rem 3.25rem; }
+  .pc-play:has(> img[data-imgx]) .pc-play-badge { display: none; }
 }
 
 /* S17: a service with no price says what the free quote takes, above the band's button. */
@@ -1047,16 +1063,24 @@
 }
 
 /* Type on phones (below md only): h1 30px (every interior h1 already is; Home's hero is
-   its own), h2 24, h3 18, body text 15px at 1.7, Arabic 1.9. Section headings only: the
-   titles of grid tiles keep their own sizes. The :not() raises these above the single
-   utility classes on the headings, and leaves desktop to them. */
+   its own), h2 24, h3 18, body text 15px at 1.7 (14px paragraphs too), Arabic 1.9.
+   Section headings only: the titles of grid tiles keep their own sizes. The :not()
+   raises these above the single utility classes on the headings, and leaves desktop to
+   them. */
 @media not all and (min-width: 768px) {
   body { font-size: 15px; line-height: 1.7; }
   [dir="rtl"] body { line-height: 1.9; }
   main p:not(.x) { line-height: 1.7; }
   [dir="rtl"] main p:not(.x) { line-height: 1.9; }
-  main h2:not(.sr-only, .idx-title, .idx-h2, .sp-title) { font-size: 1.5rem; line-height: 2rem; }
-  main h3:not(.pc-title, .rel-title, .cat-title, .sp-title) { font-size: 1.125rem; line-height: 1.75rem; }
+  main h2:not(.sr-only, .idx-title, .idx-h2, .sp-title), main h3.sc-more { font-size: 1.5rem; line-height: 2rem; }
+  main h3:not(.pc-title, .rel-title, .cat-title, .sp-title, .sc-more) { font-size: 1.125rem; line-height: 1.75rem; }
   /* One FAQ heading: every "Frequently Asked Questions" h2 (and Home's) the same. */
   .faq-h { font-weight: 700; color: #171717; margin-bottom: 1.5rem; }
+  /* Paragraphs set in 14px (summaries, excerpts, FAQ answers, the S17 line) are body
+     text too. One whose sm: size is already larger keeps it from sm (rule below); a
+     truncated value in a contact row keeps 14px. Captions are text-xs and stay so. */
+  main p.text-sm:not([class*="sm:text-"], .truncate), main p:is(.idx-text, .faq-a, .hero-p, .no-price) { font-size: 0.9375rem; }
+}
+@media not all and (min-width: 640px) {
+  main p.text-sm:not(.truncate), main p.sc-text { font-size: 0.9375rem; }
 }

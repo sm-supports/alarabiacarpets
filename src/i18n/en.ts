@@ -8,7 +8,6 @@ import { enClient } from "./en.client";
 export const en = {
   ...enClient,
   price: {
-    contact: "Contact for Price",
     from: (amount: string, unit?: string) => `From QAR ${amount}${unit ? ` ${unit}` : ""}`,
     units: {
       "per sqm": "per sqm",

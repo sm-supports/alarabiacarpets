@@ -187,11 +187,15 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
                         />
                       )}
                     </div>
+                    {/* The same tile as /products on a phone: name, price line, description. */}
                     <div className="p-3 sm:p-4">
                       <h3 className="rel-title">
                         {p.name}
                       </h3>
-                      <p className="font-poppins text-xs text-neutral-500 mt-1 line-clamp-2">
+                      <p className="pc-price">
+                        {p.priceFrom ? formatFromPrice(p.priceFrom, p.priceUnit, locale) : t.price.freeQuote}
+                      </p>
+                      <p className="rel-text">
                         {p.description}
                       </p>
                     </div>

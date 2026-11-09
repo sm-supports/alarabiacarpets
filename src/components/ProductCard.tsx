@@ -16,8 +16,17 @@ interface ProductCardProps {
   /** English name, so the analytics source is the same in both languages. */
   analyticsName?: string;
   description: string;
-  /** Card-sized image shown for a video slide until it is played. */
-  poster: string;
+  /**
+   * The phone tile's price line (below sm): the starting price, or the short free quote
+   * line for an item without one. Worded on the server, so no dictionary comes with it.
+   */
+  price?: string;
+  /**
+   * Card-sized image shown for a video slide until it is played. Defaults to the first
+   * image slide, so ProductsGrid leaves it out when it is that one: each prop is in the
+   * page's hydration data once per card.
+   */
+  poster?: string;
   /** Slides. Image `src` values are already the card-sized copies (see ProductsGrid). */
   media?: ProductMedia[];
   onClick?: () => void;
@@ -31,6 +40,7 @@ const ProductCard = memo(function ProductCard({
   name,
   analyticsName,
   description,
+  price,
   poster,
   media = [],
   onClick,
@@ -47,8 +57,9 @@ const ProductCard = memo(function ProductCard({
   const [loadedUpTo, setLoadedUpTo] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const cover = poster ?? media.find((item) => item.type === "image")?.src ?? "";
   // If no media array is provided, show the poster on its own
-  const displayMedia = media.length > 0 ? media : [{ type: 'image', src: poster } as ProductMedia];
+  const displayMedia = media.length > 0 ? media : [{ type: 'image', src: cover } as ProductMedia];
 
   const handleCardClick = useCallback(() => {
     if (href) {
@@ -150,9 +161,9 @@ const ProductCard = memo(function ProductCard({
           </>
         )}
 
-        {/* Media Count Badge */}
+        {/* Media Count Badge. Not on a phone tile, which shows one photo and doesn't swipe. */}
         {hydrated && displayMedia.length > 1 && (
-          <div className="absolute top-3 right-3 z-10 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium">
+          <div className="max-sm:hidden absolute top-3 right-3 z-10 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium">
             {displayMedia[activeIndex]?.type === 'video' ? <Video size={11} /> : <ImageIcon size={11} />}
             <span>{activeIndex + 1}/{displayMedia.length}</span>
           </div>
@@ -173,7 +184,7 @@ const ProductCard = memo(function ProductCard({
                 // If the video fails, the poster stays under ImageFallback's band.
                 <video
                   src={item.src}
-                  poster={poster}
+                  poster={cover}
                   aria-label={imageAlt ?? name}
                   className="w-full h-full object-cover"
                   controls
@@ -191,7 +202,7 @@ const ProductCard = memo(function ProductCard({
                   onClick={(e) => { e.stopPropagation(); setPlayingSrc(item.src); }}
                 >
                   <img
-                    src={poster}
+                    src={cover}
                     alt={imageAlt ?? name}
                     loading="lazy"
                     decoding="async"
@@ -218,7 +229,9 @@ const ProductCard = memo(function ProductCard({
         </div>
       </div>
 
-      {/* Content Section */}
+      {/* Content Section. Below sm the card is a two-column tile (index.css): the title
+          link covers the whole card, the price line shows, and the button gives way to
+          the action bar. */}
       <div className="pc-body">
         <h3 className="pc-title">
           {href ? (
@@ -232,6 +245,7 @@ const ProductCard = memo(function ProductCard({
             </span>
           )}
         </h3>
+        {price && <p className="pc-price">{price}</p>}
         <p className="pc-text">
           {description}
         </p>

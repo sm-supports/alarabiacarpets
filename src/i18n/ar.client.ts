@@ -30,6 +30,7 @@ export const arClient: ClientDict = {
   nav: {
     about: "من نحن",
     contact: "تواصل معنا",
+    getQuote: "اطلب عرض سعر",
     getFreeQuote: "اطلب عرض سعر مجاني",
     freeDelivery: "توصيل وتركيب مجاني في قطر",
     toggleMenu: "فتح القائمة",

@@ -13,14 +13,6 @@ export interface ProductFaq {
   a: string;
 }
 
-/**
- * What the free quote on a job with no priceFrom asks of the visitor, picking the page's
- * price line (S17, `price.noPrice` in src/i18n/en.ts). Unset is "measure", a free
- * measurement and quote; "quote" is quoted from sizes and photos (floor mats, ceramic
- * tiles); "check" is quoted from photos of the piece (upholstery and repair).
- */
-export type QuoteKind = "measure" | "quote" | "check";
-
 export interface Product {
   id: string;
   name: string;
@@ -55,8 +47,6 @@ export interface Product {
   priceTo?: number;
   /** e.g. "per sqm", "per piece" -- display only. */
   priceUnit?: string;
-  /** The price line without priceFrom (see QuoteKind). Never shown with a price. */
-  quoteKind?: QuoteKind;
 
   /** Set on translated records: the English name, so analytics sources match across languages. */
   analyticsName?: string;

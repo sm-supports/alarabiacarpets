@@ -12,9 +12,10 @@
  *   - The offline page is built here, by path: Arabic for /ar and /ar/..., English for
  *     the rest. Not an /offline.html file: Pages would 308 it to /offline, and Qatar's
  *     redirect rule would send that to /ar/offline, a 404.
- *   - Self-contained: no imports, inline styles. The phone number and the opening hours
- *     are copies of src/lib/site.ts and formStates.open in src/i18n/*.client.ts, and
- *     scripts/check-consistency.mjs fails the build when they drift.
+ *   - Self-contained: no imports, inline styles. The phone number, the opening hours and
+ *     the saved-message line are copies of src/lib/site.ts, and of formStates.open and
+ *     statePanel.draftSaved in src/i18n/*.client.ts, and scripts/check-consistency.mjs
+ *     fails the build when they drift.
  *   - The draft check reads the contact form's sessionStorage entry the way
  *     src/lib/draft.ts writes it (key "contact-draft", { v: 1, draft: { name, email,
  *     message } }). Change both together.
@@ -39,7 +40,7 @@ const COPY = {
     badge: "OFFLINE",
     headline: "No connection.",
     body: "Turn on Wi-Fi or mobile data. This page reloads when you're back.",
-    kept: "Your text is still here.",
+    saved: "Your message is saved.",
     calls: "Calls don't need internet.",
     open: "We're open every day, 8:00 AM to 10:00 PM.",
     tryAgain: "Try again",
@@ -52,7 +53,7 @@ const COPY = {
     badge: "بدون إنترنت",
     headline: "ما فيه اتصال حاليًا.",
     body: "شغّل الواي فاي أو البيانات، والصفحة ترجع أول ما يرجع الاتصال.",
-    kept: "اللي كتبته باقي هنا.",
+    saved: "رسالتك محفوظة.",
     calls: "المكالمات ما تحتاج إنترنت.",
     open: "نفتح يوميًا من 8:00 صباحًا إلى 10:00 مساءً.",
     tryAgain: "حاول مرة ثانية",
@@ -85,18 +86,19 @@ h1{margin:0;color:#0A2A1F;font-size:18px;line-height:1.4;font-weight:600}
 @media (hover:hover){.c:hover{background:#1E4B3D}.c2:hover{background:#F5F5F5}}
 `;
 
-// Inline in the page: shows {kept} when this tab holds a draft with text in it, and
-// reloads when the connection is back. A weak signal, a captive portal or a DNS failure
-// can fail the page while the phone still counts as online, and then no "online" event
-// comes, so while the page is shown it also asks for itself now and then (15 s, doubling
-// to a minute) and reloads once the site answers.
+// Inline in the page: says the message is saved (statePanel.draftSaved, S15's sentence,
+// which reads right on a page with no form too) when this tab holds a draft with text in
+// it, and reloads when the connection is back. A weak signal, a captive portal or a DNS
+// failure can fail the page while the phone still counts as online, and then no "online"
+// event comes, so while the page is shown it also asks for itself now and then (15 s,
+// doubling to a minute) and reloads once the site answers.
 const SCRIPT = `(function () {
   try {
     var stored = JSON.parse(sessionStorage.getItem("contact-draft"));
     var draft = stored && stored.v === 1 && stored.draft;
     if (draft && typeof draft.name === "string" && typeof draft.email === "string" && typeof draft.message === "string" &&
         (draft.name + draft.email + draft.message).trim() !== "") {
-      document.getElementById("kept").hidden = false;
+      document.getElementById("saved").hidden = false;
     }
   } catch (e) {}
   document.getElementById("retry").addEventListener("click", function () { location.reload(); });
@@ -148,7 +150,7 @@ ${address}<style>${CSS}</style>
 <p class="bd">${t.badge}</p>
 <h1>${t.headline}</h1>
 <div class="fx">
-<p id="kept" hidden>${t.kept}</p>
+<p id="saved" hidden>${t.saved}</p>
 <p>${t.body}</p>
 <p>${t.calls} ${t.open}</p>
 </div>

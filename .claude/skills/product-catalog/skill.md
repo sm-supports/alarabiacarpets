@@ -17,7 +17,7 @@ interface Product {
   description: string;
   imageSrc: string;
   media: ProductMedia[];
-  // optional: priceFrom, priceTo, priceUnit, quoteKind, longDescription, specs, faqs, ...
+  // optional: priceFrom, priceTo, priceUnit, longDescription, specs, faqs, ...
 }
 ```
 
@@ -49,9 +49,8 @@ Defined in `src/components/ProductsGrid.tsx` (the `CATEGORIES` object) and mirro
 
 ## Bulk Price Update
 
-A product without `priceFrom` shows the free-quote line picked by its `quoteKind`. To add a real price:
+A product without `priceFrom` shows the free-quote line (`price.noPrice` in `src/i18n`: "Free measurement and quote", one line for every job). To add a real price:
 - Set `priceFrom` (a number, QAR) and `priceUnit` (e.g. `"per sqm"`), only from a price the owner confirmed
-- Remove that product's `quoteKind`: it is never shown beside a price
 - `priceFrom` also emits `Product` + `AggregateOffer` JSON-LD (see the SEO invariants in CLAUDE.md); change `updatedAt`
 
 ## Bulk Description Update

@@ -83,14 +83,15 @@ export default function HomeView({ locale }: { locale: Locale }) {
             kind of passage; the sections above are mostly images and short labels. */}
         <section className="py-10 md:py-16 bg-gray-50/50">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl font-poppins text-neutral-700 leading-relaxed text-[15px]">
-            {/* On phones the passage folds, its heading the toggle (FoldHead, .fold in
-                index.css): the intro, the ranges with their prices and the showroom
-                paragraphs. The keyword chips below stay open. From md it is all open. */}
+            {/* On phones the intro stays open and the rest folds, its heading the toggle
+                (FoldHead, .fold-lead in index.css): the ranges with their prices and the
+                showroom paragraphs (the owner, 2026-11-09). The keyword chips below stay
+                open. From md it is all open. */}
             <FoldHead id="hm-about" as="h2" className="h2-sec6">
               {t.home.aboutTitle}
             </FoldHead>
+            <p className="fold-lead mb-4">{t.home.aboutIntro}</p>
             <div className="fold-body">
-              <p className="mb-4">{t.home.aboutIntro}</p>
               <ul className="space-y-3">
                 {aboutItems.map((item) => (
                   <li key={item.slug}>

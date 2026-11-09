@@ -109,16 +109,13 @@ const CONTACT_PAGE_REMOVED = {
 };
 const isContactPageRemoval = (text, url) => CONTACT_PAGE_REMOVED[url]?.has(text) ?? false;
 // The product price line without a price (WP8, S17): "Contact for Price" gives way to
-// what the free quote takes, on product pages only. Each S17 line is reported as a
-// planned addition; services gain it as a line of their own.
+// what the free quote takes, on product pages only. The S17 line is reported as a planned
+// addition; services gain it as a line of their own. One line for every job (the owner,
+// 2026-11-09: the team measures for floor mats, ceramic tiles and upholstery too).
 const PLANNED_PRICE_LINES = new Set(["Contact for Price", "تواصل معنا للسعر"]);
 const FREE_QUOTE_LINES = new Set([
   "Free measurement and quote. Send your sizes and a few photos.",
-  "Free quote. Send your sizes and a few photos.",
-  "Free check and quote. Send a few photos of the piece.",
   "القياس وعرض السعر مجانًا. أرسل المقاسات وبعض الصور.",
-  "عرض السعر مجاني. أرسل المقاسات وبعض الصور.",
-  "الفحص وعرض السعر مجانًا. أرسل بعض الصور للقطعة.",
 ]);
 const isProduct = (url) => /^(\/ar)?\/products\/[^/]+$/.test(url);
 const isGuide = (url) => /^(\/ar)?\/guides\//.test(url);

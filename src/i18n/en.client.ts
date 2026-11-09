@@ -18,9 +18,10 @@ export const enClient = {
     allProducts: "All Products",
     /**
      * The CTA vocabulary (the plan's Component specs, held by scripts/check-consistency.mjs):
-     * heroQuote in heroes and closing sections, nav.getFreeQuote on the bar, menu, header,
-     * footer and product cards, statePanel.call wherever a button calls. askOnWhatsApp is
-     * the one exception, on guides only, because what a guide offers is advice.
+     * heroQuote in heroes and closing sections, nav.getFreeQuote on the bar, menu, footer
+     * and product cards, statePanel.call wherever a button calls. Two exceptions:
+     * askOnWhatsApp on guides only, because what a guide offers is advice, and nav.getQuote
+     * on the desktop header button only (the owner's decision of 2026-11-09).
      */
     askOnWhatsApp: "Ask us on WhatsApp",
     breadcrumb: "Breadcrumb",
@@ -41,6 +42,9 @@ export const enClient = {
   nav: {
     about: "About",
     contact: "Contact",
+    /** The desktop header button only, md and up: the owner kept the old label on 2026-11-09
+     *  so the desktop nav doesn't move. Phones, the menu and the footer use getFreeQuote. */
+    getQuote: "Get Quote",
     getFreeQuote: "Get a Free Quote",
     freeDelivery: "Free delivery & installation in Qatar",
     toggleMenu: "Toggle menu",

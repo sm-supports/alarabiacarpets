@@ -35,9 +35,7 @@ Use `template.json` in this folder as a starting point. Fill in:
 - `media` — array of `{ type: "image" | "video", src: "/Products/<Folder>/<filename>" }`
 - `imageSrc` — path to the primary display image (first image in media array)
 - `priceFrom` / `priceUnit` (optional) — only a starting price the owner confirmed, e.g. `450` and `"per sqm"`. It drives the page's price line and the `AggregateOffer` in the JSON-LD
-- `quoteKind` (optional, only without `priceFrom`) — what the free quote takes: unset is a free measurement, `"quote"` sizes and photos, `"check"` photos of the piece (see `QuoteKind` in `src/data/products.ts`)
-
-The record holds no price string and no WhatsApp link: without `priceFrom` the page shows the free-quote line, and every WhatsApp link is built from `quoteMessage(name)` in `src/i18n`.
+The record holds no price string and no WhatsApp link: without `priceFrom` the page shows the one free-quote line (`price.noPrice` in `src/i18n`, "Free measurement and quote", since the team measures on every job), and every WhatsApp link is built from `quoteMessage(name)` in `src/i18n`.
 
 ## Step 4: Add to Products Array
 
@@ -52,7 +50,7 @@ interface Product {
   description: string;
   imageSrc: string;
   media: ProductMedia[];
-  // optional: priceFrom, priceTo, priceUnit, quoteKind, longDescription, specs, faqs, ...
+  // optional: priceFrom, priceTo, priceUnit, longDescription, specs, faqs, ...
 }
 ```
 

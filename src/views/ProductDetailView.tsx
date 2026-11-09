@@ -152,7 +152,7 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
                     </h1>
                     {/* Without a price, what the free quote takes (S17), never a dead end. */}
                     <p className="font-poppins font-medium text-lg text-primary">
-                      {fromPrice ?? t.price.noPrice[product.quoteKind ?? "measure"]}
+                      {fromPrice ?? t.price.noPrice}
                     </p>
                   </div>
 

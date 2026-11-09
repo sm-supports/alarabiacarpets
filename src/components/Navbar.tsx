@@ -193,12 +193,13 @@ const Navbar = memo(function Navbar() {
               ))}
             </div>
 
-            {/* Desktop CTA */}
+            {/* Desktop CTA. Its label is nav.getQuote, the owner's decision of 2026-11-09:
+                the desktop row keeps the links where they were (.nav-cta in index.css). */}
             <div className="hidden md:flex items-center gap-3">
               <LanguageSwitcher className="nav-switch" />
               <WhatsAppLink source="navbar_desktop" className="cta cta-s nav-cta">
                 <WhatsAppIcon />
-                {t.nav.getFreeQuote}
+                {t.nav.getQuote}
               </WhatsAppLink>
             </div>
 

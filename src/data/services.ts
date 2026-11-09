@@ -18,8 +18,6 @@
  * asserting work we cannot show.
  */
 
-import type { QuoteKind } from "./products";
-
 export interface ServiceStep {
   title: string;
   body: string;
@@ -87,8 +85,6 @@ export interface Service {
    *  price the owner has confirmed; most jobs are quoted after measuring and have none. */
   priceFrom?: number;
   priceUnit?: string;
-  /** The price line without priceFrom (S17), as for products: see QuoteKind. */
-  quoteKind?: QuoteKind;
   /** ISO date of the last real content edit; the sitemap's lastmod. */
   updatedAt?: string;
 }
@@ -757,7 +753,6 @@ updatedAt: "2026-11-07",
     heading: "Sofa Upholstery & Repair in Qatar",
     label: "Sofa Upholstery",
     updatedAt: "2026-11-07",
-    quoteKind: "check",
     seoTitle: "Sofa Upholstery in Qatar | Reupholstery & Repair",
     metaDescription:
       "Sofa upholstery and repair in Qatar. New fabric, new foam and frame repairs for sofas and majlis seating, checked and quoted free by our team in Doha.",
@@ -945,7 +940,6 @@ updatedAt: "2026-11-07",
     slug: "floor-mats",
     heading: "Floor and Entrance Mats in Qatar",
     label: "Floor & Entrance Mats",
-    quoteKind: "quote",
     seoTitle: "Floor & Entrance Mats in Qatar | Doha Supplier",
     metaDescription:
       "Floor and entrance mats in Qatar for homes, offices, gyms and shops. Non-slip, easy-clean options supplied by Al Arabia Carpets in Doha.",
@@ -1038,7 +1032,6 @@ updatedAt: "2026-11-07",
     slug: "ceramic-tiles",
     heading: "Ceramic and Mosaic Tiles in Qatar",
     label: "Ceramic & Mosaic Tiles",
-    quoteKind: "quote",
     seoTitle: "Ceramic & Mosaic Tiles in Qatar | Doha Supplier",
     metaDescription:
       "Ceramic and mosaic tiles in Qatar for floors, walls, bathrooms and kitchens. Compare options at Al Arabia Carpets on Al Mansoura St, Doha.",

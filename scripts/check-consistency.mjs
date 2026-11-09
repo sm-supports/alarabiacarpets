@@ -8,23 +8,30 @@
  *    icon. Its label must then be one of the vocabulary's, read from the dictionaries in
  *    the page's language: common.heroQuote, nav.getFreeQuote, statePanel.call (alone or
  *    before the phone number). common.askOnWhatsApp is allowed on guides only, the plan's
- *    one exception. Contact details are not CTAs: the WhatsApp, email and map rows
- *    (ct-method, ft-contact), the social icons (ft-social) and the 404's number (nf-tel).
+ *    one exception. nav.getQuote is the owner's (2026-11-09): the desktop header button
+ *    (.nav-cta) keeps that old label so the desktop nav doesn't move, and must say exactly
+ *    that; anywhere else the label stays retired. Contact details are not CTAs: the
+ *    WhatsApp, email and map rows (ct-method, ft-contact), the social icons (ft-social)
+ *    and the 404's number (nf-tel).
  *    Labels the plan retired (RETIRED) fail anywhere: as an element's text in out/, or as
  *    a string anywhere in src/, which also covers what only renders after hydration.
  *    WhatsApp CTAs carry WhatsAppIcon and no cart, phone or chat icon; a .cta button with
  *    a WhatsApp label must carry it; a tel: link must not.
  * 2. Breadcrumbs. Every page but Home shows one trail (components/Breadcrumb.tsx) and has
  *    one BreadcrumbList, and the two agree step for step: names, links and the page.
- * 3. Phone and hours. global-error.tsx, global-not-found.tsx (and the built 404.html) and
- *    public/sw.js are self-contained, so a change to src/lib/site.ts or to the opening
- *    hours doesn't reach them by itself. Any phone number in them must be PHONE /
- *    PHONE_E164 from site.ts, and any time of day must sit inside the formStates.open
- *    sentence of en.client.ts or ar.client.ts, word for word.
+ * 3. Phone, hours and the saved-message line. global-error.tsx, global-not-found.tsx (and
+ *    the built 404.html) and public/sw.js are self-contained, so a change to
+ *    src/lib/site.ts or to the dictionaries doesn't reach them by itself. Any phone number
+ *    in them must be PHONE / PHONE_E164 from site.ts, any time of day must sit inside the
+ *    formStates.open sentence of en.client.ts or ar.client.ts, word for word, and a
+ *    `saved:` line must be statePanel.draftSaved. The /contact page's hours line
+ *    (pages.contact.hoursLine in en.ts and ar.ts) must give the days and hours of its
+ *    language's formStates.open word for word.
  * 4. The service worker. public/sw.js (and out/sw.js after a build) must exist: a 404 on
  *    /sw.js keeps an installed worker running (its header). Only the name is checked, so
  *    the kill switch (scripts/sw-kill.js copied over it) passes. When it reads the contact
- *    draft, its key and version must be src/lib/draft.ts's DRAFT_KEY and VERSION.
+ *    draft, its key and version must be src/lib/draft.ts's DRAFT_KEY and VERSION, and its
+ *    offline page must say statePanel.draftSaved in both languages.
  */
 import fs from "node:fs";
 
@@ -54,6 +61,8 @@ const words = (lang) => ({
   call: pick(DICT[lang], "statePanel", "call"),
   ask: pick(DICT[lang], "common", "askOnWhatsApp"),
   open: pick(DICT[lang], "formStates", "open"),
+  getQuote: pick(DICT[lang], "nav", "getQuote"),
+  draftSaved: pick(DICT[lang], "statePanel", "draftSaved"),
 });
 const VOCAB = { en: words("en"), ar: words("ar") };
 
@@ -63,7 +72,8 @@ const PHONE_E164 = /export const PHONE_E164 = "([^"]+)"/.exec(site)?.[1];
 if (!PHONE || !PHONE_E164) throw new Error("check-consistency: PHONE or PHONE_E164 not found in src/lib/site.ts");
 const DIGITS = PHONE_E164.replace(/\D/g, "");
 
-// The plan replaced these. Exact labels, both languages.
+// The plan replaced these. Exact labels, both languages. "Get Quote" / "اطلب عرض سعر" is
+// nav.getQuote, still allowed on the desktop header button alone (HEADER_BUTTON below).
 const RETIRED = [
   "Get Quote",
   "Contact Us on WhatsApp",
@@ -97,9 +107,14 @@ const CTA_WORDS = /\b(whatsapp|quote|call|chat|inquire|enquire)\b|واتساب|�
 const CONTACT_DETAIL = /\b(ct-method|ft-contact|ft-social|nf-tel)\b/;
 const CTA_CLASS = /\b(cta|cta-dark|cta-2|ab-wa|ab-call|nf-btn|nf-fill)\b/;
 const isGuide = (url) => /^(\/ar)?\/guides\//.test(url);
+// The desktop header's quote button (Navbar.tsx). The owner decided on 2026-11-09 that it
+// keeps its old label, nav.getQuote, on desktop only, so the header's links stay where they
+// were; the phone bar, the menu and the footer say nav.getFreeQuote.
+const HEADER_BUTTON = /\bnav-cta\b/;
+const pageLang = (url) => (url === "/ar" || url.startsWith("/ar/") ? "ar" : "en");
 
 function allowedLabels(url) {
-  const langs = url === "404" ? ["en", "ar"] : [url === "/ar" || url.startsWith("/ar/") ? "ar" : "en"];
+  const langs = url === "404" ? ["en", "ar"] : [pageLang(url)];
   const labels = new Set();
   const wa = new Set();
   for (const lang of langs) {
@@ -133,6 +148,13 @@ for (const { url, file } of pages) {
     const icons = new Set([...inner.matchAll(/icons\.svg#([\w-]+)"/g)].map((m) => m[1]));
     const where = `${url} <${tag}${cls ? ` class="${cls}"` : ""}> "${label}"`;
 
+    if (HEADER_BUTTON.test(cls)) {
+      ctaCount += 1;
+      const own = url === "404" ? null : VOCAB[pageLang(url)].getQuote;
+      if (label !== own) fail(where, `the desktop header button must say nav.getQuote ("${own}"), the owner's decision of 2026-11-09`);
+      if (!icons.has("whatsapp")) fail(where, "WhatsApp CTA without WhatsAppIcon");
+      continue;
+    }
     if (RETIRED.includes(label)) fail(where, "retired CTA label");
     if (CONTACT_DETAIL.test(cls)) continue;
     const tel = href.startsWith("tel:");
@@ -186,8 +208,11 @@ function walk(dir) {
     return entry.isDirectory() ? walk(full) : /\.(tsx?|mjs|js)$/.test(entry.name) ? [full] : [];
   });
 }
+// nav.getQuote's own entries in the client dictionaries hold the header button's label.
+const getQuoteEntry = /^\s*getQuote: "[^"]*",$/m;
 for (const file of walk("src")) {
-  const source = read(file);
+  let source = read(file);
+  if (file === DICT.en || file === DICT.ar) source = source.replace(getQuoteEntry, "");
   for (const label of RETIRED) {
     const quoted = [`"${label}"`, `'${label}'`, `\`${label}\``, `>${label}<`];
     if (quoted.some((q) => source.includes(q))) fail(file, `retired CTA label "${label}"`);
@@ -234,6 +259,25 @@ for (const file of SELF_CONTAINED) {
   for (const [time] of rest.matchAll(/\b\d{1,2}[:٫]\d{2}\b/g)) {
     fail(file, `time "${time}" outside the formStates.open sentence ("${VOCAB.en.open}" / "${VOCAB.ar.open}")`);
   }
+  // The sentence that says a draft is kept (S15's "Your message is saved."), where a file
+  // has its own copy: sw.js's offline page and global-error.tsx.
+  for (const [, saved] of text.matchAll(/\bsaved: "([^"]*)"/g)) {
+    if (saved !== VOCAB.en.draftSaved && saved !== VOCAB.ar.draftSaved) {
+      fail(file, `saved line "${saved}" is not statePanel.draftSaved ("${VOCAB.en.draftSaved}" / "${VOCAB.ar.draftSaved}")`);
+    }
+  }
+}
+
+// /contact's hours line is server text (en.ts, ar.ts) in its own words; its days and hours,
+// from the two words before the first time to the word after the last, must be
+// formStates.open's.
+const hoursSpan = (text) => /(?:\S+\s+){2}\d{1,2}:\d{2}.*\d{1,2}:\d{2}\s+\S+/u.exec(text)?.[0].replace(/[.,،]$/, "") ?? null;
+for (const [lang, file] of [["en", "src/i18n/en.ts"], ["ar", "src/i18n/ar.ts"]]) {
+  const line = pick(file, "contact", "hoursLine");
+  const want = hoursSpan(VOCAB[lang].open);
+  const have = hoursSpan(line);
+  if (!want) throw new Error(`check-consistency: no hours in formStates.open (${DICT[lang]})`);
+  if (have !== want) fail(file, `pages.contact.hoursLine gives "${have}", formStates.open says "${want}" ("${VOCAB[lang].open}")`);
 }
 
 // ---------------------------------------------------------------- service worker
@@ -256,6 +300,13 @@ if (fs.existsSync(SW)) {
     }
     if (!versions.length || versions.some((v) => v !== draftVersion)) {
       fail(SW, `expects draft version ${JSON.stringify(versions)}, src/lib/draft.ts writes ${draftVersion}`);
+    }
+    // What the offline page says when a draft is there: statePanel.draftSaved, in both
+    // languages (each copy is held to the dictionary above).
+    for (const lang of ["en", "ar"]) {
+      if (!worker.includes(`saved: "${VOCAB[lang].draftSaved}"`)) {
+        fail(SW, `reads the draft but has no saved: "${VOCAB[lang].draftSaved}" (statePanel.draftSaved, ${lang})`);
+      }
     }
   }
 }

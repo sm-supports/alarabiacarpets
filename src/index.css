@@ -850,9 +850,7 @@
   .ct-skel-page .ct-skel-area { @apply h-[90px]; }
   .ct-folds { @apply border-t border-white/10; }
   .ct-fold { @apply border-b border-white/10; }
-  .ct-fold > summary { @apply relative flex min-h-11 cursor-pointer list-none items-center py-2.5 pe-8; }
-  .ct-fold > summary::-webkit-details-marker { display: none; }
-  .ct-fold > summary:focus-visible { @apply rounded outline outline-2 outline-offset-2 outline-gold-500; }
+  /* The toggle is FoldHead's (.fold-all, after the .fold rules); these only colour it. */
   .ct-fold-h { @apply font-playfair text-base sm:text-lg font-semibold text-white; }
   .ct-fold-body { @apply space-y-3 pb-4 font-poppins text-sm leading-relaxed text-white/75; }
   .ct-fold-body h3 { @apply font-playfair text-base font-semibold text-white; }
@@ -862,17 +860,6 @@
   .ct-fold-body .faq-a { @apply text-white/70; }
   .ct-fold-body .faq-toggle { @apply text-gold-400; }
   .ct-fold-body .divide-y, .ct-fold-body .divide-y > * { @apply border-white/10; }
-}
-/* A chevron at the end of each panel's summary: down when closed, up when open. */
-.ct-fold > summary::after {
-  content: ""; content: "" / "";
-  position: absolute; top: 50%; inset-inline-end: 0.5rem; width: 0.5rem; height: 0.5rem;
-  border-right: 2px solid #C5A572; border-bottom: 2px solid #C5A572;
-  transform: translateY(-75%) rotate(45deg); transition: transform 200ms;
-}
-.ct-fold[open] > summary::after { transform: translateY(-25%) rotate(-135deg); }
-@media (prefers-reduced-motion: reduce) {
-  .ct-fold > summary::after { transition: none; }
 }
 
 @layer components {
@@ -1241,8 +1228,31 @@
 @media (min-width: 768px) {
   .fold-h > .fold { display: none; }
 }
+/* A fold that is a toggle at every width (FoldHead always, .fold-all): the /contact panels,
+   closed on desktop too so that page fits one screen. The same rules as a heading's fold
+   below md, without the media query; they come after the md rule above so they win there.
+   Without :has() the text stays open, as with .fold-h. */
+.fold-all { position: relative; }
+.fold-all > :first-child { margin: 0; min-height: 2.75rem; padding-block: 0.625rem; padding-inline-end: 2rem; }
+.fold-all > .fold { display: block; }
+.fold-all > .fold > summary {
+  display: block; position: absolute; inset: 0; min-height: 0; padding: 0;
+  cursor: pointer; border-radius: 0.25rem;
+}
+.fold-all > .fold > summary:focus-visible { outline: 2px solid #0A2A1F; outline-offset: 2px; }
+.fold-all > .fold > summary::after {
+  content: "+"; content: "+" / "";
+  @apply font-poppins font-medium text-primary text-xl leading-none;
+  position: absolute; top: 50%; inset-inline-end: 0.5rem;
+  transform: translateY(-50%); transition: transform 200ms;
+}
+.fold-all > .fold[open] > summary::after { transform: translateY(-50%) rotate(45deg); }
+.fold-all:has(> .fold:not([open])) + .fold-body { display: none; }
+/* On the forest (/contact): the sign and the focus ring in gold. */
+.ct-fold .fold-all > .fold > summary::after { color: #C5A572; }
+.ct-fold .fold-all > .fold > summary:focus-visible { outline-color: #C5A572; }
 @media (prefers-reduced-motion: reduce) {
-  .fold > summary::after { transition: none; }
+  .fold > summary::after, .fold-all > .fold > summary::after { transition: none; }
 }
 
 /* An FAQ question (FaqList) is a 44px tap below md, on every page that lists them: the

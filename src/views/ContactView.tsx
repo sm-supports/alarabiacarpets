@@ -6,6 +6,7 @@ import JsonLd from "@/components/JsonLd";
 import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import Link from "next/link";
 import FaqList from "@/components/FaqList";
+import FoldHead from "@/components/FoldHead";
 import CallLink from "@/components/CallLink";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
@@ -110,20 +111,22 @@ export default function ContactView({ locale }: { locale: Locale }) {
       <Navbar />
       <main className="flex-grow">
         <ContactSection layout="page" intro={intro}>
+          {/* Each panel's heading sits outside its toggle (FoldHead), so screen readers
+              list it as a heading; the toggle is the whole heading row at every width. */}
           <div className="ct-folds">
-            <details className="ct-fold">
-              <summary><h2 className="ct-fold-h">{page.visitTitle}</h2></summary>
-              <div className="ct-fold-body">
+            <div className="ct-fold">
+              <FoldHead id="ct-visit" as="h2" className="ct-fold-h" always>{page.visitTitle}</FoldHead>
+              <div className="fold-body ct-fold-body">
                 <p>{page.visitText}</p>
                 <h3>{page.hoursTitle}</h3>
                 <p>{page.hoursText(PHONE, EMAIL)}</p>
                 <h3>{page.areasTitle}</h3>
                 <p>{page.areasText}</p>
               </div>
-            </details>
-            <details className="ct-fold">
-              <summary><h2 className="ct-fold-h">{page.quoteTitle}</h2></summary>
-              <div className="ct-fold-body">
+            </div>
+            <div className="ct-fold">
+              <FoldHead id="ct-quote" as="h2" className="ct-fold-h" always>{page.quoteTitle}</FoldHead>
+              <div className="fold-body ct-fold-body">
                 <p>{page.quoteText}</p>
                 <ul className="list-disc ps-5 space-y-1">
                   {page.quoteItems.map((item) => (
@@ -142,13 +145,13 @@ export default function ContactView({ locale }: { locale: Locale }) {
                   ))}
                 </ul>
               </div>
-            </details>
-            <details className="ct-fold">
-              <summary><h2 className="ct-fold-h">{t.common.faqTitle}</h2></summary>
-              <div className="ct-fold-body">
+            </div>
+            <div className="ct-fold">
+              <FoldHead id="ct-faq" as="h2" className="ct-fold-h" always>{t.common.faqTitle}</FoldHead>
+              <div className="fold-body ct-fold-body">
                 <FaqList faqs={faqs} />
               </div>
-            </details>
+            </div>
           </div>
         </ContactSection>
       </main>

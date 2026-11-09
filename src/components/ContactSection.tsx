@@ -1021,8 +1021,10 @@ const ContactSection = memo(function ContactSection({ layout = "home", intro, ch
       id="contact"
       className={`relative ${page ? "py-6 sm:py-8 lg:py-10" : "py-10 sm:py-20 lg:py-28"} bg-forest-900 overflow-hidden`}
     >
-      {/* Background Elements - Smaller on mobile */}
-      <div className="absolute inset-0">
+      {/* Background Elements - Smaller on mobile. Never a scroll anchor: the lower glow is
+          pinned to the section's bottom, so when a /contact panel opened, Chrome kept the
+          glow still and scrolled the page down by the panel's height. */}
+      <div className="absolute inset-0 [overflow-anchor:none]">
         {hydrated && (
           <>
         <div className="absolute top-0 left-1/4 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-gold-500/10 rounded-full blur-3xl" />

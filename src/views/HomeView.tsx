@@ -80,23 +80,30 @@ export default function HomeView({ locale }: { locale: Locale }) {
         <ServicesSection locale={locale} />
         {/* States who we are and what things cost in plain text. AI tools quote this
             kind of passage; the sections above are mostly images and short labels. */}
-        <section className="py-14 md:py-16 bg-gray-50/50">
+        <section className="py-10 md:py-16 bg-gray-50/50">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl font-poppins text-neutral-700 leading-relaxed text-[15px]">
-            <h2 className="h2-sec6">{t.home.aboutTitle}</h2>
-            <p className="mb-4">{t.home.aboutIntro}</p>
-            <ul className="space-y-3">
-              {aboutItems.map((item) => (
-                <li key={item.slug}>
-                  <Link href={localePath(locale, `/products/${item.slug}`)} className="font-medium text-primary hover:underline">
-                    {findCategory(locale, item.slug)?.heading}
-                  </Link>
-                  {": "}
-                  {item.text}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4">{t.facts.whereText}</p>
-            <p className="mt-3">{t.facts.whereTrack}</p>
+            {/* On phones the passage folds, its heading the toggle (.fold in index.css):
+                the intro, the ranges with their prices and the showroom paragraphs. The
+                keyword chips below stay open. From md it is all open, as before. */}
+            <details className="fold">
+              <summary><h2 className="h2-sec6">{t.home.aboutTitle}</h2></summary>
+            </details>
+            <div className="fold-body">
+              <p className="mb-4">{t.home.aboutIntro}</p>
+              <ul className="space-y-3">
+                {aboutItems.map((item) => (
+                  <li key={item.slug}>
+                    <Link href={localePath(locale, `/products/${item.slug}`)} className="font-medium text-primary hover:underline">
+                      {findCategory(locale, item.slug)?.heading}
+                    </Link>
+                    {": "}
+                    {item.text}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4">{t.facts.whereText}</p>
+              <p className="mt-3">{t.facts.whereTrack}</p>
+            </div>
             <h3 className="font-playfair text-xl font-bold text-neutral-900 mt-8 mb-4">{t.home.moreWorkTitle}</h3>
             <div className="flex flex-wrap gap-3">
               {keywordLinks(locale).map((link) => (
@@ -108,7 +115,7 @@ export default function HomeView({ locale }: { locale: Locale }) {
           </div>
         </section>
         {/* Native <details>, so the answers stay in the static HTML for crawlers. */}
-        <section className="py-14 md:py-16 bg-white">
+        <section className="py-10 md:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
             <h2 className="h2-sec faq-h">
               {t.home.faqTitle}

@@ -113,7 +113,7 @@ export default function RelatedProducts({
           <div className="mt-8">
             <Link
               href={href}
-              className="font-poppins text-sm font-medium text-primary hover:underline"
+              className="rel-all"
             >
               {t.productDetail.viewAll(label)} {locale === "ar" ? <>&larr;</> : <>&rarr;</>}
             </Link>

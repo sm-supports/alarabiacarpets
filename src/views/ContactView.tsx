@@ -106,7 +106,7 @@ function ContactDetails({ locale }: { locale: Locale }) {
           </ul>
           <p className="mt-3">{page.quoteNote}</p>
           <h3 className="font-playfair text-lg font-semibold text-neutral-900 mt-6 mb-2">{page.helpTitle}</h3>
-          <ul className="flex flex-wrap gap-x-4 gap-y-2">
+          <ul className="cat-links">
             {getCategories(locale).map((category) => (
               <li key={category.slug}>
                 <Link href={localePath(locale, `/products/${category.slug}`)} className="text-primary hover:underline">

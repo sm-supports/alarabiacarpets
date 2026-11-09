@@ -51,12 +51,13 @@ export default function Footer({ locale }: { locale: Locale }) {
     // id: the phone header's menu button links here until the menu can open (Navbar).
     <footer id="footer" className="bg-white border-t border-gray-100">
       <h2 className="sr-only">{t.footer.srTitle}</h2>
-      {/* Main Footer */}
+      {/* Main Footer. Below md: one column, the two link lists folded (.fold), every
+          link a 44px row; the links stay in the HTML either way (.ft-* in index.css). */}
       <div className="container mx-auto px-4 sm:px-5 lg:px-8 py-10 sm:py-12 lg:py-16">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+        <div className="ft-grid">
           {/* Brand Column - Full width on mobile */}
-          <div className="col-span-2 sm:col-span-2 lg:col-span-2">
-            <Link href={lp("/")} className="inline-flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
+          <div className="col-span-2 max-md:pb-6">
+            <Link href={lp("/")} className="ft-logo">
               <img
                 src="/lovable-uploads/tran-golden-logo.webp"
                 alt={t.common.logoAlt}
@@ -71,7 +72,7 @@ export default function Footer({ locale }: { locale: Locale }) {
             </p>
 
             {/* Contact Info */}
-            <div className="space-y-2.5 sm:space-y-3">
+            <div className="md:space-y-3">
               <WhatsAppLink
                 source="footer_contact"
                 className="ft-contact"
@@ -99,9 +100,11 @@ export default function Footer({ locale }: { locale: Locale }) {
           </div>
 
           {/* Products Column */}
-          <div>
-            <h3 className="font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base">{t.common.products}</h3>
-            <ul className="space-y-2 sm:space-y-3">
+          <div className="ft-col">
+            <details className="fold">
+              <summary><h3 className="ft-h">{t.common.products}</h3></summary>
+            </details>
+            <ul className="fold-body md:space-y-3">
               {footerLinks.products.map((link) => (
                 <li key={link.label}>
                   <Link
@@ -116,9 +119,11 @@ export default function Footer({ locale }: { locale: Locale }) {
           </div>
 
           {/* Company Column */}
-          <div>
-            <h3 className="font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base">{t.footer.company}</h3>
-            <ul className="space-y-2 sm:space-y-3">
+          <div className="ft-col">
+            <details className="fold">
+              <summary><h3 className="ft-h">{t.footer.company}</h3></summary>
+            </details>
+            <ul className="fold-body md:space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
                   <Link
@@ -133,8 +138,8 @@ export default function Footer({ locale }: { locale: Locale }) {
           </div>
 
           {/* CTA Column - Hidden on small mobile, shown on larger */}
-          <div className="col-span-2 sm:col-span-1">
-            <h3 className="font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base">{t.footer.getStarted}</h3>
+          <div className="ft-col ft-go">
+            <h3 className="ft-h">{t.footer.getStarted}</h3>
             <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
               {t.footer.getStartedText}
             </p>

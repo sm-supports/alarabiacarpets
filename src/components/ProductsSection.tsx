@@ -91,10 +91,10 @@ function ProductShowcase({
   }[product.color];
 
   return (
-    <div className={`py-12 sm:py-16 lg:py-24 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+    <div className={`py-10 sm:py-16 lg:py-24 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
       <div className="container mx-auto px-4 sm:px-5 lg:px-8">
         <div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-16 items-center"
         >
           {/* Image - Shows first on mobile */}
           <div
@@ -142,8 +142,8 @@ function ProductShowcase({
               ))}
             </div>
 
-            {/* CTAs - Stack on mobile */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            {/* CTAs: side by side when both fit, else stacked full width (.cta-pair) */}
+            <div className="cta-pair">
               <Link
                 href={lp(product.href)}
                 className="group cta cta-m"
@@ -175,8 +175,9 @@ export default function ProductsSection({ locale }: { locale: Locale }) {
 
   return (
     <section id="products" className="relative">
-      {/* Section Header */}
-      <div className="py-12 sm:py-16 lg:py-20 bg-white">
+      {/* Section Header. No padding below it on phones: the first showcase, also
+          white, has its own. */}
+      <div className="pt-10 sm:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-5 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-forest-900 mb-3 sm:mb-4">
             {t.showcase.title}
@@ -193,7 +194,7 @@ export default function ProductsSection({ locale }: { locale: Locale }) {
       ))}
 
       {/* Additional Products Grid */}
-      <div className="py-12 sm:py-16 lg:py-20 bg-white">
+      <div className="py-10 sm:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-5 lg:px-8">
           <div className="text-center mb-8 sm:mb-12">
             <h3 className="sc-more">

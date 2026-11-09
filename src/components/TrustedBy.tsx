@@ -41,7 +41,7 @@ function AnimatedStat({ value, label, isVisible }: { value: string; label: strin
   const count = useCountUp(numericPart, 2000, isVisible);
 
   return (
-    <div className="text-center p-4 sm:p-0">
+    <div className="text-center">
       <p className="stat-num">
         {count}{suffix}
       </p>
@@ -68,8 +68,9 @@ const logos = [
 ];
 
 export default function TrustedBy() {
-  // Drives the count-up only. The fade-in is the CSS `.reveal` class, so the
-  // section is visible before hydration.
+  // Drives the count-up only, from md: below md, and for anyone who asks for less
+  // motion, the figures stay as the HTML has them. The fade-in is the CSS `.reveal`
+  // class, so the section is visible before hydration.
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { t } = useI18n();
@@ -79,6 +80,7 @@ export default function TrustedBy() {
   const extendedLogos = hydrated ? [...logos, ...logos] : [];
 
   useEffect(() => {
+    if (!window.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)").matches) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -98,12 +100,12 @@ export default function TrustedBy() {
   return (
     <section
       ref={sectionRef}
-      className="py-12 sm:py-16 lg:py-24 bg-white border-y border-gray-100"
+      className="py-10 sm:py-16 lg:py-24 bg-white border-y border-gray-100"
     >
       <div className="container mx-auto px-4 sm:px-5 lg:px-8">
         {/* Header */}
         <div
-          className="reveal text-center mb-8 sm:mb-12 lg:mb-14"
+          className="reveal text-center mb-6 sm:mb-12 lg:mb-14"
         >
           <p className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider mb-2 sm:mb-3">
             {t.trusted.eyebrow}
@@ -153,7 +155,7 @@ export default function TrustedBy() {
 
         {/* Stats - 2x2 grid on mobile, 4 columns on desktop */}
         <div
-          className="reveal mt-10 sm:mt-14 lg:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8"
+          className="reveal mt-8 sm:mt-14 lg:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 sm:gap-8"
         >
           {[
             { value: '1000+', label: t.trusted.stats.customers },

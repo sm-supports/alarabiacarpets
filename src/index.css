@@ -720,7 +720,8 @@
 /* Long utility strings repeated on every page, named so they aren't repeated in the
    static HTML: pages must stay above Semrush's 10% text-to-HTML ratio. */
 @layer components {
-  .ft-link { @apply text-xs sm:text-sm text-gray-600 hover:text-forest-900 transition-colors; }
+  /* A footer link: a 44px row below md (the footer block at the end of this file), inline from md. */
+  .ft-link { @apply flex min-h-11 items-center text-sm text-gray-600 hover:text-forest-900 transition-colors md:inline; }
   .pc-card { @apply overflow-hidden h-full flex flex-col shadow-md hover:shadow-xl transition-all duration-500 rounded-2xl bg-white text-card-foreground; }
   .pc-body { @apply p-4 sm:p-5 flex flex-col flex-grow; }
   .pc-media { @apply relative aspect-[4/3] bg-neutral-100 overflow-hidden rounded-t-2xl; }
@@ -746,11 +747,12 @@
 @layer components {
   .ct-method { @apply flex items-center gap-4 sm:gap-5 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 active:scale-[0.98]; }
   .ct-chip { @apply px-3 sm:px-4 py-2 text-xs sm:text-sm text-white/80 bg-white/5 rounded-full border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-[0.98] max-md:inline-flex max-md:min-h-11 max-md:items-center; }
-  .ft-social { @apply w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 transition-all duration-300 hover:bg-forest-900 hover:text-white active:scale-[0.95]; }
+  .ft-social { @apply w-11 h-11 md:w-10 md:h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 transition-all duration-300 hover:bg-forest-900 hover:text-white active:scale-[0.95]; }
   .sc-pill { @apply inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-gray-200 rounded-full text-xs sm:text-sm text-gray-700 whitespace-nowrap flex-shrink-0; }
-  .why-card { @apply p-5 sm:p-6 lg:p-8 bg-white rounded-2xl sm:rounded-3xl border border-gray-100 transition-all duration-700 ease-out-expo hover:shadow-float hover:-translate-y-1 active:scale-[0.98]; }
+  /* Below sm the icon sits beside the title and text (why-icon spans both rows); from sm it is above them, as before. */
+  .why-card { @apply grid grid-cols-[auto_1fr] gap-x-4 p-4 sm:block sm:p-6 lg:p-8 bg-white rounded-2xl sm:rounded-3xl border border-gray-100 transition-all duration-700 ease-out-expo hover:shadow-float hover:-translate-y-1 active:scale-[0.98]; }
   .ct-icon { @apply w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 flex-shrink-0; }
-  .more-tile { @apply relative aspect-[4/5] sm:aspect-square rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-700 ease-out-expo hover:shadow-float active:scale-[0.98]; }
+  .more-tile { @apply relative aspect-square rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-700 ease-out-expo hover:shadow-float active:scale-[0.98]; }
   .chip-link { @apply font-poppins text-sm px-4 py-2.5 rounded-full border border-neutral-200 text-neutral-700 transition-all duration-300 hover:border-primary/40 hover:text-primary; }
   .more-arrow { @apply w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full transition-all duration-300 group-hover:bg-white; }
   .sc-shade { @apply absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500; }
@@ -759,16 +761,18 @@
   .idx-card { @apply bg-white rounded-xl overflow-hidden border border-neutral-200 flex flex-col transition-all duration-300 hover:shadow-md; }
   .idx-card2 { @apply bg-white rounded-xl border border-neutral-200 overflow-hidden flex flex-col transition-all duration-300 hover:shadow-md; }
   .arrow-go { @apply w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1; }
-  .sc-frame { @apply relative aspect-[4/3] sm:aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-elevated sm:shadow-float; }
+  /* Home's showcase photo: 16:9 on phones, 4:3 from sm. */
+  .sc-frame { @apply relative aspect-video sm:aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-elevated sm:shadow-float; }
   .rel-card { @apply block bg-white rounded-xl overflow-hidden border border-neutral-200 transition-all duration-300 hover:shadow-md; }
   .sc-title { @apply text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-forest-900 mb-3 sm:mb-4 leading-tight; }
   /* Home's "More to Explore": an h3 that heads its grid like a section h2, and is sized as one. */
   .sc-more { @apply text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-3 sm:mb-4; }
   .cat-title { @apply font-playfair text-sm sm:text-base font-semibold text-neutral-900 group-hover:text-primary transition-colors; }
   .faq-q { @apply font-poppins font-medium text-neutral-900 cursor-pointer list-none flex justify-between items-center gap-4; }
-  .why-title { @apply text-base sm:text-lg lg:text-xl font-display font-semibold text-forest-900 mb-2 sm:mb-3; }
+  .why-title { @apply text-base sm:text-lg lg:text-xl font-display font-semibold text-forest-900 mb-1 sm:mb-3; }
+  .why-icon { @apply row-span-2 w-11 h-11 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center sm:mb-5 lg:mb-6 transition-transform duration-300 group-hover:scale-110; }
   .stat-num { @apply text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-0.5 sm:mb-1; }
-  .ft-contact { @apply flex items-center gap-2 text-sm text-gray-600 hover:text-forest-900 transition-colors; }
+  .ft-contact { @apply flex min-h-11 items-center gap-2 text-sm text-gray-600 hover:text-forest-900 transition-colors md:min-h-0; }
   .sc-text { @apply text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-lg; }
   /* The header row has to fit on one line with "Get a Free Quote" in it: from 1280 as
      before, from 1024 with 8px less between links, and between 768 and 1024 (logo
@@ -848,6 +852,11 @@
   .cta-s { @apply md:min-h-10 md:px-5 md:py-2.5; }
   .cta-m { @apply md:min-h-11; }
   .cta-l { @apply md:px-8 md:py-4 md:text-base; }
+  /* Two buttons in a row (Home's hero and showcases): below sm side by side when both
+     labels fit, each growing to share the line, else stacked full width; from sm in a row
+     at their own widths, as before. */
+  .cta-pair { @apply flex flex-wrap gap-3 sm:flex-nowrap sm:gap-4; }
+  .cta-pair > * { @apply max-sm:flex-auto; }
   /* Full width on phones, up to 320px, and its own width from md. */
   .cta-wide { @apply w-full max-w-xs md:w-auto md:max-w-none; }
   /* ContactSection's primary: 60px with a 24px icon from md, as .ct-primary was. */
@@ -1179,4 +1188,36 @@
   /* A chip link (42px) gains a pixel of padding above and below, taken back by its
      margin, so it is a 44px tap and its row of chips keeps its place. */
   .chip-link { padding-block: 0.6875rem; margin-block: -1px; }
+}
+
+/* The last links under 44px on phones, each made a 44px tap without moving anything:
+   - a link that is a whole heading ("More in …" over related products, a guide's or a
+     service's title on the index pages) stays inline, and padding on an inline box grows
+     what you can tap but not the line;
+   - "Read the guide", "View … details" and "View all …" get a 44px box whose extra
+     height their margins give back. */
+@layer components {
+  .rel-all { @apply font-poppins text-sm font-medium text-primary hover:underline; }
+  .cat-links { @apply flex flex-wrap gap-x-4 gap-y-2; }
+}
+@media not all and (min-width: 768px) {
+  main :is(.h2-sec, .idx-title, .idx-h2) > a { padding-block: 0.625rem; }
+  .idx-more { padding-block: 0.75rem; margin-top: 0.25rem; margin-bottom: -0.75rem; }
+  .rel-all { display: inline-block; padding-block: 0.75rem; margin-block: -0.75rem; }
+  /* The contact page's category links: rows of 44px taps, wrapping as before. */
+  .cat-links { row-gap: 0; }
+  .cat-links a { display: inline-flex; min-height: 2.75rem; align-items: center; }
+}
+
+/* The footer (Footer.tsx). From md the columns are as they were. Below md it is one column:
+   the brand, then Products and Company folded (.fold above) with their headings as the
+   toggles, then Get Started, with a rule between them; the logo, the contact rows, the
+   social icons and every link are 44px taps. The folded links are in the HTML. */
+@layer components {
+  .ft-grid { @apply grid grid-cols-2 gap-x-8 md:gap-y-8 lg:grid-cols-5 lg:gap-12; }
+  .ft-logo { @apply inline-flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6 max-md:min-h-11; }
+  .ft-h { @apply font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base; }
+  .ft-col { @apply max-md:col-span-2 max-md:border-t max-md:border-gray-100; }
+  .ft-col > ul { @apply max-md:pb-2; }
+  .ft-go { @apply max-md:pt-6; }
 }

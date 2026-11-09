@@ -1004,7 +1004,7 @@ const ContactSection = memo(function ContactSection() {
   return (
     <section
       id="contact"
-      className="relative py-16 sm:py-20 lg:py-28 bg-forest-900 overflow-hidden"
+      className="relative py-10 sm:py-20 lg:py-28 bg-forest-900 overflow-hidden"
     >
       {/* Background Elements - Smaller on mobile */}
       <div className="absolute inset-0">
@@ -1029,7 +1029,7 @@ const ContactSection = memo(function ContactSection() {
         {/* No scroll reveal in this section: it is the whole body of /contact, so it
             must be visible from the first paint. Its overflow-hidden would also
             capture a .reveal timeline. */}
-        <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-white mb-4 sm:mb-6 leading-tight">
             {t.titleTop}
             <br />

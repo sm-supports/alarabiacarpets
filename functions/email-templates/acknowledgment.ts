@@ -126,7 +126,7 @@ ${ref ? `
               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                   <td style="padding:7px 0;">
-                    <a href="https://wa.me/+97455512858" target="_blank" rel="noopener noreferrer" style="font-family:'Poppins', Arial, Helvetica, sans-serif; font-size:14px; color:#E8D5B5; text-decoration:none;">
+                    <a href="https://wa.me/97455512858" target="_blank" rel="noopener noreferrer" style="font-family:'Poppins', Arial, Helvetica, sans-serif; font-size:14px; color:#E8D5B5; text-decoration:none;">
                       &#9742;&ensp;${c.whatsapp}: <span dir="ltr">+974 5551 2858</span>
                     </a>
                   </td>

@@ -5,7 +5,7 @@
 | Layer | File |
 |-------|------|
 | Frontend form | `src/components/ContactSection.tsx` |
-| Contact page | `src/app/contact/page.tsx` (server component, renders ContactSection) |
+| Contact page | `src/app/(en)/contact/page.tsx` and `src/app/(ar)/ar/contact/page.tsx` over `src/views/ContactView.tsx`, which renders `<ContactSection layout="page">` (the one-screen layout). Home renders `<ContactSection />` too |
 | API endpoint | `functions/api/contact.ts` (Cloudflare Workers) |
 | Email template | `functions/email-templates/acknowledgment.ts` |
 | Turnstile widget | `src/components/CloudflareTurnstile.tsx` |
@@ -57,11 +57,36 @@
 
 ## Google Ads Conversion Tracking
 
-The form fires conversion events — do not remove without explicit instruction:
-- Form submission: `AW-16463357836/vNfLCO7DwcgbEIzPq6o9`
-- WhatsApp clicks: `AW-16463357836/n6RiCOKH_I0bEIzPq6o9`
+The form fires conversion events — do not remove without explicit instruction. The labels
+are `CONVERSION_LABELS` in `src/lib/analytics.ts` (`formLead`, `whatsappClick`); read them
+there rather than copying them here.
 
 Conversion tracking lives in `src/lib/analytics.ts` (`trackFormLead`, `trackWhatsAppClick`, `trackPhoneClick`). All events use currency `QAR`. The legacy `gtag_report_conversion()` global is re-created by `src/components/ThirdPartyScripts.tsx` for backward compatibility.
+
+What the form sends, once per outcome, with no personal data:
+
+| Outcome | Events |
+|---------|--------|
+| Sent | `formLead` conversion and GA4 `generate_lead`, once per lead |
+| Sent after "Correct and resend" | GA4 `form_correction` only: the lead was already counted. The request carries `correction: true`, and the admin email's subject starts "Correction:" |
+| Any failure | GA4 `form_failed {code}`: the API's `code` (`unknown` for one the form doesn't know), or one the form names itself: `unreachable`, `no_reply` (the 20 s abort), `offline`, `bot_pending`, `bot_timeout`, `bot_error`, `bot_unsupported`, `bot_no_key` |
+| "Continue on WhatsApp" on the Sent panel | GA4 `whatsapp_click` with `source: contact_sent_followup` and `conversion: false`: no Ads conversion |
+| "Send this on WhatsApp" / Call on a failure | `source: contact_form_failed` (a WhatsApp tap counts as a conversion; a call is GA4 only) |
+
+## Request and response
+
+The form posts `{ name, email, message, turnstileToken, submissionId, locale, correction? }`.
+Every answer other than 200 carries `{ error, code }`, and the form picks its state by
+`code`, never by status or `error` text. The codes: `bot_required`, `bot_rejected`,
+`bot_unavailable`, `invalid_email`, `too_long`, `fields_required`, `bad_body`, `send_failed`,
+`send_unknown` (see `turnstile-spin/` for the bot classes and `CONTACT_SCENARIOS` in
+`scripts/lib/browser.mjs` for each body). A code the form doesn't know shows S7, as
+`send_failed` does.
+
+REF is `submissionId.slice(0, 8).toUpperCase()`: one id per message, kept across retries,
+so Resend's idempotency key holds. It appears on the Sent panel, in the admin email's subject,
+in the acknowledgment email and in the WhatsApp follow-up prefill. A failed send's WhatsApp
+prefill is capped at about 1,800 encoded bytes, with a notice and a Copy button (S19).
 
 ## Turnstile Configuration
 
@@ -109,6 +134,10 @@ Conversion tracking lives in `src/lib/analytics.ts` (`trackFormLead`, `trackWhat
 ```bash
 npm run pages:dev
 ```
+
+On this Mac's case-insensitive volume `wrangler pages dev` 404s `/products/*`, but
+`/contact` works. A real send needs the Turnstile widget to allow the host (see
+`turnstile-spin/`), and sends real email: get the owner's go-ahead first.
 
 Set environment variables in `.dev.vars` for local testing:
 ```

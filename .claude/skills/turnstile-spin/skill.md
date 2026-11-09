@@ -88,6 +88,12 @@ Cloudflare's always-passes test secret does not help: it returns `hostname: "exa
 To test locally you must first add `localhost` and `127.0.0.1` to the widget's domains
 (dashboard → Turnstile → widget → Settings) and put the real secret in `.dev.vars`.
 
+A Pages preview URL is the same: its host isn't on the widget, so the real widget fails there
+and the form shows S8 after Send. That is expected, not a regression. On a preview, check the
+Function's codes with curl instead (each body has no name, email and message, so nothing can
+be emailed): no token is 400 `bot_required`, a bogus token 403 `bot_rejected`, a body that
+isn't JSON 400 `bad_body`. First confirm the preview environment has its secrets.
+
 ## The in-app browser pane cannot verify this widget
 
 Do not try to confirm the widget renders using the Claude browser pane. It reports

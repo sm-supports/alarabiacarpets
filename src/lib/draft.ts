@@ -10,6 +10,10 @@
  *
  * app/global-error.tsx imports this, and Next loads that file on every page of both
  * languages, so keep this file free of imports.
+ *
+ * public/sw.js reads the stored entry too, as plain JavaScript outside the TypeScript
+ * build: the key, the version and { v, draft: { name, email, message } }. Change both
+ * together; scripts/check-consistency.mjs fails when its key or version differ from these.
  */
 const DRAFT_KEY = "contact-draft";
 const VERSION = 1;

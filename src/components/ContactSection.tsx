@@ -1071,9 +1071,11 @@ const ContactSection = memo(function ContactSection({ layout = "home", intro, ch
           ? "grid grid-cols-1 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:grid-rows-[auto_1fr] gap-6 lg:gap-x-12 lg:gap-y-5 max-w-6xl mx-auto"
           : "grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 max-w-6xl mx-auto"}>
           {page && <div className="lg:col-start-1 lg:row-start-1">{intro}</div>}
-          {/* Contact Form: first in the page order, so Tab and a screen reader reach it first, as
-              phones show it. lg:order-last puts it back in the second column on wide screens.
-              The id is where the action bar's quote link points on /contact before hydration. */}
+          {/* Contact Form. On Home: first in the page order, so Tab and a screen reader reach it
+              first, as phones show it; lg:order-last puts it back in the second column on wide
+              screens. On the page the intro comes first (see above).
+              The id is where /contact's WhatsApp links point before hydration (the action bar's
+              and the main tile's). */}
           <div id="contact-form" className={page ? "lg:col-start-2 lg:row-start-1 lg:row-span-2" : "lg:order-last"}>
             <div className={`${page ? "p-5 sm:p-6" : "p-5 sm:p-6 lg:p-8"} rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm`}>
               <FormHeading className={`text-xl sm:text-2xl font-display font-semibold text-white ${page ? "mb-4" : "mb-5 sm:mb-6"}`}>

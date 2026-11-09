@@ -844,22 +844,27 @@
   .ct-tile-main .ct-tile-icon { @apply text-forest-900; }
   .ct-tile-text { @apply flex min-w-0 flex-col; }
   .ct-tile-label { @apply font-poppins text-sm font-semibold leading-snug; }
-  .ct-tile-value { @apply truncate font-poppins text-xs opacity-75; }
+  /* Below sm a value wraps rather than being cut, and email and directions take a row each. */
+  .ct-tile-value { @apply font-poppins text-xs opacity-75 [overflow-wrap:anywhere] sm:truncate; }
+  .ct-wide { @apply max-sm:col-span-2; }
   .ct-hours { @apply mt-4 font-poppins text-xs sm:text-sm leading-relaxed text-white/70; }
   .ct-skel-page { @apply min-h-[300px] sm:min-h-[300px]; }
   .ct-skel-page .ct-skel-area { @apply h-[90px]; }
   .ct-folds { @apply border-t border-white/10; }
   .ct-fold { @apply border-b border-white/10; }
   /* The toggle is FoldHead's (.fold-all, after the .fold rules); these only colour it. */
-  .ct-fold-h { @apply font-playfair text-base sm:text-lg font-semibold text-white; }
+  .ct-fold-h { @apply font-playfair text-base sm:text-lg font-semibold text-white text-balance; }
   .ct-fold-body { @apply space-y-3 pb-4 font-poppins text-sm leading-relaxed text-white/75; }
   .ct-fold-body h3 { @apply font-playfair text-base font-semibold text-white; }
   .ct-fold-body a { @apply text-gold-400 hover:underline; }
   /* FaqList, made for light pages, on the forest. */
   .ct-fold-body .faq-q { @apply text-white; }
   .ct-fold-body .faq-a { @apply text-white/70; }
-  .ct-fold-body .faq-toggle { @apply text-gold-400; }
+  /* Each question's sign under the panel's (inset-inline-end 0.5rem in .fold-all), and no
+     second line after the last question: the panel's own border ends the list. */
+  .ct-fold-body .faq-toggle { @apply me-2 text-gold-400; }
   .ct-fold-body .divide-y, .ct-fold-body .divide-y > * { @apply border-white/10; }
+  .ct-fold-body > .divide-y { @apply border-b-0; }
 }
 
 @layer components {

@@ -17,10 +17,14 @@
  * 2. Breadcrumbs. Every page but Home shows one trail (components/Breadcrumb.tsx) and has
  *    one BreadcrumbList, and the two agree step for step: names, links and the page.
  * 3. Phone and hours. global-error.tsx, global-not-found.tsx (and the built 404.html) and
- *    public/sw.js, once it exists, are self-contained, so a change to src/lib/site.ts or to
- *    the opening hours doesn't reach them by itself. Any phone number in them must be
- *    PHONE / PHONE_E164 from site.ts, and any time of day must sit inside the
- *    formStates.open sentence of en.client.ts or ar.client.ts, word for word.
+ *    public/sw.js are self-contained, so a change to src/lib/site.ts or to the opening
+ *    hours doesn't reach them by itself. Any phone number in them must be PHONE /
+ *    PHONE_E164 from site.ts, and any time of day must sit inside the formStates.open
+ *    sentence of en.client.ts or ar.client.ts, word for word.
+ * 4. The service worker. public/sw.js (and out/sw.js after a build) must exist: a 404 on
+ *    /sw.js keeps an installed worker running (its header). Only the name is checked, so
+ *    the kill switch (scripts/sw-kill.js copied over it) passes. When it reads the contact
+ *    draft, its key and version must be src/lib/draft.ts's DRAFT_KEY and VERSION.
  */
 import fs from "node:fs";
 
@@ -196,7 +200,11 @@ const SELF_CONTAINED = ["src/app/global-error.tsx", "src/app/global-not-found.ts
 const openSentences = [VOCAB.en.open, VOCAB.ar.open];
 let checkedFiles = 0;
 for (const file of SELF_CONTAINED) {
-  if (!fs.existsSync(file)) continue; // sw.js arrives with WP13; 404.html with a build
+  if (!fs.existsSync(file)) {
+    // 404.html comes with a build; sw.js is reported below; the rest must be there.
+    if (file !== `${OUT}/404.html` && file !== "public/sw.js") fail(file, "missing");
+    continue;
+  }
   checkedFiles += 1;
   let text = read(file);
   if (file.endsWith(".html")) text = text.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/g, "");
@@ -225,6 +233,30 @@ for (const file of SELF_CONTAINED) {
   for (const sentence of openSentences) rest = rest.split(sentence).join(" ");
   for (const [time] of rest.matchAll(/\b\d{1,2}[:٫]\d{2}\b/g)) {
     fail(file, `time "${time}" outside the formStates.open sentence ("${VOCAB.en.open}" / "${VOCAB.ar.open}")`);
+  }
+}
+
+// ---------------------------------------------------------------- service worker
+
+const SW = "public/sw.js";
+const WORKER_GONE = "a 404 on /sw.js keeps an installed worker running; restore it, or copy scripts/sw-kill.js over it (see its header)";
+if (!fs.existsSync(SW)) fail(SW, `missing: ${WORKER_GONE}`);
+if (fs.existsSync(`${OUT}/index.html`) && !fs.existsSync(`${OUT}/sw.js`)) fail(`${OUT}/sw.js`, `missing from the build: ${WORKER_GONE}`);
+if (fs.existsSync(SW)) {
+  const worker = read(SW);
+  const draft = read("src/lib/draft.ts");
+  const draftKey = /const DRAFT_KEY = "([^"]+)"/.exec(draft)?.[1];
+  const draftVersion = /const VERSION = (\d+);/.exec(draft)?.[1];
+  if (!draftKey || !draftVersion) throw new Error("check-consistency: DRAFT_KEY or VERSION not found in src/lib/draft.ts");
+  if (worker.includes("sessionStorage")) {
+    const keys = [...worker.matchAll(/sessionStorage\.getItem\(\s*["']([^"']+)["']\s*\)/g)].map((m) => m[1]);
+    const versions = [...worker.matchAll(/\.v === (\d+)/g)].map((m) => m[1]);
+    if (!keys.length || keys.some((key) => key !== draftKey)) {
+      fail(SW, `reads the draft under ${JSON.stringify(keys)}, src/lib/draft.ts writes "${draftKey}"`);
+    }
+    if (!versions.length || versions.some((v) => v !== draftVersion)) {
+      fail(SW, `expects draft version ${JSON.stringify(versions)}, src/lib/draft.ts writes ${draftVersion}`);
+    }
   }
 }
 

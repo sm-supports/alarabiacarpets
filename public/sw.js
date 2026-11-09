@@ -75,7 +75,7 @@ p{margin:0}
 .br::after{content:"";display:block;width:32px;height:2px;margin-top:6px;background:#C5A572}
 .bd{display:inline-block;margin-bottom:8px;padding:4px 12px;border-radius:9999px;background:#D3E3DD;color:#0A2A1F;font-size:12px;line-height:16px;font-weight:600}
 h1{margin:0;color:#0A2A1F;font-size:18px;line-height:1.4;font-weight:600}
-.fx{display:flex;flex-direction:column;gap:8px;margin-top:8px;color:#404040;font-size:14px}
+.fx{display:flex;flex-direction:column;gap:8px;margin-top:8px;color:#404040;font-size:14px;text-wrap:pretty}
 [hidden]{display:none}
 .ac{display:flex;flex-direction:column;gap:8px;margin-top:16px}
 .c{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;padding:12px 16px;border:1px solid #0A2A1F;border-radius:9999px;background:#0A2A1F;color:#fff;font:inherit;font-size:14px;line-height:20px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer}
@@ -85,7 +85,11 @@ h1{margin:0;color:#0A2A1F;font-size:18px;line-height:1.4;font-weight:600}
 @media (hover:hover){.c:hover{background:#1E4B3D}.c2:hover{background:#F5F5F5}}
 `;
 
-// Inline in the page: shows {kept} when this tab holds a draft with text in it.
+// Inline in the page: shows {kept} when this tab holds a draft with text in it, and
+// reloads when the connection is back. A weak signal, a captive portal or a DNS failure
+// can fail the page while the phone still counts as online, and then no "online" event
+// comes, so while the page is shown it also asks for itself now and then (15 s, doubling
+// to a minute) and reloads once the site answers.
 const SCRIPT = `(function () {
   try {
     var stored = JSON.parse(sessionStorage.getItem("contact-draft"));
@@ -97,6 +101,15 @@ const SCRIPT = `(function () {
   } catch (e) {}
   document.getElementById("retry").addEventListener("click", function () { location.reload(); });
   addEventListener("online", function () { location.reload(); });
+  var wait = 15000;
+  function later() { setTimeout(check, wait); wait = Math.min(wait * 2, 60000); }
+  function check() {
+    if (document.visibilityState === "hidden" || !navigator.onLine) return later();
+    fetch(location.href, { method: "HEAD", cache: "no-store" }).then(function (r) {
+      if (r.status < 500) location.reload(); else later();
+    }, later);
+  }
+  later();
 })();`;
 
 /**

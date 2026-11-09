@@ -66,7 +66,8 @@ export default function ContactView({ locale }: { locale: Locale }) {
       <p className="ct-intro">{page.intro}</p>
       <ul className="ct-tiles">
         <li>
-          <WhatsAppLink source="contact_page_whatsapp" className="ct-tile ct-tile-main">
+          {/* Before hydration it goes to the form, as the action bar does here, not to this page. */}
+          <WhatsAppLink source="contact_page_whatsapp" staticHref="#contact-form" className="ct-tile ct-tile-main">
             <WhatsAppIcon className="ct-tile-icon" />
             {/* The site's one WhatsApp CTA label (scripts/check-consistency.mjs). */}
             <span className="ct-tile-label">{t.common.heroQuote}</span>
@@ -76,25 +77,27 @@ export default function ContactView({ locale }: { locale: Locale }) {
           <CallLink source="contact_page_call" className="ct-tile">
             <Phone className="ct-tile-icon" />
             <span className="ct-tile-text">
-              <span className="ct-tile-label">{page.call}</span>
+              {/* The space keeps label and value apart for anything reading the text without CSS. */}
+              <span className="ct-tile-label">{page.call}</span>{" "}
               <bdi dir="ltr" className="ct-tile-value">{PHONE}</bdi>
             </span>
           </CallLink>
         </li>
-        <li>
+        {/* Email and directions take the full width on phones, so the address is never cut. */}
+        <li className="ct-wide">
           <a href={`mailto:${EMAIL}`} className="ct-tile">
             <Mail className="ct-tile-icon" />
             <span className="ct-tile-text">
-              <span className="ct-tile-label">{page.email}</span>
+              <span className="ct-tile-label">{page.email}</span>{" "}
               <bdi dir="ltr" className="ct-tile-value">{EMAIL}</bdi>
             </span>
           </a>
         </li>
-        <li>
+        <li className="ct-wide">
           <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="ct-tile">
             <MapPin className="ct-tile-icon" />
             <span className="ct-tile-text">
-              <span className="ct-tile-label">{page.directions}</span>
+              <span className="ct-tile-label">{page.directions}</span>{" "}
               <span className="ct-tile-value">{page.showroomShort}</span>
             </span>
           </a>

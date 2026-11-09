@@ -31,8 +31,8 @@ offline emulation, and every other host blocked, so nothing was sent anywhere.
 | `s15-page-error.jpg` | S15, a page that throws (`error.tsx`), with a draft stored | `/contact` with its page components broken in the hydration data, as a bad deploy would serve it |
 | `s15-global-error.jpg` | S15, a root layout that throws (`global-error.tsx`, self-contained) | The layout's `Providers` broken the same way |
 | `s16-404.jpg` | S16, the 404 (one bilingual page) | An unknown English address and an unknown `/ar` address; both answer 404 |
-| `s16-photo-tile-failed.jpg` | S16, a photo that failed (named tile) | `/products`, the first tile's image refused |
-| `s16-image-failed.jpg` | S16, a video whose poster failed (band across the top) | `/products/luxury-majlis-sofa`, the poster refused |
+| `s16-photo-tile-failed.jpg` | S16, a photo that failed (named tile) | `/products`, the first product tile's photo refused (the grid's first card, below "Shop by category"). Re-shot after the stage 6 review: the earlier image showed a category card |
+| `s16-image-failed.jpg` | S16, a video whose poster failed (band across the top, clear of the "1/2" badge) | `/products/luxury-majlis-sofa`, the poster refused. Re-shot after MB-01's fix |
 | `s17-no-price.jpg` | S17, the no-price line | `/services/floor-mats` |
 | `s18-live-chat-opening.jpg` | S18, menu's Live chat row while Tawk loads | Tawk's script held |
 | `s18-live-chat-failed.jpg` | S18, the chat didn't open | Tawk's script refused (offline and the 8 s limit show the same) |

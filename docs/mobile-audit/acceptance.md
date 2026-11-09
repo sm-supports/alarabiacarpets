@@ -5,22 +5,27 @@ The plan's acceptance checklist (items 1 to 14), against `feature/mobile-redesig
 fix, which changes nothing in `out/`. Owner decisions made after the plan are in
 `decisions.md`; open items are in `backlog.md` by ID.
 
+Re-checked after the stage 6 review, the same day: items 7, 8 and 11 on a build with that
+review's fixes, and the branch merged with `main` in a scratch copy (item 7, "After the
+merge"). **Acceptance has to be re-run on the merge result before release** (MB-37): `main`
+has moved since the branch point.
+
 Commands ran on this Mac with `CHROME_PATH` set to the installed Chrome. Each script serves
 `out/` itself, blocks every other host and mocks `/api/contact`, so nothing was sent.
 
 | # | Item | Result |
 |---|------|--------|
 | 1 | Tap targets 44px, inputs 16px | **Pass** |
-| 2 | Bar position, menu over bar, no Tawk on phones, two actions on error screens | **Pass** |
-| 3 | Every S row in both languages, screenshot pairs | **Pass**, Arabic wording waits on item 14 |
+| 2 | Bar position, menu over bar, no Tawk on phones, two actions on error screens | **Pass** on the bar, the menu and Tawk. Error screens: the 404 and `error.tsx` offer the bar's two actions; the offline page and `global-error` don't, **owner to confirm** (MB-55) |
+| 3 | Every S row in both languages, screenshot pairs | **Pass**, Arabic wording waits on item 14; S19's primary button differs, **owner to confirm** (MB-56) |
 | 4 | Every API code reaches its state with the text intact | **Pass** |
 | 5 | Wi-Fi off at browse, mid-form and at send | **Needs a real phone**, and one known failure (MB-05) |
-| 6 | One conversion per tap, one lead per lead | **Pass** |
-| 7 | 154 pages match the WP0 snapshot except CTA labels and additions | **Pass** |
+| 6 | One conversion per tap, one lead per lead | **Pass** for every tracked tap; the 404's buttons fire nothing (MB-44) |
+| 7 | 154 pages match the WP0 snapshot except CTA labels and additions | **Pass** on the branch. Merged with `main`: two expected differences from `main` itself (the majlis guide's title and description) |
 | 8 | `npm run check` and `npm run typecheck` | **Pass** |
 | 9 | `/contact` field ≤ 850px; `/products` and Home ≤ 7,500px at 390 | **Pass**, Home **owner-accepted deviation** |
 | 10 | Desktop at 1280 differs only in the allowed ways | **Pass** |
-| 11 | Phone LCP, CLS and `/contact` TBT within 10% of baseline | **Fails on Home LCP** (MB-06); the rest pass |
+| 11 | Phone LCP, CLS and `/contact` TBT within 10% of baseline | CLS, `/contact` TBT and seven pages' LCP pass. **Home LCP is borderline**: +6% on average back to back against a fresh base build, +19% in one session; **owner to decide** (MB-06) |
 | 12 | JavaScript off: tile, footer nav, form fallback, bar | **Pass** |
 | 13 | Keyboard and screen reader pass; fold tap on Android keeps the bar | **Needs a person and a real phone**; emulated checks pass |
 | 14 | WP14 deliverables exist; a Gulf Arabic speaker signed off the catalogue | Deliverables **pass**; sign-off **needs the owner** (MB-30) |
@@ -45,11 +50,16 @@ Baseline (WP0): 3,805 of 4,743 controls under 44px and 36 inputs under 16px.
   centre with the menu open is the menu panel, not the bar (scratch check, `elementFromPoint`).
 - No Tawk on phones: none of the 63 loads below 768 asked for `embed.tawk.to`
   (`otherHosts` in the audit's output); only `www.googletagmanager.com`.
-- The two actions: the 404 has Call and Get a Free Quote (WhatsApp) in both languages
-  (`docs/mobile-states/s16-404.jpg`); `error.tsx` (S15) has Call and Reload over the bar's
-  Call and Get a Free Quote. The self-contained screens have the actions their catalogue rows
-  give them: the offline page (S14) Try again and Call (WhatsApp can't open offline), and
-  `global-error.tsx` Call and Reload. Call is on every one.
+- The two actions, which this item doesn't fully meet. The 404 has the bar's Call and Get a
+  Free Quote (WhatsApp) in both languages (`docs/mobile-states/s16-404.jpg`), and
+  `error.tsx` (S15) has Call and Reload over the bar itself. The two self-contained screens
+  have the actions their catalogue rows give them instead, with no WhatsApp: the offline
+  page (S14) Try again and Call, and `global-error.tsx` Call and Reload
+  (`s14-offline-page.jpg`, `s15-global-error.jpg`). Call is on every one. On the offline
+  page WhatsApp can't open anyway; `global-error` is shown while online, so a plain `wa.me`
+  link would work there, as on the 404. The plan's checklist and its catalogue disagree
+  here, so it is the owner's call (MB-55): accept the catalogue's actions, or add WhatsApp
+  to `global-error.tsx`.
 
 ## 3. The state catalogue
 
@@ -64,6 +74,10 @@ where a row has two sentences. Where the build differs from the catalogue, on pu
   catalogue; they are on the Arabic reader's list (`backlog.md`, MB-30).
 - S16's 404 shows Browse Products, Return Home, the five categories and Contact in both
   languages, with Call and Get a Free Quote along the bottom.
+- S19's row makes Copy the primary. S19 never shows alone: it is a line inside S7, S8 or
+  S9 when the WhatsApp prefill had to be cut, and the build keeps that row's own primary
+  (Send this on WhatsApp, WhatsApp, or Send) with Copy as a secondary button above it
+  (`s19-long-prefill.jpg`). Not decided by the owner (MB-56).
 
 The Arabic itself waits on the Gulf Arabic reader (item 14).
 
@@ -119,6 +133,13 @@ Walked in `core-flow.md` at 390, EN and AR, reading `dataLayer` after each tap:
 | Sent panel's Continue on WhatsApp | `whatsapp_click` with `conversion: false`, no Ads conversion |
 | Failure's Send this on WhatsApp | 1 conversion + 1 `whatsapp_click` (`contact_form_failed`) |
 | Any Call | `phone_click` only (no Ads call conversion exists) |
+| The 404's Call or Get a Free Quote | Nothing |
+
+Not tracked, by design of the self-contained screens: `out/404.html` loads no analytics
+(no Google tag in it), so a tap on its Call or Get a Free Quote fires no conversion and no
+`whatsapp_click`; the same holds for the Call on `global-error` and on the offline page.
+The 404's WhatsApp button is new with WP4, so it is a lead path the 28-day Ads review can't
+see (MB-44).
 
 ## 7. The SEO snapshot
 
@@ -131,7 +152,28 @@ snapshot-seo: 154 pages against baseline 2f10125: 0 failure(s), 14 to look at, 1
 The 14 to look at are the ones the stage 5 review accepted: the contact merge's new blocks
 on `/contact` and `/ar/contact` and the form's order on Home. The planned changes are the
 CTA labels, the breadcrumb separators, the S17 lines and the one-screen contact page. No
-title, description or h1 changed, Home's included.
+title, description or h1 changed, Home's included. The same result after the stage 6
+review's fixes.
+
+**After the merge.** `main` has two commits since the branch point (`4714064`, merged as
+`5832fd1`): the majlis guide's `seoTitle` and `metaDescription` (`src/data/guides.ts`),
+`LocalBusiness` to `HomeGoodsStore` with `areaServed` (`src/lib/seo.ts`), and
+`public/llms.txt`. No file overlaps the branch: `git merge-tree --write-tree main HEAD`
+writes a tree with no conflict. That tree, with the stage 6 fixes to
+`check-consistency.mjs` and `src/index.css` copied in, built in a scratch copy:
+
+```
+npm run check     exit 0 (same lines as item 8)
+snapshot-seo: 154 pages against baseline 2f10125: 2 failure(s), 14 to look at, 1183 planned or added
+  title changed: Majlis Design Ideas Qatar: Layout, Seating & Decor -> Majlis Design for Home: Layouts, Seating & Room Plans
+  description changed: Majlis design ideas for Qatari homes: ... -> Planning a majlis at hom…
+    /guides/majlis-interior-design-ideas
+npm run llms      public/llms.txt: 154 pages, identical to main's copy
+```
+
+The two failures are `main`'s own retitle, not the redesign: expected. After the real merge,
+accept them (or re-baseline that one page from `main`), then rebuild and re-run `check`,
+the snapshot and `audit-mobile` on the merge result.
 
 ## 8. Checks
 
@@ -147,7 +189,8 @@ check-consistency: 0 problem(s); 972 CTAs on 155 pages, breadcrumbs on 152, 4 se
 ```
 
 The tightest text-to-HTML page is `/ar/products/luxury-majlis-sofa` at 11.86%, 4,717 bytes
-of HTML to spare.
+of HTML to spare. The same five lines after the stage 6 review's fixes, which add no
+static HTML (a stylesheet rule, the check script and docs).
 
 ## 9. Heights at 390
 
@@ -207,16 +250,41 @@ is the run with the median LCP.
 - **`/contact` TBT:** lower in both runs (42 and 6 ms against 261; the baseline's own spread
   was 27 to 823 ms). Pass.
 - **LCP:** within 10% on seven of eight pages (`/ar` at the limit in the 3-run median, +6% in
-  the 5-run). **Home fails: 2.8 s against 2.3 s in both medians, +22%.** Not accepted by the
-  owner; MB-06.
+  the 5-run). Home read +22% against the 2.3 s baseline, but that baseline was taken two
+  days earlier and doesn't reproduce: see the back-to-back runs below.
 - First paint is 0.2 s later on every page (0.9 to 1.1 s), and transferred bytes are up
   (scripts about +12 KB per page; images on Home 155 to 337 KB and `/products` 606 to 923 KB,
-  MB-07). Not in the criterion, but it is the likely cause of Home's LCP: Home's LCP element
-  is the hero h1, and in a DevTools-throttled trace (4x CPU, 1.6 Mbps) it paints at first
-  paint, which lands with DOMContentLoaded (Home 3.0 to 3.3 s, `/contact` 3.0 s): anything
-  that runs before the end-of-body hydration script moves it. That was not measured against
-  `main` in the same session, so the cause is a lead, not a finding. Before release, run
-  `main` and this branch back to back on the same machine.
+  MB-07).
+
+**Back to back, after the stage 6 review.** A fresh build of the branch point `2f10125`
+(`git archive` into a scratch folder, `npm ci`, `npm run build` with the same `.env`) and
+this branch's build, measured alternately on this Mac with nothing else running,
+`node scripts/check-perf.mjs / /ar --runs=5` (and `--dir=` the scratch build for the base).
+Each cell is the run with the median LCP:
+
+| Session | `/` base | `/` branch | Change | `/ar` base | `/ar` branch | Change |
+|---------|----------|------------|--------|------------|--------------|--------|
+| 1 (5 runs) | 2.6 s | 3.1 s | +19% | 3.1 s | 3.3 s | +6% |
+| 2 (5 runs) | 2.6 s | 2.8 s | +8% | 3.2 s | 3.3 s | +3% |
+| 3 (3 runs) | 2.6 s | 2.7 s | +4% | | | |
+
+Session 3's single runs: base 2.57, 2.63, 2.66 s; branch 2.83, 2.42, 2.72 s. The stage 6
+reviewer's own back-to-back sessions on this Mac gave base 2.8, 2.7, 2.7 s and branch 3.1,
+2.4, 2.8 s. Over the six sessions of each, the branch's median Home LCP averages about
+0.15 s (6%) above the base's: inside the 10% line on average, but over it in session 1
+here, and the branch spreads wider (2.4 to 3.1 s against 2.6 to 2.8 s). FCP was 0.9 s on the base in every
+session and 1.1 to 1.3 s on the branch. CLS 0.000 throughout.
+
+In the kept reports (session 3), Home's LCP element is the hero h1 in both builds and its
+time is all render delay (2.0 to 2.4 s after a 0.46 s TTFB): it paints when the page first
+paints with its fonts, so it moves with first paint. What changed before first paint: the
+main stylesheet (85 to 111 KB, 11.1 to 13.8 KB Brotli; 13 to 16 KB transferred with the
+small one), three more async chunks on every page (17 script tags against 14, among them
+`error.tsx` and `global-error.tsx`; scripts 143 to 155 KB), and more lazy images within
+the browser's loading distance of a shorter page (155 to 337 KB). Which of these moves FCP
+was not isolated. **Item 11 is not cleanly met on Home and not clearly failed either: the
+owner decides** whether to release on this and judge Home by field LCP (GA4's LCP events)
+for 28 days, or to have the pre-paint cost cut first (MB-06).
 
 ## 12. JavaScript off
 
@@ -249,9 +317,10 @@ Needs a person with a screen reader and a real Android phone (MB-28, MB-29). Emu
   gallery's video controls, the description fold, the folded heading, Get a Free Quote, the
   FAQ questions, then the related guides. A fold opens from the keyboard (Enter).
 - A tap on a Home fold opens it and leaves the bar where it was, visible.
-- **Accepted deviation:** on category pages below md the visual order (`order-*`) differs
-  from the focus order, which follows the DOM so headings and links stay where crawlers and
-  `check-internal-links` count them (MB-50).
+- **Deviation, accepted by the WP11 review, owner to confirm:** on category pages below md
+  the visual order (`order-*`) differs from the focus order, which follows the DOM so
+  headings and links stay where crawlers and `check-internal-links` count them (MB-50,
+  MB-39).
 
 ## 14. Deliverables and the Arabic sign-off
 
@@ -266,18 +335,28 @@ WP14's deliverables:
   header's exception, page header, type on phones, StatePanel, action bar, folds, tiles,
   gallery, z-stack).
 - `CLAUDE.md`, `.claude/skills/contact-form/skill.md`, `.claude/skills/turnstile-spin/skill.md`
-  updated to the code as it is.
+  updated to the code as it is; after the stage 6 review also `new-page` (both route trees
+  over a view, the visible `Breadcrumb`, the band header, `npm run check`) and
+  `new-component` (the `.cta` family and the CTA vocabulary), whose old templates would now
+  fail `check-consistency`.
 
 **The Gulf Arabic sign-off has not happened.** The catalogue and the list of strings to read
 are in `backlog.md` (MB-30). Release waits on it.
 
-## Accepted deviations
+## Deviations from the plan
 
-| What | Decided |
-|------|---------|
-| Home at about 8,000px on a 390 phone (item 9) | Owner, 2026-11-09 |
-| Desktop header button keeps "Get Quote", weight 500 | Owner, 2026-11-09 |
-| One S17 line; S14's draft line is S15's | Owner, 2026-11-09 |
-| Category pages: focus order follows the DOM, not the visual order on phones (MB-50) | WP11 review |
-| Find in page and `#:~:text=` links can't open a closed fold on phones (MB-51) | WP10 review |
-| `/contact` at 1366x657 fits one screen with a thin margin: the last fold clears the WhatsApp pill by 10.5px (EN) and 27px (AR) (MB-52) | Stage 5 review |
+Only the owner can accept a deviation from the approved plan. The first three are the
+owner's; the next three were accepted by reviews and wait on the owner's confirmation
+(MB-39); the last three have no decision yet (MB-55, MB-56, MB-06).
+
+| What | Status |
+|------|--------|
+| Home at about 8,000px on a 390 phone (item 9) | Accepted by the owner, 2026-11-09 |
+| Desktop header button keeps "Get Quote", weight 500 | Accepted by the owner, 2026-11-09 |
+| One S17 line; S14's draft line is S15's | Accepted by the owner, 2026-11-09 |
+| Category pages: focus order follows the DOM, not the visual order on phones (MB-50; item 13) | Accepted by the WP11 review, **owner to confirm** |
+| Find in page and `#:~:text=` links can't open a closed fold on phones (MB-51) | Accepted by the WP10 review, **owner to confirm** |
+| `/contact` at 1366x657 fits one screen with a thin margin: the last fold clears the WhatsApp pill by 10.5px (EN) and 27px (AR) (MB-52) | Accepted by the stage 5 review, **owner to confirm** |
+| The offline page and `global-error` offer their catalogue rows' actions, not the bar's two (MB-55; item 2) | **Owner to decide** |
+| S19's Copy is a secondary button, under its failure row's own primary (MB-56; item 3) | **Owner to decide** |
+| Home lab LCP about 6% above a fresh base build on average, +19% in one session; first paint 0.15 to 0.2 s later on every page (MB-06; item 11) | **Owner to decide**: release and judge on field LCP, or cut the pre-paint cost first |

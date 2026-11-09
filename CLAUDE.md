@@ -77,11 +77,15 @@ node scripts/audit-mobile.mjs --strict   # tap targets, inputs, bar and heights 
 node scripts/audit-mobile.mjs --form     # every contact form outcome, mocked (no real send)
 ```
 
-`check-consistency` (`scripts/check-consistency.mjs`) fails on a retired CTA label, a wrong
-icon on a CTA, a breadcrumb that differs from its BreadcrumbList, a phone number, hours or
-saved-message line in `global-error.tsx`, `global-not-found.tsx`, `out/404.html` or
-`public/sw.js` that differs from `src/lib/site.ts` and the dictionaries, a draft key or
-version in `sw.js` that differs from `src/lib/draft.ts`, and a missing `sw.js`. The audit
+`check-consistency` (`scripts/check-consistency.mjs`) fails on a retired CTA label (in
+`out/`, or in `src/` written out or as `nav.getQuote` outside the `.nav-cta` element), a
+desktop header button (`.nav-cta`) that doesn't say `nav.getQuote`, a wrong icon on a CTA,
+a breadcrumb that differs from its BreadcrumbList, a phone number, hours or saved-message
+line in `global-error.tsx`, `global-not-found.tsx`, `out/404.html` or `public/sw.js` that
+differs from `src/lib/site.ts` and the dictionaries (`global-error.tsx` must have the saved
+line in both languages), a `/contact` hours line (`pages.contact.hoursLine`) whose days and
+hours differ from `formStates.open`, a draft key or version in `sw.js` that differs from
+`src/lib/draft.ts`, and a missing `sw.js`. The audit
 and snapshot scripts need Chrome (`CHROME_PATH` if it isn't in `/Applications`) and serve
 `out/` themselves.
 

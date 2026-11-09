@@ -14,9 +14,12 @@
  *    WhatsApp, email and map rows (ct-method, ft-contact), the social icons (ft-social)
  *    and the 404's number (nf-tel).
  *    Labels the plan retired (RETIRED) fail anywhere: as an element's text in out/, or as
- *    a string anywhere in src/, which also covers what only renders after hydration.
+ *    a string anywhere in src/, which also covers what only renders after hydration. A
+ *    retired label reached through its key is caught the same way: code in src/ may use
+ *    nav.getQuote once, inside the .nav-cta element in Navbar.tsx.
  *    WhatsApp CTAs carry WhatsAppIcon and no cart, phone or chat icon; a .cta button with
- *    a WhatsApp label must carry it; a tel: link must not.
+ *    a WhatsApp label must carry it; a tel: link must not. (StatePanel's buttons render
+ *    after hydration, so they are not read here; they are words only, design.md.)
  * 2. Breadcrumbs. Every page but Home shows one trail (components/Breadcrumb.tsx) and has
  *    one BreadcrumbList, and the two agree step for step: names, links and the page.
  * 3. Phone, hours and the saved-message line. global-error.tsx, global-not-found.tsx (and
@@ -24,7 +27,8 @@
  *    src/lib/site.ts or to the dictionaries doesn't reach them by itself. Any phone number
  *    in them must be PHONE / PHONE_E164 from site.ts, any time of day must sit inside the
  *    formStates.open sentence of en.client.ts or ar.client.ts, word for word, and a
- *    `saved:` line must be statePanel.draftSaved. The /contact page's hours line
+ *    `saved:` line must be statePanel.draftSaved; global-error.tsx must have that line in
+ *    both languages, under that key. The /contact page's hours line
  *    (pages.contact.hoursLine in en.ts and ar.ts) must give the days and hours of its
  *    language's formStates.open word for word.
  * 4. The service worker. public/sw.js (and out/sw.js after a build) must exist: a 404 on
@@ -210,6 +214,12 @@ function walk(dir) {
 }
 // nav.getQuote's own entries in the client dictionaries hold the header button's label.
 const getQuoteEntry = /^\s*getQuote: "[^"]*",$/m;
+// Comments may name nav.getQuote; code may use it once, on the header button. Blank
+// comments keep their newlines, so line numbers hold; the `//` rule skips "https://".
+const stripComments = (source) =>
+  source.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, "")).replace(/(?<![:"'`\w\\])\/\/[^\n]*/g, "");
+const NAVBAR = "src/components/Navbar.tsx";
+const getQuoteUses = [];
 for (const file of walk("src")) {
   let source = read(file);
   if (file === DICT.en || file === DICT.ar) source = source.replace(getQuoteEntry, "");
@@ -217,6 +227,19 @@ for (const file of walk("src")) {
     const quoted = [`"${label}"`, `'${label}'`, `\`${label}\``, `>${label}<`];
     if (quoted.some((q) => source.includes(q))) fail(file, `retired CTA label "${label}"`);
   }
+  // The label behind a key: nav.getQuote anywhere but the header button, including the
+  // phone menu and the panels, which only render after hydration and so never reach out/.
+  const code = stripComments(source);
+  for (const match of code.matchAll(/\bgetQuote\b/g)) getQuoteUses.push({ file, code, at: match.index });
+}
+{
+  const header = /<(\w+)\b[^>]*\bnav-cta\b[^>]*>[\s\S]*?<\/\1>/.exec(getQuoteUses.find((u) => u.file === NAVBAR)?.code ?? "");
+  const onHeader = (u) => u.file === NAVBAR && header && u.at > header.index && u.at < header.index + header[0].length;
+  for (const use of getQuoteUses.filter((u) => !onHeader(u))) {
+    const line = use.code.slice(0, use.at).split("\n").length;
+    fail(`${use.file}:${line}`, `nav.getQuote outside the desktop header button (.nav-cta): the label is retired everywhere else`);
+  }
+  if (getQuoteUses.filter(onHeader).length !== 1) fail(NAVBAR, "the desktop header button (.nav-cta) must show nav.getQuote once");
 }
 
 // ---------------------------------------------------------------- phone and hours
@@ -264,6 +287,17 @@ for (const file of SELF_CONTAINED) {
   for (const [, saved] of text.matchAll(/\bsaved: "([^"]*)"/g)) {
     if (saved !== VOCAB.en.draftSaved && saved !== VOCAB.ar.draftSaved) {
       fail(file, `saved line "${saved}" is not statePanel.draftSaved ("${VOCAB.en.draftSaved}" / "${VOCAB.ar.draftSaved}")`);
+    }
+  }
+}
+// global-error.tsx always has its copy of S15's saved line (sw.js's is checked below, when
+// it reads the draft): held to the key's name too, so a renamed key can't slip past.
+{
+  const GLOBAL_ERROR = "src/app/global-error.tsx";
+  const source = fs.existsSync(GLOBAL_ERROR) ? read(GLOBAL_ERROR) : "";
+  for (const lang of ["en", "ar"]) {
+    if (source && !source.includes(`saved: "${VOCAB[lang].draftSaved}"`)) {
+      fail(GLOBAL_ERROR, `no saved: "${VOCAB[lang].draftSaved}" (statePanel.draftSaved, ${lang})`);
     }
   }
 }

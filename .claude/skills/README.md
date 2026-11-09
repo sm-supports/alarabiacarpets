@@ -8,7 +8,7 @@ Each folder below contains a `skill.md` with step-by-step instructions for a spe
 |-------|--------|-------------|
 | Deploy | `deploy/` | Build, test, and deploy to Cloudflare Pages |
 | New Component | `new-component/` | Create a new React component following project patterns |
-| New Page | `new-page/` | Add a new routed page with lazy loading |
+| New Page | `new-page/` | Add a new routed page, in both languages |
 | Add Product | `add-product/` | Add a single product to the catalog |
 | Email Template | `email-template/` | Create or modify branded email templates |
 | Content Update | `content-update/` | Update hero text, about page, services, SEO metadata |

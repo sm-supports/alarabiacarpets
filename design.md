@@ -324,10 +324,13 @@ One set of labels everywhere. They are shared HTML, so desktop shows them too.
   "المقاس:", then the page address without its query, so `gclid` and `lang=en` never reach
   the customer's chat.
 - A WhatsApp CTA carries `WhatsAppIcon` and nothing else: no cart, phone or chat icon. A
-  `tel:` link carries the phone icon or none.
+  `tel:` link carries the phone icon or none. One exception: `StatePanel`'s buttons are
+  words only (below).
 - Retired, and failed by `check-consistency` anywhere in `src/` or `out/`: "Get Quote"
   (except on `.nav-cta`), "Contact Us on WhatsApp", "Chat on WhatsApp", "Inquire on
-  WhatsApp", "Call Now", and their Arabic.
+  WhatsApp", "Call Now", and their Arabic. In `src/` it catches the label written out and
+  `nav.getQuote` used anywhere but inside the `.nav-cta` element, so the phone menu and the
+  panels, which never reach `out/`, are covered too.
 
 ### Page header
 
@@ -383,8 +386,12 @@ as props; it reads no context.
   - `page`: the whole body of a page (`.sp-page`): `error.tsx` (S15). Never a Close.
 - **Close** (`.sp-close`): 44px, top end. Focus goes back where it was.
 - **Focus and speech:** the status and alert regions are always mounted, so a change is
-  announced. Failures the visitor's own press caused (S7 to S10, and Sent) move focus to
-  the headline. `urgent` uses the alert role.
+  announced. Failures the visitor's own press caused move focus: S7 to S9 and Sent to the
+  headline, S10 (field errors) to the first field in error. `urgent` uses the alert role.
+- **Buttons are words only.** A panel's WhatsApp and Call buttons carry no icon, unlike
+  the bar and the cards: the panel's headline already says what each one is for, and a
+  column of full-width buttons reads by its labels. `check-consistency` reads the static
+  HTML, which these never reach (they render after hydration), so this rule is held here.
 - Names, emails and REF go in `<bdi>`, so they don't reorder in Arabic.
 - One status at a time. A form state in view outranks all tap feedback, then S4, S2, S1,
   S3 (`lib/feedback.ts`).
@@ -452,8 +459,9 @@ hidden. From `md` the 300 / 500px box is as before.
 
 `ImageFallback` (in `providers.tsx`): a catalog photo that fails becomes a tile (`.imgx`) in
 its own box, its alt text over "Image unavailable". A video keeps its poster and gets the same
-words as a band across its top (`.imgx-v`). Both are asked for again when the connection
-comes back.
+words as a band across its top (`.imgx-v`); where a count badge sits over it, the band's
+words keep 4.75rem clear on both sides. Both are asked for again when the connection comes
+back.
 
 ### Z-stack
 

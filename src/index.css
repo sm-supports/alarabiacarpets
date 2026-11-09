@@ -976,6 +976,15 @@
      badge still shows the video icon. */
   .cat-media .imgx { padding: 0.5rem 0.5rem 3.25rem; }
   .pc-play:has(> img[data-imgx]) .pc-play-badge { display: none; }
+  /* A video's band runs under the count badge ("1/2", top end, z-10) where one shows: in
+     the product page's gallery below md, on the cards from sm. The words keep clear of it
+     on both sides, so they stay centred (MB-01). */
+  @media not all and (min-width: 768px) {
+    .pd-slide .imgx-v { padding-inline: 4.75rem; }
+  }
+  @media (min-width: 640px) {
+    .pc-count ~ .pc-track .imgx-v { padding-inline: 4.75rem; }
+  }
 }
 
 /* S17: a service with no price says what the free quote takes, above the band's button. */
@@ -1259,6 +1268,7 @@
 }
 .fold-all > .fold[open] > summary::after { transform: translateY(-50%) rotate(45deg); }
 .fold-all:has(> .fold:not([open])) + .fold-body { display: none; }
+.fold-all:has(> .fold:not([open])) + .fold-lead + .fold-body { display: none; }
 /* On the forest (/contact): the sign and the focus ring in gold. */
 .ct-fold .fold-all > .fold > summary::after { color: #C5A572; }
 .ct-fold .fold-all > .fold > summary:focus-visible { outline-color: #C5A572; }

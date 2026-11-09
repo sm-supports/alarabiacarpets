@@ -735,6 +735,8 @@
   /* A tile's price line, on phones only (the tile rules at the end of this file): on the
      /products cards and on the category landings' product tiles, whose description is .rel-text. */
   .pc-price { @apply mt-1 font-poppins text-xs font-semibold text-forest-900 sm:hidden; text-wrap: balance; }
+  /* "2/5" over a card's photos and the product page's phone gallery; each sets its own side. */
+  .pc-count { @apply absolute top-3 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm; }
   .rel-text { @apply mt-1 font-poppins text-xs text-neutral-500 line-clamp-2; }
   /* /products "Shop by category" cards. */
   .cat-card { @apply block rounded-xl overflow-hidden border border-neutral-200 transition-all duration-300 hover:shadow-md; }
@@ -1100,7 +1102,8 @@
 @media not all and (min-width: 640px) {
   .pc-card { position: relative; border-radius: 0.75rem; }
   .pc-media { border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem; }
-  .pc-track { overflow: hidden; }
+  /* The cards' track only: the product page's gallery (ProductGallery) swipes on phones. */
+  .pc-card .pc-track { overflow: hidden; }
   .pc-body { padding: 0.625rem; }
   .pc-title { margin-bottom: 0; font-size: 0.875rem; line-height: 1.25rem; -webkit-line-clamp: 2; }
   .pc-title a::after { content: ""; position: absolute; inset: 0; }
@@ -1111,4 +1114,59 @@
   .pc-act, .pc-play-badge { display: none; }
   main p:is(.pc-price, .pc-text, .rel-text):not(.x) { line-height: 1.5; }
   [dir="rtl"] main p:is(.pc-price, .pc-text, .rel-text):not(.x) { line-height: 1.6; }
+}
+
+/* The product page (ProductDetailView, ProductMedia, ProductGallery). From sm these are the
+   classes the card had before. Below sm, on a phone held upright, the card runs edge to
+   edge, its text lines up with the page's gutter and the photo box is 4:3. Between sm and
+   md the card stays inset, because the header's container is 640px wide there and an
+   edge-to-edge card would not line up with it. Below md the photo box holds a swipe strip:
+   the server-rendered hero, then the product's other photos once hydrated. */
+@layer components {
+  .pd-card { @apply grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg shadow-md overflow-hidden max-sm:-mx-4 max-sm:gap-0 max-sm:rounded-none max-sm:shadow-none; }
+  .pd-body { @apply px-4 py-6 sm:p-6 md:p-8 flex flex-col justify-between; }
+  /* The photo box: 300px, 500px from md, as before; 4:3 across a phone below sm. */
+  .pd-media { @apply relative h-[300px] overflow-hidden bg-gray-100 md:h-[500px] max-sm:h-auto max-sm:aspect-[4/3]; }
+  .pd-slide { @apply relative h-full w-full flex-shrink-0 snap-center; }
+}
+
+/* Folds (.fold): text that is folded on phones and open from md, in every browser, with no
+   script and nothing moving. The <details> holds only its <summary>; the text is the next
+   element, .fold-body, which a closed fold hides below md. The text is in the HTML either
+   way, so crawlers and the SEO snapshot read it. (The plan put the text inside the
+   <details> and opened it at md with ::details-content: a browser without that, such as
+   Safari before 18.4 or an older Firefox, would have shown desktop folded.)
+   A summary that is only a label (.fold-l) leaves with its fold at md (md:hidden on the
+   <details>). A summary holding a heading shows the heading at md and up, as it was, while
+   the summary itself is hidden there, so it is neither a tab stop nor a button. */
+@layer components {
+  .fold > summary { list-style: none; }
+  .fold > summary::-webkit-details-marker { display: none; }
+  .fold-l { @apply font-poppins font-medium text-primary; }
+}
+@media not all and (min-width: 768px) {
+  /* A block with the chevron placed absolutely, not flex: older browsers ignored flex on a
+     summary. At least 44px: 10px above and below a line of 25px or more. */
+  .fold > summary {
+    display: block; position: relative; min-height: 2.75rem; padding-block: 0.625rem; padding-inline-end: 2rem;
+    cursor: pointer; border-radius: 0.25rem;
+  }
+  .fold > summary > * { margin: 0; }
+  .fold > summary:focus-visible { outline: 2px solid #0A2A1F; outline-offset: 2px; }
+  /* A chevron at the end: down when closed, up when open. CSS, so it isn't page text. */
+  .fold > summary::after {
+    content: ""; content: "" / "";
+    position: absolute; top: 50%; inset-inline-end: 0.5rem; width: 0.5rem; height: 0.5rem;
+    border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+    transform: translateY(-75%) rotate(45deg); transition: transform 200ms;
+  }
+  .fold[open] > summary::after { transform: translateY(-25%) rotate(-135deg); }
+  .fold:not([open]) + .fold-body { display: none; }
+}
+@media (min-width: 768px) {
+  .fold > summary { display: block; visibility: hidden; pointer-events: none; }
+  .fold > summary > * { visibility: visible; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fold > summary::after { transition: none; }
 }

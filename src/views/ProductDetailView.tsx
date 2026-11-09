@@ -9,6 +9,7 @@ import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
 import FaqList from "@/components/FaqList";
 import ProductMedia from "@/components/ProductMedia";
+import type { GallerySlide } from "@/components/ProductGallery";
 import RelatedProducts from "@/components/RelatedProducts";
 import RelatedGuides from "@/components/RelatedGuides";
 import ServiceLinks from "@/components/ServiceLinks";
@@ -18,7 +19,7 @@ import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Check } from "@/components/icons";
 import { categoryLabelFor, findProduct, getProducts, servicesForProductL } from "@/data/localized";
-import { fullImage, fullImagePath } from "@/lib/card-image";
+import { cardImagePath, fullImage, fullImagePath } from "@/lib/card-image";
 import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
 import {
   absoluteUrl,
@@ -79,6 +80,15 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
   const poster = fullImagePath(product.imageSrc);
   if (videoSrc) preload(poster, { as: "image", fetchPriority: "high" });
 
+  // The phone gallery's slides after the hero: the product's other photos and videos.
+  // A video hero's poster is the product's own photo, so that photo isn't repeated. The
+  // photos are the cards' 4:3 copies, one URL each: the phone box is 4:3 too (.pd-media),
+  // and only hero images have uncropped copies.
+  const slides: GallerySlide[] = product.media
+    .slice(1)
+    .filter((item) => !(item.type === "image" && item.src === product.imageSrc))
+    .map((item) => ({ type: item.type, src: item.type === "video" ? item.src : cardImagePath(item.src) }));
+
   const t = getDict(locale);
   const lp = (path: string) => localePath(locale, path);
   const label = categoryLabelFor(locale, product.category);
@@ -100,11 +110,14 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
       <Navbar />
       <main className="flex-grow">
         <section className="py-10 md:py-14 bg-neutral-50">
+          {/* On a phone the card runs edge to edge (.pd-card): the first screen is the
+              trail, the photos, the name and the price. */}
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
             {/* Breadcrumb: real anchors, not a JS-only back button */}
             <Breadcrumb locale={locale} trail={crumbs} className="mb-6" />
 
-            <div className="mb-6">
+            {/* On phones the trail's Products link does this job. */}
+            <div className="mb-6 max-md:hidden">
               <Button asChild variant="ghost" className="flex items-center gap-2 w-fit">
                 <Link href={lp("/products")}>
                   <ArrowLeft size={16} className="rtl:-scale-x-100" />
@@ -113,14 +126,16 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="pd-card">
               <ProductMedia
                 alt={productImageAlt(product, locale)}
                 {...(videoSrc ? { src: poster } : fullImage(product.imageSrc, "(min-width:1024px) 50vw, 66vw"))}
                 videoSrc={videoSrc}
+                slides={slides}
+                poster={slides.some((slide) => slide.type === "video") ? poster : undefined}
               />
 
-              <div className="p-6 md:p-8 flex flex-col justify-between">
+              <div className="pd-body">
                 <div>
                   <div className="mb-6">
                     <p className="font-poppins text-sm text-primary/70 mb-2">{label}</p>
@@ -139,11 +154,23 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
                       {t.facts.productSummary(product.name, fromPrice)}
                     </p>
                     <p className="font-poppins text-muted-foreground">{product.description}</p>
-                    {product.longDescription?.map((para, i) => (
-                      <p key={i} className="font-poppins text-muted-foreground mt-3">
-                        {para}
-                      </p>
-                    ))}
+                    {/* Folded on phones (.fold in index.css): the toggle is a <details> of its
+                        own and the text follows it, so the text is in the HTML and shows at
+                        md and up in every browser, with no script. The toggle goes at md. */}
+                    {product.longDescription?.length ? (
+                      <>
+                        <details className="fold md:hidden">
+                          <summary className="fold-l">{t.service.viewDetails(product.name)}</summary>
+                        </details>
+                        <div className="fold-body">
+                          {product.longDescription.map((para, i) => (
+                            <p key={i} className="font-poppins text-muted-foreground mt-3">
+                              {para}
+                            </p>
+                          ))}
+                        </div>
+                      </>
+                    ) : null}
                   </div>
 
                   {product.specs?.length ? (
@@ -162,11 +189,17 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
                     </div>
                   ) : null}
 
+                  {/* Folded on phones too, its heading the toggle; at md and up the heading
+                      shows as before and the toggle is out of reach. */}
                   <div className="mb-8">
-                    <h2 className="font-playfair text-xl font-semibold mb-3">
-                      {t.productDetail.included}
-                    </h2>
-                    <ul className="font-poppins space-y-2">
+                    <details className="fold">
+                      <summary>
+                        <h2 className="font-playfair text-xl font-semibold mb-3">
+                          {t.productDetail.included}
+                        </h2>
+                      </summary>
+                    </details>
+                    <ul className="fold-body font-poppins space-y-2">
                       {t.productDetail.features.map((feature) => (
                         <li key={feature} className="flex items-center gap-2">
                           <Check size={16} className="text-primary flex-shrink-0" />
@@ -184,7 +217,9 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
                     className="cta cta-m w-full"
                   >
                     <WhatsAppIcon />
-                    {t.common.heroQuote}
+                    {/* The product-card label: heroQuote took two lines here on a 320px phone
+                        in both languages, and at 360 in Arabic. */}
+                    {t.nav.getFreeQuote}
                   </WhatsAppLink>
                 </div>
               </div>

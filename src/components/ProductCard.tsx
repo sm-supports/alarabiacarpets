@@ -163,7 +163,7 @@ const ProductCard = memo(function ProductCard({
 
         {/* Media Count Badge. Not on a phone tile, which shows one photo and doesn't swipe. */}
         {hydrated && displayMedia.length > 1 && (
-          <div className="max-sm:hidden absolute top-3 right-3 z-10 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium">
+          <div className="pc-count right-3 max-sm:hidden">
             {displayMedia[activeIndex]?.type === 'video' ? <Video size={11} /> : <ImageIcon size={11} />}
             <span>{activeIndex + 1}/{displayMedia.length}</span>
           </div>

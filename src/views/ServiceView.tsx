@@ -112,10 +112,14 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
 
       <BarIntent name={service.label} type="service" slug={service.slug} />
       <Navbar />
-      <main className="flex-grow">
+      {/* Below md, main is a column whose order puts the project photos, where a service
+          has them, straight under the band and its hero photo, ahead of the intro. Only the
+          order on screen changes: the HTML, its headings and its links keep their order
+          (check-internal-links and the SEO snapshot read it), and the photos hold no control. */}
+      <main className="flex-grow max-md:flex max-md:flex-col">
         {/* Text band. A hero photo follows it when the service has one; the
             services without photography stay text-only rather than borrowing. */}
-        <div className="bg-primary text-white py-12 md:py-16">
+        <div className="bg-primary text-white py-12 md:py-16 max-md:order-first">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
             <Breadcrumb locale={locale} trail={crumbs} dark />
             <h1 className="h1-band">
@@ -134,7 +138,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
         </div>
 
         {service.heroImage && (
-          <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-4xl -mt-8 md:-mt-10 relative">
+          <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-4xl -mt-8 md:-mt-10 relative max-md:order-first">
             <img
               {...fullImage(service.heroImage, "(min-width:1024px) 896px, 66vw")}
               alt={service.heroImageAlt ?? service.heading}
@@ -161,10 +165,16 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
               {service.offers.map((o) => <li key={o} className="leading-relaxed">{o}</li>)}
             </ul>
 
-            <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
-              {t.service.workIncludes}
-            </h2>
-            <ul className="font-poppins text-neutral-700 text-[15px] space-y-2">
+            {/* Includes and Specifications fold on phones, each heading its toggle (.fold in
+                index.css); open from md, where the heading shows as before. */}
+            <details className="fold max-md:mt-8">
+              <summary>
+                <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
+                  {t.service.workIncludes}
+                </h2>
+              </summary>
+            </details>
+            <ul className="fold-body font-poppins text-neutral-700 text-[15px] space-y-2">
               {service.includes.map((inc) => (
                 <li key={inc} className="flex items-start gap-2 leading-relaxed">
                   <Check size={16} className="text-primary flex-shrink-0 mt-1" />
@@ -173,10 +183,14 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
               ))}
             </ul>
 
-            <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
-              {t.common.specifications}
-            </h2>
-            <dl className="font-poppins text-sm divide-y divide-neutral-100 border-y border-neutral-100">
+            <details className="fold max-md:mt-8">
+              <summary>
+                <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
+                  {t.common.specifications}
+                </h2>
+              </summary>
+            </details>
+            <dl className="fold-body font-poppins text-sm divide-y divide-neutral-100 border-y border-neutral-100">
               {service.specs.map((spec) => (
                 <div key={spec.label} className="flex justify-between gap-4 py-2.5">
                   <dt className="text-neutral-500">{spec.label}</dt>
@@ -229,7 +243,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
 
         {/* Our work -- real project photos for this service. */}
         {service.gallery?.length ? (
-          <section className="py-12 md:py-14 bg-neutral-50">
+          <section className="py-12 md:py-14 bg-neutral-50 max-md:order-first">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8">
               <h2 className="h2-sec">
                 {t.service.projects(service.label)}
@@ -295,7 +309,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
                     <Link
                       key={c.slug}
                       href={lp(`/products/${c.slug}`)}
-                      className="font-poppins text-sm px-4 py-2.5 rounded-full border border-neutral-200 bg-white text-neutral-700 transition-all duration-300 hover:border-primary/40 hover:text-primary"
+                      className="chip-link bg-white"
                     >
                       {t.service.browse(c.label)}
                     </Link>
@@ -346,7 +360,7 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
                       <Link
                         key={other.slug}
                         href={lp(`/services/${other.slug}`)}
-                        className="font-poppins text-sm px-4 py-2.5 rounded-full border border-neutral-200 bg-white text-neutral-700 transition-all duration-300 hover:border-primary/40 hover:text-primary"
+                        className="chip-link bg-white"
                       >
                         {other.label}
                       </Link>

@@ -29,10 +29,10 @@ export function categoryMetadata(locale: Locale, slug: string): Metadata {
   return buildCategoryMetadata(category, locale);
 }
 
-/** Specs table and FAQ list, shared by the main body and any secondary section. */
-function SpecList({ specs }: { specs: NonNullable<CategorySection["specs"]> }) {
+/** Specs table, shared by the main body (folded on phones) and any secondary section. */
+function SpecList({ specs, fold }: { specs: NonNullable<CategorySection["specs"]>; fold?: boolean }) {
   return (
-    <dl className="font-poppins text-sm divide-y divide-neutral-100 border-y border-neutral-100 max-w-2xl">
+    <dl className={`${fold ? "fold-body " : ""}font-poppins text-sm divide-y divide-neutral-100 border-y border-neutral-100 max-w-2xl`}>
       {specs.map((spec) => (
         <div key={spec.label} className="flex justify-between gap-4 py-2.5">
           <dt className="text-neutral-500">{spec.label}</dt>
@@ -100,8 +100,12 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
 
       <BarIntent name={category.label} type="category" slug={category.slug} />
       <Navbar />
-      <main className="flex-grow">
-        <div className="bg-primary text-white py-12 md:py-16">
+      {/* Below md, main is a column whose order puts the product tiles and the price guide
+          straight under the band, ahead of the body copy. Only the order on screen changes:
+          the HTML, its headings and its links keep their order (check-internal-links and the
+          SEO snapshot read it), and the body copy that moves down holds one control, its fold. */}
+      <main className="flex-grow max-md:flex max-md:flex-col">
+        <div className="bg-primary text-white py-12 md:py-16 max-md:order-first">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
             <Breadcrumb locale={locale} trail={crumbs} dark />
             <h1 className="h1-band">
@@ -131,12 +135,17 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
               </p>
             ))}
 
+            {/* Folded on phones, its heading the toggle (.fold in index.css); open from md. */}
             {category.specs?.length ? (
               <div className="mt-8">
-                <h2 className="font-playfair text-2xl font-bold text-neutral-900 mb-4">
-                  {t.category.whatWeOffer}
-                </h2>
-                <SpecList specs={category.specs} />
+                <details className="fold">
+                  <summary>
+                    <h2 className="font-playfair text-2xl font-bold text-neutral-900 mb-4">
+                      {t.category.whatWeOffer}
+                    </h2>
+                  </summary>
+                </details>
+                <SpecList specs={category.specs} fold />
               </div>
             ) : null}
 
@@ -160,7 +169,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
 
         {/* The products in this category */}
         {items.length > 0 && (
-          <section className="py-12 md:py-14 bg-neutral-50">
+          <section className="py-12 md:py-14 bg-neutral-50 max-md:order-first">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8">
               <h2 className="h2-sec">
                 {t.category.weSupply(category.label)}
@@ -172,7 +181,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
                     href={lp(`/products/${p.id}`)}
                     className="group rel-card"
                   >
-                    <div className="aspect-[4/3] overflow-hidden bg-neutral-100">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
                       {p.imageSrc.endsWith(".mp4") ? (
                         <div className="w-full h-full flex items-center justify-center text-neutral-400 text-xs p-2 text-center">
                           {p.name}
@@ -207,7 +216,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
         )}
 
         {priceGuide.length > 0 && (
-          <section className="py-12 md:py-14 bg-white">
+          <section className="py-12 md:py-14 bg-white max-md:order-first">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
               <h2 className="h2-sec6">{t.category.priceGuide}</h2>
               <table className="w-full font-poppins text-sm border-y border-neutral-100">
@@ -221,7 +230,8 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
                   {priceGuide.map((row) => (
                     <tr key={row.id}>
                       <td className="py-2.5">
-                        <Link href={lp(`/products/${row.id}`)} className="font-medium text-primary hover:underline">{row.name}</Link>
+                        {/* A 44px tap below md: the row grows 4px, the text stays centred. */}
+                        <Link href={lp(`/products/${row.id}`)} className="font-medium text-primary hover:underline max-md:block max-md:py-3 max-md:-my-2.5">{row.name}</Link>
                       </td>
                       <td className="py-2.5 text-end text-neutral-900 font-medium">{row.price}</td>
                     </tr>

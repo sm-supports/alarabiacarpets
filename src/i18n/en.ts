@@ -279,7 +279,7 @@ export const en = {
       call: "Call",
       email: "Email",
       directions: "Directions",
-      showroomShort: "Al Mansoura St, Doha",
+      showroomShort: "Al Mansoura St, Doha, Qatar",
       hoursLine: "Open every day, 8:00 AM to 10:00 PM · Doha, Al Rayyan, Al Wakra, Al Khor, Lusail and all of Qatar",
     },
   },

@@ -76,6 +76,38 @@ function expectedHeadings(url, headings) {
   }
   return swapped;
 }
+// The contact page on one screen (feature/contact-one-screen, the owner's request of
+// 9 November 2026): /contact keeps one title, so the home section's heading, subtitle,
+// "Get in Touch" list and quick links leave it, and the form's heading becomes an h2 under
+// the page's h1. Exact entries, on these two pages only: the home page keeps all of them,
+// and anything else removed from /contact still fails.
+const CONTACT_PAGE_REMOVED = {
+  "/contact": new Set([
+    "h2 Ready to Transform Your Space?",
+    "h3 Get in Touch",
+    "h3 Send a Message",
+    "Ready to Transform",
+    "Your Space?",
+    "Get in touch with our team for personalized recommendations and a free quote. We're here to bring your vision to life.",
+    "Get in Touch",
+    "Location",
+    "Quick Links",
+    "View Products",
+    "About Us",
+  ]),
+  "/ar/contact": new Set([
+    "h2 جاهز تجدّد مساحتك؟",
+    "h3 تواصل معنا",
+    "h3 أرسل لنا رسالة",
+    "جاهز تجدّد",
+    "مساحتك؟",
+    "تواصل مع فريقنا واحصل على توصيات تناسبك وعرض سعر مجاني. حيّاكم، ونحن هنا لنحوّل فكرتك إلى واقع.",
+    "روابط سريعة",
+    "شوف المنتجات",
+    "من نحن",
+  ]),
+};
+const isContactPageRemoval = (text, url) => CONTACT_PAGE_REMOVED[url]?.has(text) ?? false;
 // The product price line without a price (WP8, S17): "Contact for Price" gives way to
 // what the free quote takes, on product pages only. Each S17 line is reported as a
 // planned addition; services gain it as a line of their own.
@@ -229,7 +261,10 @@ function diffSite(baseline, now) {
     if (before.description !== after.description) add(failures, "description changed", `${before.description} -> ${after.description}`, url);
     if (JSON.stringify(before.h1) !== JSON.stringify(after.h1)) add(failures, "h1 changed", `${before.h1.join(" | ")} -> ${after.h1.join(" | ")}`, url);
 
-    for (const heading of missingFrom(before.headings, after.headings)) add(failures, "heading removed or changed", heading, url);
+    for (const heading of missingFrom(before.headings, after.headings)) {
+      if (isContactPageRemoval(heading, url)) add(notes, "contact page on one screen (planned)", heading, url);
+      else add(failures, "heading removed or changed", heading, url);
+    }
     for (const heading of missingFrom(after.headings, before.headings)) add(notes, "heading added", heading, url);
     const expected = expectedHeadings(url, before.headings);
     const swapPlanned = JSON.stringify(expected) !== JSON.stringify(before.headings);
@@ -246,7 +281,8 @@ function diffSite(baseline, now) {
     const added = missingFrom(after.main, before.main);
     const addedText = added.join(" ");
     for (const text of missingFrom(before.main, after.main)) {
-      if (isPlannedLabel(text, url)) add(notes, "CTA label replaced (planned)", text, url);
+      if (isContactPageRemoval(text, url)) add(notes, "contact page on one screen (planned)", text, url);
+      else if (isPlannedLabel(text, url)) add(notes, "CTA label replaced (planned)", text, url);
       else if (PLANNED_PRICE_LINES.has(text) && isProduct(url) && added.some((line) => FREE_QUOTE_LINES.has(line))) {
         add(notes, "price line replaced by S17 (planned)", text, url);
       } else if (isSeparator(text)) add(notes, "separator removed", text, url);

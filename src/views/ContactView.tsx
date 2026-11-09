@@ -119,16 +119,6 @@ export default function ContactView({ locale }: { locale: Locale }) {
                 <p>{page.hoursText(PHONE, EMAIL)}</p>
                 <h3>{page.areasTitle}</h3>
                 <p>{page.areasText}</p>
-                <h3>{page.helpTitle}</h3>
-                <ul className="cat-links">
-                  {getCategories(locale).map((category) => (
-                    <li key={category.slug}>
-                      <Link href={localePath(locale, `/products/${category.slug}`)}>
-                        {page.categoryIn(category.label)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
               </div>
             </details>
             <details className="ct-fold">
@@ -141,6 +131,16 @@ export default function ContactView({ locale }: { locale: Locale }) {
                   ))}
                 </ul>
                 <p>{page.quoteNote}</p>
+                <h3>{page.helpTitle}</h3>
+                <ul className="cat-links">
+                  {getCategories(locale).map((category) => (
+                    <li key={category.slug}>
+                      <Link href={localePath(locale, `/products/${category.slug}`)}>
+                        {page.categoryIn(category.label)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </details>
             <details className="ct-fold">

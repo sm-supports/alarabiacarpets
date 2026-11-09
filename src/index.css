@@ -829,6 +829,52 @@
   .cat-price { @apply absolute bottom-2 start-2 max-w-[calc(100%-1rem)] rounded-lg bg-primary px-2 py-1 font-poppins text-[11px] font-medium leading-tight text-white sm:text-xs; }
 }
 
+/* The contact page (ContactView.tsx, ContactSection layout="page"): one h1, four contact
+   tiles and an hours line beside the form, and the showroom, quote and FAQ text in closed
+   panels. The panels stay closed at every width (unlike .fold), so from lg the page fits
+   one screen; their text is in the HTML either way. */
+@layer components {
+  .ct-h1 { @apply font-playfair text-3xl sm:text-4xl lg:text-[2.5rem] font-bold leading-tight text-white; }
+  .ct-intro { @apply mt-2 font-poppins text-sm sm:text-base text-white/70; }
+  .ct-tiles { @apply mt-5 grid grid-cols-2 gap-3; }
+  .ct-tile { @apply flex h-full min-h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 sm:px-4 text-white transition-colors duration-200 hover:bg-white/10 active:scale-[0.98]; }
+  .ct-tile:focus-visible { @apply outline outline-2 outline-offset-2 outline-gold-500; }
+  .ct-tile-main { @apply border-gold-500 bg-gold-500 text-forest-900 hover:bg-gold-400; }
+  .ct-tile-icon { @apply h-5 w-5 flex-shrink-0 text-gold-400; }
+  .ct-tile-main .ct-tile-icon { @apply text-forest-900; }
+  .ct-tile-text { @apply flex min-w-0 flex-col; }
+  .ct-tile-label { @apply font-poppins text-sm font-semibold leading-snug; }
+  .ct-tile-value { @apply truncate font-poppins text-xs opacity-75; }
+  .ct-hours { @apply mt-4 font-poppins text-xs sm:text-sm leading-relaxed text-white/70; }
+  .ct-skel-page { @apply min-h-[300px] sm:min-h-[300px]; }
+  .ct-skel-page .ct-skel-area { @apply h-[90px]; }
+  .ct-folds { @apply border-t border-white/10; }
+  .ct-fold { @apply border-b border-white/10; }
+  .ct-fold > summary { @apply relative flex min-h-11 cursor-pointer list-none items-center py-2.5 pe-8; }
+  .ct-fold > summary::-webkit-details-marker { display: none; }
+  .ct-fold > summary:focus-visible { @apply rounded outline outline-2 outline-offset-2 outline-gold-500; }
+  .ct-fold-h { @apply font-playfair text-base sm:text-lg font-semibold text-white; }
+  .ct-fold-body { @apply space-y-3 pb-4 font-poppins text-sm leading-relaxed text-white/75; }
+  .ct-fold-body h3 { @apply font-playfair text-base font-semibold text-white; }
+  .ct-fold-body a { @apply text-gold-400 hover:underline; }
+  /* FaqList, made for light pages, on the forest. */
+  .ct-fold-body .faq-q { @apply text-white; }
+  .ct-fold-body .faq-a { @apply text-white/70; }
+  .ct-fold-body .faq-toggle { @apply text-gold-400; }
+  .ct-fold-body .divide-y, .ct-fold-body .divide-y > * { @apply border-white/10; }
+}
+/* A chevron at the end of each panel's summary: down when closed, up when open. */
+.ct-fold > summary::after {
+  content: ""; content: "" / "";
+  position: absolute; top: 50%; inset-inline-end: 0.5rem; width: 0.5rem; height: 0.5rem;
+  border-right: 2px solid #C5A572; border-bottom: 2px solid #C5A572;
+  transform: translateY(-75%) rotate(45deg); transition: transform 200ms;
+}
+.ct-fold[open] > summary::after { transform: translateY(-25%) rotate(-135deg); }
+@media (prefers-reduced-motion: reduce) {
+  .ct-fold > summary::after { transition: none; }
+}
+
 @layer components {
   /* The site's buttons, one family: .cta forest on light, .cta-dark gold on the forest
      bands, .cta-2 outlined. 48px tall, full radius, 14px semibold. They replace .pc-cta,

@@ -217,8 +217,23 @@ const INPUT_CLASS =
 const TEXTAREA_CLASS =
   "w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 aria-[invalid=true]:border-red-300 rounded-lg sm:rounded-xl resize-none text-base";
 
-const ContactSection = memo(function ContactSection() {
+interface ContactSectionProps {
+  /**
+   * "home" (default) is the section at the end of the home page, with its own heading and
+   * contact list. "page" is the body of /contact: the view passes the page's h1 and
+   * contact tiles as `intro` and its closed panels as `children`, and this adds the form.
+   */
+  layout?: "home" | "page";
+  intro?: ReactNode;
+  children?: ReactNode;
+}
+
+const ContactSection = memo(function ContactSection({ layout = "home", intro, children }: ContactSectionProps) {
   const hydrated = useHydrated();
+  const page = layout === "page";
+  // Under the page's h1 the form's heading is an h2, so its panels move up a level too.
+  const FormHeading = page ? "h2" : "h3";
+  const panelHeading = page ? "h3" : "h4";
   const { locale, t: dict, lp } = useI18n();
   const t = dict.contactSection;
   const f = dict.formStates;
@@ -871,7 +886,7 @@ const ContactSection = memo(function ContactSection() {
       <StatePanel
         variant="inline"
         tone="ok"
-        headingAs="h4"
+        headingAs={panelHeading}
         focusHeadline
         badge={badgeParts([
           f.sentBadge,
@@ -904,7 +919,7 @@ const ContactSection = memo(function ContactSection() {
       <StatePanel
         variant="inline"
         tone="ok"
-        headingAs="h4"
+        headingAs={panelHeading}
         badge={badgeParts([
           f.sentBadge,
           sentBefore.ref && <Fragment key="ref">{f.refLabel} <bdi>{sentBefore.ref}</bdi></Fragment>,
@@ -995,7 +1010,7 @@ const ContactSection = memo(function ContactSection() {
     urgent = isUrgent;
     spoken = formState.focus ? children : <>{view.headline} {children}</>;
     panel = (
-      <StatePanel key={formState.id} variant="inline" headingAs="h4" focusHeadline={formState.focus} {...view}>
+      <StatePanel key={formState.id} variant="inline" headingAs={panelHeading} focusHeadline={formState.focus} {...view}>
         {children}
       </StatePanel>
     );
@@ -1004,7 +1019,7 @@ const ContactSection = memo(function ContactSection() {
   return (
     <section
       id="contact"
-      className="relative py-10 sm:py-20 lg:py-28 bg-forest-900 overflow-hidden"
+      className={`relative ${page ? "py-6 sm:py-8 lg:py-10" : "py-10 sm:py-20 lg:py-28"} bg-forest-900 overflow-hidden`}
     >
       {/* Background Elements - Smaller on mobile */}
       <div className="absolute inset-0">
@@ -1029,6 +1044,7 @@ const ContactSection = memo(function ContactSection() {
         {/* No scroll reveal in this section: it is the whole body of /contact, so it
             must be visible from the first paint. Its overflow-hidden would also
             capture a .reveal timeline. */}
+        {!page && (
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-white mb-4 sm:mb-6 leading-tight">
             {t.titleTop}
@@ -1045,31 +1061,38 @@ const ContactSection = memo(function ContactSection() {
             {dict.common.heroQuote}
           </WhatsAppLink>
         </div>
+        )}
 
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 max-w-6xl mx-auto">
+        {/* Content Grid. On the page: the intro, then the form, then the panels, which is
+            also the order on phones; from lg the form takes the second column. */}
+        <div className={page
+          ? "grid grid-cols-1 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:grid-rows-[auto_1fr] gap-6 lg:gap-x-12 lg:gap-y-5 max-w-6xl mx-auto"
+          : "grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 max-w-6xl mx-auto"}>
+          {page && <div className="lg:col-start-1 lg:row-start-1">{intro}</div>}
           {/* Contact Form: first in the page order, so Tab and a screen reader reach it first, as
               phones show it. lg:order-last puts it back in the second column on wide screens.
               The id is where the action bar's quote link points on /contact before hydration. */}
-          <div id="contact-form" className="lg:order-last">
-            <div className="p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-5 sm:mb-6">
+          <div id="contact-form" className={page ? "lg:col-start-2 lg:row-start-1 lg:row-span-2" : "lg:order-last"}>
+            <div className={`${page ? "p-5 sm:p-6" : "p-5 sm:p-6 lg:p-8"} rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm`}>
+              <FormHeading className={`text-xl sm:text-2xl font-display font-semibold text-white ${page ? "mb-4" : "mb-5 sm:mb-6"}`}>
                 {t.sendMessage}
-              </h3>
+              </FormHeading>
 
               {!hydrated ? (
                 // Stand-in for the form until it hydrates. The form itself is
                 // interactive-only markup, so it stays out of the static HTML.
                 <>
-                  <div className="ct-skel" aria-hidden="true">
-                    <div>
-                      <p className="ct-skel-label">{t.name}</p>
-                      <div className="ct-skel-field" />
-                    </div>
-                    <div>
-                      <p className="ct-skel-label">{t.emailLabel}</p>
-                      <div className="ct-skel-field" />
-                    </div>
+                  <div className={page ? "ct-skel ct-skel-page" : "ct-skel"} aria-hidden="true">
+                    <Pair page={page}>
+                      <div>
+                        <p className="ct-skel-label">{t.name}</p>
+                        <div className="ct-skel-field" />
+                      </div>
+                      <div>
+                        <p className="ct-skel-label">{t.emailLabel}</p>
+                        <div className="ct-skel-field" />
+                      </div>
+                    </Pair>
                     <div>
                       <p className="ct-skel-label">{t.message}</p>
                       <div className="ct-skel-area" />
@@ -1095,6 +1118,7 @@ const ContactSection = memo(function ContactSection() {
                   onFocus={() => setArmed(true)}
                   className="space-y-4 sm:space-y-5"
                 >
+                  <Pair page={page}>
                   <div>
                     <label htmlFor="contact-name" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">{t.name}</label>
                     <Input
@@ -1123,6 +1147,7 @@ const ContactSection = memo(function ContactSection() {
                     />
                     {fieldError("email")}
                   </div>
+                  </Pair>
 
                   <div>
                     <label htmlFor="contact-message" className="block text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2">{t.message}</label>
@@ -1130,7 +1155,7 @@ const ContactSection = memo(function ContactSection() {
                       {...fieldProps("message")}
                       value={message}
                       onChange={(e) => edit("message", e.target.value)}
-                      rows={4}
+                      rows={page ? 3 : 4}
                       className={TEXTAREA_CLASS}
                       placeholder={t.messagePlaceholder}
                     />
@@ -1223,7 +1248,10 @@ const ContactSection = memo(function ContactSection() {
             </div>
           </div>
 
-          {/* Contact Methods */}
+          {page ? (
+            <div className="lg:col-start-1 lg:row-start-2">{children}</div>
+          ) : (
+          /* Contact Methods */
           <div>
             <h3 className="text-xl sm:text-2xl font-display font-semibold text-white mb-6 sm:mb-8">
               {t.getInTouch}
@@ -1286,10 +1314,16 @@ const ContactSection = memo(function ContactSection() {
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
     </section>
   );
 });
+
+/** Name and email: side by side from sm on /contact, stacked as before on the home page. */
+function Pair({ page, children }: { page: boolean; children: ReactNode }) {
+  return page ? <div className="grid gap-4 sm:grid-cols-2 sm:gap-3">{children}</div> : <>{children}</>;
+}
 
 export default ContactSection;

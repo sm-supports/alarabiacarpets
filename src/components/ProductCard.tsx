@@ -119,8 +119,9 @@ const ProductCard = memo(function ProductCard({
       <div dir="ltr" className="pc-media">
         {/* Navigation Arrows (only if multiple items). These and the extra slides need
             JavaScript anyway, and on /products they would be most of the static HTML.
-            Below md, arrows and dots are hidden: a phone swipes, and the count badge
-            below says where it is. */}
+            Below md, arrows and dots are hidden: from sm the card swipes and the count
+            badge below says where it is; below sm it is a tile with one photo that
+            doesn't swipe (index.css). */}
         {hydrated && displayMedia.length > 1 && (
           <>
             <button

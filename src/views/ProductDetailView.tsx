@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
 import FaqList from "@/components/FaqList";
+import FoldHead from "@/components/FoldHead";
 import ProductMedia from "@/components/ProductMedia";
 import type { GallerySlide } from "@/components/ProductGallery";
 import RelatedProducts from "@/components/RelatedProducts";
@@ -83,11 +84,18 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
   // The phone gallery's slides after the hero: the product's other photos and videos.
   // A video hero's poster is the product's own photo, so that photo isn't repeated. The
   // photos are the cards' 4:3 copies, one URL each: the phone box is 4:3 too (.pd-media),
-  // and only hero images have uncropped copies.
-  const slides: GallerySlide[] = product.media
-    .slice(1)
-    .filter((item) => !(item.type === "image" && item.src === product.imageSrc))
-    .map((item) => ({ type: item.type, src: item.type === "video" ? item.src : cardImagePath(item.src) }));
+  // and only hero images have uncropped copies. Compared by copy, not by file name: two
+  // files with the same picture share one copy (image-manifest.json), and would show twice.
+  const heroCopy = cardImagePath(product.imageSrc);
+  const slides: GallerySlide[] = [
+    ...new Map(
+      product.media
+        .slice(1)
+        .map((item) => ({ type: item.type, src: item.type === "video" ? item.src : cardImagePath(item.src) }))
+        .filter((slide) => !(slide.type === "image" && slide.src === heroCopy))
+        .map((slide) => [slide.src, slide] as const)
+    ).values(),
+  ];
 
   const t = getDict(locale);
   const lp = (path: string) => localePath(locale, path);
@@ -189,16 +197,12 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
                     </div>
                   ) : null}
 
-                  {/* Folded on phones too, its heading the toggle; at md and up the heading
-                      shows as before and the toggle is out of reach. */}
+                  {/* Folded on phones too, its heading the toggle (FoldHead); at md and up
+                      the heading shows as before and there is no toggle. */}
                   <div className="mb-8">
-                    <details className="fold">
-                      <summary>
-                        <h2 className="font-playfair text-xl font-semibold mb-3">
-                          {t.productDetail.included}
-                        </h2>
-                      </summary>
-                    </details>
+                    <FoldHead id="pd-inc" as="h2" className="font-playfair text-xl font-semibold mb-3">
+                      {t.productDetail.included}
+                    </FoldHead>
                     <ul className="fold-body font-poppins space-y-2">
                       {t.productDetail.features.map((feature) => (
                         <li key={feature} className="flex items-center gap-2">

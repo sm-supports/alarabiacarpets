@@ -4,6 +4,7 @@ import { categories } from "@/data/categories";
 import { services } from "@/data/services";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
+import FoldHead from "@/components/FoldHead";
 import { getDict, localePath, type Locale } from "@/i18n";
 import { localizedCategoryLabel, localizedServiceLabel } from "@/i18n/labels";
 import { WHATSAPP_URL } from "@/lib/site";
@@ -48,8 +49,7 @@ export default function Footer({ locale }: { locale: Locale }) {
   };
 
   return (
-    // id: the phone header's menu button links here until the menu can open (Navbar).
-    <footer id="footer" className="bg-white border-t border-gray-100">
+    <footer className="bg-white border-t border-gray-100">
       <h2 className="sr-only">{t.footer.srTitle}</h2>
       {/* Main Footer. Below md: one column, the two link lists folded (.fold), every
           link a 44px row; the links stay in the HTML either way (.ft-* in index.css). */}
@@ -101,9 +101,9 @@ export default function Footer({ locale }: { locale: Locale }) {
 
           {/* Products Column */}
           <div className="ft-col">
-            <details className="fold">
-              <summary><h3 className="ft-h">{t.common.products}</h3></summary>
-            </details>
+            {/* id: the phone header's menu button links here until the menu can open
+                (Navbar), and the fold opens when it does. */}
+            <FoldHead id="ft-p" as="h3" className="ft-h">{t.common.products}</FoldHead>
             <ul className="fold-body md:space-y-3">
               {footerLinks.products.map((link) => (
                 <li key={link.label}>
@@ -120,9 +120,7 @@ export default function Footer({ locale }: { locale: Locale }) {
 
           {/* Company Column */}
           <div className="ft-col">
-            <details className="fold">
-              <summary><h3 className="ft-h">{t.footer.company}</h3></summary>
-            </details>
+            <FoldHead id="ft-c" as="h3" className="ft-h">{t.footer.company}</FoldHead>
             <ul className="fold-body md:space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
@@ -137,7 +135,7 @@ export default function Footer({ locale }: { locale: Locale }) {
             </ul>
           </div>
 
-          {/* CTA Column - Hidden on small mobile, shown on larger */}
+          {/* Get Started column */}
           <div className="ft-col ft-go">
             <h3 className="ft-h">{t.footer.getStarted}</h3>
             <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">

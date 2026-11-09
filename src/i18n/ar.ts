@@ -9,7 +9,7 @@ import { arClient } from "./ar.client";
 export const ar: Dict = {
   ...arClient,
   price: {
-    from: (amount, unit) => `ابتداءً من ${amount} ر.ق${unit ? ` ${unit}` : ""}`,
+    from: (amount, unit) => `ابتداءً من ${amount}\u00a0ر.ق${unit ? ` ${unit}` : ""}`,
     units: {
       "per sqm": "للمتر المربع",
       "per piece": "للقطعة",

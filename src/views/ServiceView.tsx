@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
 import FaqList from "@/components/FaqList";
+import FoldHead from "@/components/FoldHead";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import HeroQuoteCta from "@/components/HeroQuoteCta";
@@ -165,15 +166,11 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
               {service.offers.map((o) => <li key={o} className="leading-relaxed">{o}</li>)}
             </ul>
 
-            {/* Includes and Specifications fold on phones, each heading its toggle (.fold in
-                index.css); open from md, where the heading shows as before. */}
-            <details className="fold max-md:mt-8">
-              <summary>
-                <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
-                  {t.service.workIncludes}
-                </h2>
-              </summary>
-            </details>
+            {/* Includes and Specifications fold on phones, each heading its toggle (FoldHead,
+                .fold in index.css); open from md, where the heading shows as before. */}
+            <FoldHead id="sv-inc" as="h2" wrapClassName="max-md:mt-8" className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
+              {t.service.workIncludes}
+            </FoldHead>
             <ul className="fold-body font-poppins text-neutral-700 text-[15px] space-y-2">
               {service.includes.map((inc) => (
                 <li key={inc} className="flex items-start gap-2 leading-relaxed">
@@ -183,13 +180,9 @@ export default function ServiceView({ locale, slug }: { locale: Locale; slug: st
               ))}
             </ul>
 
-            <details className="fold max-md:mt-8">
-              <summary>
-                <h2 className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
-                  {t.common.specifications}
-                </h2>
-              </summary>
-            </details>
+            <FoldHead id="sv-spec" as="h2" wrapClassName="max-md:mt-8" className="font-playfair text-2xl font-bold text-neutral-900 mt-10 mb-4">
+              {t.common.specifications}
+            </FoldHead>
             <dl className="fold-body font-poppins text-sm divide-y divide-neutral-100 border-y border-neutral-100">
               {service.specs.map((spec) => (
                 <div key={spec.label} className="flex justify-between gap-4 py-2.5">

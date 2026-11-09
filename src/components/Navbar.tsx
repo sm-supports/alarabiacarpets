@@ -203,7 +203,8 @@ const Navbar = memo(function Navbar() {
             </div>
 
             {/* Mobile language switch and menu button. Until hydration the menu can't
-                open, so the button is a link to the footer's links instead. */}
+                open, so the button is a link to the footer's links instead: to the
+                Products fold, which opens when the link lands on it (.fold-h in index.css). */}
             <div className="md:hidden flex items-center gap-1">
             <LanguageSwitcher
               short
@@ -221,7 +222,7 @@ const Navbar = memo(function Navbar() {
                 <Burger open={isOpen} />
               </button>
             ) : (
-              <a href="#footer" className="nav-burger" aria-label={t.nav.toggleMenu}>
+              <a href="#ft-p" className="nav-burger" aria-label={t.nav.toggleMenu}>
                 <Burger open={false} />
               </a>
             )}

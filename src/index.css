@@ -1121,6 +1121,10 @@
   /* Not grown to the row's height: a clamped box taller than its lines shows the next one. */
   .pc-text { flex-grow: 0; margin: 0.25rem 0 0; }
   .pc-act, .pc-play-badge { display: none; }
+  /* A video tile's play button lies under the link, so it leaves the tab order and the
+     accessibility tree; its poster (and an ImageFallback tile) still shows. */
+  .pc-card .pc-play { visibility: hidden; }
+  .pc-card .pc-play > * { visibility: visible; }
   main p:is(.pc-price, .pc-text, .rel-text):not(.x) { line-height: 1.5; }
   [dir="rtl"] main p:is(.pc-price, .pc-text, .rel-text):not(.x) { line-height: 1.6; }
 }
@@ -1144,37 +1148,52 @@
    element, .fold-body, which a closed fold hides below md. The text is in the HTML either
    way, so crawlers and the SEO snapshot read it. (The plan put the text inside the
    <details> and opened it at md with ::details-content: a browser without that, such as
-   Safari before 18.4 or an older Firefox, would have shown desktop folded.)
+   Safari before 18.4 or an older Firefox, would have shown desktop folded.) Because the
+   text is outside the <details>, find in page and a search result's #:~:text= link can't
+   open a closed fold on a phone: accepted. hidden="until-found" would fix that, but the
+   hidden attribute in the HTML reads as hidden text to tools that don't apply CSS.
    A summary that is only a label (.fold-l) leaves with its fold at md (md:hidden on the
-   <details>). A summary holding a heading shows the heading at md and up, as it was, while
-   the summary itself is hidden there, so it is neither a tab stop nor a button. */
+   <details>). A heading's fold (FoldHead, .fold-h) keeps the heading out of the summary,
+   because a summary is a button and a heading inside it stops being a heading: the empty
+   summary is named by the heading and laid over it below md, and gone from md. */
 @layer components {
   .fold > summary { list-style: none; }
   .fold > summary::-webkit-details-marker { display: none; }
   .fold-l { @apply font-poppins font-medium text-primary; }
 }
 @media not all and (min-width: 768px) {
-  /* A block with the chevron placed absolutely, not flex: older browsers ignored flex on a
+  /* A block with the sign placed absolutely, not flex: older browsers ignored flex on a
      summary. At least 44px: 10px above and below a line of 25px or more. */
   .fold > summary {
     display: block; position: relative; min-height: 2.75rem; padding-block: 0.625rem; padding-inline-end: 2rem;
     cursor: pointer; border-radius: 0.25rem;
   }
-  .fold > summary > * { margin: 0; }
   .fold > summary:focus-visible { outline: 2px solid #0A2A1F; outline-offset: 2px; }
-  /* A chevron at the end: down when closed, up when open. CSS, so it isn't page text. */
+  /* The FAQ's sign (.faq-toggle): a + that turns to × when open, so every <details> on a
+     phone has the same one. CSS, so it isn't page text. */
   .fold > summary::after {
-    content: ""; content: "" / "";
-    position: absolute; top: 50%; inset-inline-end: 0.5rem; width: 0.5rem; height: 0.5rem;
-    border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
-    transform: translateY(-75%) rotate(45deg); transition: transform 200ms;
+    content: "+"; content: "+" / "";
+    @apply font-poppins font-medium text-primary text-xl leading-none;
+    position: absolute; top: 50%; inset-inline-end: 0.5rem;
+    transform: translateY(-50%); transition: transform 200ms;
   }
-  .fold[open] > summary::after { transform: translateY(-25%) rotate(-135deg); }
+  .fold[open] > summary::after { transform: translateY(-50%) rotate(45deg); }
   .fold:not([open]) + .fold-body { display: none; }
+  /* A heading's fold: the heading takes the 44px row, the summary covers it. */
+  .fold-h { position: relative; }
+  .fold-h > :first-child { margin: 0; min-height: 2.75rem; padding-block: 0.625rem; padding-inline-end: 2rem; }
+  .fold-h > .fold > summary { position: absolute; inset: 0; min-height: 0; padding: 0; }
+}
+/* Rules of their own: a browser without :has() drops them and leaves the text open. The
+   second opens a fold whose heading a link lands on: the menu button before hydration
+   links to the footer's Products (Navbar), so without JavaScript the links show at once. */
+@media not all and (min-width: 768px) {
+  .fold-h:has(> .fold:not([open])) + .fold-body { display: none; }
+  .fold-h:has(> [id]:target) + .fold-body { display: block; }
+  .fold-h:has(> [id]:target) > .fold > summary::after { transform: translateY(-50%) rotate(45deg); }
 }
 @media (min-width: 768px) {
-  .fold > summary { display: block; visibility: hidden; pointer-events: none; }
-  .fold > summary > * { visibility: visible; }
+  .fold-h > .fold { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .fold > summary::after { transition: none; }

@@ -8,7 +8,8 @@ import { enClient } from "./en.client";
 export const en = {
   ...enClient,
   price: {
-    from: (amount: string, unit?: string) => `From QAR ${amount}${unit ? ` ${unit}` : ""}`,
+    /** A no-break space keeps the amount with its currency when a narrow tile wraps. */
+    from: (amount: string, unit?: string) => `From QAR\u00a0${amount}${unit ? ` ${unit}` : ""}`,
     units: {
       "per sqm": "per sqm",
       "per piece": "per piece",

@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
 import FaqList from "@/components/FaqList";
+import FoldHead from "@/components/FoldHead";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import HeroQuoteCta from "@/components/HeroQuoteCta";
@@ -135,16 +136,12 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
               </p>
             ))}
 
-            {/* Folded on phones, its heading the toggle (.fold in index.css); open from md. */}
+            {/* Folded on phones, its heading the toggle (FoldHead, .fold in index.css); open from md. */}
             {category.specs?.length ? (
               <div className="mt-8">
-                <details className="fold">
-                  <summary>
-                    <h2 className="font-playfair text-2xl font-bold text-neutral-900 mb-4">
-                      {t.category.whatWeOffer}
-                    </h2>
-                  </summary>
-                </details>
+                <FoldHead id="ct-offer" as="h2" className="font-playfair text-2xl font-bold text-neutral-900 mb-4">
+                  {t.category.whatWeOffer}
+                </FoldHead>
                 <SpecList specs={category.specs} fold />
               </div>
             ) : null}

@@ -275,6 +275,12 @@ export const en = {
         "If you are not sure of the sizes, we can visit, take the measurements on site and recommend the right material for the room.",
       helpTitle: "What we can help with",
       categoryIn: (label: string) => `${label} in Doha`,
+      // The page's contact tiles and the one line under them.
+      call: "Call",
+      email: "Email",
+      directions: "Directions",
+      showroomShort: "Al Mansoura St, Doha",
+      hoursLine: "Open every day, 8:00 AM to 10:00 PM · Doha, Al Rayyan, Al Wakra, Al Khor, Lusail and all of Qatar",
     },
   },
   /** Named-business answers, so AI tools and readers get who/where/what up front. */

@@ -17,6 +17,13 @@
 /_flight/*
   Cache-Control: public, max-age=31536000, immutable
 
+# The service worker. Browsers ask for it on every page load to see whether it changed;
+# no-cache makes that reach Cloudflare each time, so a fix or the kill switch lands on
+# the next visit. Never immutable or a long max-age, and never delete the file (see the
+# header of public/sw.js).
+/sw.js
+  Cache-Control: no-cache
+
 /icons.svg
   Cache-Control: public, max-age=86400
 

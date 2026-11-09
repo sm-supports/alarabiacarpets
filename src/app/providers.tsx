@@ -2,6 +2,7 @@
 
 import ImageFallback from "@/components/ImageFallback";
 import NavProgress from "@/components/NavProgress";
+import RegisterSW from "@/components/RegisterSW";
 import StatusRegion from "@/components/StatusRegion";
 import TapFeedback from "@/components/TapFeedback";
 
@@ -13,7 +14,7 @@ import TapFeedback from "@/components/TapFeedback";
  *
  * The site-wide feedback mounts here: the status panel, what it says after a WhatsApp or
  * Call tap, the progress line, and the tile in place of a photo that failed. None of them
- * renders anything in the static HTML.
+ * renders anything in the static HTML. RegisterSW adds or removes the service worker.
  */
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -23,6 +24,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <TapFeedback />
       <NavProgress />
       <ImageFallback />
+      <RegisterSW />
     </>
   );
 }

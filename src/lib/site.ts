@@ -18,3 +18,11 @@ export const EMAIL = "info@alarabiacarpets.com";
  * (src/lib/tawk.ts), so no chat bubble sits over the action bar.
  */
 export const TAWK_SRC = "https://embed.tawk.to/68a5dfd1f412351925ef40a3/1j33v4jea";
+/**
+ * The service worker's release switch (public/sw.js, which only stands in for a page that
+ * can't load offline). It ships after the rest of the redesign, separately.
+ * true: components/RegisterSW.tsx registers /sw.js after the load event.
+ * false: it registers nothing and unregisters any copy a browser already has, which is
+ * also the quick rollback. The kill switch for a broken sw.js is in scripts/sw-kill.js.
+ */
+export const SERVICE_WORKER = false;

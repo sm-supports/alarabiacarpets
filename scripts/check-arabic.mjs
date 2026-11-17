@@ -19,7 +19,7 @@ const DESCRIPTION_MAX = 160;
 
 // Latin text allowed on an Arabic page: materials, trade terms, brands, contact details.
 const LATIN_OK = new Set(
-  "PVC SPC UV MDF HPL HDF LED LVT HDMI WPC EVA WhatsApp C-Board Board Karndean Instagram Facebook EN English QAR com info alarabiacarpets your email Al Arabia Carpets Ezdan Mall Enormous Festival City Khalij MUFTAH GROUP Anaka event planning ALSAM Trading contacting service L.L.C GRADE ONE Contracting Inworth Petro guard offshore Shapelier Asia Engineering Services Aquatech for trading contracting WLL New star Co W.L.L".split(" ")
+  "PVC SPC UV MDF HPL HDF LED LVT HDMI WPC EVA WhatsApp C-Board Board Karndean Instagram Facebook EN English QAR com info alarabiacarpets your email Al Arabia Carpets Ezdan Mall Enormous Festival City Khalij MUFTAH GROUP Anaka event planning ALSAM Trading contacting service L.L.C GRADE ONE Contracting Inworth Petro guard offshore Shapelier Asia Engineering Services Aquatech for trading contracting WLL New star Co W.L.L Grade One Anaqh".split(" ")
 );
 
 const decode = (s) =>

@@ -61,6 +61,8 @@ export const arClient: ClientDict = {
   trusted: {
     eyebrow: "شركاء نعتز بهم",
     title: "تثق فينا كبرى الجهات والشركات",
+    clients:
+      "من عملائنا: إزدان العقارية، وإزدان مول، ودوحة فستيفال سيتي، ومجموعة المفتاح، وشركة إسمنت الخليج، وبترو جارد أوفشور سبلايز، وEnormous للتجارة والمقاولات، وAquatech للتجارة والمقاولات، وشركة النجوم الجديدة للمقاولات، وAsia Engineering & Services، وGrade One، وInworth، وAl Anaqh لتنظيم المناسبات.",
     stats: {
       customers: "عميل سعيد",
       partners: "شريك موثوق",

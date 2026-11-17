@@ -83,7 +83,7 @@ const output =
     section("Product categories", ["/products", ...categories]),
     section("Guides", ["/guides", ...under("/guides")]),
     section("Products", under("/products").filter((u) => !categories.includes(u))),
-    section("Company", ["/about", "/contact"]),
+    section("Company", ["/", "/about", "/contact"]),
     section("الخدمات (Services in Arabic)", ["/ar/services", ...under("/ar/services")]),
     section("فئات المنتجات (Product categories in Arabic)", ["/ar/products", ...categories.map((c) => `/ar${c}`)]),
     section("الأدلة (Guides in Arabic)", ["/ar/guides", ...under("/ar/guides")]),

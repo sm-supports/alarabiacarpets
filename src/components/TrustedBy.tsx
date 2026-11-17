@@ -50,21 +50,24 @@ function AnimatedStat({ value, label, isVisible }: { value: string; label: strin
   );
 }
 
+// Alt text matches what each image shows (checked 2026-11-17; the old list was
+// shuffled). logo8, a green oval "A", is unidentified: name it once the owner
+// confirms the client, and add it to t.trusted.clients too.
 const logos = [
-  { src: '/logos/logo1.webp', alt: 'Ezdan Mall' },
-  { src: '/logos/logo2.webp', alt: 'Enormous' },
-  { src: '/logos/logo3.webp', alt: 'Festival City' },
-  { src: '/logos/logo4.webp', alt: 'Al Khalij' },
-  { src: '/logos/logo5.webp', alt: 'Al Arabia' },
-  { src: '/logos/logo6.webp', alt: 'AL MUFTAH GROUP' },
-  { src: '/logos/logo7.webp', alt: 'Al Anaka event planning' },
-  { src: '/logos/logo8.webp', alt: 'ALSAM Trading & contacting service L.L.C' },
-  { src: '/logos/logo9.webp', alt: 'GRADE ONE Trading & Contracting' },
-  { src: '/logos/logo10.webp', alt: 'Inworth' },
-  { src: '/logos/logo11.webp', alt: 'Petro guard offshore Shapelier' },
-  { src: '/logos/logo12.webp', alt: 'Asia trading Engineering & Services' },
-  { src: '/logos/logo13.webp', alt: 'Aquatech for trading & contracting WLL' },
-  { src: '/logos/logo14.webp', alt: 'New star Contracting Co W.L.L' },
+  { src: '/logos/logo1.webp', alt: 'Ezdan Real Estate' },
+  { src: '/logos/logo2.webp', alt: 'Al Khalij Cement Company' },
+  { src: '/logos/logo3.webp', alt: 'Ezdan Mall' },
+  { src: '/logos/logo4.webp', alt: 'Doha Festival City' },
+  { src: '/logos/logo5.webp', alt: 'Enormous Trading and Contracting' },
+  { src: '/logos/logo6.webp', alt: 'Al Muftah Group' },
+  { src: '/logos/logo7.webp', alt: 'Al Anaqh Event Planning' },
+  { src: '/logos/logo8.webp', alt: 'Client logo' },
+  { src: '/logos/logo9.webp', alt: 'Asia Engineering & Services' },
+  { src: '/logos/logo10.webp', alt: 'Grade One' },
+  { src: '/logos/logo11.webp', alt: 'Aquatech for Trading & Contracting' },
+  { src: '/logos/logo12.webp', alt: 'Inworth' },
+  { src: '/logos/logo13.webp', alt: 'New Star Contracting' },
+  { src: '/logos/logo14.webp', alt: 'Petro Guard Offshore Supplies' },
 ];
 
 export default function TrustedBy() {
@@ -150,6 +153,12 @@ export default function TrustedBy() {
             })}
           </div>
         </div>
+
+        {/* The marquee renders only after hydration, so the client names are also
+            plain text: crawlers and answer engines that don't run JavaScript read it. */}
+        <p className="reveal mt-6 text-center font-poppins text-sm text-gray-500 max-w-3xl mx-auto">
+          {t.trusted.clients}
+        </p>
 
         {/* Stats - 2x2 grid on mobile, 4 columns on desktop */}
         <div

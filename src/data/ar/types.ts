@@ -1,4 +1,5 @@
 import type { Category, CategorySection } from "../categories";
+import type { Author } from "../authors";
 import type { Guide } from "../guides";
 import type { Product } from "../products";
 import type { Service } from "../services";
@@ -24,5 +25,7 @@ export type ServiceAr = Pick<
     galleryAlts?: string[];
   };
 
-export type GuideAr = Pick<Guide, "title" | "metaDescription" | "excerpt" | "heroImageAlt" | "intro" | "sections"> &
+export type GuideAr = Pick<Guide, "title" | "metaDescription" | "excerpt" | "heroImageAlt" | "answer" | "intro" | "sections"> &
   Partial<Pick<Guide, "seoTitle" | "faqs">>;
+
+export type AuthorAr = Pick<Author, "jobTitle" | "bio">;

@@ -151,6 +151,7 @@ export const en = {
       "Send us a message on WhatsApp and our team in Doha will talk through the options with you. Measurement and quotation are free.",
     adviceMessage: (title: string) => `Hi, I read your guide "${title}" and would like some advice.`,
     read: "Read the guide",
+    answer: "In short",
   },
   pages: {
     products: {
@@ -178,10 +179,10 @@ export const en = {
     guides: {
       title: "Guides",
       description:
-        "Practical guides to carpets, barkia flooring, curtains and majlis design in Qatar, written by the Al Arabia Carpets team in Doha.",
+        "Practical guides to carpet, flooring, curtains, wallpaper, gypsum board, cabinets, wardrobes and sofas in Qatar, from the Al Arabia Carpets team in Doha.",
       heading: "Guides",
       intro:
-        "Practical advice on choosing carpets, barkia flooring, curtains and majlis furniture for homes and offices in Qatar.",
+        "Practical advice on carpet, vinyl, SPC and parquet flooring, curtains, wallpaper, gypsum and cement board, kitchen cabinets, wardrobes, TV units and majlis sofas for homes and offices in Qatar.",
     },
     about: {
       title: "About Us",
@@ -234,6 +235,8 @@ export const en = {
         },
       ],
       factsTitle: "Al Arabia Carpets at a glance",
+      authorsTitle: "Who writes our guides",
+      yearsInTrade: (n: number) => `${n} years in the trade`,
       ctaTitle: "Ready to Transform Your Space?",
       ctaText: "Contact us today to discuss your home furnishing needs and discover how we can help.",
     },

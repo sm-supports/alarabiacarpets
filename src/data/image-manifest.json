@@ -497,6 +497,16 @@
     720,
     "/img/a2bba18d17-c720.webp"
    ]
+  ],
+  "f": [
+   [
+    800,
+    "/img/a2bba18d17-f800.webp"
+   ],
+   [
+    1200,
+    "/img/a2bba18d17-f1200.webp"
+   ]
   ]
  },
  "/Products/Furniture/Modern majlis.jpeg": {
@@ -718,6 +728,12 @@
    [
     720,
     "/img/b59a8a395c-c720.webp"
+   ]
+  ],
+  "f": [
+   [
+    800,
+    "/img/b59a8a395c-f800.webp"
    ]
   ]
  },
@@ -1370,6 +1386,16 @@
    [
     720,
     "/img/a0ff72ee95-c720.webp"
+   ]
+  ],
+  "f": [
+   [
+    800,
+    "/img/a0ff72ee95-f800.webp"
+   ],
+   [
+    1200,
+    "/img/a0ff72ee95-f1200.webp"
    ]
   ]
  },

@@ -8,17 +8,17 @@ import FaqList from "@/components/FaqList";
 import ServiceLinks from "@/components/ServiceLinks";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { Button } from "@/components/ui/button";
-import { categoryLabelFor, findCategory, findGuide, findProduct, findService, getGuides } from "@/data/localized";
+import { categoryLabelFor, findAuthor, findCategory, findGuide, findProduct, findService, getGuides } from "@/data/localized";
 import { cardImage, fullImage } from "@/lib/card-image";
 import { getDict, HTML_LANG, localePath, type Locale } from "@/i18n";
 import {
-  SITE_URL,
   absoluteUrl,
   buildBreadcrumb,
   buildFaq,
   buildTitle,
   clampDescription,
   ogLocaleFields,
+  orgRef,
   pageAlternates,
   productImageAlt,
 } from "@/lib/seo";
@@ -44,7 +44,7 @@ export function guideMetadata(locale: Locale, slug: string): Metadata {
       title,
       description: guide.metaDescription,
       url: localePath(locale, path),
-      publishedTime: guide.updatedAt,
+      publishedTime: guide.publishedAt,
       modifiedTime: guide.updatedAt,
       images: [{ url: absoluteUrl(guide.heroImage), alt: guide.heroImageAlt }],
     },
@@ -91,18 +91,36 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
     return service;
   });
 
+  // A named person once the owner supplies one (src/data/authors.ts); the company until then.
+  const author = guide.authorId ? findAuthor(locale, guide.authorId) : undefined;
+  if (guide.authorId && !author) {
+    throw new Error(`Guide "${guide.slug}" references unknown author id: ${guide.authorId}`);
+  }
+
+  const pageUrl = absoluteUrl(lp(`/guides/${guide.slug}`));
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
+    "@id": `${pageUrl}#article`,
     ...(locale === "ar" ? { inLanguage: HTML_LANG.ar } : {}),
     headline: guide.title,
     description: guide.metaDescription,
+    abstract: guide.answer,
     image: absoluteUrl(guide.heroImage),
-    datePublished: guide.updatedAt,
+    datePublished: guide.publishedAt,
     dateModified: guide.updatedAt,
-    author: { "@id": `${SITE_URL}/#organization` },
-    publisher: { "@id": `${SITE_URL}/#organization` },
-    mainEntityOfPage: absoluteUrl(lp(`/guides/${guide.slug}`)),
+    author: author
+      ? {
+          "@type": "Person",
+          "@id": `${absoluteUrl(lp("/about"))}#${author.id}`,
+          name: author.name,
+          jobTitle: author.jobTitle,
+          url: `${absoluteUrl(lp("/about"))}#${author.id}`,
+          worksFor: orgRef(locale),
+        }
+      : orgRef(locale),
+    publisher: orgRef(locale, { logo: true }),
+    mainEntityOfPage: pageUrl,
   };
 
   return (
@@ -146,7 +164,14 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
                     year: "numeric",
                   })}
                 </time>{" "}
-                {t.guide.by} {t.brand}
+                {t.guide.by}{" "}
+                {author ? (
+                  <Link href={lp(`/about#${author.id}`)} className="underline hover:text-white">
+                    {author.name}, {author.jobTitle}
+                  </Link>
+                ) : (
+                  t.brand
+                )}
               </p>
             </div>
           </header>
@@ -161,6 +186,11 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
                 decoding="async"
                 className="w-full rounded-xl mb-10 object-cover aspect-[16/9]"
               />
+
+              <div className="guide-answer">
+                <p className="guide-answer-label">{t.guide.answer}</p>
+                <p className="font-poppins text-neutral-900 leading-relaxed text-[15px]">{guide.answer}</p>
+              </div>
 
               {guide.intro.map((para, i) => (
                 <p
@@ -194,6 +224,29 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
                         <li key={b} className="leading-relaxed">{b}</li>
                       ))}
                     </ul>
+                  ) : null}
+                  {section.table ? (
+                    <div className="guide-table-wrap">
+                      <table className="guide-table">
+                        <caption>{section.table.caption}</caption>
+                        <thead>
+                          <tr>
+                            {section.table.head.map((h) => (
+                              <th key={h} scope="col">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {section.table.rows.map((row) => (
+                            <tr key={row[0]}>
+                              {row.map((cell, i) =>
+                                i === 0 ? <th key={i} scope="row">{cell}</th> : <td key={i}>{cell}</td>
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   ) : null}
                 </section>
               ))}

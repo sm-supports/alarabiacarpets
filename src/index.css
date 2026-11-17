@@ -790,6 +790,15 @@
   .ct-skel-area { @apply h-[98px] sm:h-[114px] rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
   .ct-skel-btn { @apply w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl text-center opacity-50; }
   .cat-price { @apply absolute bottom-2 start-2 max-w-[calc(100%-1rem)] rounded-lg bg-primary px-2 py-1 font-poppins text-[11px] font-medium leading-tight text-white sm:text-xs; }
+  /* Guide answer box and tables. Logical properties only, so both mirror in Arabic. */
+  .guide-answer { @apply mb-8 rounded-xl border-s-4 border-gold-500 bg-neutral-50 px-5 py-4; }
+  .guide-answer-label { @apply font-poppins text-xs font-semibold uppercase tracking-wider text-gold-600 mb-1; }
+  .guide-table-wrap { @apply my-6 overflow-x-auto rounded-lg border border-neutral-200; }
+  .guide-table { @apply w-full border-collapse font-poppins text-[14px] text-neutral-700; }
+  .guide-table caption { @apply caption-top px-4 py-3 text-start text-sm font-medium text-neutral-500; }
+  .guide-table th { @apply bg-neutral-100 px-4 py-2.5 text-start font-semibold text-neutral-900; }
+  .guide-table td, .guide-table tbody th { @apply border-t border-neutral-200 px-4 py-2.5 align-top; }
+  .guide-table tbody th { @apply bg-transparent font-medium text-neutral-900; }
 }
 
 /* Hero entrance. CSS only, so it runs from the first paint and never waits for

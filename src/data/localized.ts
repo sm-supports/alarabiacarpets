@@ -2,10 +2,12 @@ import type { Locale } from "@/i18n/config";
 import { getDict } from "@/i18n";
 import { AR_CATEGORY_LABELS, AR_SERVICE_LABELS } from "@/i18n/labels";
 import { WHATSAPP_URL } from "@/lib/seo";
+import { authors, type Author } from "./authors";
 import { categories, type Category } from "./categories";
 import { guides, type Guide } from "./guides";
 import { products, type Product } from "./products";
 import { services, type Service } from "./services";
+import { arAuthors } from "./ar/authors";
 import { arCategories } from "./ar/categories";
 import { arGuides } from "./ar/guides";
 import { arProducts } from "./ar/products";
@@ -71,6 +73,16 @@ const arGuideList: Guide[] = guides.map((g) => {
   if (g.seoTitle) need(t.seoTitle, `guide ${g.slug}.seoTitle`);
   return { ...g, ...t };
 });
+
+// The name stays as the person writes it; only the role and bio are translated.
+const arAuthorList: Author[] = authors.map((a) => ({ ...a, ...need(arAuthors[a.id], `author ${a.id}`) }));
+
+export function getAuthors(locale: Locale): Author[] {
+  return locale === "ar" ? arAuthorList : authors;
+}
+export function findAuthor(locale: Locale, id: string): Author | undefined {
+  return getAuthors(locale).find((a) => a.id === id);
+}
 
 export function getProducts(locale: Locale): Product[] {
   return locale === "ar" ? arProductList : products;

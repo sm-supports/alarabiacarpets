@@ -283,7 +283,7 @@ updatedAt: "2026-11-07",
     gallery: [
       {
         src: "/Services/wardrobes/walk-in-wardrobe-lit-shelving.webp",
-        alt: "Walk-in wardrobe interior with glass shelving and integrated LED lighting",
+        alt: "Walk-in wardrobe with glass-fronted doors, oak-finish shelving and integrated LED lighting",
       },
       {
         src: "/Services/wardrobes/dressing-room-island-drawers.webp",

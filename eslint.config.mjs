@@ -6,7 +6,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   // Build output and generated or vendored code. `eslint .` would otherwise lint all of it.
-  { ignores: ["dist", "out", ".next", ".wrangler", ".claude", "public", "email-automation", "next-env.d.ts"] },
+  { ignores: ["dist", "out", ".next", ".wrangler", ".claude", "public", "next-env.d.ts"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

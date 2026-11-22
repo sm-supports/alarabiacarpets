@@ -8,6 +8,7 @@ import JsonLd from "@/components/JsonLd";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
+import { getAuthors } from "@/data/localized";
 import { getDict, localePath, type Locale } from "@/i18n";
 import { buildBreadcrumb, clampDescription, defaultOgImages, ogLocaleFields, pageAlternates } from "@/lib/seo";
 
@@ -31,6 +32,9 @@ export default function AboutView({ locale }: { locale: Locale }) {
   const t = getDict(locale);
   const page = t.pages.about;
   const crumbs: Crumb[] = [[page.breadcrumb, "/about"]];
+  // Guide authors, once the owner names them (src/data/authors.ts). Each profile's
+  // id is the fragment the guides' Person schema points to.
+  const authors = getAuthors(locale);
   return (
     <div className="min-h-screen flex flex-col">
       <JsonLd data={buildBreadcrumb(crumbs, locale)} />
@@ -112,6 +116,26 @@ export default function AboutView({ locale }: { locale: Locale }) {
             </div>
           </div>
         </section>
+
+        {authors.length > 0 && (
+          <section className="py-16 bg-secondary">
+            <div className="container mx-auto px-4 max-w-3xl">
+              <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-8 text-center">{page.authorsTitle}</h2>
+              <div className="grid gap-6">
+                {authors.map((a) => (
+                  <Card key={a.id} id={a.id} className="p-6 scroll-mt-24">
+                    <h3 className="font-playfair text-xl font-semibold">{a.name}</h3>
+                    <p className="font-poppins text-sm text-muted-foreground mb-3">
+                      {a.jobTitle}
+                      {a.yearsInTrade ? ` · ${page.yearsInTrade(a.yearsInTrade)}` : null}
+                    </p>
+                    <p className="font-poppins">{a.bio}</p>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         <BusinessFacts locale={locale} title={page.factsTitle} />
 

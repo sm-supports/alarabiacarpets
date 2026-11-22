@@ -84,6 +84,8 @@ export const enClient = {
   trusted: {
     eyebrow: "Trusted Partners",
     title: "Trusted by Leading Organizations",
+    clients:
+      "Clients include Ezdan Real Estate, Ezdan Mall, Doha Festival City, Al Muftah Group, Al Khalij Cement Company, Petro Guard Offshore Supplies, Enormous Trading and Contracting, Aquatech for Trading & Contracting, New Star Contracting, Asia Engineering & Services, Grade One, Inworth and Al Anaqh Event Planning.",
     stats: {
       customers: "Happy Customers",
       partners: "Trusted Partners",

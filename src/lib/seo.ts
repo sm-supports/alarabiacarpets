@@ -123,6 +123,22 @@ export const SERVICE_AREAS = ["Doha", "Al Rayyan", "Al Wakra", "Al Khor", "Lusai
 export const OPENING_HOURS = "Mo-Su 08:00-22:00";
 export const OPENING_HOURS_TEXT = "Every day, 8:00 AM to 10:00 PM";
 
+/**
+ * OPENING_HOURS as an OpeningHoursSpecification, the form Google documents for
+ * LocalBusiness. Throws if OPENING_HOURS stops being one daily range, so a change
+ * there cannot leave the two out of step.
+ */
+function openingHoursSpecification() {
+  const m = OPENING_HOURS.match(/^Mo-Su (\d\d:\d\d)-(\d\d:\d\d)$/);
+  if (!m) throw new Error(`OPENING_HOURS "${OPENING_HOURS}" is not one daily range; update openingHoursSpecification()`);
+  return {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    opens: m[1],
+    closes: m[2],
+  };
+}
+
 const COUNTRY_AR = "قطر";
 const SERVICE_AREAS_AR = ["الدوحة", "الريان", "الوكرة", "الخور", "لوسيل"];
 
@@ -160,18 +176,19 @@ function areaServed(locale: Locale = "en") {
   ];
 }
 
+// addressCountry is the ISO 3166-1 code in both languages: Google asks for the code.
 const POSTAL_ADDRESS = {
   "@type": "PostalAddress",
   streetAddress: STREET,
   addressLocality: CITY,
-  addressCountry: COUNTRY,
+  addressCountry: "QA",
 };
 
 const POSTAL_ADDRESS_AR = {
   "@type": "PostalAddress",
   streetAddress: "شارع المنصورة",
   addressLocality: "الدوحة",
-  addressCountry: COUNTRY_AR,
+  addressCountry: "QA",
 };
 
 /** Name fields shared by the Organization, LocalBusiness and WebSite nodes. */
@@ -215,9 +232,13 @@ export function buildLocalBusiness(locale: Locale = "en") {
     knowsLanguage: ["ar", "en"],
     address: isAr ? POSTAL_ADDRESS_AR : POSTAL_ADDRESS,
     geo: GEO,
-    openingHours: OPENING_HOURS,
+    openingHoursSpecification: openingHoursSpecification(),
     priceRange: "$$",
     image: absoluteUrl(DEFAULT_IMAGE),
+    logo: absoluteUrl(DEFAULT_IMAGE),
+    // The store is the company's showroom. Both nodes sit on the home page, so the
+    // bare @id resolves there.
+    parentOrganization: { "@id": `${SITE_URL}/#organization` },
     sameAs: SOCIAL_PROFILES,
     areaServed: areaServed(locale),
     // Plain names, not Offers: the project never emits a price-less Offer.
@@ -239,6 +260,22 @@ export function buildOrganization(locale: Locale = "en") {
     knowsLanguage: ["ar", "en"],
     address: isAr ? POSTAL_ADDRESS_AR : POSTAL_ADDRESS,
     sameAs: SOCIAL_PROFILES,
+  };
+}
+
+/**
+ * A named pointer to the Organization node, for author, publisher, provider and
+ * seller. Only the home page carries the full node, so a bare { "@id" } leaves the
+ * company anonymous on every other page. The shared @id lets Google merge this
+ * with the full node; `logo` is for Article publishers.
+ */
+export function orgRef(locale: Locale = "en", opts: { logo?: boolean } = {}) {
+  return {
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
+    name: locale === "ar" ? SITE_NAME_AR : SITE_NAME,
+    url: locale === "ar" ? `${SITE_URL}/ar` : SITE_URL,
+    ...(opts.logo ? { logo: absoluteUrl(DEFAULT_IMAGE) } : {}),
   };
 }
 
@@ -421,7 +458,7 @@ export function buildProductJsonLd(product: Product, locale: Locale = "en") {
       image: absoluteUrl(productImage(product)),
       url,
       serviceType: label,
-      provider: { "@id": `${SITE_URL}/#organization` },
+      provider: orgRef(locale),
       areaServed: areaServed(locale),
     };
   }
@@ -444,7 +481,7 @@ export function buildProductJsonLd(product: Product, locale: Locale = "en") {
       offerCount: 1,
       availability: "https://schema.org/InStock",
       url,
-      seller: { "@id": `${SITE_URL}/#organization` },
+      seller: orgRef(locale),
       priceSpecification: {
         "@type": "UnitPriceSpecification",
         price: product.priceFrom,
@@ -567,7 +604,7 @@ export function buildServiceJsonLd(
     serviceType: service.label,
     description: service.metaDescription,
     url,
-    provider: { "@id": `${SITE_URL}/#organization` },
+    provider: orgRef(locale),
     areaServed: areaServed(locale),
     // Only when a real project photo exists -- never the brand logo, which
     // would assert imagery of work we cannot show.

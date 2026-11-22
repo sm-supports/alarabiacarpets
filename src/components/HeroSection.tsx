@@ -8,17 +8,24 @@ export default function HeroSection() {
   const hydrated = useHydrated();
   const { t } = useI18n();
 
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  // The buttons are links to the sections, so they work before hydration (a jump, and
+  // the hash in the address bar). Once hydrated they scroll there as they always did,
+  // without the hash.
+  const scrollToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    const section = document.getElementById(id);
+    if (!section || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    section.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <section
       id="home"
-      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-gradient-subtle"
+      className="relative md:min-h-[100svh] flex items-center justify-center overflow-hidden bg-gradient-subtle"
     >
-      {/* Ambient Background Elements - Smaller on mobile */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* Ambient background, from md only: below md the hero is as tall as its content,
+          with no blurred orbs to paint. */}
+      <div className="absolute inset-0 overflow-hidden max-md:hidden">
         {hydrated && (
           <>
         {/* Gradient orbs - reduced size on mobile for performance */}
@@ -43,7 +50,7 @@ export default function HeroSection() {
       <div className="relative z-10 container mx-auto px-4 sm:px-5 lg:px-8 py-8 md:py-0">
         <div className="max-w-5xl mx-auto text-center">
           {/* Badge */}
-          <div className="hero-in inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 mb-6 sm:mb-8 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-full shadow-subtle">
+          <div className="hero-in inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 mb-6 sm:mb-8 bg-white/80 md:backdrop-blur-sm border border-gray-200/50 rounded-full shadow-subtle">
             <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gold-500 rounded-full animate-pulse-subtle" />
             <span className="text-xs sm:text-sm font-medium text-gray-700">
               {t.hero.badge}
@@ -66,25 +73,27 @@ export default function HeroSection() {
             {t.hero.subtitle}
           </p>
 
-          {/* CTA Buttons - Full width on mobile */}
+          {/* CTA Buttons: side by side when both fit, else stacked full width (.cta-pair) */}
           <div
-            className="hero-in flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-16 px-4 sm:px-0"
+            className="hero-in cta-pair justify-center sm:items-center mb-10 sm:mb-16"
             style={{ animationDelay: '100ms' }}
           >
-            <button
-              onClick={() => scrollToSection('products')}
-              className="group hero-dark"
+            <a
+              href="#products"
+              onClick={(event) => scrollToSection(event, 'products')}
+              className="group cta cta-l"
             >
               {t.hero.explore}
               <ArrowRight className="arrow-go" />
-            </button>
-            <button
-              onClick={() => scrollToSection('services')}
-              className="group hero-light"
+            </a>
+            <a
+              href="#services"
+              onClick={(event) => scrollToSection(event, 'services')}
+              className="group cta-2 cta-l"
             >
-              <Play className="w-4 h-4" />
+              <Play />
               {t.hero.ourServices}
-            </button>
+            </a>
                   </div>
 
           {/* Trust Indicators - Vertical stack on mobile, horizontal on larger screens */}
@@ -121,7 +130,7 @@ export default function HeroSection() {
 
       {/* Bottom gradient fade */}
       <div
-        className="hero-fade absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-white to-transparent"
+        className="hero-fade absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent max-md:hidden"
         style={{ animationDelay: '300ms' }}
       />
 

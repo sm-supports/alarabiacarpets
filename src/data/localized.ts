@@ -1,7 +1,5 @@
 import type { Locale } from "@/i18n/config";
-import { getDict } from "@/i18n";
 import { AR_CATEGORY_LABELS, AR_SERVICE_LABELS } from "@/i18n/labels";
-import { WHATSAPP_URL } from "@/lib/seo";
 import { authors, type Author } from "./authors";
 import { categories, type Category } from "./categories";
 import { guides, type Guide } from "./guides";
@@ -39,8 +37,6 @@ const arProductList: Product[] = products.map((p) => {
     ...p,
     ...t,
     analyticsName: p.name,
-    price: getDict("ar").price.contact,
-    whatsappLink: `${WHATSAPP_URL}?text=${encodeURIComponent(getDict("ar").common.interestedMessage(t.name))}`,
   };
 });
 

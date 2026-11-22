@@ -9,13 +9,14 @@ import { arClient } from "./ar.client";
 export const ar: Dict = {
   ...arClient,
   price: {
-    contact: "تواصل معنا للسعر",
-    from: (amount, unit) => `ابتداءً من ${amount} ر.ق${unit ? ` ${unit}` : ""}`,
+    from: (amount, unit) => `ابتداءً من ${amount}\u00a0ر.ق${unit ? ` ${unit}` : ""}`,
     units: {
       "per sqm": "للمتر المربع",
       "per piece": "للقطعة",
       "per project": "للمشروع",
     },
+    noPrice: "القياس وعرض السعر مجانًا. أرسل المقاسات وبعض الصور.",
+    freeQuote: "عرض سعر مجاني",
   },
   footer: {
     srTitle: "تذييل الموقع",
@@ -38,7 +39,6 @@ export const ar: Dict = {
     viewAll: "شوف كل المنتجات",
     viewRange: "شوف التشكيلة",
     moreAlt: (name: string) => `${name} من سجاد العربية في الدوحة`,
-    getQuote: "اطلب عرض سعر",
     items: {
       carpet: {
         name: "سجاد فاخر",
@@ -259,6 +259,11 @@ export const ar: Dict = {
       quoteNote: "إذا ما كنت متأكد من المقاسات، نقدر نزورك ونقيس في الموقع ونرشح لك الخامة المناسبة للغرفة.",
       helpTitle: "كيف نقدر نساعدك",
       categoryIn: (label) => `${label} في الدوحة`,
+      call: "اتصل",
+      email: "البريد الإلكتروني",
+      directions: "الموقع على الخريطة",
+      showroomShort: "شارع المنصورة، الدوحة، قطر",
+      hoursLine: "مفتوحين يوميًا من 8:00 صباحًا إلى 10:00 مساءً · الدوحة والريان والوكرة والخور ولوسيل وكل مناطق قطر",
     },
   },
   facts: {

@@ -39,3 +39,16 @@ export const Truck = sprite("truck");
 export const Video = sprite("video");
 export const Wrench = sprite("wrench");
 export const X = sprite("x");
+
+/**
+ * The same X, drawn inline for StatePanel's Close. That panel is what a visitor sees when
+ * the network has gone, and a sprite icon first used offline can come out blank, which
+ * would leave Close an empty button.
+ */
+export function XInline({ className }: Pick<IconProps, "className">) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true">
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  );
+}

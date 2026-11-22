@@ -39,15 +39,89 @@ interface CFContext {
 // would hold the visitor on "Sending..." until the platform killed the Function.
 const RESEND_TIMEOUT_MS = 8_000;
 
+// How long to give a send Resend says is still in progress under this key before asking
+// again, once. Resend answers a finished send's key with that send's own result.
+const IN_PROGRESS_WAIT_MS = 1_000;
+
 // The form sends one id per message, and the same id again when the visitor retries
 // the same text. Resend drops a second send with the same key, so a retry after a
 // lost response doesn't email the team twice.
 const SUBMISSION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-// Length caps. Keep in sync with the maxLength attributes in ContactSection.tsx.
+// Length caps. Keep in sync with FIELD_LIMITS in ContactSection.tsx.
 const MAX_NAME_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 254;
 const MAX_MESSAGE_LENGTH = 5000;
+
+/**
+ * What went wrong, for the form to show the right state. The HTTP statuses are the ones
+ * this Function has always returned; `code` only tells apart the cases a status shares.
+ * The form maps any code it doesn't know to "send_failed". Keep in step with
+ * ContactSection.tsx and CONTACT_SCENARIOS in scripts/lib/browser.mjs.
+ *
+ * send_failed: Resend answered and refused the message, so it didn't go.
+ * send_unknown: Resend gave no answer (timed out, couldn't be reached, or still busy with
+ * the first send under this key), so it may have gone. The form says so and offers Try
+ * again, which the idempotency key makes safe. Only sent with a submission id: without
+ * one a retry could email the team twice, so that case stays send_failed.
+ */
+type ContactCode =
+  | "bad_body"
+  | "bot_required"
+  | "bot_rejected"
+  | "bot_unavailable"
+  | "fields_required"
+  | "too_long"
+  | "invalid_email"
+  | "send_failed"
+  | "send_unknown";
+
+/**
+ * Turnstile rejections a visitor can't fix by getting a new token: our configuration,
+ * or siteverify itself being down. They get "bot_unavailable" (call or WhatsApp us);
+ * anything else is "bot_rejected" (press Send to retry). verifyTurnstileToken's reason
+ * is a comma-joined list when siteverify sent several error codes.
+ */
+const CHECK_UNAVAILABLE = new Set([
+  "secret-not-configured",
+  "no-hostnames-configured",
+  "siteverify-unavailable",
+  "missing-input-secret",
+  "invalid-input-secret",
+  "internal-error",
+  "action-mismatch",
+  "hostname-mismatch",
+]);
+
+function botCode(reason: string): ContactCode {
+  return reason.split(",").some((part) => CHECK_UNAVAILABLE.has(part)) ? "bot_unavailable" : "bot_rejected";
+}
+
+/**
+ * What one call to Resend came to, from the `error` sendEmail returns.
+ *
+ * - sent: no error.
+ * - duplicate: 409, Resend already sent under this idempotency key (a retry of the same
+ *   submission with a payload that differs). The message is with the team.
+ * - in_progress: 409 concurrent_idempotent_requests, the first send under this key hasn't
+ *   finished. It may still fail, so it isn't counted as sent.
+ * - refused: Resend answered with any other status. The message didn't go.
+ * - unknown: no answer. Our time limit, or the SDK's own catch of a network failure or an
+ *   abort, which it reports with `statusCode: null`. The message may have gone.
+ */
+type SendResult = "sent" | "duplicate" | "in_progress" | "refused" | "unknown";
+
+function sendResult(error: unknown): SendResult {
+  if (!error) return "sent";
+  if (typeof error !== "object" || error instanceof Error) return "unknown";
+  const { statusCode, name } = error as { statusCode?: unknown; name?: unknown };
+  if (name === "concurrent_idempotent_requests") return "in_progress";
+  if (statusCode === 409 || name === "invalid_idempotent_request") return "duplicate";
+  if (typeof statusCode === "number") return "refused";
+  // A Resend error body that names its cause without a status is still an answer.
+  if (typeof name === "string" && name !== "application_error") return "refused";
+  return "unknown";
+}
 
 // The form is same-origin, so CORS is only relevant to cross-origin callers.
 // Preview deployments post to their own origin and are unaffected.
@@ -208,6 +282,8 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       headers: { ...headers, "Server-Timing": serverTiming },
     });
   };
+  const fail = (status: number, error: string, code: ContactCode, outcome: string): Response =>
+    respond(status, { error, code }, outcome);
 
   try {
     let body: unknown;
@@ -217,7 +293,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       body = null;
     }
     if (body === null || typeof body !== "object" || Array.isArray(body)) {
-      return respond(400, { error: "Invalid request body" }, "bad-body");
+      return fail(400, "Invalid request body", "bad_body", "bad-body");
     }
     const { turnstileToken, ...fields } = body as Record<string, unknown>;
 
@@ -227,7 +303,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
 
     // Verify Turnstile token
     if (!turnstileToken) {
-      return respond(400, { error: "Bot verification required" }, "no-token");
+      return fail(400, "Bot verification required", "bot_required", "no-token");
     }
 
     const clientIp = context.request.headers.get("CF-Connecting-IP");
@@ -241,7 +317,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
 
     if (!verification.ok) {
       console.warn("Turnstile verification rejected:", verification.reason);
-      return respond(403, { error: "Bot verification failed" }, "bot-check-failed");
+      return fail(403, "Bot verification failed", botCode(verification.reason), "bot-check-failed");
     }
 
     // Validate required fields. The JSON body is untrusted, so check the types
@@ -251,17 +327,17 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       typeof fields.email !== "string" ||
       typeof fields.message !== "string"
     ) {
-      return respond(400, { error: "Name, email, and message are required" }, "invalid");
+      return fail(400, "Name, email, and message are required", "fields_required", "invalid");
     }
 
     // The name goes into the subject line, so collapse line breaks and other
-    // control characters.
+    // control characters. The form applies the same rules before it sends.
     const name = fields.name.replace(/[\u0000-\u001F\u007F]+/g, " ").trim();
     const email = fields.email.trim();
     const message = fields.message.trim();
 
     if (!name || !email || !message) {
-      return respond(400, { error: "Name, email, and message are required" }, "invalid");
+      return fail(400, "Name, email, and message are required", "fields_required", "invalid");
     }
 
     if (
@@ -269,7 +345,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       email.length > MAX_EMAIL_LENGTH ||
       message.length > MAX_MESSAGE_LENGTH
     ) {
-      return respond(400, { error: "One or more fields are too long" }, "invalid");
+      return fail(400, "One or more fields are too long", "too_long", "invalid");
     }
 
     // Bare addresses only: no display-name syntax and no address lists, since
@@ -277,7 +353,7 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
     const emailRegex = /^[^\s@<>",;]+@[^\s@<>",;]+\.[^\s@<>",;]+$/;
 
     if (!emailRegex.test(email)) {
-      return respond(400, { error: "Invalid email format" }, "invalid");
+      return fail(400, "Invalid email format", "invalid_email", "invalid");
     }
 
     // Optional: a tab opened before this field existed doesn't send it.
@@ -285,36 +361,62 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
       typeof fields.submissionId === "string" && SUBMISSION_ID.test(fields.submissionId)
         ? fields.submissionId.toLowerCase()
         : undefined;
+    // The reference the visitor sees on the Sent panel. Derived from the id, never per
+    // request, so a retry of the same message sends Resend the same payload under the
+    // same key; a different payload would get a 409 instead of the original answer.
+    const ref = submissionId ? submissionId.slice(0, 8).toUpperCase() : undefined;
+    // Sent from the Sent panel's "Correct and resend": a new message replacing the last.
+    const correction = fields.correction === true;
 
     const resend = new Resend(context.env.RESEND_API_KEY);
 
     // Send admin notification (critical). Failures come back in `error`, not as a
     // throw, so it has to be checked explicitly.
     const emailStarted = Date.now();
-    const { error: adminError } = await sendEmail(resend, {
+    const adminEmail: CreateEmailOptions = {
       from: "Al Arabia Carpets <noreply@alarabiacarpets.com>",
       to: "info@alarabiacarpets.com",
       replyTo: email,
-      subject: `New Contact Form Message from ${name}`,
+      subject: `${correction ? "Correction: " : ""}New Contact Form Message from ${name}${ref ? ` · REF ${ref}` : ""}`,
       html: `
-        <h2>New Contact Form Submission</h2>
+        <h2>${correction ? "Correction: " : ""}New Contact Form Submission</h2>
+        ${correction ? "<p>This replaces the sender's previous message.</p>" : ""}
+        ${ref ? `<p><strong>REF:</strong> ${ref}</p>` : ""}
         <p><strong>Name:</strong> ${escapeHtml(name)}</p>
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
         <p><strong>Message:</strong></p>
         <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
       `,
-    }, submissionId && `contact-admin/${submissionId}`);
+    };
+    const adminKey = submissionId && `contact-admin/${submissionId}`;
+    let { error: adminError } = await sendEmail(resend, adminEmail, adminKey);
+    let result = sendResult(adminError);
+    if (result === "in_progress") {
+      // The visitor's earlier request for this message is still with Resend and may yet
+      // fail. Ask once more with the same key and payload: a finished send answers with
+      // its own result.
+      await new Promise((resolve) => setTimeout(resolve, IN_PROGRESS_WAIT_MS));
+      ({ error: adminError } = await sendEmail(resend, adminEmail, adminKey));
+      const second = sendResult(adminError);
+      // Still in progress: no answer yet, so it may go or not.
+      result = second === "in_progress" ? "unknown" : second === "sent" ? "duplicate" : second;
+    }
     timing.email_ms = Date.now() - emailStarted;
 
-    if (adminError) {
+    if (result === "refused" || (result === "unknown" && !submissionId)) {
       console.error("Admin notification failed:", adminError);
-      return respond(502, { error: "Failed to send email" }, "admin-email-failed");
+      return fail(502, "Failed to send email", "send_failed", "admin-email-failed");
     }
+    if (result === "unknown") {
+      console.error("Admin notification has no answer:", adminError);
+      return fail(502, "No answer from the email service", "send_unknown", "admin-email-unknown");
+    }
+    const duplicate = result === "duplicate";
 
     // Acknowledgment to the submitter (non-critical). The team already has the
     // message, so the visitor gets their answer now and this finishes afterwards.
     // Only after the admin email succeeded: never thank someone for a message that
-    // didn't arrive.
+    // didn't arrive. On a duplicate it has its own key, so it isn't sent twice either.
     context.waitUntil(
       sendEmail(resend, {
         from: "Al Arabia Carpets <noreply@alarabiacarpets.com>",
@@ -323,16 +425,16 @@ export async function onRequestPost(context: CFContext): Promise<Response> {
           locale === "ar"
             ? "شكرًا لتواصلك مع سجاد العربية"
             : "Thank you for contacting Al Arabia Carpets",
-        html: generateAcknowledgmentEmail(name, locale),
+        html: generateAcknowledgmentEmail(name, locale, ref),
       }, submissionId && `contact-ack/${submissionId}`).then(({ error: ackError }) => {
         if (ackError) console.error("Acknowledgment email failed:", ackError);
       })
     );
 
-    return respond(200, { message: "Email sent successfully" }, "sent");
+    return respond(200, { message: "Email sent successfully" }, duplicate ? "sent-duplicate" : "sent");
   } catch (error) {
     console.error("Email send error:", error);
-    return respond(500, { error: "Failed to send email" }, "error");
+    return fail(500, "Failed to send email", "send_failed", "error");
   }
 }
 

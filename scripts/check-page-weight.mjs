@@ -80,6 +80,18 @@ for (const url of new Set(urls)) {
   }
 }
 
+// The 404 is one document for both languages (src/app/global-not-found.tsx), outside
+// the sitemap: it must load neither language's scripts, nor the 85 KB site stylesheet.
+{
+  const html = fs.readFileSync("out/404.html", "utf8");
+  let loaded = html;
+  for (const [, src] of html.matchAll(/<script[^>]*src="(\/_flight\/[^"]+)"/g)) loaded += fs.readFileSync(`out${src}`, "utf8");
+  if (["en", "ar"].some((group) => groupChunks(group).some((chunk) => loaded.includes(chunk)))) {
+    problems.push("/404.html: loads a language's script; global-not-found must not render client components");
+  }
+  if (/<link[^>]*rel="stylesheet"/.test(html)) problems.push("/404.html: loads a stylesheet; its styles are inline");
+}
+
 for (const problem of problems) console.log(problem);
 console.log(
   `check-page-weight: ${problems.length} problem(s) on ${new Set(urls).size} pages; ` +

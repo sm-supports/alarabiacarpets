@@ -5,10 +5,12 @@
 | Layer | File |
 |-------|------|
 | Frontend form | `src/components/ContactSection.tsx` |
-| Contact page | `src/app/contact/page.tsx` (server component, renders ContactSection) |
+| Contact page | `src/app/(en)/contact/page.tsx` and `src/app/(ar)/ar/contact/page.tsx` over `src/views/ContactView.tsx`, which renders `<ContactSection layout="page">` (the one-screen layout). Home renders `<ContactSection />` too |
 | API endpoint | `functions/api/contact.ts` (Cloudflare Workers) |
 | Email template | `functions/email-templates/acknowledgment.ts` |
 | Turnstile widget | `src/components/CloudflareTurnstile.tsx` |
+| Outcome messages | Inline `StatePanel`s in `ContactSection.tsx` (`data-form-state`), strings in `formStates` in `src/i18n/*.client.ts`, one per API `code` |
+| Draft | `src/lib/draft.ts`: the text in this tab's sessionStorage (`contact-draft`), with the submission id and when it was made (`createdAt`), or the sent time and REF after a send. An id older than 23 hours is replaced, inside Resend's 24-hour key window. Import-free, because `app/global-error.tsx` reads it |
 
 ## Current Form Fields
 
@@ -21,33 +23,15 @@
 
 ### Frontend (`src/components/ContactSection.tsx`)
 
-1. Add state:
-   ```tsx
-   const [phone, setPhone] = useState("");
-   ```
-
-2. Add input JSX following the existing pattern:
-   ```tsx
-   <div>
-     <label className="...">Phone</label>
-     <Input
-       value={phone}
-       onChange={(e) => setPhone(e.target.value)}
-       placeholder="Your phone number"
-       className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-gold-500 focus:ring-gold-500/20 rounded-lg sm:rounded-xl h-11 sm:h-12 text-sm sm:text-base"
-     />
-   </div>
-   ```
-
-3. Include in the fetch body within `handleSubmit`:
-   ```tsx
-   body: JSON.stringify({ name, email, phone, message, turnstileToken }),
-   ```
-
-4. Reset the field on success:
-   ```tsx
-   setPhone("");
-   ```
+1. Add it to `FIELD_LIMITS` (same cap as the Function), `FIELDS`, `clean()` and `validate()`,
+   with its error strings in `formStates` in both `src/i18n/*.client.ts`.
+2. Add state and an input following the existing ones: `{...fieldProps("x")}`, `INPUT_CLASS`
+   (16px text, so iOS doesn't zoom), an `autoComplete`, and `{fieldError("x")}` under it.
+3. Add it to the `Values` that `press()` builds and `send()` posts, and to `contentOf()`,
+   so an edit gets a new submission id.
+4. Clear it in `onSent()` and in `onSentElsewhere` (the restore effect), and restore it in
+   `correct()`. Set it through `edit()`, which writes the draft, and add it to `Draft` in
+   `src/lib/draft.ts`, to the restore effect and to the `live` ref.
 
 ### Backend (`functions/api/contact.ts`)
 
@@ -73,11 +57,36 @@
 
 ## Google Ads Conversion Tracking
 
-The form fires conversion events — do not remove without explicit instruction:
-- Form submission: `AW-16463357836/vNfLCO7DwcgbEIzPq6o9`
-- WhatsApp clicks: `AW-16463357836/n6RiCOKH_I0bEIzPq6o9`
+The form fires conversion events — do not remove without explicit instruction. The labels
+are `CONVERSION_LABELS` in `src/lib/analytics.ts` (`formLead`, `whatsappClick`); read them
+there rather than copying them here.
 
 Conversion tracking lives in `src/lib/analytics.ts` (`trackFormLead`, `trackWhatsAppClick`, `trackPhoneClick`). All events use currency `QAR`. The legacy `gtag_report_conversion()` global is re-created by `src/components/ThirdPartyScripts.tsx` for backward compatibility.
+
+What the form sends, once per outcome, with no personal data:
+
+| Outcome | Events |
+|---------|--------|
+| Sent | `formLead` conversion and GA4 `generate_lead`, once per lead |
+| Sent after "Correct and resend" | GA4 `form_correction` only: the lead was already counted. The request carries `correction: true`, and the admin email's subject starts "Correction:" |
+| Any failure | GA4 `form_failed {code}`: the API's `code` (`unknown` for one the form doesn't know), or one the form names itself: `unreachable`, `no_reply` (the 20 s abort), `offline`, `bot_pending`, `bot_timeout`, `bot_error`, `bot_unsupported`, `bot_no_key` |
+| "Continue on WhatsApp" on the Sent panel | GA4 `whatsapp_click` with `source: contact_sent_followup` and `conversion: false`: no Ads conversion |
+| "Send this on WhatsApp" / Call on a failure | `source: contact_form_failed` (a WhatsApp tap counts as a conversion; a call is GA4 only) |
+
+## Request and response
+
+The form posts `{ name, email, message, turnstileToken, submissionId, locale, correction? }`.
+Every answer other than 200 carries `{ error, code }`, and the form picks its state by
+`code`, never by status or `error` text. The codes: `bot_required`, `bot_rejected`,
+`bot_unavailable`, `invalid_email`, `too_long`, `fields_required`, `bad_body`, `send_failed`,
+`send_unknown` (see `turnstile-spin/` for the bot classes and `CONTACT_SCENARIOS` in
+`scripts/lib/browser.mjs` for each body). A code the form doesn't know shows S7, as
+`send_failed` does.
+
+REF is `submissionId.slice(0, 8).toUpperCase()`: one id per message, kept across retries,
+so Resend's idempotency key holds. It appears on the Sent panel, in the admin email's subject,
+in the acknowledgment email and in the WhatsApp follow-up prefill. A failed send's WhatsApp
+prefill is capped at about 1,800 encoded bytes, with a notice and a Copy button (S19).
 
 ## Turnstile Configuration
 
@@ -104,6 +113,20 @@ Conversion tracking lives in `src/lib/analytics.ts` (`trackFormLead`, `trackWhat
 - Acknowledgment: sent to the submitter's email address
 - Sender: `Al Arabia Carpets <noreply@alarabiacarpets.com>`
 - API key: `context.env.RESEND_API_KEY`
+- The admin email goes under the idempotency key `contact-admin/<submissionId>`, so a retry
+  of the same message can't email the team twice. Resend's answer sets the response
+  (`sendResult()` in `functions/api/contact.ts`):
+
+  | Resend | Function | Form |
+  |--------|----------|------|
+  | Sent | 200 | Sent (S6) |
+  | 409, already sent under this key | 200 | Sent (S6) |
+  | 409 `concurrent_idempotent_requests` (first send still in progress) | asks again once after 1 s, then as that answer; still in progress is `send_unknown` | |
+  | Any other status (422, 429, 5xx…) | 502 `send_failed` | S7, "didn't accept", WhatsApp first |
+  | No answer: the 8 s limit, or a network failure | 502 `send_unknown` | S7b, "may have arrived", Try again first |
+
+  A request without a `submissionId` has no key, so a retry could send twice: there, no
+  answer is `send_failed` too.
 - CORS: allows all origins (`"*"`) — frontend and API are on the same Cloudflare Pages domain
 
 ## Testing
@@ -111,6 +134,10 @@ Conversion tracking lives in `src/lib/analytics.ts` (`trackFormLead`, `trackWhat
 ```bash
 npm run pages:dev
 ```
+
+On this Mac's case-insensitive volume `wrangler pages dev` 404s `/products/*`, but
+`/contact` works. A real send needs the Turnstile widget to allow the host (see
+`turnstile-spin/`), and sends real email: get the owner's go-ahead first.
 
 Set environment variables in `.dev.vars` for local testing:
 ```
@@ -120,10 +147,12 @@ TURNSTILE_SECRET_KEY=xxxxx
 
 Test:
 - Form renders with all fields
-- Turnstile widget appears and produces a token
+- Turnstile produces a token (interaction-only: it shows only when it wants a tap)
 - Submission sends both admin notification and acknowledgment emails
-- Validation errors display correctly for missing/invalid fields
-- Success toast appears after submission
+- Every outcome, mocked: `node scripts/audit-mobile.mjs --form` (exits 1 on a wrong state,
+  focus, post count or lost text)
+- The Sent panel stays until closed; Close returns to an empty form with focus on Send
+- Offline at send: the panel appears, the page stays, and the text is still in the form
 
 ## Rules
 
@@ -131,3 +160,4 @@ Test:
 - Always escape user input with `escapeHtml()` before inserting into email HTML
 - Never remove the Turnstile verification
 - Never remove the Google Ads conversion tracking without explicit instruction
+- Never load a form message from a lazy chunk: offline, the chunk fails and takes the page with it

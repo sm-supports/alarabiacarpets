@@ -1,5 +1,6 @@
 import type NextScript from "next/script";
 import { CONVERSION_LABELS, CURRENCY, GA_MEASUREMENT_ID, GOOGLE_ADS_ID } from "@/lib/analytics";
+import { TAWK_SRC } from "@/lib/site";
 
 /**
  * Third-party tags, ported from the old index.html.
@@ -70,10 +71,13 @@ export default function ThirdPartyScripts({ Script }: { Script: typeof NextScrip
           during loading would otherwise start Tawk while the page's own images are
           still coming in. On Save-Data or a 2G connection there is no timer, only the
           interaction. Tawk reads window.Tawk_API, so it has to be set on window here:
-          a `var` inside this function would be local. */}
+          a `var` inside this function would be local.
+          Below md none of this runs: its bubble would sit on the action bar, so phones
+          load Tawk only from the menu's Live chat row (src/lib/tawk.ts). */}
       <Script id="tawk-to" strategy="afterInteractive">
         {`
           (function () {
+            if (!matchMedia('(min-width: 768px)').matches) return;
             var events = ['pointerdown', 'scroll', 'keydown'];
             var loaded = false;
             var timer;
@@ -82,7 +86,7 @@ export default function ThirdPartyScripts({ Script }: { Script: typeof NextScrip
               window.Tawk_LoadStart = new Date();
               var s1 = document.createElement('script');
               s1.async = true;
-              s1.src = 'https://embed.tawk.to/68a5dfd1f412351925ef40a3/1j33v4jea';
+              s1.src = '${TAWK_SRC}';
               s1.charset = 'UTF-8';
               s1.setAttribute('crossorigin', '*');
               document.head.appendChild(s1);

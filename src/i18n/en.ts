@@ -8,13 +8,22 @@ import { enClient } from "./en.client";
 export const en = {
   ...enClient,
   price: {
-    contact: "Contact for Price",
-    from: (amount: string, unit?: string) => `From QAR ${amount}${unit ? ` ${unit}` : ""}`,
+    /** A no-break space keeps the amount with its currency when a narrow tile wraps. */
+    from: (amount: string, unit?: string) => `From QAR\u00a0${amount}${unit ? ` ${unit}` : ""}`,
     units: {
       "per sqm": "per sqm",
       "per piece": "per piece",
       "per project": "per project",
     } as Record<string, string>,
+    /**
+     * The price line of a product or service with no priceFrom (S17 in the plan's state
+     * catalogue). One line for every such job: the team visits to measure for all of them,
+     * floor mats, ceramic tiles and sofa upholstery included (the owner, 2026-11-09).
+     * Page text only: the JSON-LD of these items carries no offer and no price.
+     */
+    noPrice: "Free measurement and quote. Send your sizes and a few photos.",
+    /** The short form, for a tile with room for one line in place of a price. */
+    freeQuote: "Free quote",
   },
   footer: {
     srTitle: "Site footer",
@@ -38,7 +47,6 @@ export const en = {
     viewAll: "View All Products",
     viewRange: "View Range",
     moreAlt: (name: string) => `${name} by Al Arabia Carpets in Doha`,
-    getQuote: "Get Quote",
     items: {
       carpet: {
         name: "Luxury Carpets",
@@ -268,6 +276,12 @@ export const en = {
         "If you are not sure of the sizes, we can visit, take the measurements on site and recommend the right material for the room.",
       helpTitle: "What we can help with",
       categoryIn: (label: string) => `${label} in Doha`,
+      // The page's contact tiles and the one line under them.
+      call: "Call",
+      email: "Email",
+      directions: "Directions",
+      showroomShort: "Al Mansoura St, Doha, Qatar",
+      hoursLine: "Open every day, 8:00 AM to 10:00 PM · Doha, Al Rayyan, Al Wakra, Al Khor, Lusail and all of Qatar",
     },
   },
   /** Named-business answers, so AI tools and readers get who/where/what up front. */

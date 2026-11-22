@@ -22,6 +22,15 @@ export const CONVERSION_LABELS = {
   phoneClick: null as string | null,
 } as const;
 
+/**
+ * Whether a WhatsApp tap on the action bar (and the pill it becomes at md and up) counts
+ * as the whatsappClick conversion, as the old floating button's taps did. The bar is a
+ * bigger target, so it may bring more taps for the same number of chats: compare the
+ * `sticky_bar:*` sources with real chat counts for 28 days after release. Setting this to
+ * false keeps those taps in GA4 only, which also takes the pill's taps out of bidding.
+ */
+export const BAR_SENDS_ADS = true;
+
 /** Al Arabia Carpets is a Qatar business — conversions are valued in Qatari riyal. */
 export const CURRENCY = "QAR";
 
@@ -57,19 +66,44 @@ export function trackConversion(sendTo: string, params: GtagParams = {}): void {
   gtagEvent("conversion", { send_to: sendTo, value: 1.0, currency: CURRENCY, ...params });
 }
 
-/** Contact form submitted successfully. */
+/** Contact form submitted successfully. Not for a correction of a message already sent. */
 export function trackFormLead(): void {
   trackConversion(CONVERSION_LABELS.formLead);
   gtagEvent("generate_lead", { currency: CURRENCY, value: 1.0, method: "contact_form" });
 }
 
+/** A "Correct and resend" went through. The lead was counted by the first send. */
+export function trackFormCorrection(): void {
+  gtagEvent("form_correction", { method: "contact_form" });
+}
+
+/**
+ * The contact form showed a failure. `code` is the API's code or the form's own
+ * (offline, unreachable, no_reply, bot_*): never anything the visitor typed.
+ */
+export function trackFormFailed(code: string): void {
+  gtagEvent("form_failed", { code, method: "contact_form" });
+}
+
 /**
  * A WhatsApp CTA was clicked.
  * @param source where the click came from, e.g. "navbar", "product_card:carpet"
+ * @param conversion false for a tap that isn't a new lead, such as the follow-up after
+ *   a sent form: GA4 still records it, Google Ads doesn't count it.
  */
-export function trackWhatsAppClick(source: string): void {
-  trackConversion(CONVERSION_LABELS.whatsappClick, { source });
-  gtagEvent("whatsapp_click", { source, method: "whatsapp" });
+export function trackWhatsAppClick(source: string, conversion = true): void {
+  if (conversion) trackConversion(CONVERSION_LABELS.whatsappClick, { source });
+  gtagEvent("whatsapp_click", { source, method: "whatsapp", ...(!conversion && { conversion: false }) });
+}
+
+/**
+ * "Back to WhatsApp" on the panel a phone shows on returning from WhatsApp (S1). The chat
+ * was already counted by the tap that first opened it, so this is GA4 only, and not a
+ * whatsapp_click either.
+ * @param source the source of that first tap
+ */
+export function trackWhatsAppReopen(source: string): void {
+  gtagEvent("whatsapp_reopen", { source, method: "whatsapp" });
 }
 
 /** A tel: link was clicked. */

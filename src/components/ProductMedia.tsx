@@ -1,26 +1,27 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-import { ImageIcon } from "@/components/icons";
-import { useI18n } from "@/i18n/LocaleProvider";
+import ProductGallery, { type GallerySlide } from "@/components/ProductGallery";
 
 /**
- * Hero media for a product detail page.
+ * Hero media for a product detail page. A server component: nothing here needs the
+ * browser, so its props stay out of the page's hydration data.
  *
- * Client leaf holding only the image error state, so the surrounding page can
- * remain a server component and export generateMetadata. The image is never hidden
- * while it loads: it is the page's LCP element, and hiding it until React runs would
- * tie LCP to hydration.
+ * The image is never hidden while it loads: it is the page's LCP element, and hiding it
+ * until React runs would tie LCP to hydration. A photo or video that fails becomes a
+ * named tile in this same box, from ImageFallback (mounted in src/app/providers.tsx),
+ * which also catches a failure from before hydration.
+ *
+ * With `slides`, the product's other photos and videos follow the hero in a swipe strip
+ * on phones (ProductGallery). The hero is still rendered here, so it stays in the static
+ * HTML exactly as before; the strip adds only the slides' URLs to the hydration data.
  */
 export default function ProductMedia({
-  name,
   alt,
   src,
   srcSet,
   sizes,
   videoSrc,
+  slides,
+  poster,
 }: {
-  name: string;
   alt: string;
   /** The hero image, or the poster when the product leads with a video. Sized copies
       resolved on the server (see ProductDetailView). */
@@ -28,57 +29,47 @@ export default function ProductMedia({
   srcSet?: string;
   sizes?: string;
   videoSrc?: string;
+  /** The slides after the hero, phones only. */
+  slides?: GallerySlide[];
+  /** The poster for video slides. */
+  poster?: string;
 }) {
-  const { t } = useI18n();
-  const [imageError, setImageError] = useState(false);
-  const imageRef = useRef<HTMLImageElement>(null);
-
-  // The image in the static HTML can fail before React attaches onError, and the
-  // event won't fire again.
-  useEffect(() => {
-    const image = imageRef.current;
-    if (image?.complete && image.naturalWidth === 0) setImageError(true);
-  }, []);
+  const hero = videoSrc ? (
+    // Plays on request: autoplay made every visitor download the whole file, up to
+    // 11 MB, during page load. The poster paints straight away and is the LCP element.
+    <video
+      src={videoSrc}
+      className="w-full h-full object-cover"
+      controls
+      playsInline
+      preload="none"
+      poster={src}
+      aria-label={alt}
+    />
+  ) : (
+    <img
+      src={src}
+      srcSet={srcSet}
+      sizes={sizes}
+      alt={alt}
+      className="w-full h-full object-cover"
+      // Hero image: eager + high priority, it is the LCP element.
+      loading="eager"
+      fetchPriority="high"
+      decoding="async"
+    />
+  );
 
   return (
-    <div className="h-[300px] md:h-[500px] relative overflow-hidden bg-gray-100">
-      {imageError && (
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-          <div className="text-gray-500 text-center p-6">
-            <ImageIcon size={64} className="mx-auto mb-4 text-gray-400" />
-            <div className="text-lg font-medium mb-2">{t.productCard.imageNotAvailable}</div>
-            <div className="text-sm text-gray-400">{name}</div>
-          </div>
-        </div>
-      )}
-
-      {videoSrc ? (
-        // Plays on request: autoplay made every visitor download the whole file, up to
-        // 11 MB, during page load. The poster paints straight away and is the LCP element.
-        <video
-          src={videoSrc}
-          className="w-full h-full object-cover"
-          controls
-          playsInline
-          preload="none"
-          poster={src}
-          aria-label={alt}
-        />
+    <div className="pd-media">
+      {slides?.length ? (
+        // Props left out rather than passed as undefined: each is written into the page's
+        // hydration data, and an undefined one as "$undefined".
+        <ProductGallery slides={slides} alt={alt} {...(videoSrc ? { heroVideo: true } : {})} {...(poster ? { poster } : {})}>
+          {hero}
+        </ProductGallery>
       ) : (
-        <img
-          ref={imageRef}
-          src={src}
-          srcSet={srcSet}
-          sizes={sizes}
-          alt={alt}
-          className="w-full h-full object-cover"
-          onError={() => setImageError(true)}
-          // Hero image: eager + high priority, it is the LCP element.
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-          style={{ display: imageError ? "none" : "block" }}
-        />
+        hero
       )}
     </div>
   );

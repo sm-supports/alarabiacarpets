@@ -3,8 +3,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContactSection from "@/components/ContactSection";
 import JsonLd from "@/components/JsonLd";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import Link from "next/link";
 import FaqList from "@/components/FaqList";
+import FoldHead from "@/components/FoldHead";
+import CallLink from "@/components/CallLink";
+import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
+import { Mail, MapPin, Phone } from "@/components/icons";
 import { findCategory, getCategories } from "@/data/localized";
 import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
 import {
@@ -17,6 +23,8 @@ import {
   pageAlternates,
   PHONE,
 } from "@/lib/seo";
+
+const MAPS_URL = "https://maps.google.com/?q=Al+Mansoura+St,+Doha,+Qatar";
 
 export function contactMetadata(locale: Locale): Metadata {
   const { title, description } = getDict(locale).pages.contact;
@@ -34,6 +42,12 @@ export function contactMetadata(locale: Locale): Metadata {
   };
 }
 
+/**
+ * One screen from lg: the h1, four contact tiles and the hours line beside the form, with
+ * the showroom details, quote tips and FAQs in closed panels under the tiles. Phones get
+ * the h1 and tiles, then the form, then the panels. The panels' text is in the HTML, so
+ * crawlers, the FAQ markup and the text-to-HTML check still read it.
+ */
 export default function ContactView({ locale }: { locale: Locale }) {
   const t = getDict(locale);
   const page = t.pages.contact;
@@ -43,77 +57,108 @@ export default function ContactView({ locale }: { locale: Locale }) {
     return formatFromPrice(category.priceFrom, category.priceUnit, locale);
   };
   const faqs = t.home.faqs(price("carpet"), price("barkia"));
+  const crumbs: Crumb[] = [[page.breadcrumb, "/contact"]];
+
+  const intro = (
+    <>
+      <Breadcrumb locale={locale} trail={crumbs} dark phoneOnly />
+      <h1 className="ct-h1">{page.heading}</h1>
+      <p className="ct-intro">{page.intro}</p>
+      <ul className="ct-tiles">
+        <li>
+          {/* Before hydration it goes to the form, as the action bar does here, not to this page. */}
+          <WhatsAppLink source="contact_page_whatsapp" staticHref="#contact-form" className="ct-tile ct-tile-main">
+            <WhatsAppIcon className="ct-tile-icon" />
+            {/* The site's one WhatsApp CTA label (scripts/check-consistency.mjs). */}
+            <span className="ct-tile-label">{t.common.heroQuote}</span>
+          </WhatsAppLink>
+        </li>
+        <li>
+          <CallLink source="contact_page_call" className="ct-tile">
+            <Phone className="ct-tile-icon" />
+            <span className="ct-tile-text">
+              {/* The space keeps label and value apart for anything reading the text without CSS. */}
+              <span className="ct-tile-label">{page.call}</span>{" "}
+              <bdi dir="ltr" className="ct-tile-value">{PHONE}</bdi>
+            </span>
+          </CallLink>
+        </li>
+        {/* Email and directions take the full width on phones, so the address is never cut. */}
+        <li className="ct-wide">
+          <a href={`mailto:${EMAIL}`} className="ct-tile">
+            <Mail className="ct-tile-icon" />
+            <span className="ct-tile-text">
+              <span className="ct-tile-label">{page.email}</span>{" "}
+              <bdi dir="ltr" className="ct-tile-value">{EMAIL}</bdi>
+            </span>
+          </a>
+        </li>
+        <li className="ct-wide">
+          <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="ct-tile">
+            <MapPin className="ct-tile-icon" />
+            <span className="ct-tile-text">
+              <span className="ct-tile-label">{page.directions}</span>{" "}
+              <span className="ct-tile-value">{page.showroomShort}</span>
+            </span>
+          </a>
+        </li>
+      </ul>
+      <p className="ct-hours">{page.hoursLine}</p>
+    </>
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
       <JsonLd data={buildFaq(faqs, locale)} />
-      <JsonLd data={buildBreadcrumb([[page.breadcrumb, "/contact"]], locale)} />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       <Navbar />
-      {/* This page previously had no <h1> at all and no <main> wrapper --
-          ContactSection starts at <h2>. */}
       <main className="flex-grow">
-        <div className="bg-primary text-white py-14 md:py-16">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="h1-band">
-              {page.heading}
-            </h1>
-            <p className="hero-p">
-              {page.intro}
-            </p>
+        <ContactSection layout="page" intro={intro}>
+          {/* Each panel's heading sits outside its toggle (FoldHead), so screen readers
+              list it as a heading; the toggle is the whole heading row at every width. */}
+          <div className="ct-folds">
+            <div className="ct-fold">
+              <FoldHead id="ct-visit" as="h2" className="ct-fold-h" always>{page.visitTitle}</FoldHead>
+              <div className="fold-body ct-fold-body">
+                <p>{page.visitText}</p>
+                <h3>{page.hoursTitle}</h3>
+                <p>{page.hoursText(PHONE, EMAIL)}</p>
+                <h3>{page.areasTitle}</h3>
+                <p>{page.areasText}</p>
+              </div>
+            </div>
+            <div className="ct-fold">
+              <FoldHead id="ct-quote" as="h2" className="ct-fold-h" always>{page.quoteTitle}</FoldHead>
+              <div className="fold-body ct-fold-body">
+                <p>{page.quoteText}</p>
+                <ul className="list-disc ps-5 space-y-1">
+                  {page.quoteItems.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <p>{page.quoteNote}</p>
+                <h3>{page.helpTitle}</h3>
+                <ul className="cat-links">
+                  {getCategories(locale).map((category) => (
+                    <li key={category.slug}>
+                      <Link href={localePath(locale, `/products/${category.slug}`)}>
+                        {page.categoryIn(category.label)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="ct-fold">
+              <FoldHead id="ct-faq" as="h2" className="ct-fold-h" always>{t.common.faqTitle}</FoldHead>
+              <div className="fold-body ct-fold-body">
+                <FaqList faqs={faqs} />
+              </div>
+            </div>
           </div>
-        </div>
-        <ContactSection />
-        <ContactDetails locale={locale} />
-        <section className="py-14 md:py-16 bg-neutral-50">
-          <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
-            <h2 className="h2-sec">{t.common.faqTitle}</h2>
-            <FaqList faqs={faqs} />
-          </div>
-        </section>
+        </ContactSection>
       </main>
       <Footer locale={locale} />
     </div>
-  );
-}
-
-/**
- * Plain, factual detail under the form: hours, showroom, areas, what to send for
- * a quote. Every fact comes from src/lib/seo.ts or copy already on the site, so
- * it stays in step with the LocalBusiness schema.
- */
-function ContactDetails({ locale }: { locale: Locale }) {
-  const page = getDict(locale).pages.contact;
-  return (
-    <section className="bg-white py-14 md:py-16">
-      <div className="container mx-auto px-4 sm:px-5 lg:px-8 grid gap-10 md:grid-cols-2 font-poppins text-neutral-700 leading-relaxed">
-        <div>
-          <h2 className="font-playfair text-2xl font-semibold text-neutral-900 mb-3">{page.visitTitle}</h2>
-          <p>{page.visitText}</p>
-          <h3 className="font-playfair text-lg font-semibold text-neutral-900 mt-6 mb-2">{page.hoursTitle}</h3>
-          <p>{page.hoursText(PHONE, EMAIL)}</p>
-          <h3 className="font-playfair text-lg font-semibold text-neutral-900 mt-6 mb-2">{page.areasTitle}</h3>
-          <p>{page.areasText}</p>
-        </div>
-        <div>
-          <h2 className="font-playfair text-2xl font-semibold text-neutral-900 mb-3">{page.quoteTitle}</h2>
-          <p>{page.quoteText}</p>
-          <ul className="list-disc ps-5 mt-3 space-y-1">
-            {page.quoteItems.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <p className="mt-3">{page.quoteNote}</p>
-          <h3 className="font-playfair text-lg font-semibold text-neutral-900 mt-6 mb-2">{page.helpTitle}</h3>
-          <ul className="flex flex-wrap gap-x-4 gap-y-2">
-            {getCategories(locale).map((category) => (
-              <li key={category.slug}>
-                <Link href={localePath(locale, `/products/${category.slug}`)} className="text-primary hover:underline">
-                  {page.categoryIn(category.label)}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </section>
   );
 }

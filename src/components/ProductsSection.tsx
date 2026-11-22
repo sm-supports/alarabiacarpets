@@ -3,8 +3,8 @@ import Link from "next/link";
 import { products } from "@/data/products";
 import { getCategory } from "@/data/categories";
 import { cardImagePath, fullImagePath } from "@/lib/card-image";
-import { WHATSAPP_URL } from "@/lib/site";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { getDict, localePath, type Locale } from "@/i18n";
 
 // Showcase presentation config. Each entry points at a CATEGORY landing page --
@@ -73,31 +73,28 @@ function ProductShowcase({
   const t = getDict(locale);
   const lp = (path: string) => localePath(locale, path);
   const copy = t.showcase.items[product.id];
-  const whatsappLink = `${WHATSAPP_URL}?text=${encodeURIComponent(t.common.interestedMessage(copy.name))}`;
 
+  // The badge and ticks keep each range's colour; the buttons are the one .cta family.
   const colorClasses = {
     forest: {
       badge: 'bg-forest-100 text-forest-700',
       accent: 'text-forest-600',
-      button: 'bg-forest-900 hover:bg-forest-700',
     },
     gold: {
       badge: 'bg-gold-100 text-gold-700',
       accent: 'text-gold-600',
-      button: 'bg-gold-600 hover:bg-gold-500',
     },
     teal: {
       badge: 'bg-teal-100 text-teal-700',
       accent: 'text-teal-600',
-      button: 'bg-teal-600 hover:bg-teal-500',
     },
   }[product.color];
 
   return (
-    <div className={`py-12 sm:py-16 lg:py-24 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+    <div className={`py-10 sm:py-16 lg:py-24 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
       <div className="container mx-auto px-4 sm:px-5 lg:px-8">
         <div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-16 items-center"
         >
           {/* Image - Shows first on mobile */}
           <div
@@ -145,23 +142,23 @@ function ProductShowcase({
               ))}
             </div>
 
-            {/* CTAs - Stack on mobile */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            {/* CTAs: side by side when both fit, else stacked full width (.cta-pair) */}
+            <div className="cta-pair">
               <Link
                 href={lp(product.href)}
-                className={`group sc-cta ${colorClasses.button}`}
+                className="group cta cta-m"
               >
                 {t.showcase.viewRange}
                 <span className="sr-only">: {copy.name}</span>
                 <ArrowRight className="arrow-go" />
               </Link>
               <WhatsAppLink
-                href={whatsappLink}
+                message={t.common.quoteMessage(copy.name)}
                 source={`showcase:${product.id}`}
-                className="btn-outline"
+                className="cta-2 cta-m"
               >
-                {t.showcase.getQuote}
-                <ArrowUpRight className="w-4 h-4 rtl:-scale-x-100" />
+                <WhatsAppIcon />
+                {t.nav.getFreeQuote}
               </WhatsAppLink>
             </div>
           </div>
@@ -178,8 +175,9 @@ export default function ProductsSection({ locale }: { locale: Locale }) {
 
   return (
     <section id="products" className="relative">
-      {/* Section Header */}
-      <div className="py-12 sm:py-16 lg:py-20 bg-white">
+      {/* Section Header. No padding below it on phones: the first showcase, also
+          white, has its own. */}
+      <div className="pt-10 sm:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-5 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-forest-900 mb-3 sm:mb-4">
             {t.showcase.title}
@@ -196,10 +194,10 @@ export default function ProductsSection({ locale }: { locale: Locale }) {
       ))}
 
       {/* Additional Products Grid */}
-      <div className="py-12 sm:py-16 lg:py-20 bg-white">
+      <div className="py-10 sm:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-5 lg:px-8">
           <div className="text-center mb-8 sm:mb-12">
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-3 sm:mb-4">
+            <h3 className="sc-more">
               {t.showcase.moreTitle}
             </h3>
             <p className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto">
@@ -239,7 +237,7 @@ export default function ProductsSection({ locale }: { locale: Locale }) {
           <div className="mt-8 sm:mt-12 text-center">
             <Link
               href={lp("/products")}
-              className="group all-cta"
+              className="group cta cta-l cta-wide"
             >
               {t.showcase.viewAll}
               <ArrowRight className="arrow-go" />

@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import BarIntent from "@/components/BarIntent";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
 import FaqList from "@/components/FaqList";
+import FoldHead from "@/components/FoldHead";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import HeroQuoteCta from "@/components/HeroQuoteCta";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import ServiceLinks from "@/components/ServiceLinks";
-import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "@/components/icons";
 import type { CategorySection } from "@/data/categories";
 import { findCategory, findProduct, findService, getCategories, getProducts, guidesForCategoryL } from "@/data/localized";
 import { cardImage } from "@/lib/card-image";
@@ -28,10 +30,10 @@ export function categoryMetadata(locale: Locale, slug: string): Metadata {
   return buildCategoryMetadata(category, locale);
 }
 
-/** Specs table and FAQ list, shared by the main body and any secondary section. */
-function SpecList({ specs }: { specs: NonNullable<CategorySection["specs"]> }) {
+/** Specs table, shared by the main body (folded on phones) and any secondary section. */
+function SpecList({ specs, fold }: { specs: NonNullable<CategorySection["specs"]>; fold?: boolean }) {
   return (
-    <dl className="font-poppins text-sm divide-y divide-neutral-100 border-y border-neutral-100 max-w-2xl">
+    <dl className={`${fold ? "fold-body " : ""}font-poppins text-sm divide-y divide-neutral-100 border-y border-neutral-100 max-w-2xl`}>
       {specs.map((spec) => (
         <div key={spec.label} className="flex justify-between gap-4 py-2.5">
           <dt className="text-neutral-500">{spec.label}</dt>
@@ -70,6 +72,11 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
     return { id, name: product.name, price: formatFromPrice(product.priceFrom, product.priceUnit, locale) };
   });
   const path = `/products/${category.slug}`;
+  // One trail for the visible breadcrumb and the BreadcrumbList.
+  const crumbs: Crumb[] = [
+    [t.common.products, "/products"],
+    [category.label, path],
+  ];
   const fromPrice = category.priceFrom ? formatFromPrice(category.priceFrom, category.priceUnit, locale) : undefined;
 
   // FAQs from the main body and any folded-in secondary section are emitted as
@@ -89,30 +96,19 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
           locale
         )}
       />
-      <JsonLd
-        data={buildBreadcrumb(
-          [
-            [t.common.products, "/products"],
-            [category.label, path],
-          ],
-          locale
-        )}
-      />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       {allFaqs.length > 0 && <JsonLd data={buildFaq(allFaqs, locale)} />}
 
+      <BarIntent name={category.label} type="category" slug={category.slug} />
       <Navbar />
-      <main className="flex-grow">
-        <div className="bg-primary text-white py-12 md:py-16">
+      {/* Below md, main is a column whose order puts the product tiles and the price guide
+          straight under the band, ahead of the body copy. Only the order on screen changes:
+          the HTML, its headings and its links keep their order (check-internal-links and the
+          SEO snapshot read it), and the body copy that moves down holds one control, its fold. */}
+      <main className="flex-grow max-md:flex max-md:flex-col">
+        <div className="bg-primary text-white py-12 md:py-16 max-md:order-first">
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
-            <nav aria-label={t.common.breadcrumb} className="mb-5">
-              <ol className="flex flex-wrap items-center gap-2 font-poppins text-sm text-white/70">
-                <li><Link href={lp("/")} className="hover:text-white">{t.common.home}</Link></li>
-                <li aria-hidden="true">/</li>
-                <li><Link href={lp("/products")} className="hover:text-white">{t.common.products}</Link></li>
-                <li aria-hidden="true">/</li>
-                <li className="text-white">{category.label}</li>
-              </ol>
-            </nav>
+            <Breadcrumb locale={locale} trail={crumbs} dark />
             <h1 className="h1-band">
               {category.heading}
             </h1>
@@ -140,12 +136,13 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
               </p>
             ))}
 
+            {/* Folded on phones, its heading the toggle (FoldHead, .fold in index.css); open from md. */}
             {category.specs?.length ? (
               <div className="mt-8">
-                <h2 className="font-playfair text-2xl font-bold text-neutral-900 mb-4">
+                <FoldHead id="ct-offer" as="h2" className="font-playfair text-2xl font-bold text-neutral-900 mb-4">
                   {t.category.whatWeOffer}
-                </h2>
-                <SpecList specs={category.specs} />
+                </FoldHead>
+                <SpecList specs={category.specs} fold />
               </div>
             ) : null}
 
@@ -169,7 +166,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
 
         {/* The products in this category */}
         {items.length > 0 && (
-          <section className="py-12 md:py-14 bg-neutral-50">
+          <section className="py-12 md:py-14 bg-neutral-50 max-md:order-first">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8">
               <h2 className="h2-sec">
                 {t.category.weSupply(category.label)}
@@ -181,7 +178,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
                     href={lp(`/products/${p.id}`)}
                     className="group rel-card"
                   >
-                    <div className="aspect-[4/3] overflow-hidden bg-neutral-100">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
                       {p.imageSrc.endsWith(".mp4") ? (
                         <div className="w-full h-full flex items-center justify-center text-neutral-400 text-xs p-2 text-center">
                           {p.name}
@@ -196,11 +193,15 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
                         />
                       )}
                     </div>
+                    {/* The same tile as /products on a phone: name, price line, description. */}
                     <div className="p-3 sm:p-4">
                       <h3 className="rel-title">
                         {p.name}
                       </h3>
-                      <p className="font-poppins text-xs text-neutral-500 mt-1 line-clamp-2">
+                      <p className="pc-price">
+                        {p.priceFrom ? formatFromPrice(p.priceFrom, p.priceUnit, locale) : t.price.freeQuote}
+                      </p>
+                      <p className="rel-text">
                         {p.description}
                       </p>
                     </div>
@@ -212,7 +213,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
         )}
 
         {priceGuide.length > 0 && (
-          <section className="py-12 md:py-14 bg-white">
+          <section className="py-12 md:py-14 bg-white max-md:order-first">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
               <h2 className="h2-sec6">{t.category.priceGuide}</h2>
               <table className="w-full font-poppins text-sm border-y border-neutral-100">
@@ -226,7 +227,8 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
                   {priceGuide.map((row) => (
                     <tr key={row.id}>
                       <td className="py-2.5">
-                        <Link href={lp(`/products/${row.id}`)} className="font-medium text-primary hover:underline">{row.name}</Link>
+                        {/* A 44px tap below md: the row grows 4px, the text stays centred. */}
+                        <Link href={lp(`/products/${row.id}`)} className="font-medium text-primary hover:underline max-md:block max-md:py-3 max-md:-my-2.5">{row.name}</Link>
                       </td>
                       <td className="py-2.5 text-end text-neutral-900 font-medium">{row.price}</td>
                     </tr>
@@ -241,7 +243,7 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
         {category.faqs?.length ? (
           <section className="py-12 md:py-14 bg-white">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
-              <h2 className="h2-sec6">
+              <h2 className="h2-sec6 faq-h">
                 {t.common.faqTitle}
               </h2>
               <FaqList faqs={[...category.faqs, ...(category.secondary?.faqs ?? [])]} />
@@ -315,16 +317,14 @@ export default function CategoryLanding({ slug, locale = "en" }: { slug: string;
             <p className="font-poppins max-w-2xl mx-auto mb-8 text-neutral-500">
               {t.category.ctaText}
             </p>
-            <Button asChild size="lg" className="bg-green-700 hover:bg-green-800 text-white">
-              <WhatsAppLink
-                source={`category:${category.slug}`}
-                message={t.common.quoteMessage(category.label)}
-                className="flex items-center gap-2"
-              >
-                <ShoppingCart size={16} />
-                <span>{t.common.askOnWhatsApp}</span>
-              </WhatsAppLink>
-            </Button>
+            <WhatsAppLink
+              source={`category:${category.slug}`}
+              message={t.common.quoteMessage(category.label)}
+              className="cta cta-m"
+            >
+              <WhatsAppIcon />
+              {t.common.heroQuote}
+            </WhatsAppLink>
           </div>
         </section>
       </main>

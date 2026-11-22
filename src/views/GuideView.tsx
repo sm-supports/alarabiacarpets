@@ -7,7 +7,8 @@ import JsonLd from "@/components/JsonLd";
 import FaqList from "@/components/FaqList";
 import ServiceLinks from "@/components/ServiceLinks";
 import WhatsAppLink from "@/components/WhatsAppLink";
-import { Button } from "@/components/ui/button";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { categoryLabelFor, findAuthor, findCategory, findGuide, findProduct, findService, getGuides } from "@/data/localized";
 import { cardImage, fullImage } from "@/lib/card-image";
 import { getDict, HTML_LANG, localePath, type Locale } from "@/i18n";
@@ -91,6 +92,12 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
     return service;
   });
 
+  // One trail for the visible breadcrumb and the BreadcrumbList.
+  const crumbs: Crumb[] = [
+    [t.common.guides, "/guides"],
+    [guide.title, `/guides/${guide.slug}`],
+  ];
+
   // A named person once the owner supplies one (src/data/authors.ts); the company until then.
   const author = guide.authorId ? findAuthor(locale, guide.authorId) : undefined;
   if (guide.authorId && !author) {
@@ -126,15 +133,7 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
   return (
     <div className="min-h-screen flex flex-col">
       <JsonLd data={articleSchema} />
-      <JsonLd
-        data={buildBreadcrumb(
-          [
-            [t.common.guides, "/guides"],
-            [guide.title, `/guides/${guide.slug}`],
-          ],
-          locale
-        )}
-      />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       {guide.faqs?.length ? <JsonLd data={buildFaq(guide.faqs, locale)} /> : null}
 
       <Navbar />
@@ -142,13 +141,7 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
         <article>
           <header className="bg-primary text-white py-12 md:py-16">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
-              <nav aria-label={t.common.breadcrumb} className="mb-5">
-                <ol className="flex flex-wrap items-center gap-2 font-poppins text-sm text-white/70">
-                  <li><Link href={lp("/")} className="hover:text-white">{t.common.home}</Link></li>
-                  <li aria-hidden="true">/</li>
-                  <li><Link href={lp("/guides")} className="hover:text-white">{t.common.guides}</Link></li>
-                </ol>
-              </nav>
+              <Breadcrumb locale={locale} trail={crumbs} dark currentPhoneOnly />
               <h1 className="h1-band">
                 {guide.title}
               </h1>
@@ -253,7 +246,7 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
 
               {guide.faqs?.length ? (
                 <section className="mt-12">
-                  <h2 className="font-playfair text-2xl font-bold text-neutral-900 mb-6">
+                  <h2 className="font-playfair text-2xl font-bold text-neutral-900 mb-6 faq-h">
                     {t.common.faqTitle}
                   </h2>
                   <FaqList faqs={guide.faqs} />
@@ -339,15 +332,16 @@ export default function GuideView({ locale, slug }: { locale: Locale; slug: stri
             <p className="font-poppins max-w-2xl mx-auto mb-8 text-neutral-500">
               {t.guide.ctaText}
             </p>
-            <Button asChild size="lg" className="bg-green-700 hover:bg-green-800 text-white">
-              <WhatsAppLink
-                source={`guide:${guide.slug}`}
-                message={t.guide.adviceMessage(guide.title)}
-                className="flex items-center gap-2"
-              >
-                <span>{t.common.askOnWhatsApp}</span>
-              </WhatsAppLink>
-            </Button>
+            {/* "Ask us on WhatsApp", not the quote label: the plan's one exception to the
+                CTA vocabulary, because what a guide offers is advice. */}
+            <WhatsAppLink
+              source={`guide:${guide.slug}`}
+              message={t.guide.adviceMessage(guide.title)}
+              className="cta cta-m"
+            >
+              <WhatsAppIcon />
+              {t.common.askOnWhatsApp}
+            </WhatsAppLink>
           </div>
         </section>
       </main>

@@ -46,7 +46,16 @@ Key patterns from existing components:
 **Layout:**
 - Mobile-first responsive: base → `sm:` → `md:` → `lg:` → `xl:`
 - Container: `<div className="container mx-auto px-4 sm:px-5 lg:px-8">`
-- Rounded corners: `rounded-2xl` for cards, `rounded-xl` for buttons, `rounded-full` for pills
+- Rounded corners: `rounded-2xl` for cards, `rounded-full` for pills
+- Use logical classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-`) so Arabic mirrors
+
+**Buttons:** the `.cta` family, not utility strings (`design.md`, "Buttons: the `.cta`
+family"): `.cta` on light backgrounds, `.cta-dark` on forest bands, `.cta-2` for the
+secondary action; all full radius and 48px tall on phones. Labels come from the CTA
+vocabulary (`design.md`, "CTA vocabulary"): `common.heroQuote`, `nav.getFreeQuote`,
+`statePanel.call`, with `WhatsAppIcon` on a WhatsApp button and no other icon there.
+`npm run check` (`check-consistency`) fails any other label in the static HTML. Every
+control outside running text is at least 44px both ways on phones.
 
 **Animations:**
 - Transitions: `transition-all duration-700 ease-out-expo`
@@ -74,10 +83,10 @@ A section that needs no hooks should stay a server component and take `locale` a
 ## Step 6: Verify
 
 ```bash
-npx tsc --noEmit
+npm run typecheck
 ```
 
-Then import and use the component where needed.
+Then import and use the component where needed, and run `npm run build && npm run check`.
 
 ## Canonical Examples
 

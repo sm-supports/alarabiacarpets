@@ -3,6 +3,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { getServices } from "@/data/localized";
 import { fullImagePath } from "@/lib/card-image";
 import { getDict, localePath, type Locale } from "@/i18n";
@@ -35,6 +36,7 @@ export default function ServicesIndexView({ locale }: { locale: Locale }) {
   const t = getDict(locale);
   const page = t.pages.services;
   const services = getServices(locale);
+  const crumbs: Crumb[] = [[t.common.services, "/services"]];
   return (
     <div className="min-h-screen flex flex-col">
       <JsonLd
@@ -48,11 +50,12 @@ export default function ServicesIndexView({ locale }: { locale: Locale }) {
           locale
         )}
       />
-      <JsonLd data={buildBreadcrumb([[t.common.services, "/services"]], locale)} />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       <Navbar />
       <main className="flex-grow">
-        <div className="bg-primary text-white py-14 md:py-16">
-          <div className="container mx-auto px-4 text-center">
+        <div className="bg-primary text-white py-12 md:py-16">
+          <div className="container mx-auto px-4 md:text-center">
+            <Breadcrumb locale={locale} trail={crumbs} dark phoneOnly />
             <h1 className="h1-band">
               {page.heading}
             </h1>
@@ -91,7 +94,7 @@ export default function ServicesIndexView({ locale }: { locale: Locale }) {
                       </Link>
                     )}
                     <div className="p-6 flex flex-col flex-grow">
-                      <h2 className="font-playfair text-xl font-semibold text-neutral-900 mb-2">
+                      <h2 className="idx-h2">
                         <Link href={href} className="hover:text-primary transition-colors">
                           {service.heading}
                         </Link>
@@ -101,7 +104,7 @@ export default function ServicesIndexView({ locale }: { locale: Locale }) {
                       </p>
                       <Link
                         href={href}
-                        className="font-poppins text-sm font-medium text-primary mt-4 hover:underline"
+                        className="idx-more"
                       >
                         {t.service.viewDetails(service.label)}
                       </Link>

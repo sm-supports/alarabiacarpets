@@ -18,10 +18,8 @@ export interface Product {
   name: string;
   category: string;
   description: string;
-  price: string;
   imageSrc: string;
   media: ProductMedia[];
-  whatsappLink: string;
 
   // --- Optional SEO / content fields ---
   // Products without these fall back to the generic copy above, so the catalog
@@ -74,7 +72,6 @@ export const products: Product[] = [
     "name": "Artificial Flowers Grass",
     "category": "carpet",
     "description": "Artificial green and flower walls for interiors, backdrops and event styling.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "image",
@@ -86,7 +83,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Artificial flowers grass 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Artificial%20flowers%20grass",
     seoTitle: "Artificial Green & Flower Walls in Qatar",
     metaDescription: "Artificial flower and green walls in Qatar. Vertical foliage panels for feature walls, receptions, backdrops and events. Installed across Doha.",
     imageAlt: "Artificial flower and green wall panel installed as a feature wall in Doha",
@@ -136,7 +132,6 @@ export const products: Product[] = [
     "name": "Artificial Grass Installation Work",
     "category": "carpet",
     "description": "Professional artificial grass installation with proper base preparation and drainage.",
-    "price": "Contact for Price",
     priceFrom: 25,
     priceUnit: "per sqm",
     "media": [
@@ -154,7 +149,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Artificial grass installation work.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Artificial%20grass%20installation%20work",
     seoTitle: "Artificial Grass Installation Qatar | Doha Fitting",
     metaDescription: "Professional artificial grass installation across Qatar. Base preparation, drainage and seam-free finishing for gardens, terraces and play areas in Doha.",
     imageAlt: "Artificial grass carpet fitted to the entrance steps of a villa in Qatar",
@@ -196,7 +190,6 @@ export const products: Product[] = [
     "name": "Event Carpet",
     "category": "carpet",
     "description": "Event and exhibition carpet supplied and laid for short-term use, then lifted.",
-    "price": "Contact for Price",
     priceFrom: 22,
     priceUnit: "per sqm",
     "media": [
@@ -206,7 +199,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Event:normal carpet.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Event%20Carpet",
     updatedAt: "2026-11-07",
     seoTitle: "Event Carpet Supply & Laying in Qatar | Exhibitions",
     metaDescription: "Event and exhibition carpet in Qatar. Fast supply and laying for conferences, weddings and stands, lifted and cleared afterwards. Doha-based.",
@@ -261,7 +253,6 @@ export const products: Product[] = [
     "name": "Home Design Luxury Carpet",
     "category": "carpet",
     "description": "Made-to-measure rugs and carpet cut to your room's shape, colour and border.",
-    "price": "Contact for Price",
     priceFrom: 80,
     priceUnit: "per sqm",
     "media": [
@@ -271,7 +262,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Home design luxury carpet.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Home%20design%20luxury%20carpet",
     seoTitle: "Custom Made-to-Measure Rugs in Qatar | Doha",
     metaDescription: "Custom rugs made to measure in Qatar. Any size or shape, with bound or braided borders, matched to your majlis or living room. Delivered in Doha.",
     imageAlt: "Custom made-to-measure rug with a bound border in a Qatari majlis",
@@ -321,7 +311,6 @@ export const products: Product[] = [
     "name": "Luxury Home Carpet",
     "category": "carpet",
     "description": "Premium wall-to-wall carpet for bedrooms and majlis, with denser pile and better recovery.",
-    "price": "Contact for Price",
     priceFrom: 80,
     priceUnit: "per sqm",
     "media": [
@@ -343,7 +332,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Luxury home carpet 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Luxury%20home%20carpet",
     seoTitle: "Luxury Wall-to-Wall Carpet in Qatar | Doha",
     metaDescription: "Luxury wall-to-wall carpet in Qatar. Denser pile with better recovery underfoot for bedrooms and majlis. Measured and fitted across Doha.",
     imageAlt: "Luxury wall-to-wall carpet fitted in a Doha bedroom",
@@ -393,7 +381,6 @@ export const products: Product[] = [
     "name": "Masjid & Mosque Carpet Installation",
     "category": "carpet",
     "description": "Mosque carpet installation: qiblah alignment, row setting out and phased fitting.",
-    "price": "Contact for Price",
     priceFrom: 65,
     priceUnit: "per sqm",
     "media": [
@@ -411,7 +398,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Mosjid:mosque carpet installation 0.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Masjid%20%26%20Mosque%20Carpet%20Installation",
     seoTitle: "Mosque Carpet Installation Qatar | Qiblah Set",
     metaDescription: "Mosque and masjid carpet installation across Qatar. Rows set true to the qiblah, work phased around prayer times, minimal disruption in Doha.",
     imageAlt: "Mosque carpet installation with prayer rows being set to the qiblah in Qatar",
@@ -461,7 +447,6 @@ export const products: Product[] = [
     "name": "Mosque & Masjid Carpet",
     "category": "carpet",
     "description": "Prayer-row and plain mosque carpet, aligned to the qiblah and fitted across Qatar.",
-    "price": "Contact for Price",
     priceFrom: 65,
     priceUnit: "per sqm",
     "media": [
@@ -471,7 +456,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Mosque:masjid carpet.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Mosque%20%26%20Masjid%20Carpet",
     seoTitle: "Mosque & Masjid Carpet Qatar | Supply & Fitting",
     metaDescription: "Mosque and masjid carpet supplied and installed across Qatar. Prayer-row designs, heavy-duty pile for high footfall, fitted by Al Arabia Carpets in Doha.",
     imageAlt: "Mosque prayer hall carpet with prayer rows installed in Qatar",
@@ -517,7 +501,6 @@ export const products: Product[] = [
     "name": "PVC Gym Mat & Indoor Game Mat",
     "category": "carpet",
     "description": "PVC matting for gyms and play areas \u2014 shock absorbing, non-slip and wipe-clean.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "image",
@@ -525,7 +508,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/PVC gym mat:indoor game mat.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20PVC%20Gym%20Mat%20%26%20Indoor%20Game%20Mat",
     seoTitle: "Gym & Play Area Matting in Qatar | PVC Flooring",
     metaDescription: "PVC gym and indoor play matting in Qatar. Shock-absorbing, non-slip and wipe-clean flooring for home gyms and play areas. Fitted in Doha.",
     imageAlt: "PVC gym matting installed in a home gym in Doha",
@@ -575,7 +557,6 @@ export const products: Product[] = [
     "name": "Carpet Tiles & Office Carpet",
     "category": "carpet",
     "description": "Modular office carpet tiles, hard-wearing and individually replaceable.",
-    "price": "Contact for Price",
     priceFrom: 70,
     priceUnit: "per sqm",
     "media": [
@@ -585,7 +566,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Carpets/Tiles carpet:office carpet.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Carpet%20Tiles%20%26%20Office%20Carpet",
     seoTitle: "Office Carpet Tiles Qatar | Supply & Installation",
     metaDescription: "Office carpet tiles supplied and fitted across Qatar. Hard-wearing, individually replaceable, and installed with minimal disruption to your workplace.",
     imageAlt: "Office carpet tiles installed in a commercial workspace in Doha",
@@ -631,7 +611,6 @@ export const products: Product[] = [
     "name": "Artificial Grass Carpet",
     "category": "carpet",
     "description": "UV-stable artificial grass for gardens, terraces and play areas, installed in Doha.",
-    "price": "Contact for Price",
     priceFrom: 25,
     priceUnit: "per sqm",
     "media": [
@@ -642,7 +621,6 @@ export const products: Product[] = [
     ],
     "imageSrc": "/Products/Carpets/Artificial grass installation work.jpeg",
     updatedAt: "2026-11-07",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Artificial%20Grass%20Carpet",
     seoTitle: "Artificial Grass Carpet Qatar | Supply & Fitting",
     metaDescription: "Artificial grass carpet in Qatar for gardens, terraces, balconies and play areas. UV-stable, free-draining, and installed across Doha with free delivery.",
     imageAlt: "Artificial grass carpet laid over the entrance steps and landing of a villa in Qatar",
@@ -722,7 +700,6 @@ export const products: Product[] = [
     "name": "Home Curtains",
     "category": "curtains",
     "description": "Custom curtains for villas and apartments, measured, made and fitted in Doha.",
-    "price": "Contact for Price",
     priceFrom: 850,
     priceUnit: "per piece",
     "media": [
@@ -740,7 +717,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Curtain/Home curtains 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Home%20curtains",
     seoTitle: "Home Curtains Qatar | Custom Made for Villas",
     metaDescription: "Custom home curtains in Qatar for villas and apartments. Blackout and sheer options, measured, made and fitted across Doha by Al Arabia Carpets.",
     imageAlt: "Custom home curtains in a Qatari villa living room",
@@ -782,7 +758,6 @@ export const products: Product[] = [
     "name": "Office Roller & Vertical Blinds",
     "category": "curtains",
     "description": "Vertical and roller blinds for offices, controlling glare without darkening the space.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "image",
@@ -798,7 +773,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Curtain/Office blind:office roller:vertical blinds 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Office%20Roller%20%26%20Vertical%20Blinds",
     seoTitle: "Office Blinds Qatar | Roller & Vertical Blinds",
     metaDescription: "Office roller and vertical blinds in Qatar. Glare control for workstations and meeting rooms, made to measure and fitted across Doha, out of hours too.",
     imageAlt: "Vertical and roller blinds fitted in a Doha office",
@@ -840,7 +814,6 @@ export const products: Product[] = [
     "name": "Roller Blinds",
     "category": "curtains",
     "description": "Made-to-measure roller blinds in blackout and sunscreen fabrics for homes and offices.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "image",
@@ -848,7 +821,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Curtain/roller.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Roller%20Blinds",
     seoTitle: "Roller Blinds Qatar | Made to Measure & Fitted",
     metaDescription: "Roller blinds in Qatar made to measure. Blackout and sunscreen fabrics for homes and offices, with free measurement and installation across Doha.",
     imageAlt: "Made-to-measure roller blinds fitted in a Doha office",
@@ -894,7 +866,6 @@ export const products: Product[] = [
     "name": "Khema Majlis Sofa",
     "category": "furniture",
     "description": "Tent-style khema majlis seating, built low and hard-wearing for camps and outdoor majlis.",
-    "price": "Contact for Price",
     priceFrom: 850,
     priceUnit: "per piece",
     "media": [
@@ -908,7 +879,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Khema majlis sofa 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Khema%20majlis%20sofa",
     seoTitle: "Khema Majlis Sofa Qatar | Tent Majlis Seating",
     metaDescription: "Khema majlis sofas in Qatar for tents, camps and outdoor majlis. Low tent-style seating in hard-wearing fabric, measured and delivered across Doha.",
     imageAlt: "Khema tent-style majlis sofa running along a tent wall",
@@ -959,7 +929,6 @@ export const products: Product[] = [
     "name": "Luxury Majlis Sofa",
     "category": "furniture",
     "description": "Premium majlis seating with heavier fabrics, deeper cushioning and detailed finishing.",
-    "price": "Contact for Price",
     priceFrom: 850,
     priceUnit: "per piece",
     "media": [
@@ -973,7 +942,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Luxury majlis sofa poster.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Luxury%20majlis%20sofa",
     seoTitle: "Luxury Majlis Sofa Qatar | Custom Made Seating",
     metaDescription: "Luxury majlis sofas custom made in Qatar. Premium fabrics, detailed finishing and seating sized to your majlis, with delivery included across Doha.",
     imageAlt: "Luxury majlis sofa with premium upholstery in a Qatari majlis",
@@ -1015,7 +983,6 @@ export const products: Product[] = [
     "name": "Majlis Sofa & Cabinets",
     "category": "furniture",
     "description": "Majlis seating supplied with matching cabinetry, so the sofas and joinery are finished as one scheme.",
-    "price": "Contact for Price",
     priceFrom: 850,
     priceUnit: "per piece",
     "media": [
@@ -1033,7 +1000,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Majlis and cabinets:majlis sofa 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Majlis%20Sofa%20%26%20Cabinets",
     seoTitle: "Majlis Sofa & Cabinets Qatar | Fitted Together",
     metaDescription: "Majlis sofas and matching cabinets made together in Qatar. Seating, TV units and storage finished in one scheme, measured and fitted across Doha.",
     imageAlt: "Majlis sofa and matching fitted cabinets in a Doha majlis",
@@ -1084,7 +1050,6 @@ export const products: Product[] = [
     "name": "Modern Majlis",
     "category": "furniture",
     "description": "Contemporary majlis seating with lower backs and cleaner lines for modern villas and apartments.",
-    "price": "Contact for Price",
     priceFrom: 850,
     priceUnit: "per piece",
     "media": [
@@ -1102,7 +1067,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Furniture/Modern majlis 2.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Modern%20majlis",
     seoTitle: "Modern Majlis Qatar | Contemporary Majlis Seating",
     metaDescription: "Modern majlis seating in Qatar. Lower backs, clean lines and contemporary fabrics, made to measure for villas and apartments across Doha.",
     imageAlt: "Modern majlis seating with low backs in a contemporary Doha villa",
@@ -1153,7 +1117,6 @@ export const products: Product[] = [
     "name": "Cabin Interior Design",
     "category": "interior",
     "description": "Full room fit-out delivered as one project \u2014 ceilings, panelling, joinery and finishes.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "video",
@@ -1177,7 +1140,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Cabin interior design 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Cabin%20interior%20design",
     seoTitle: "Room Fit-Out & Interior Design in Qatar",
     metaDescription: "Complete room fit-out in Qatar. Ceilings, panelling, joinery, flooring and furnishing designed and delivered as one project across Doha.",
     imageAlt: "Completed interior fit-out with panelling and integrated joinery in Doha",
@@ -1227,7 +1189,6 @@ export const products: Product[] = [
     "name": "Cabinet and Gypsum Board Work",
     "category": "interior",
     "description": "Built-in joinery integrated with gypsum work, so cabinetry and ceilings finish as one.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "image",
@@ -1247,7 +1208,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Cabinet and gypsum board work 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Cabinet%20and%20gypsum%20board%20work",
     seoTitle: "Built-In Cabinets & Gypsum Joinery Qatar",
     metaDescription: "Built-in cabinetry integrated with gypsum work in Qatar. Storage, niches and shelving finished flush with the walls and ceiling. Fitted in Doha.",
     imageAlt: "Built-in cabinetry integrated with gypsum wall detailing in a Doha interior",
@@ -1297,7 +1257,6 @@ export const products: Product[] = [
     "name": "Gypsum Board Work Design",
     "category": "interior",
     "description": "False ceilings, bulkheads, coves and wall detailing in gypsum board.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "image",
@@ -1321,7 +1280,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Gypsum board work design 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Gypsum%20board%20work%20design",
     seoTitle: "Gypsum Board Work in Qatar | False Ceilings",
     metaDescription: "Gypsum board false ceilings, bulkheads, coves and wall detailing in Qatar. Designed and installed by our own team across Doha.",
     imageAlt: "Gypsum board false ceiling with cove lighting in a Doha villa",
@@ -1371,7 +1329,6 @@ export const products: Product[] = [
     "name": "Indoor Wall Panel Design",
     "category": "interior",
     "description": "Decorative interior wall panelling \u2014 slatted, fluted and upholstered feature walls.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "video",
@@ -1383,7 +1340,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Indoor wall panel design 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Indoor%20wall%20panel%20design",
     seoTitle: "Indoor Wall Panelling in Qatar | Feature Walls",
     metaDescription: "Interior wall panelling in Qatar. Slatted, fluted and upholstered feature walls supplied and installed across Doha by Al Arabia Carpets.",
     imageAlt: "Slatted indoor wall panelling on a feature wall in a Doha home",
@@ -1433,7 +1389,6 @@ export const products: Product[] = [
     "name": "TV Unit with Cabinet Box",
     "category": "interior",
     "description": "TV feature walls with integrated cabinetry and concealed cable management.",
-    "price": "Contact for Price",
     priceFrom: 4500,
     priceUnit: "per project",
     "media": [
@@ -1475,7 +1430,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/Interior Design/Television decore with cabin box 1.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20TV%20Unit%20with%20Cabinet%20Box",
     updatedAt: "2026-11-07",
     seoTitle: "Built-In TV Unit with Cabinet Box in Qatar",
     metaDescription: "TV feature walls with built-in cabinetry in Qatar. Concealed cabling, integrated storage and lighting, designed and installed across Doha.",
@@ -1526,7 +1480,6 @@ export const products: Product[] = [
     "name": "Al Wakra White – Ultra-Modern Waterproof SPC Flooring",
     "category": "barkia",
     "description": "Near-white SPC with a clean matt finish. Built for retail, showrooms and ultra-modern interiors.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -1536,7 +1489,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Al Wakra White – Ultra-Modern Waterproof SPC Flooring.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Al%20Wakra%20White%20%E2%80%93%20Ultra-Modern%20Waterproof%20SPC%20Flooring",
     seoTitle: "Al Wakra White SPC Flooring | Retail & Showroom",
     metaDescription: "Al Wakra White SPC flooring in Qatar. A near-white matt decor for showrooms, retail and ultra-modern interiors. Commercial-grade, fitted in Doha.",
     imageAlt: "Al Wakra White SPC flooring in a modern Doha showroom",
@@ -1586,7 +1538,6 @@ export const products: Product[] = [
     "name": "Arabian Night Espresso – High-End Waterproof SPC",
     "category": "barkia",
     "description": "Very dark espresso SPC. High contrast and dramatic, with honest trade-offs on dust.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -1596,7 +1547,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Arabian Night Espresso – High-End Waterproof SPC.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Arabian%20Night%20Espresso%20%E2%80%93%20High-End%20Waterproof%20SPC",
     seoTitle: "Arabian Night Espresso SPC | Dark Floor Qatar",
     metaDescription: "Arabian Night Espresso SPC flooring in Qatar. A very dark, high-contrast decor for dramatic interiors. Honest advice on dust before you commit.",
     imageAlt: "Arabian Night Espresso dark SPC flooring in a Doha interior",
@@ -1646,7 +1596,6 @@ export const products: Product[] = [
     "name": "Desert Walnut Classic – Luxury SPC Flooring Doha",
     "category": "barkia",
     "description": "Mid-tone walnut SPC. The most forgiving decor in the range for busy family homes.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -1656,7 +1605,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Desert Walnut Classic – Luxury SPC Flooring Doha.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Desert%20Walnut%20Classic%20%E2%80%93%20Luxury%20SPC%20Flooring%20Doha",
     seoTitle: "Desert Walnut SPC Flooring Doha | Mid-Tone Walnut",
     metaDescription: "Desert Walnut Classic SPC flooring in Doha. A mid-tone walnut that hides dust and marks better than pale or dark floors. Fitted across Qatar.",
     imageAlt: "Desert Walnut Classic SPC flooring in a Doha family home",
@@ -1706,7 +1654,6 @@ export const products: Product[] = [
     "name": "Doha Coastal Grey – Premium Rigid Core SPC Vinyl",
     "category": "barkia",
     "description": "Cool-toned grey SPC with a rigid core. Suits modern villas with white walls and dark joinery.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -1716,7 +1663,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Doha Coastal Grey – Premium Rigid Core SPC Vinyl.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Doha%20Coastal%20Grey%20%E2%80%93%20Premium%20Rigid%20Core%20SPC%20Vinyl",
     seoTitle: "Doha Coastal Grey SPC Vinyl | Rigid Core Flooring",
     metaDescription: "Doha Coastal Grey rigid core SPC vinyl flooring. A cool grey decor for modern villas, dent-resistant under heavy furniture. Fitted across Qatar.",
     imageAlt: "Doha Coastal Grey SPC vinyl flooring in a modern Qatari villa",
@@ -1766,7 +1712,6 @@ export const products: Product[] = [
     "name": "Outdoor Wall Panel Products",
     "category": "barkia",
     "description": "Exterior wall panels for facades, balconies and garden walls, rated for sun and rain.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "image",
@@ -1774,7 +1719,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Outdoor wall panel products.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Outdoor%20wall%20panel%20products",
     seoTitle: "Outdoor Wall Panels Qatar | Exterior Cladding",
     metaDescription: "Outdoor wall panels in Qatar for facades, balconies and garden walls. UV stable and weather resistant cladding, measured and installed across Doha.",
     imageAlt: "Outdoor wall panel cladding fitted to an exterior wall in Qatar",
@@ -1825,7 +1769,6 @@ export const products: Product[] = [
     "name": "Pearl Grey Herringbone \u2013 100% Waterproof SPC",
     "category": "barkia",
     "description": "Pearl grey SPC in a herringbone pattern. The only format-led floor in the range.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -1835,7 +1778,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Pearl Grey Herringbone – 100  Waterproof SPC Qatar.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Pearl%20Grey%20Herringbone%20%5Cu2013%20100%25%20Waterproof%20SPC",
     seoTitle: "Pearl Grey Herringbone SPC Flooring Qatar",
     metaDescription: "Pearl Grey Herringbone SPC flooring in Qatar. A classic herringbone laying pattern in waterproof SPC, fitted plank by plank across Doha.",
     imageAlt: "Pearl Grey Herringbone SPC flooring laid in a Doha entrance hall",
@@ -1885,7 +1827,6 @@ export const products: Product[] = [
     "name": "Qatar Breeze Oak – Bright & Waterproof SPC Flooring",
     "category": "barkia",
     "description": "Bright, airy oak SPC with a cool-neutral cast. For rooms that need to feel more open.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -1895,7 +1836,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Qatar Breeze Oak – Bright & Waterproof SPC Flooring.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Qatar%20Breeze%20Oak%20%E2%80%93%20Bright%20%26%20Waterproof%20SPC%20Flooring",
     seoTitle: "Qatar Breeze Oak SPC Flooring | Bright Neutral Oak",
     metaDescription: "Qatar Breeze Oak SPC flooring in Qatar. A bright, cool-neutral oak that lifts north-facing and enclosed rooms. Supplied and installed across Doha.",
     imageAlt: "Qatar Breeze Oak SPC flooring in a bright Doha room",
@@ -1945,7 +1885,6 @@ export const products: Product[] = [
     "name": "Qatar Sand Oak – Luxury Waterproof SPC Flooring",
     "category": "barkia",
     "description": "Warm sand-toned oak SPC. A light, forgiving floor that makes smaller rooms feel bigger.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -1955,7 +1894,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Qatar Sand Oak – Luxury Waterproof SPC Flooring.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Qatar%20Sand%20Oak%20%E2%80%93%20Luxury%20Waterproof%20SPC%20Flooring",
     seoTitle: "Qatar Sand Oak SPC Flooring | Light Oak Decor",
     metaDescription: "Qatar Sand Oak SPC flooring in Doha. A warm, light oak decor that opens up small rooms and hides everyday dust. Supplied and fitted across Qatar.",
     imageAlt: "Qatar Sand Oak SPC flooring laid in a bright Doha living room",
@@ -2005,7 +1943,6 @@ export const products: Product[] = [
     "name": "Royal Mahogany – Luxury Waterproof Vinyl SPC",
     "category": "barkia",
     "description": "Deep red-brown mahogany SPC. A formal floor for majlis and reception rooms.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -2015,7 +1952,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Royal Mahogany – Luxury Waterproof Vinyl SPC.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Royal%20Mahogany%20%E2%80%93%20Luxury%20Waterproof%20Vinyl%20SPC",
     seoTitle: "Royal Mahogany SPC Flooring | Formal Majlis Floor",
     metaDescription: "Royal Mahogany waterproof vinyl SPC flooring in Qatar. A deep red-brown decor for formal majlis and reception rooms. Supplied and installed in Doha.",
     imageAlt: "Royal Mahogany SPC flooring in a formal Qatari majlis",
@@ -2065,7 +2001,6 @@ export const products: Product[] = [
     "name": "Scandinavian White Oak – Modern Waterproof SPC Doha",
     "category": "barkia",
     "description": "Pale, low-contrast white oak SPC. The quietest floor in the range for minimal interiors.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -2075,7 +2010,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Scandinavian White Oak – Modern Waterproof SPC Doha.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Scandinavian%20White%20Oak%20%E2%80%93%20Modern%20Waterproof%20SPC%20Doha",
     seoTitle: "Scandinavian White Oak SPC Flooring Doha | Minimal",
     metaDescription: "Scandinavian White Oak SPC flooring in Doha. A pale, low-contrast decor for minimal interiors and apartments. Supplied and installed across Qatar.",
     imageAlt: "Scandinavian White Oak SPC flooring in a minimal Doha apartment",
@@ -2125,7 +2059,6 @@ export const products: Product[] = [
     "name": "Skirting & Nala Profile",
     "category": "barkia",
     "description": "Skirting and nala profiles that finish the floor-to-wall junction and cover expansion gaps.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "image",
@@ -2133,7 +2066,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Skerting:Nala:profile.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Skirting%20%26%20Nala%20Profile",
     seoTitle: "Skirting & Nala Profile Qatar | Floor Trim",
     metaDescription: "Skirting and nala profiles in Qatar. Trim that finishes the floor-to-wall junction and hides expansion gaps, colour matched and fitted across Doha.",
     imageAlt: "Skirting and nala profile trim fitted at a floor-to-wall junction",
@@ -2184,7 +2116,6 @@ export const products: Product[] = [
     "name": "SPC Zigzag Barkia Installation",
     "category": "barkia",
     "description": "SPC barkia laid in a zigzag herringbone pattern, cut and angled on site.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -2198,7 +2129,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Spc zigzag barkia installation poster.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20SPC%20Zigzag%20Barkia%20Installation",
     seoTitle: "SPC Zigzag Barkia Installation Qatar | Herringbone",
     metaDescription: "SPC barkia fitted in a zigzag herringbone pattern in Qatar. Each plank cut and angled on site by our own installers, with free measurement in Doha.",
     imageAlt: "SPC barkia planks being laid in a zigzag herringbone pattern",
@@ -2249,7 +2179,6 @@ export const products: Product[] = [
     "name": "Stairs Carpet Installation",
     "category": "carpet",
     "description": "Stair carpet templated and fitted to every tread, riser and landing.",
-    "price": "Contact for Price",
     "media": [
       {
         "type": "image",
@@ -2257,7 +2186,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Stairs carpet installation.jpeg",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Stairs%20carpet%20installation",
     seoTitle: "Stairs Carpet Installation Qatar | Al Arabia",
     metaDescription: "Stair carpet supply and installation across Qatar. Precise fitting to treads, risers and landings for a safe, quiet staircase. Free measurement in Doha.",
     imageAlt: "Carpeted staircase with fitted treads and risers in a Doha villa",
@@ -2299,7 +2227,6 @@ export const products: Product[] = [
     "name": "Sunset Teak Gold – Elegant SPC Vinyl Flooring Qatar",
     "category": "barkia",
     "description": "Golden teak SPC with warm honey tones. Traditional character without a dark floor.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -2309,7 +2236,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/Sunset Teak Gold – Elegant SPC Vinyl Flooring Qatar.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20Sunset%20Teak%20Gold%20%E2%80%93%20Elegant%20SPC%20Vinyl%20Flooring%20Qatar",
     seoTitle: "Sunset Teak Gold SPC Flooring Qatar | Warm Teak",
     metaDescription: "Sunset Teak Gold SPC vinyl flooring in Qatar. Warm golden teak tones for traditional interiors that still want a light floor. Fitted across Doha.",
     imageAlt: "Sunset Teak Gold SPC flooring in a traditional Qatari interior",
@@ -2359,7 +2285,6 @@ export const products: Product[] = [
     "name": "PVC Barkia Flooring",
     "category": "barkia",
     "description": "100% waterproof PVC barkia flooring, ideal for kitchens, bathrooms and wet areas.",
-    "price": "Contact for Price",
     priceFrom: 75,
     priceUnit: "per sqm",
     "media": [
@@ -2369,7 +2294,6 @@ export const products: Product[] = [
       }
     ],
     "imageSrc": "/Products/barkia&pvc/pvc-barkia.webp",
-    "whatsappLink": "https://wa.me/97455512858?text=I%27m%20interested%20in%20PVC%20Barkia%20Flooring",
     seoTitle: "PVC Barkia Flooring Doha | Waterproof & Fitted",
     metaDescription: "PVC barkia flooring in Qatar: 100% waterproof, scratch-resistant and quick to install. Free measurement, delivery and fitting from Al Arabia Carpets.",
     imageAlt: "PVC barkia waterproof flooring installed in a Doha interior",

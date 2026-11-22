@@ -1,12 +1,13 @@
 "use client";
 
 
-import { ShoppingCart, ExternalLink, ImageIcon, Video, ChevronLeft, ChevronRight, Play } from "@/components/icons";
+import { ImageIcon, Video, ChevronLeft, ChevronRight, Play } from "@/components/icons";
 import { memo, useCallback, useState, useRef, useEffect } from "react";
 import type { ProductMedia } from "@/data/products";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { useHydrated } from "@/hooks/use-hydrated";
 
@@ -15,12 +16,19 @@ interface ProductCardProps {
   /** English name, so the analytics source is the same in both languages. */
   analyticsName?: string;
   description: string;
-  /** Card-sized image shown for a video slide until it is played. */
-  poster: string;
+  /**
+   * The phone tile's price line (below sm): the starting price, or the short free quote
+   * line for an item without one. Worded on the server, so no dictionary comes with it.
+   */
+  price?: string;
+  /**
+   * Card-sized image shown for a video slide until it is played. Defaults to the first
+   * image slide, so ProductsGrid leaves it out when it is that one: each prop is in the
+   * page's hydration data once per card.
+   */
+  poster?: string;
   /** Slides. Image `src` values are already the card-sized copies (see ProductsGrid). */
   media?: ProductMedia[];
-  /** Prefilled WhatsApp link. When omitted, built from the name in the page's language. */
-  whatsappLink?: string;
   onClick?: () => void;
   /** Product detail URL. When set the title renders as a real crawlable anchor. */
   href?: string;
@@ -32,9 +40,9 @@ const ProductCard = memo(function ProductCard({
   name,
   analyticsName,
   description,
+  price,
   poster,
   media = [],
-  whatsappLink,
   onClick,
   href,
   imageAlt
@@ -42,7 +50,6 @@ const ProductCard = memo(function ProductCard({
   const router = useRouter();
   const { t } = useI18n();
   const hydrated = useHydrated();
-  const [hasError, setHasError] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [playingSrc, setPlayingSrc] = useState<string | null>(null);
   // Highest slide allowed to load. Starts at the first: loading="lazy" doesn't help
@@ -50,8 +57,9 @@ const ProductCard = memo(function ProductCard({
   const [loadedUpTo, setLoadedUpTo] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const cover = poster ?? media.find((item) => item.type === "image")?.src ?? "";
   // If no media array is provided, show the poster on its own
-  const displayMedia = media.length > 0 ? media : [{ type: 'image', src: poster } as ProductMedia];
+  const displayMedia = media.length > 0 ? media : [{ type: 'image', src: cover } as ProductMedia];
 
   const handleCardClick = useCallback(() => {
     if (href) {
@@ -63,10 +71,6 @@ const ProductCard = memo(function ProductCard({
 
   const handleWhatsAppClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-  }, []);
-
-  const handleImageError = useCallback(() => {
-    setHasError(true);
   }, []);
 
   // Track active slide on scroll
@@ -109,31 +113,34 @@ const ProductCard = memo(function ProductCard({
   };
 
   return (
-    <div className="group product-card pc-card">
+    <div className="group pc-card">
       {/* Media Container - Fixed 4:3 aspect ratio for uniformity. LTR in Arabic too,
           because the slide tracking below assumes a positive scrollLeft. */}
       <div dir="ltr" className="pc-media">
         {/* Navigation Arrows (only if multiple items). These and the extra slides need
-            JavaScript anyway, and on /products they would be most of the static HTML. */}
+            JavaScript anyway, and on /products they would be most of the static HTML.
+            Below md, arrows and dots are hidden: from sm the card swipes and the count
+            badge below says where it is; below sm it is a tile with one photo that
+            doesn't swipe (index.css). */}
         {hydrated && displayMedia.length > 1 && (
           <>
             <button
               onClick={(e) => { e.stopPropagation(); scroll('left'); }}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm max-md:hidden"
               aria-label={t.productCard.previous}
             >
               <ChevronLeft size={18} />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); scroll('right'); }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-neutral-700 p-1.5 rounded-full opacity-40 group-hover:opacity-100 focus:opacity-100 group-focus-within:opacity-100 transition-all duration-300 shadow-lg backdrop-blur-sm max-md:hidden"
               aria-label={t.productCard.next}
             >
               <ChevronRight size={18} />
             </button>
 
             {/* Dot Indicators */}
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 flex">
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 flex max-md:hidden">
               {displayMedia.map((_, idx) => (
                 // The button is the 24px tap target; the dot inside it stays small.
                 <button
@@ -155,9 +162,9 @@ const ProductCard = memo(function ProductCard({
           </>
         )}
 
-        {/* Media Count Badge */}
+        {/* Media Count Badge. Not on a phone tile, which shows one photo and doesn't swipe. */}
         {hydrated && displayMedia.length > 1 && (
-          <div className="absolute top-3 right-3 z-10 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium">
+          <div className="pc-count right-3 max-sm:hidden">
             {displayMedia[activeIndex]?.type === 'video' ? <Video size={11} /> : <ImageIcon size={11} />}
             <span>{activeIndex + 1}/{displayMedia.length}</span>
           </div>
@@ -166,7 +173,7 @@ const ProductCard = memo(function ProductCard({
         {/* Scrollable Media Container */}
         <div
           ref={scrollContainerRef}
-          className="pc-track scrollbar-hide"
+          className="pc-track"
         >
           {(hydrated ? displayMedia : displayMedia.slice(0, 1)).map((item, index) => (
             <div
@@ -175,8 +182,11 @@ const ProductCard = memo(function ProductCard({
               onClick={handleCardClick}
             >
               {index > loadedUpTo ? null : item.type === 'video' && playingSrc === item.src ? (
+                // If the video fails, the poster stays under ImageFallback's band.
                 <video
                   src={item.src}
+                  poster={cover}
+                  aria-label={imageAlt ?? name}
                   className="w-full h-full object-cover"
                   controls
                   autoPlay
@@ -193,7 +203,7 @@ const ProductCard = memo(function ProductCard({
                   onClick={(e) => { e.stopPropagation(); setPlayingSrc(item.src); }}
                 >
                   <img
-                    src={poster}
+                    src={cover}
                     alt={imageAlt ?? name}
                     loading="lazy"
                     decoding="async"
@@ -206,41 +216,27 @@ const ProductCard = memo(function ProductCard({
                   )}
                 </button>
               ) : (
-                <>
-                  {hasError && index === 0 && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center">
-                      <div className="text-neutral-400 text-center p-4">
-                        <ImageIcon size={40} className="mx-auto mb-2" />
-                        <div className="text-xs font-medium">{t.productCard.imageUnavailable}</div>
-                      </div>
-                    </div>
-                  )}
-
-                  <img
-                    src={item.src}
-                    alt={imageAlt ? `${imageAlt}${index > 0 ? t.productCard.view(index + 1) : ""}` : `${name} - ${index + 1}`}
-                    loading="lazy"
-                    decoding="async"
-                    onError={index === 0 ? handleImageError : undefined}
-                    className="pc-img"
-                  />
-                </>
+                // A slide that fails becomes a named tile from ImageFallback (providers.tsx).
+                <img
+                  src={item.src}
+                  alt={imageAlt ? `${imageAlt}${index > 0 ? t.productCard.view(index + 1) : ""}` : `${name} - ${index + 1}`}
+                  loading="lazy"
+                  decoding="async"
+                  className="pc-img"
+                />
               )}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Content Section */}
+      {/* Content Section. Below sm the card is a two-column tile (index.css): the title
+          link covers the whole card, the price line shows, and the button gives way to
+          the action bar. */}
       <div className="pc-body">
         <h3 className="pc-title">
           {href ? (
-            <Link
-              href={href}
-              className="hover:text-primary transition-colors"
-            >
-              {name}
-            </Link>
+            <Link href={href}>{name}</Link>
           ) : (
             <span
               className="hover:text-primary transition-colors cursor-pointer"
@@ -250,19 +246,18 @@ const ProductCard = memo(function ProductCard({
             </span>
           )}
         </h3>
+        {price && <p className="pc-price">{price}</p>}
         <p className="pc-text">
           {description}
         </p>
         <WhatsAppLink
-          href={whatsappLink}
-          message={t.common.interestedMessage(name)}
+          message={t.common.quoteMessage(name)}
           source={`product_card:${analyticsName ?? name}`}
-          className="pc-cta"
+          className="cta pc-act"
           onClick={handleWhatsAppClick}
         >
-          <ShoppingCart size={15} />
-          <span>{t.productCard.inquire}</span>
-          <ExternalLink size={13} />
+          <WhatsAppIcon />
+          {t.nav.getFreeQuote}
         </WhatsAppLink>
       </div>
     </div>

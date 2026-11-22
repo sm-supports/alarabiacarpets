@@ -3,19 +3,24 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { preload } from "react-dom";
 import Navbar from "@/components/Navbar";
+import BarIntent from "@/components/BarIntent";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import BusinessFacts from "@/components/BusinessFacts";
 import FaqList from "@/components/FaqList";
+import FoldHead from "@/components/FoldHead";
 import ProductMedia from "@/components/ProductMedia";
+import type { GallerySlide } from "@/components/ProductGallery";
 import RelatedProducts from "@/components/RelatedProducts";
 import RelatedGuides from "@/components/RelatedGuides";
 import ServiceLinks from "@/components/ServiceLinks";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check, ShoppingCart } from "@/components/icons";
+import { ArrowLeft, Check } from "@/components/icons";
 import { categoryLabelFor, findProduct, getProducts, servicesForProductL } from "@/data/localized";
-import { fullImage, fullImagePath } from "@/lib/card-image";
+import { cardImagePath, fullImage, fullImagePath } from "@/lib/card-image";
 import { formatFromPrice, getDict, localePath, type Locale } from "@/i18n";
 import {
   absoluteUrl,
@@ -76,42 +81,51 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
   const poster = fullImagePath(product.imageSrc);
   if (videoSrc) preload(poster, { as: "image", fetchPriority: "high" });
 
+  // The phone gallery's slides after the hero: the product's other photos and videos.
+  // A video hero's poster is the product's own photo, so that photo isn't repeated. The
+  // photos are the cards' 4:3 copies, one URL each: the phone box is 4:3 too (.pd-media),
+  // and only hero images have uncropped copies. Compared by copy, not by file name: two
+  // files with the same picture share one copy (image-manifest.json), and would show twice.
+  const heroCopy = cardImagePath(product.imageSrc);
+  const slides: GallerySlide[] = [
+    ...new Map(
+      product.media
+        .slice(1)
+        .map((item) => ({ type: item.type, src: item.type === "video" ? item.src : cardImagePath(item.src) }))
+        .filter((slide) => !(slide.type === "image" && slide.src === heroCopy))
+        .map((slide) => [slide.src, slide] as const)
+    ).values(),
+  ];
+
   const t = getDict(locale);
   const lp = (path: string) => localePath(locale, path);
   const label = categoryLabelFor(locale, product.category);
   const fromPrice =
     typeof product.priceFrom === "number" ? formatFromPrice(product.priceFrom, product.priceUnit, locale) : undefined;
+  // One trail for the visible breadcrumb and the BreadcrumbList, so the two can't disagree.
+  const crumbs: Crumb[] = [
+    [t.common.products, "/products"],
+    [product.name, `/products/${product.id}`],
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
       <JsonLd data={buildProductJsonLd(product, locale)} />
-      <JsonLd
-        data={buildBreadcrumb(
-          [
-            [t.common.products, "/products"],
-            [product.name, `/products/${product.id}`],
-          ],
-          locale
-        )}
-      />
+      <JsonLd data={buildBreadcrumb(crumbs, locale)} />
       {product.faqs?.length ? <JsonLd data={buildFaq(product.faqs, locale)} /> : null}
 
+      <BarIntent name={product.name} type="product" slug={product.id} />
       <Navbar />
       <main className="flex-grow">
         <section className="py-10 md:py-14 bg-neutral-50">
+          {/* On a phone the card runs edge to edge (.pd-card): the first screen is the
+              trail, the photos, the name and the price. */}
           <div className="container mx-auto px-4 sm:px-5 lg:px-8">
             {/* Breadcrumb: real anchors, not a JS-only back button */}
-            <nav aria-label={t.common.breadcrumb} className="mb-6">
-              <ol className="flex flex-wrap items-center gap-2 font-poppins text-sm text-neutral-500">
-                <li><Link href={lp("/")} className="hover:text-primary">{t.common.home}</Link></li>
-                <li aria-hidden="true">/</li>
-                <li><Link href={lp("/products")} className="hover:text-primary">{t.common.products}</Link></li>
-                <li aria-hidden="true">/</li>
-                <li className="text-neutral-800 font-medium">{product.name}</li>
-              </ol>
-            </nav>
+            <Breadcrumb locale={locale} trail={crumbs} className="mb-6" />
 
-            <div className="mb-6">
+            {/* On phones the trail's Products link does this job. */}
+            <div className="mb-6 max-md:hidden">
               <Button asChild variant="ghost" className="flex items-center gap-2 w-fit">
                 <Link href={lp("/products")}>
                   <ArrowLeft size={16} className="rtl:-scale-x-100" />
@@ -120,23 +134,25 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="pd-card">
               <ProductMedia
-                name={product.name}
                 alt={productImageAlt(product, locale)}
                 {...(videoSrc ? { src: poster } : fullImage(product.imageSrc, "(min-width:1024px) 50vw, 66vw"))}
                 videoSrc={videoSrc}
+                slides={slides}
+                poster={slides.some((slide) => slide.type === "video") ? poster : undefined}
               />
 
-              <div className="p-6 md:p-8 flex flex-col justify-between">
+              <div className="pd-body">
                 <div>
                   <div className="mb-6">
                     <p className="font-poppins text-sm text-primary/70 mb-2">{label}</p>
                     <h1 className="font-playfair text-3xl md:text-4xl font-bold mb-3">
                       {product.name}
                     </h1>
+                    {/* Without a price, what the free quote takes (S17), never a dead end. */}
                     <p className="font-poppins font-medium text-lg text-primary">
-                      {fromPrice ?? product.price}
+                      {fromPrice ?? t.price.noPrice}
                     </p>
                   </div>
 
@@ -146,11 +162,23 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
                       {t.facts.productSummary(product.name, fromPrice)}
                     </p>
                     <p className="font-poppins text-muted-foreground">{product.description}</p>
-                    {product.longDescription?.map((para, i) => (
-                      <p key={i} className="font-poppins text-muted-foreground mt-3">
-                        {para}
-                      </p>
-                    ))}
+                    {/* Folded on phones (.fold in index.css): the toggle is a <details> of its
+                        own and the text follows it, so the text is in the HTML and shows at
+                        md and up in every browser, with no script. The toggle goes at md. */}
+                    {product.longDescription?.length ? (
+                      <>
+                        <details className="fold md:hidden">
+                          <summary className="fold-l">{t.service.viewDetails(product.name)}</summary>
+                        </details>
+                        <div className="fold-body">
+                          {product.longDescription.map((para, i) => (
+                            <p key={i} className="font-poppins text-muted-foreground mt-3">
+                              {para}
+                            </p>
+                          ))}
+                        </div>
+                      </>
+                    ) : null}
                   </div>
 
                   {product.specs?.length ? (
@@ -169,11 +197,13 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
                     </div>
                   ) : null}
 
+                  {/* Folded on phones too, its heading the toggle (FoldHead); at md and up
+                      the heading shows as before and there is no toggle. */}
                   <div className="mb-8">
-                    <h2 className="font-playfair text-xl font-semibold mb-3">
+                    <FoldHead id="pd-inc" as="h2" className="font-playfair text-xl font-semibold mb-3">
                       {t.productDetail.included}
-                    </h2>
-                    <ul className="font-poppins space-y-2">
+                    </FoldHead>
+                    <ul className="fold-body font-poppins space-y-2">
                       {t.productDetail.features.map((feature) => (
                         <li key={feature} className="flex items-center gap-2">
                           <Check size={16} className="text-primary flex-shrink-0" />
@@ -185,19 +215,16 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
                 </div>
 
                 <div className="mt-auto">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="w-full bg-primary hover:bg-accent text-white flex items-center justify-center gap-2"
+                  <WhatsAppLink
+                    message={t.common.quoteMessage(product.name)}
+                    source={`product_detail:${product.id}`}
+                    className="cta cta-m w-full"
                   >
-                    <WhatsAppLink
-                      href={product.whatsappLink}
-                      source={`product_detail:${product.id}`}
-                    >
-                      <ShoppingCart size={18} />
-                      <span>{t.productCard.inquire}</span>
-                    </WhatsAppLink>
-                  </Button>
+                    <WhatsAppIcon />
+                    {/* The product-card label: heroQuote took two lines here on a 320px phone
+                        in both languages, and at 360 in Arabic. */}
+                    {t.nav.getFreeQuote}
+                  </WhatsAppLink>
                 </div>
               </div>
             </div>
@@ -209,7 +236,7 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
         {product.faqs?.length ? (
           <section className="py-14 md:py-16 bg-white">
             <div className="container mx-auto px-4 sm:px-5 lg:px-8 max-w-3xl">
-              <h2 className="h2-sec">
+              <h2 className="h2-sec faq-h">
                 {t.common.faqTitle}
               </h2>
               <FaqList faqs={product.faqs} />
@@ -233,15 +260,14 @@ export default function ProductDetailView({ locale, productId }: { locale: Local
             <p className="font-poppins max-w-2xl mx-auto mb-8">
               {t.productDetail.needHelpText}
             </p>
-            <Button asChild size="lg" className="bg-green-700 hover:bg-green-800 text-white">
-              <WhatsAppLink
-                source={`product_detail_bottom:${product.id}`}
-                className="flex items-center gap-2"
-              >
-                <ShoppingCart size={16} />
-                <span>{t.common.contactOnWhatsApp}</span>
-              </WhatsAppLink>
-            </Button>
+            <WhatsAppLink
+              message={t.common.quoteMessage(product.name)}
+              source={`product_detail_bottom:${product.id}`}
+              className="cta cta-m"
+            >
+              <WhatsAppIcon />
+              {t.common.heroQuote}
+            </WhatsAppLink>
           </div>
         </section>
       </main>

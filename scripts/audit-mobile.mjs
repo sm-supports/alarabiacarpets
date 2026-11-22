@@ -1,0 +1,1137 @@
+/**
+ * Measures the built site in out/ in headless Chrome, with nothing leaving this machine
+ * (see scripts/lib/browser.mjs). Not part of `npm run check`.
+ *
+ *   node scripts/audit-mobile.mjs                  the 10 page types EN and AR, and the 404, at 320, 360, 390
+ *   ... --widths=360,390 --langs=en                narrower run
+ *   ... --pages=/contact,/ar/contact               these paths instead of the page types
+ *   ... --no-404                                   leave out the 404 page
+ *   ... --no-js                                    JavaScript off (acceptance 12)
+ *   ... --out=file.json                            write the full result
+ *   ... --strict                                   exit 1 if a tap target or an input fails
+ *   ... --screenshots=dir [--full-page] [--format=jpeg --quality=60]
+ *   ... --form[=ok,send_failed,offline]            run the contact form through each outcome
+ *   ... --form=flows                               only the multi-step flows (flow:<name>)
+ *   ... --max-seconds=180                          close Chrome and exit 2 after this long (default 1800)
+ *
+ * For each page it records:
+ *   - tap targets: every visible control under 44px either way (acceptance 1). A link in
+ *     running text doesn't count. A control's area includes an absolutely positioned
+ *     ::before or ::after, so a stretched link is measured by what you can tap.
+ *   - inputs that compute below 16px, which make iOS zoom the page
+ *   - the fixed element at the bottom of the screen, at the top, middle and end of the
+ *     page, and whether it stays put. An element marked data-action-bar wins; until
+ *     there is one, that's the WhatsApp pill.
+ *   - page height, horizontal overflow, the top of the first WhatsApp or call link in
+ *     <main>, and the top of the first form field
+ *   - which other hosts the page tried to reach. Tawk shows up here, so "no Tawk on
+ *     phones" can be checked even though the widget itself is blocked.
+ *
+ * --form loads /contact with a fake Turnstile and a mocked /api/contact, types a message,
+ * presses Send, and checks the state the form ends in (its data-form-state), where focus
+ * is, how many requests were posted and whether the text survived (SINGLE below). Single
+ * scenarios are the keys of CONTACT_SCENARIOS plus: network, hang, offline, and ts:<mode>
+ * for a Turnstile mode (error, timeout, unsupported, expire, pending, challenge,
+ * script-fail, script-hang). flow:<name> runs one of FLOWS: early press, a challenge
+ * pausing the 15 s clock, the 15 s S8 and a token after it, retries after a lost response,
+ * a connection lost mid-send, a Resend 409, send_unknown and a 20 s abort, Try again from
+ * the keyboard, offline then online, Correct and resend, field errors, a long prefill,
+ * leaving for Home while a send is on its way. The draft flows reload the page: offline
+ * mid-form then a language switch, a reload after a lost answer, with an id past 23 hours
+ * and after Sent, a correction, S13 cleared by an edit or replaced by a challenge, and
+ * storage that is full or blocked. The timeout flows: before any press, with nothing typed,
+ * and a challenge a reset brought after S7b or S7 that the visitor ignores.
+ * Exits 1 if any run ends somewhere it shouldn't. The helpers are exported from
+ * lib/browser.mjs for anything more specific.
+ */
+import { execFileSync } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import {
+  CONTACT_SCENARIOS,
+  gotoSettled,
+  installRoutes,
+  launchBrowser,
+  newPage,
+  scrollThrough,
+} from "./lib/browser.mjs";
+import { serveOut } from "./lib/serve-out.mjs";
+
+const PAGE_TYPES = [
+  ["home", "/"],
+  ["products", "/products"],
+  ["category", "/products/carpet"],
+  ["product", "/products/artificial-grass-installation-work"],
+  ["services", "/services"],
+  ["service", "/services/wardrobes"],
+  ["guides", "/guides"],
+  ["guide", "/guides/choosing-carpet-for-qatar-homes"],
+  ["about", "/about"],
+  ["contact", "/contact"],
+];
+const NOT_FOUND_PATH = "/this-page-does-not-exist";
+const MIN_TAP = 44;
+const MIN_INPUT_FONT = 16;
+
+const args = process.argv.slice(2);
+const option = (name, fallback) => args.find((a) => a.startsWith(`--${name}=`))?.split("=").slice(1).join("=") ?? fallback;
+const flag = (name) => args.includes(`--${name}`);
+const list = (value) => value.split(",").map((item) => item.trim()).filter(Boolean);
+
+const dir = option("dir", "out");
+const widths = list(option("widths", "320,360,390")).map(Number);
+const langs = list(option("langs", "en,ar"));
+const shots = option("screenshots", null);
+const format = option("format", "jpeg");
+const quality = Number(option("quality", "60"));
+const fullPage = flag("full-page");
+const outFile = option("out", null);
+const strict = flag("strict");
+const javascript = !flag("no-js");
+const formArg = option("form", flag("form") ? "all" : null);
+const maxSeconds = Number(option("max-seconds", "1800"));
+
+const localized = (lang, url) => (lang === "ar" ? (url === "/" ? "/ar" : `/ar${url}`) : url);
+
+function targets() {
+  if (option("pages", null)) {
+    return list(option("pages", "")).map((url) => ({
+      type: url.replace(/^\/(ar\/?)?/, "").replaceAll("/", "_") || "home",
+      lang: /^\/ar(\/|$)/.test(url) ? "ar" : "en",
+      url,
+    }));
+  }
+  const pages = langs.flatMap((lang) => PAGE_TYPES.map(([type, url]) => ({ type, lang, url: localized(lang, url) })));
+  if (!flag("no-404")) pages.push({ type: "404", lang: "both", url: NOT_FOUND_PATH });
+  return pages;
+}
+
+/** Runs in the page. Takes no closure: puppeteer sends it over as source text. */
+function collect(minTap, minFont) {
+  const CONTROLS =
+    'a[href], button, [role="button"], [role="link"], [role="tab"], [role="menuitem"], input:not([type="hidden"]), select, textarea, summary';
+  const px = (n) => Math.round(n * 10) / 10;
+
+  const shown = (element) => {
+    if (!element.checkVisibility({ visibilityProperty: true, opacityProperty: true })) return false;
+    const rect = element.getBoundingClientRect();
+    // sr-only text, and anything parked off the side of the screen.
+    if (rect.width <= 1 || rect.height <= 1) return false;
+    if (rect.right <= 0 || rect.left >= window.innerWidth) return false;
+    if (getComputedStyle(element).pointerEvents === "none") return false;
+    // Clipped away by a scroller or carousel track. A fixed element escapes its ancestors.
+    for (let node = element; node.parentElement; node = node.parentElement) {
+      if (getComputedStyle(node).position === "fixed") break;
+      const style = getComputedStyle(node.parentElement);
+      if (style.overflowX === "visible" && style.overflowY === "visible") continue;
+      const box = node.parentElement.getBoundingClientRect();
+      if (rect.right <= box.left || rect.left >= box.right || rect.bottom <= box.top || rect.top >= box.bottom) return false;
+    }
+    return true;
+  };
+
+  const inRunningText = (element) => {
+    if (element.tagName !== "A" || getComputedStyle(element).display !== "inline") return false;
+    let block = element.parentElement;
+    while (block && getComputedStyle(block).display === "inline") block = block.parentElement;
+    if (!block) return false;
+    return block.textContent.replace(element.textContent, "").trim().length > 0;
+  };
+
+  const tapSize = (element) => {
+    const rect = element.getBoundingClientRect();
+    let { width, height } = rect;
+    for (const pseudo of ["::before", "::after"]) {
+      const style = getComputedStyle(element, pseudo);
+      if (style.content === "none" || style.content === "normal" || style.position !== "absolute") continue;
+      width = Math.max(width, parseFloat(style.width) || 0);
+      height = Math.max(height, parseFloat(style.height) || 0);
+    }
+    return { width, height };
+  };
+
+  const label = (element) => {
+    const text =
+      element.getAttribute("aria-label") ||
+      element.textContent?.replace(/\s+/g, " ").trim() ||
+      element.querySelector?.("img")?.getAttribute("alt") ||
+      element.getAttribute("placeholder") ||
+      element.getAttribute("href") ||
+      "";
+    return text.slice(0, 60);
+  };
+
+  const controls = [...document.querySelectorAll(CONTROLS)].filter(shown);
+  const counted = controls.filter((element) => !inRunningText(element));
+  const short = new Map();
+  for (const element of counted) {
+    const { width, height } = tapSize(element);
+    if (width + 0.01 >= minTap && height + 0.01 >= minTap) continue;
+    const entry = { tag: element.tagName.toLowerCase(), label: label(element), w: px(width), h: px(height) };
+    const key = JSON.stringify(entry);
+    short.set(key, { ...entry, count: (short.get(key)?.count ?? 0) + 1 });
+  }
+
+  const inputs = [...document.querySelectorAll('input:not([type="hidden"]), select, textarea')].filter(shown);
+  const smallInputs = inputs
+    .map((element) => ({ name: element.name || element.id || element.tagName.toLowerCase(), size: parseFloat(getComputedStyle(element).fontSize) }))
+    .filter((input) => input.size < minFont);
+
+  const pageTop = (element) => (element ? Math.round(element.getBoundingClientRect().top + window.scrollY) : null);
+  const main = document.querySelector("main") ?? document.body;
+  const firstCta = [...main.querySelectorAll('a[href*="wa.me"], a[href^="tel:"]')].find(shown);
+  const firstField = [...main.querySelectorAll("input:not([type='hidden']), textarea, select")].find(shown);
+
+  return {
+    height: document.documentElement.scrollHeight,
+    overflowX: Math.max(0, document.documentElement.scrollWidth - window.innerWidth),
+    controls: counted.length,
+    runningTextLinks: controls.length - counted.length,
+    shortTotal: [...short.values()].reduce((sum, entry) => sum + entry.count, 0),
+    short: [...short.values()],
+    inputs: inputs.length,
+    smallInputs,
+    firstCtaTop: pageTop(firstCta),
+    firstFieldTop: pageTop(firstField),
+  };
+}
+
+/** Runs in the page: scrolls to `where` and describes the fixed element at the bottom. */
+async function barAt(where, settle) {
+  const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const top = where === "top" ? 0 : where === "middle" ? Math.floor(max / 2) : max;
+  window.scrollTo({ top, behavior: "instant" });
+  // Timers never fire with JavaScript off, and nothing can react to the scroll then anyway.
+  if (settle) await new Promise((resolve) => setTimeout(resolve, 80));
+
+  const marked = document.querySelector("[data-action-bar]");
+  const fixed = marked
+    ? [marked]
+    : [...document.querySelectorAll("body *")].filter((element) => {
+        if (getComputedStyle(element).position !== "fixed") return false;
+        if (!element.checkVisibility({ visibilityProperty: true, opacityProperty: true })) return false;
+        const rect = element.getBoundingClientRect();
+        return rect.width > 1 && rect.height > 1 && rect.bottom > window.innerHeight * 0.6 && rect.top < window.innerHeight;
+      });
+  if (!fixed.length) return null;
+  const widest = fixed.sort((a, b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width)[0];
+  const rect = widest.getBoundingClientRect();
+  return {
+    label: (widest.getAttribute("aria-label") || widest.textContent || "").replace(/\s+/g, " ").trim().slice(0, 40),
+    left: Math.round(rect.left),
+    width: Math.round(rect.width),
+    height: Math.round(rect.height),
+    gapBelow: Math.round(window.innerHeight - rect.bottom),
+    others: fixed.length - 1,
+  };
+}
+
+async function measureBar(page) {
+  const samples = {};
+  for (const where of ["top", "middle", "end"]) samples[where] = await page.evaluate(barAt, where, javascript);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  const values = Object.values(samples).map((sample) => JSON.stringify(sample));
+  return { ...samples.top, stable: new Set(values).size === 1, ...(new Set(values).size > 1 && { samples }) };
+}
+
+async function screenshot(page, name) {
+  fs.mkdirSync(shots, { recursive: true });
+  const extension = format === "jpeg" ? "jpg" : format;
+  const file = path.join(shots, `${name}.${extension}`);
+  await page.screenshot({
+    path: file,
+    type: format,
+    fullPage,
+    ...(format === "jpeg" && { quality }),
+    ...(format === "webp" && { quality }),
+  });
+  return file;
+}
+
+async function auditPages(browser, origin) {
+  const results = [];
+  for (const width of widths) {
+    for (const target of targets()) {
+      const page = await newPage(browser, { width, javascript });
+      const routes = await installRoutes(page, { origin });
+      const response = await gotoSettled(page, `${origin}${target.url}`, { hydrate: javascript });
+      if (javascript) await scrollThrough(page);
+      const measured = await page.evaluate(collect, MIN_TAP, MIN_INPUT_FONT);
+      const bar = await measureBar(page);
+      if (shots) {
+        // The home stats count up over 2 s once scrolled past. Let them finish, so two
+        // runs give the same picture.
+        await new Promise((resolve) => setTimeout(resolve, 2300));
+        await screenshot(page, `${target.type}-${target.lang}-${width}`);
+      }
+      results.push({
+        type: target.type,
+        lang: target.lang,
+        url: target.url,
+        width,
+        status: response?.status() ?? null,
+        ...measured,
+        bar,
+        otherHosts: [...routes.otherHosts].sort(),
+        pageErrors: routes.errors,
+      });
+      await page.close();
+    }
+  }
+  return results;
+}
+
+function printPages(results) {
+  console.table(
+    results.map((r) => ({
+      page: r.url,
+      width: r.width,
+      status: r.status,
+      height: r.height,
+      overflowX: r.overflowX,
+      controls: r.controls,
+      "under 44": r.shortTotal,
+      "inputs<16": r.smallInputs.length,
+      "first CTA": r.firstCtaTop,
+      "first field": r.firstFieldTop,
+      bar: r.bar.label !== undefined ? `${r.bar.left},${r.bar.width}x${r.bar.height},gap ${r.bar.gapBelow}${r.bar.stable ? "" : " MOVES"}` : "none",
+      errors: r.pageErrors.length,
+    }))
+  );
+  const totals = { short: 0, controls: 0, small: 0, moved: 0, errors: 0 };
+  for (const r of results) {
+    totals.short += r.shortTotal;
+    totals.controls += r.controls;
+    totals.small += r.smallInputs.length;
+    if (!r.bar.stable) totals.moved += 1;
+    totals.errors += r.pageErrors.length;
+  }
+  console.log(
+    `audit-mobile: ${results.length} page loads at ${widths.join(", ")}px: ${totals.short} of ${totals.controls} controls under ${MIN_TAP}px, ` +
+      `${totals.small} inputs under ${MIN_INPUT_FONT}px, bar moved on ${totals.moved}, ${totals.errors} page error(s)`
+  );
+  return totals;
+}
+
+const FIELDS = { name: "#contact-name", email: "#contact-email", message: "#contact-message" };
+const FORM_TEXT = {
+  en: { name: "Audit Test", email: "audit@example.com", message: "Audit message. Sizes to follow." },
+  ar: { name: "اختبار", email: "audit@example.com", message: "رسالة اختبار. المقاسات لاحقًا." },
+};
+// Panel buttons the flows press, as the visitor reads them.
+const LABELS = {
+  en: { tryAgain: "Try again", send: "Send", correct: "Correct and resend", copy: "Copy", copied: "Copied" },
+  ar: { tryAgain: "حاول مرة ثانية", send: "إرسال", correct: "عدّل وأعد الإرسال", copy: "انسخ", copied: "تم النسخ" },
+};
+// The offline badge, alone and with the draft saved.
+const OFFLINE = {
+  en: { alone: "OFFLINE", saved: "OFFLINE · DRAFT SAVED" },
+  ar: { alone: "بدون إنترنت", saved: "بدون إنترنت · المسودة محفوظة" },
+};
+
+/**
+ * One press of Send and the state it must end in (data-form-state in ContactSection), with
+ * where focus must be: "headline" for the failures the press caused (S7 to S9) and Sent,
+ * the Send button for the states that only report (S5, S5b, S11). fields_required and
+ * too_long can't come from a form that checks the same rules first, so a Function that
+ * still says them has drifted from the form, which shows S7 rather than blame a field.
+ */
+const SINGLE = {
+  ok: { state: "sent", focus: "headline" },
+  resend_409: { state: "sent", focus: "headline" },
+  bad_body: { state: "refused", focus: "headline" },
+  bot_required: { state: "checkRejected", focus: "headline" },
+  bot_rejected: { state: "checkRejected", focus: "headline" },
+  bot_unavailable: { state: "checkDown", focus: "headline" },
+  fields_required: { state: "refused", focus: "headline" },
+  too_long: { state: "refused", focus: "headline" },
+  invalid_email: { state: "field:email", focus: "#contact-email" },
+  send_failed: { state: "refused", focus: "headline" },
+  // Resend timed out, couldn't be reached, or was still busy with this key: it may have
+  // arrived, so S7b, whose Try again is safe, not S7, whose WhatsApp would send it twice.
+  send_unknown: { state: "noReply", focus: "headline" },
+  server_error: { state: "refused", focus: "headline" },
+  unknown_code: { state: "refused", focus: "headline" },
+  not_json: { state: "refused", focus: "headline" },
+  network: { state: "unreachable", focus: "headline" },
+  offline: { state: "offline", focus: "#contact-send", posted: 0, badge: "saved" },
+  hang: { state: "noReply", focus: "headline", settle: 21_000 },
+  "ts:error": { state: "checkDown", focus: "headline", posted: 0 },
+  "ts:timeout": { state: "checkRejected", focus: "headline", posted: 0 },
+  "ts:unsupported": { state: "checkDown", focus: "headline", posted: 0 },
+  "ts:expire": { state: "checking", focus: "#contact-send", posted: 0 },
+  "ts:pending": { state: "checking", focus: "#contact-send", posted: 0 },
+  "ts:challenge": { state: "challenge", focus: "#contact-send", posted: 0 },
+  "ts:script-fail": { state: "checkDown", focus: "headline", posted: 0 },
+  "ts:script-hang": { state: "checking", focus: "#contact-send", posted: 0 },
+};
+
+/** Runs in the page: what the visitor is being told, where focus is, and whether their text is still there. */
+function readFormState(fields) {
+  const clean = (element) => element?.textContent.replace(/\s+/g, " ").trim() ?? null;
+  const values = {};
+  for (const [key, selector] of Object.entries(fields)) values[key] = document.querySelector(selector)?.value ?? null;
+  const holder = document.querySelector("[data-form-state]");
+  const invalid = [...document.querySelectorAll('[aria-invalid="true"]')].map((element) => element.id.replace("contact-", ""));
+  const panel = holder?.querySelector("[data-state-panel]");
+  const active = document.activeElement;
+  const whatsApp = panel?.querySelector('a[href^="https://wa.me/"]');
+  // data-state-panel: the live regions leave out a headline that has taken focus.
+  const said = [...document.querySelectorAll('[role="status"], [role="alert"], [data-state-panel]')]
+    .map(clean)
+    .filter(Boolean);
+  return {
+    values,
+    state: holder?.dataset.formState ?? (invalid.length ? `field:${invalid.join("+")}` : null),
+    badge: clean(panel?.querySelector(".sp-badge")),
+    headline: clean(panel?.querySelector(".sp-title")),
+    facts: clean(panel?.querySelector(".sp-facts")),
+    actions: [...(panel?.querySelectorAll(".sp-actions > *") ?? [])].map(clean),
+    hasClose: Boolean(panel?.querySelector(".sp-close")),
+    fieldErrors: [...document.querySelectorAll(".ct-error")].map(clean),
+    whatsAppHref: whatsApp?.getAttribute("href") ?? null,
+    focus: active?.classList.contains("sp-title") ? "headline" : active?.id ? `#${active.id}` : active?.tagName.toLowerCase() ?? null,
+    said: [...new Set(said)],
+    online: navigator.onLine,
+    hasForm: Boolean(document.querySelector("form")),
+    // The badge above Send while offline mid-form.
+    offlineLine: clean(document.querySelector("form > p[role='status'] .sp-badge")),
+    path: location.pathname,
+  };
+}
+
+/**
+ * Runs in the page before any of its scripts: sessionStorage full (every write throws)
+ * or blocked (touching it throws, as with cookies blocked).
+ */
+function breakStorage(mode) {
+  if (mode === "full") {
+    Storage.prototype.setItem = function () {
+      throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
+    };
+  } else {
+    Object.defineProperty(window, "sessionStorage", {
+      get() {
+        throw new DOMException("Access is denied for this document.", "SecurityError");
+      },
+    });
+  }
+}
+
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** Sets a React-controlled field the way typing would, past maxLength if asked. */
+async function setField(page, selector, value) {
+  await page.evaluate(
+    (target, next) => {
+      const element = document.querySelector(target);
+      const proto = element instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+      Object.getOwnPropertyDescriptor(proto, "value").set.call(element, next);
+      element.dispatchEvent(new Event("input", { bubbles: true }));
+    },
+    selector,
+    value
+  );
+}
+
+/**
+ * The tools a flow gets. waitState fails the flow if the state never comes, so a flow
+ * reads top to bottom as what the visitor sees.
+ */
+function flowTools(page, routes, lang, problems) {
+  const read = () => page.evaluate(readFormState, FIELDS);
+  const tools = {
+    read,
+    press: () => page.click("#contact-send"),
+    stub: (method, ...args) => page.evaluate((name, list) => window.__turnstileStub?.[name](...list), method, args),
+    async waitState(state, timeout = 4000) {
+      const reached = await page
+        .waitForFunction(
+          (want) => {
+            const holder = document.querySelector("[data-form-state]");
+            const invalid = [...document.querySelectorAll('[aria-invalid="true"]')].map((e) => e.id.replace("contact-", ""));
+            const now = holder?.dataset.formState ?? (invalid.length ? `field:${invalid.join("+")}` : null);
+            return now === want;
+          },
+          { timeout, polling: 50 },
+          state
+        )
+        .then(() => true, () => false);
+      if (!reached) problems.push(`never reached ${state} (was ${(await read()).state})`);
+      return reached;
+    },
+    expect(label, actual, wanted) {
+      // By value, so the fields and the button list compare too.
+      if (JSON.stringify(actual) !== JSON.stringify(wanted)) problems.push(`${label}: ${JSON.stringify(actual)}, wanted ${JSON.stringify(wanted)}`);
+    },
+    /** Presses the panel button with this label. */
+    async action(key) {
+      const label = LABELS[lang][key];
+      const clicked = await page.evaluate((text) => {
+        const button = [...document.querySelectorAll("[data-state-panel] .sp-actions > *")].find(
+          (element) => element.textContent.replace(/\s+/g, " ").trim() === text
+        );
+        button?.click();
+        return Boolean(button);
+      }, label);
+      if (!clicked) problems.push(`no "${label}" button`);
+    },
+    async waitToken() {
+      await page.waitForFunction(() => (window.__turnstileStub?.tokens ?? 0) > 0, { timeout: 4000, polling: 50 }).catch(() => {});
+    },
+    /** Reloads, as the visitor's own reload button would, and waits for the form or a panel. */
+    async reload() {
+      await page.reload({ waitUntil: "load" }).catch(() => null);
+      const ready = await page
+        .waitForFunction(() => document.querySelector("#contact-name, [data-form-state]"), { timeout: 8000, polling: 50 })
+        .then(() => true, () => false);
+      if (!ready) problems.push(`no form after reload (at ${page.url()})`);
+      await pause(300);
+    },
+    /** Taps the navbar's language link: a full page load, so offline it ends on the browser's error page. */
+    async switchLanguage() {
+      const link = (
+        await page.evaluateHandle(() =>
+          [...document.querySelectorAll("a[hreflang]")].find((a) => a.checkVisibility() && a.getBoundingClientRect().width > 0)
+        )
+      ).asElement();
+      if (!link) {
+        problems.push("no visible language link");
+        return;
+      }
+      await Promise.all([page.waitForNavigation({ timeout: 8000 }).catch(() => null), link.click()]);
+    },
+    /** Taps the navbar logo: a client-side move to Home, whose contact form mounts fresh. */
+    async goHome() {
+      const home = lang === "ar" ? "/ar" : "/";
+      await page.evaluate((href) => document.querySelector(`header a[href="${href}"]`)?.click(), home);
+      const moved = await page
+        .waitForFunction((href) => location.pathname === href && document.querySelector("#contact-name, [data-form-state]"), { timeout: 8000, polling: 50 }, home)
+        .then(() => true, () => false);
+      if (!moved) problems.push(`never reached the Home form (at ${page.url()})`);
+    },
+    /** generate_lead events in dataLayer: what one lead must fire once. */
+    leads: () =>
+      page.evaluate(() => (window.dataLayer ?? []).filter((entry) => entry?.[0] === "event" && entry?.[1] === "generate_lead").length),
+    stored: () => page.evaluate(() => JSON.parse(sessionStorage.getItem("contact-draft") ?? "null")),
+    bodies: () => routes.contactRequests.map((request) => request.body),
+  };
+  return tools;
+}
+
+/**
+ * A send fails into `state`; the widget's reset after it brings a challenge, which the
+ * visitor ignores until it times out. The failure must stay, with focus where it was,
+ * and its Try again must reset the widget and send.
+ */
+async function failedThenTimeout(t, state) {
+  await t.waitToken();
+  await t.stub("setMode", "challenge");
+  await t.press();
+  await t.waitState(state);
+  const shown = await t.page
+    .waitForFunction(() => [...document.querySelectorAll("[data-turnstile-stub]")].some((box) => box.style.display === "flex"), { timeout: 4000, polling: 50 })
+    .then(() => true, () => false);
+  t.expect("challenge shown after the reset", shown, true);
+  t.expect("state under the challenge", (await t.read()).state, state);
+  await t.stub("fire", "timeout-callback");
+  await pause(300);
+  const after = await t.read();
+  t.expect("state after the timeout", after.state, state);
+  t.expect("focus after the timeout", after.focus, "headline");
+  await t.stub("setMode", "pass");
+  const resets = await t.page.evaluate(() => window.__turnstileStub.resets);
+  await t.action("tryAgain");
+  await t.waitState("sent", 6000);
+  t.expect("reset on Try again", (await t.page.evaluate(() => window.__turnstileStub.resets)) > resets, true);
+  t.expect("posted", t.bodies().length, 2);
+}
+
+/** Several steps each, for the rules a single press can't show. */
+const FLOWS = {
+  // S5: Send pressed before the check finished sends by itself once it does.
+  async early(t) {
+    await t.press();
+    await t.waitState("checking");
+    await t.stub("solve");
+    await t.waitState("sent");
+    t.expect("posted", t.bodies().length, 1);
+  },
+  // S5b: a challenge stops the 15 s clock, so a slow tap doesn't turn into S8.
+  async "challenge-pause"(t) {
+    await t.waitState("challenge");
+    await t.press();
+    await t.waitState("challenge");
+    await pause(16_000);
+    t.expect("state after 16 s of challenge", (await t.read()).state, "challenge");
+    await t.stub("solve");
+    await t.waitState("sent");
+    t.expect("posted", t.bodies().length, 1);
+  },
+  // S8 after 15 s without a token. A token soon after still sends that press, as S5 said.
+  async "pending-15s"(t) {
+    await t.press();
+    await t.waitState("checking");
+    await t.waitState("checkDown", 17_000);
+    t.expect("focus", (await t.read()).focus, "headline");
+    t.expect("posted while waiting", t.bodies().length, 0);
+    await t.stub("solve");
+    await t.waitState("sent");
+    t.expect("posted", t.bodies().length, 1);
+    t.expect("focus on Sent", (await t.read()).focus, "headline");
+    t.expect("leads", await t.leads(), 1);
+  },
+  // The text changed after S8: the late token clears S8 and sends nothing; focus stays put.
+  async "pending-15s-edited"(t) {
+    await t.press();
+    await t.waitState("checkDown", 17_000);
+    await t.page.type(FIELDS.message, " +");
+    await t.stub("solve");
+    await t.waitState(null);
+    await pause(300);
+    t.expect("posted", t.bodies().length, 0);
+    t.expect("focus", (await t.read()).focus, "#contact-message");
+    await t.press();
+    await t.waitState("sent");
+  },
+  // The visitor took the panel's Call route after S8: the late token sends nothing, and
+  // focus, on the headline that goes, moves to Send rather than the page.
+  async "pending-15s-call"(t) {
+    await t.press();
+    await t.waitState("checkDown", 17_000);
+    await t.page.evaluate(() => {
+      // Counted as a tap on Call without leaving the page.
+      window.addEventListener("click", (event) => event.preventDefault(), { capture: true, once: true });
+      document.querySelector('[data-state-panel] a[href^="tel:"]').click();
+      document.querySelector("[data-state-panel] .sp-title").focus();
+    });
+    await t.stub("solve");
+    await t.waitState(null);
+    await pause(300);
+    t.expect("posted", t.bodies().length, 0);
+    t.expect("focus", (await t.read()).focus, "#contact-send");
+  },
+  // The visitor leaves for Home while the message is on its way. Home's form restored it,
+  // and says it went once the send finishes: one lead, nothing to send again.
+  async "leave-during-send"(t) {
+    await t.press();
+    await pause(300);
+    await t.goHome();
+    await t.waitState("sentBefore", 6000);
+    t.expect("posted", t.bodies().length, 1);
+    t.expect("leads", await t.leads(), 1);
+    await t.page.click(".sp-close");
+    await pause(200);
+    t.expect("empty after Close", Object.values((await t.read()).values).join(""), "");
+  },
+  // As above, but Send is pressed on Home while the first send is still on its way: both
+  // carry one id, Resend answers both as sent, and the lead counts once.
+  async "leave-and-resend"(t) {
+    await t.press();
+    await pause(300);
+    await t.goHome();
+    await t.waitState("restored");
+    await t.press();
+    await t.waitState("sent", 8000);
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", Boolean(first?.submissionId) && second?.submissionId === first?.submissionId, true);
+    t.expect("leads", await t.leads(), 1);
+  },
+  // The response was lost while online: the request may have reached the Function and
+  // used the token, so the retry gets a new one, with the same submission id.
+  async "lost-retry"(t) {
+    await t.press();
+    await t.waitState("unreachable");
+    await t.action("tryAgain");
+    await t.waitState("sent");
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", second?.submissionId, first?.submissionId);
+    t.expect("new token", Boolean(first?.turnstileToken) && second?.turnstileToken !== first?.turnstileToken, true);
+  },
+  // The connection dropped while the message was on its way: the request never left, so
+  // the token is unused and the Send after reconnecting reuses it.
+  async "offline-mid-send"(t) {
+    await t.press();
+    await pause(150);
+    await t.routes.setOffline(true);
+    await t.waitState("offline");
+    await t.routes.setOffline(false);
+    await t.waitState("online");
+    await t.action("send");
+    await t.waitState("sent", 6000);
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", second?.submissionId, first?.submissionId);
+    t.expect("same token (never used)", Boolean(first?.turnstileToken) && second?.turnstileToken === first?.turnstileToken, true);
+  },
+  // Try again from the keyboard: the button goes with its panel, and focus goes to Send
+  // rather than to the page, until the next state takes it.
+  async "panel-keyboard"(t) {
+    await t.press();
+    await t.waitState("unreachable");
+    await t.page.waitForFunction(() => window.__turnstileStub.tokens >= 2, { timeout: 4000, polling: 50 }).catch(() => {});
+    const focused = await t.page.evaluate((text) => {
+      const button = [...document.querySelectorAll("[data-state-panel] .sp-actions > button")].find(
+        (element) => element.textContent.trim() === text
+      );
+      button?.focus();
+      return document.activeElement === button;
+    }, LABELS[t.lang].tryAgain);
+    t.expect("Try again focused", focused, true);
+    await t.page.keyboard.press("Enter");
+    await pause(300);
+    t.expect("focus while sending", (await t.read()).focus, "#contact-send");
+    await t.waitState("sent", 6000);
+    t.expect("focus on Sent", (await t.read()).focus, "headline");
+  },
+  // Resend had no answer (timeout, or the first send under the key still in progress): S7b,
+  // and Try again sends the same id, which Resend can't email twice.
+  async "send-unknown-retry"(t) {
+    await t.press();
+    await t.waitState("noReply");
+    t.expect("focus", (await t.read()).focus, "headline");
+    await t.page.waitForFunction(() => window.__turnstileStub.tokens >= 2, { timeout: 4000, polling: 50 }).catch(() => {});
+    await t.action("tryAgain");
+    await t.waitState("sent");
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", Boolean(first?.submissionId) && second?.submissionId === first?.submissionId, true);
+    t.expect("new token", second?.turnstileToken !== first?.turnstileToken, true);
+  },
+  // Resend already had this submission's key (409): the Function answers 200.
+  async "resend-409"(t) {
+    await t.press();
+    await t.waitState("unreachable");
+    await t.action("tryAgain");
+    await t.waitState("sent");
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", second?.submissionId, first?.submissionId);
+  },
+  // S7b: no answer in 20 s. The token may have been redeemed, so the retry gets a new one.
+  async "abort-retry"(t) {
+    await t.press();
+    await t.waitState("noReply", 23_000);
+    await t.page.waitForFunction(() => window.__turnstileStub.tokens >= 2, { timeout: 4000, polling: 50 }).catch(() => {});
+    await t.action("tryAgain");
+    await t.waitState("sent");
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", second?.submissionId, first?.submissionId);
+    t.expect("new token", second?.turnstileToken !== first?.turnstileToken, true);
+  },
+  // S11 then S12. Nothing sends until Send is pressed again.
+  async "offline-online"(t) {
+    await t.routes.setOffline(true);
+    await t.press();
+    await t.waitState("offline");
+    t.expect("posted offline", t.bodies().length, 0);
+    await t.routes.setOffline(false);
+    await t.waitState("online");
+    await pause(500);
+    t.expect("posted on reconnect", t.bodies().length, 0);
+    await t.action("send");
+    await t.waitState("sent");
+  },
+  // The widget fails to load offline (phones load it on first focus): it is remounted on online.
+  async "offline-widget"(t) {
+    await t.routes.setOffline(true);
+    for (const [key, selector] of Object.entries(FIELDS)) await t.page.type(selector, t.text[key]);
+    await t.press();
+    await t.waitState("offline");
+    await t.routes.setOffline(false);
+    await t.waitState("online");
+    await t.waitToken();
+    await t.action("send");
+    await t.waitState("sent");
+  },
+  // Correct and resend: the last values come back, the resend is marked, Close empties.
+  async correction(t) {
+    await t.press();
+    await t.waitState("sent");
+    const firstBadge = (await t.read()).badge;
+    await t.action("correct");
+    await t.waitState(null);
+    const restored = await t.read();
+    t.expect("restored message", restored.values.message, t.text.message);
+    t.expect("focus after correct", restored.focus, "#contact-name");
+    await t.page.type(FIELDS.message, " +");
+    await t.waitToken();
+    await t.press();
+    await t.waitState("sent");
+    const [first, second] = t.bodies();
+    t.expect("first is not a correction", first?.correction, undefined);
+    t.expect("second is a correction", second?.correction, true);
+    t.expect("new submissionId", second?.submissionId !== first?.submissionId, true);
+    t.expect("new REF", (await t.read()).badge !== firstBadge, true);
+    await t.page.click(".sp-close");
+    await pause(200);
+    const closed = await t.read();
+    t.expect("empty after Close", Object.values(closed.values).join(""), "");
+    t.expect("focus after Close", closed.focus, "#contact-send");
+  },
+  // S10: inline errors, focus on the first, nothing posted.
+  async fields(t) {
+    await t.press();
+    await t.waitState("field:name+email+message");
+    t.expect("focus", (await t.read()).focus, "#contact-name");
+    await t.page.type(FIELDS.name, t.text.name);
+    await t.page.type(FIELDS.email, "name@gmail");
+    await t.page.type(FIELDS.message, t.text.message);
+    await t.press();
+    await t.waitState("field:email");
+    t.expect("focus", (await t.read()).focus, "#contact-email");
+    await t.page.type(FIELDS.email, ".com");
+    await setField(t.page, FIELDS.name, "x".repeat(101));
+    await t.press();
+    await t.waitState("field:name");
+    t.expect("posted", t.bodies().length, 0);
+  },
+  // S19: a long message is cut for WhatsApp, with the notice and Copy. A refused clipboard
+  // selects the text instead; a working one says Copied.
+  async "long-prefill"(t) {
+    await setField(t.page, FIELDS.message, "سجاد ".repeat(400).trim());
+    await t.press();
+    await t.waitState("refused");
+    const state = await t.read();
+    const encoded = state.whatsAppHref?.split("?text=")[1] ?? "";
+    t.expect("prefill within 1,800 bytes", encoded.length > 0 && encoded.length <= 1800, true);
+    t.expect("shortened notice", /shortened|اختصرنا/.test(state.facts ?? ""), true);
+    const realWrite = await t.page.evaluate(() => {
+      const clipboard = navigator.clipboard;
+      if (!clipboard) return false;
+      window.__realWrite = clipboard.writeText.bind(clipboard);
+      clipboard.writeText = () => Promise.reject(new DOMException("denied", "NotAllowedError"));
+      return true;
+    });
+    await t.action("copy");
+    await pause(200);
+    const selected = await t.page.evaluate(() => {
+      const area = document.querySelector("#contact-message");
+      return document.activeElement === area && area.selectionEnd - area.selectionStart === area.value.length;
+    });
+    t.expect("refused clipboard selects the text", selected, true);
+    if (realWrite) {
+      await t.page.evaluate(() => {
+        navigator.clipboard.writeText = window.__realWrite;
+      });
+      await t.action("copy");
+      await pause(200);
+      t.expect("working clipboard says Copied", (await t.read()).actions.includes(LABELS[t.lang].copied), true);
+    }
+  },
+  // Offline mid-form the badge says the draft is saved. The language link then lands on
+  // the browser's offline page; back online, its reload opens the other language with the
+  // text back (S13), and nothing is sent until Send is pressed.
+  async "draft-switch"(t) {
+    await t.routes.setOffline(true);
+    await pause(200);
+    t.expect("offline line", (await t.read()).offlineLine, OFFLINE[t.lang].saved);
+    await t.switchLanguage();
+    t.expect("form gone while offline", await t.page.evaluate(() => Boolean(document.querySelector("#contact-name"))), false);
+    await t.routes.setOffline(false);
+    await t.reload();
+    const after = await t.read();
+    t.expect("path", after.path, t.lang === "ar" ? "/contact" : "/ar/contact");
+    t.expect("state", after.state, "restored");
+    t.expect("text", after.values, t.text);
+    t.expect("offline line once online", after.offlineLine, null);
+    await pause(1000);
+    t.expect("posted by itself", t.bodies().length, 0);
+    await t.press();
+    await t.waitState("sent", 6000);
+    t.expect("posted", t.bodies().length, 1);
+  },
+  // The answer to a send was lost and the visitor reloads: the text is back (S13) and the
+  // next send carries the same submissionId, so Resend can't email the team twice.
+  async "reload-lost"(t) {
+    await t.press();
+    await t.waitState("unreachable");
+    await t.reload();
+    const after = await t.read();
+    t.expect("state", after.state, "restored");
+    t.expect("text", after.values, t.text);
+    await pause(500);
+    t.expect("posted by itself", t.bodies().length, 1);
+    await t.press();
+    await t.waitState("sent", 6000);
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", Boolean(first?.submissionId) && second?.submissionId === first?.submissionId, true);
+  },
+  // Resend keeps an idempotency key for 24 hours. A submission id stored more than 23 hours
+  // ago is replaced, so the send gets a new id and REF rather than a key Resend has dropped.
+  async "reload-stale"(t) {
+    await t.press();
+    await t.waitState("unreachable");
+    const stored = await t.stored();
+    t.expect("createdAt stored", typeof stored?.draft?.submission?.createdAt, "number");
+    await t.page.evaluate(() => {
+      const value = JSON.parse(sessionStorage.getItem("contact-draft"));
+      value.draft.submission.createdAt = Date.now() - 23.5 * 3600_000;
+      sessionStorage.setItem("contact-draft", JSON.stringify(value));
+    });
+    await t.reload();
+    t.expect("state", (await t.read()).state, "restored");
+    await t.press();
+    await t.waitState("sent", 6000);
+    const [first, second] = t.bodies();
+    t.expect("new submissionId", Boolean(first?.submissionId) && Boolean(second?.submissionId) && second.submissionId !== first.submissionId, true);
+  },
+  // S13 is only news: the first edit clears it.
+  async "restored-edit"(t) {
+    await t.reload();
+    await t.waitState("restored");
+    await t.page.type(FIELDS.message, " +");
+    await t.waitState(null);
+  },
+  // S13 doesn't hide a challenge: the box's instruction (S5b) replaces it.
+  async "restored-challenge"(t) {
+    await t.reload();
+    await t.waitState("restored");
+    // Focus arms the widget below md (it loads on first focus) without editing anything.
+    await t.page.focus(FIELDS.name);
+    await t.waitState("challenge");
+  },
+  // A reload after Sent says when it went (S6r) rather than offer an empty form. The text
+  // left storage with the send; Close forgets the rest.
+  async "reload-sent"(t) {
+    await t.press();
+    await t.waitState("sent");
+    const ref = (await t.read()).badge?.match(/[0-9A-F]{8}/)?.[0];
+    const stored = await t.stored();
+    t.expect("text out of storage", stored?.draft, undefined);
+    t.expect("REF stored", stored?.sent?.ref, ref);
+    await t.reload();
+    const after = await t.read();
+    t.expect("state", after.state, "sentBefore");
+    t.expect("REF", Boolean(ref) && after.badge?.includes(ref), true);
+    t.expect("headline", /^(Already sent at|انرسلت الساعة) \S+/.test(after.headline ?? ""), true);
+    t.expect("actions", after.actions, []);
+    t.expect("Close", after.hasClose, true);
+    t.expect("focus left alone", after.focus === "headline", false);
+    await t.page.click(".sp-close");
+    await pause(200);
+    const closed = await t.read();
+    t.expect("empty after Close", Object.values(closed.values).join(""), "");
+    t.expect("focus after Close", closed.focus, "#contact-send");
+    await t.reload();
+    t.expect("state after Close and reload", (await t.read()).state, null);
+    t.expect("posted", t.bodies().length, 1);
+  },
+  // A correction in progress survives a reload and still goes as a correction.
+  async "correction-reload"(t) {
+    await t.press();
+    await t.waitState("sent");
+    await t.action("correct");
+    await t.waitState(null);
+    await setField(t.page, FIELDS.message, `${t.text.message} +`);
+    await t.reload();
+    const after = await t.read();
+    t.expect("state", after.state, "restored");
+    t.expect("corrected text", after.values.message, `${t.text.message} +`);
+    await t.press();
+    await t.waitState("sent", 6000);
+    const [first, second] = t.bodies();
+    t.expect("second is a correction", second?.correction, true);
+    t.expect("new submissionId", second?.submissionId !== first?.submissionId, true);
+  },
+  // Storage full or blocked: the form works, and nothing claims the draft is saved.
+  async "storage-full"(t) {
+    await t.routes.setOffline(true);
+    await pause(200);
+    t.expect("offline line", (await t.read()).offlineLine, OFFLINE[t.lang].alone);
+    await t.press();
+    await t.waitState("offline");
+    t.expect("badge", (await t.read()).badge, OFFLINE[t.lang].alone);
+    await t.routes.setOffline(false);
+    await t.waitState("online");
+    await t.action("send");
+    await t.waitState("sent", 6000);
+    await t.reload();
+    t.expect("state after reload", (await t.read()).state, null);
+  },
+  // Nothing typed when the challenge times out: S9's "Your text is still here" would be
+  // false, so nothing shows. The press after typing resets the widget and answers.
+  async "timeout-empty"(t) {
+    await t.page.focus(FIELDS.name);
+    await pause(400);
+    t.expect("state over an empty form", (await t.read()).state, null);
+    for (const [key, selector] of Object.entries(FIELDS)) await t.page.type(selector, t.text[key]);
+    await t.press();
+    await t.waitState("checkRejected");
+    t.expect("reset on Send", (await t.page.evaluate(() => window.__turnstileStub.resets)) >= 1, true);
+    t.expect("focus after the press", (await t.read()).focus, "headline");
+    t.expect("posted", t.bodies().length, 0);
+  },
+  // A reset after S7b brings a challenge the visitor ignores, and it times out. S7b stays:
+  // S9's NOT SENT would hide that the message may have arrived. Its Try again is a press,
+  // which resets the widget for the timeout and sends under the same id.
+  async "noreply-challenge-timeout"(t) {
+    await failedThenTimeout(t, "noReply");
+    const [first, second] = t.bodies();
+    t.expect("same submissionId", Boolean(first?.submissionId) && second?.submissionId === first?.submissionId, true);
+  },
+  // The same over S7: the failure the visitor hasn't acted on stays.
+  async "refused-challenge-timeout"(t) {
+    await failedThenTimeout(t, "refused");
+  },
+  // S9 from the challenge timing out over typed text, before any press; Send resets the
+  // widget. Fired by hand: at md and up the widget loads with the page, so a timeout in
+  // its own time would come before the typing, over an empty form (timeout-empty).
+  async "timeout-retry"(t) {
+    await t.stub("fire", "timeout-callback");
+    await t.waitState("checkRejected");
+    t.expect("focus before a press", (await t.read()).focus === "headline", false);
+    await t.stub("setMode", "timeout");
+    await t.press();
+    await pause(300);
+    t.expect("reset on Send", (await t.page.evaluate(() => window.__turnstileStub.resets)) >= 1, true);
+    await t.waitState("checkRejected");
+    t.expect("focus after the press", (await t.read()).focus, "headline");
+  },
+};
+
+FLOWS["storage-blocked"] = FLOWS["storage-full"];
+
+const FLOW_SETUP = {
+  early: { turnstile: "pending" },
+  "challenge-pause": { turnstile: "challenge" },
+  "pending-15s": { turnstile: "pending" },
+  "pending-15s-edited": { turnstile: "pending" },
+  "pending-15s-call": { turnstile: "pending" },
+  "leave-during-send": { contact: [{ scenario: "ok", delayMs: 2500 }] },
+  "leave-and-resend": { contact: [{ scenario: "ok", delayMs: 2500 }] },
+  "lost-retry": { contact: ["network", "ok"] },
+  "offline-mid-send": { contact: [{ scenario: "network", delayMs: 800 }, "ok"] },
+  "panel-keyboard": { contact: ["network", { scenario: "ok", delayMs: 1500 }] },
+  "send-unknown-retry": { contact: ["send_unknown", "ok"] },
+  "reload-stale": { contact: ["network", "ok"] },
+  "restored-edit": {},
+  "restored-challenge": { turnstile: "challenge" },
+  "resend-409": { contact: ["network", "resend_409"] },
+  "abort-retry": { contact: ["hang", "ok"] },
+  "offline-online": {},
+  "offline-widget": { type: false },
+  correction: {},
+  fields: { type: false },
+  "long-prefill": { contact: "send_failed" },
+  "timeout-retry": { turnstile: "pending" },
+  "timeout-empty": { turnstile: "timeout", type: false },
+  "noreply-challenge-timeout": { contact: ["send_unknown", "ok"] },
+  "refused-challenge-timeout": { contact: ["send_failed", "ok"] },
+  "draft-switch": {},
+  "reload-lost": { contact: ["network", "ok"] },
+  "reload-sent": {},
+  "correction-reload": {},
+  "storage-full": { storage: "full" },
+  "storage-blocked": { storage: "blocked" },
+};
+
+async function runForm(browser, origin) {
+  const all = [...Object.keys(SINGLE), ...Object.keys(FLOWS).map((name) => `flow:${name}`)];
+  const scenarios = formArg === "all" ? all : formArg === "flows" ? all.filter((name) => name.startsWith("flow:")) : list(formArg);
+  const results = [];
+  for (const width of widths) {
+    for (const lang of langs) {
+      for (const scenario of scenarios) {
+        const flowName = scenario.startsWith("flow:") ? scenario.slice(5) : null;
+        const flow = flowName && FLOWS[flowName];
+        const single = !flowName && SINGLE[scenario];
+        if (!flow && !single) throw new Error(`Unknown form scenario: ${scenario}`);
+        // The widget loads on first focus below md, so this one means nothing on desktop.
+        if (flowName === "offline-widget" && width >= 768) continue;
+        const setup = flow ? FLOW_SETUP[flowName] : {};
+        const page = await newPage(browser, { width });
+        const turnstile = setup.turnstile ?? (scenario.startsWith("ts:") ? scenario.slice(3) : "pass");
+        const contact = setup.contact ?? (flow || scenario === "offline" || scenario.startsWith("ts:") ? "ok" : scenario);
+        const routes = await installRoutes(page, { origin, turnstile, contact });
+        if (setup.storage) await page.evaluateOnNewDocument(breakStorage, setup.storage);
+        await gotoSettled(page, `${origin}${localized(lang, "/contact")}`);
+        await page.waitForSelector(FIELDS.name, { timeout: 8000 });
+        await page.evaluate((selector) => document.querySelector(selector).scrollIntoView({ block: "center", behavior: "instant" }), FIELDS.name);
+        const text = FORM_TEXT[lang];
+        if (setup.type !== false) {
+          for (const [key, selector] of Object.entries(FIELDS)) await page.type(selector, text[key]);
+          // Typing focused the form, so the widget is loading. Give the stub its moment.
+          await pause(300);
+        }
+        const problems = [];
+        if (flow) {
+          const tools = flowTools(page, routes, lang, problems);
+          await flow({ ...tools, page, routes, lang, text });
+        } else {
+          if (scenario === "offline") await routes.setOffline(true);
+          await page.click("#contact-send").catch(() => {});
+          await pause(single.settle ?? 1500);
+        }
+        const state = await page.evaluate(readFormState, FIELDS);
+        if (single) {
+          if (state.state !== single.state) problems.push(`state ${state.state}, wanted ${single.state}`);
+          if (state.focus !== single.focus) problems.push(`focus ${state.focus}, wanted ${single.focus}`);
+          if (single.posted !== undefined && routes.contactRequests.length !== single.posted) {
+            problems.push(`posted ${routes.contactRequests.length}, wanted ${single.posted}`);
+          }
+          const kept = Object.keys(FIELDS).every((key) => state.values[key] === text[key]);
+          if (single.state !== "sent" && !kept) problems.push("text lost");
+          if (single.badge && state.badge !== OFFLINE[lang][single.badge]) {
+            problems.push(`badge ${state.badge}, wanted ${OFFLINE[lang][single.badge]}`);
+          }
+        }
+        if (routes.errors.length) problems.push(...routes.errors.map((error) => `page error: ${error}`));
+        if (shots) await screenshot(page, `form-${scenario.replace(":", "-")}-${lang}-${width}`);
+        results.push({
+          scenario,
+          lang,
+          width,
+          posted: routes.contactRequests.length,
+          problems,
+          ...state,
+        });
+        await page.close();
+      }
+    }
+  }
+  console.table(
+    results.map((r) => ({
+      scenario: r.scenario,
+      lang: r.lang,
+      width: r.width,
+      state: r.state,
+      focus: r.focus,
+      posted: r.posted,
+      said: `${r.badge ?? ""} ${r.headline ?? r.fieldErrors.join(" ")}`.trim().slice(0, 60),
+      ok: r.problems.length ? r.problems.join("; ").slice(0, 80) : "yes",
+    }))
+  );
+  const failed = results.filter((r) => r.problems.length);
+  console.log(`audit-mobile: ${results.length} form runs, ${failed.length} with problems`);
+  return results;
+}
+
+
+const server = await serveOut({ dir });
+const browser = await launchBrowser();
+// A step that never settles (a page that won't load, a wait with no timeout) must not
+// hold Chrome and this process open: give up, close both, and say so.
+setTimeout(() => {
+  console.error(`audit-mobile: gave up after ${maxSeconds} s`);
+  Promise.race([browser.close(), pause(5000)])
+    .catch(() => {})
+    .finally(() => process.exit(2));
+}, maxSeconds * 1000).unref();
+let exitCode = 0;
+try {
+  const results = formArg ? await runForm(browser, server.origin) : await auditPages(browser, server.origin);
+  if (!formArg) {
+    const totals = printPages(results);
+    if (strict && (totals.short || totals.small)) exitCode = 1;
+  } else if (results.some((r) => r.problems.length)) {
+    exitCode = 1;
+  }
+  if (outFile) {
+    const commit = execFileSync("git", ["rev-parse", "--short", "HEAD"], { encoding: "utf8" }).trim();
+    fs.mkdirSync(path.dirname(outFile), { recursive: true });
+    fs.writeFileSync(outFile, `${JSON.stringify({ commit, results })}\n`);
+    console.log(`audit-mobile: wrote ${outFile}`);
+  }
+} finally {
+  await browser.close();
+  await server.close();
+}
+process.exit(exitCode);

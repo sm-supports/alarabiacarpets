@@ -651,29 +651,29 @@
 /* ===================================
    Product Card Styles
    =================================== */
-.product-card {
+.pc-card {
   transform: translateY(0);
   transition: transform var(--duration-normal) var(--ease-out-expo),
               box-shadow var(--duration-normal) var(--ease-out-expo);
 }
 
-.product-card:hover {
+.pc-card:hover {
   transform: translateY(-4px);
 }
 
 /* Ensure uniform video display inside product cards */
-.product-card video {
+.pc-card video {
   object-fit: cover;
   background: rgb(var(--color-near-black));
 }
 
 /* Base transition for images inside product cards */
-.product-card img {
+.pc-card img {
   transition: transform var(--duration-normal) var(--ease-out-expo);
 }
 
 /* Smooth image zoom on hover */
-.product-card:hover img {
+.pc-card:hover img {
   transform: scale(1.05);
 }
 
@@ -720,27 +720,39 @@
 /* Long utility strings repeated on every page, named so they aren't repeated in the
    static HTML: pages must stay above Semrush's 10% text-to-HTML ratio. */
 @layer components {
-  .ft-link { @apply text-xs sm:text-sm text-gray-600 hover:text-forest-900 transition-colors; }
+  /* A footer link: a 44px row below md (the footer block at the end of this file), inline from md. */
+  .ft-link { @apply flex min-h-11 items-center text-sm text-gray-600 hover:text-forest-900 transition-colors md:inline; }
   .pc-card { @apply overflow-hidden h-full flex flex-col shadow-md hover:shadow-xl transition-all duration-500 rounded-2xl bg-white text-card-foreground; }
   .pc-body { @apply p-4 sm:p-5 flex flex-col flex-grow; }
   .pc-media { @apply relative aspect-[4/3] bg-neutral-100 overflow-hidden rounded-t-2xl; }
-  .pc-track { @apply flex overflow-x-auto snap-x snap-mandatory h-full w-full; }
+  /* Hides its scrollbar itself (was .scrollbar-hide beside it on every card). */
+  .pc-track { @apply flex overflow-x-auto snap-x snap-mandatory h-full w-full; scrollbar-width: none; }
+  .pc-track::-webkit-scrollbar { display: none; }
   .pc-slide { @apply flex-shrink-0 w-full h-full snap-center relative cursor-pointer; }
   .pc-img { @apply h-full w-full object-cover transition-transform duration-700 group-hover:scale-105; }
   .pc-title { @apply font-playfair text-base sm:text-lg font-semibold mb-1.5 text-neutral-900 line-clamp-1; }
+  .pc-title a { @apply transition-colors hover:text-primary; }
   .pc-text { @apply font-poppins text-xs sm:text-sm text-neutral-500 mb-4 flex-grow line-clamp-2 leading-relaxed; }
-  .pc-cta { @apply flex items-center justify-center gap-2 w-full whitespace-nowrap bg-primary hover:bg-primary/90 text-white rounded-xl h-10 sm:h-11 text-sm font-medium transition-all duration-300 hover:shadow-md mt-auto; }
+  /* A tile's price line, on phones only (the tile rules at the end of this file): on the
+     /products cards and on the category landings' product tiles, whose description is .rel-text. */
+  .pc-price { @apply mt-1 font-poppins text-xs font-semibold text-forest-900 sm:hidden; text-wrap: balance; }
+  /* "2/5" over a card's photos and the product page's phone gallery; each sets its own side. */
+  .pc-count { @apply absolute top-3 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm; }
+  .rel-text { @apply mt-1 font-poppins text-xs text-neutral-500 line-clamp-2; }
+  /* /products "Shop by category" cards. */
+  .cat-card { @apply block rounded-xl overflow-hidden border border-neutral-200 transition-all duration-300 hover:shadow-md; }
+  .cat-media { @apply relative aspect-[4/3] overflow-hidden bg-neutral-100; }
 }
 
 @layer components {
-  .btn-outline { @apply inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3 bg-white text-forest-900 text-sm font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98]; }
   .ct-method { @apply flex items-center gap-4 sm:gap-5 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 active:scale-[0.98]; }
-  .ct-chip { @apply px-3 sm:px-4 py-2 text-xs sm:text-sm text-white/80 bg-white/5 rounded-full border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-[0.98]; }
-  .ft-social { @apply w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 transition-all duration-300 hover:bg-forest-900 hover:text-white active:scale-[0.95]; }
+  .ct-chip { @apply px-3 sm:px-4 py-2 text-xs sm:text-sm text-white/80 bg-white/5 rounded-full border border-white/10 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-[0.98] max-md:inline-flex max-md:min-h-11 max-md:items-center; }
+  .ft-social { @apply w-11 h-11 md:w-10 md:h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 transition-all duration-300 hover:bg-forest-900 hover:text-white active:scale-[0.95]; }
   .sc-pill { @apply inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-gray-200 rounded-full text-xs sm:text-sm text-gray-700 whitespace-nowrap flex-shrink-0; }
-  .why-card { @apply p-5 sm:p-6 lg:p-8 bg-white rounded-2xl sm:rounded-3xl border border-gray-100 transition-all duration-700 ease-out-expo hover:shadow-float hover:-translate-y-1 active:scale-[0.98]; }
+  /* Below sm the icon sits beside the title and text (why-icon spans both rows); from sm it is above them, as before. */
+  .why-card { @apply grid grid-cols-[auto_1fr] gap-x-4 p-4 sm:block sm:p-6 lg:p-8 bg-white rounded-2xl sm:rounded-3xl border border-gray-100 transition-all duration-700 ease-out-expo hover:shadow-float hover:-translate-y-1 active:scale-[0.98]; }
   .ct-icon { @apply w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 flex-shrink-0; }
-  .more-tile { @apply relative aspect-[4/5] sm:aspect-square rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-700 ease-out-expo hover:shadow-float active:scale-[0.98]; }
+  .more-tile { @apply relative aspect-square rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-700 ease-out-expo hover:shadow-float active:scale-[0.98]; }
   .chip-link { @apply font-poppins text-sm px-4 py-2.5 rounded-full border border-neutral-200 text-neutral-700 transition-all duration-300 hover:border-primary/40 hover:text-primary; }
   .more-arrow { @apply w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full transition-all duration-300 group-hover:bg-white; }
   .sc-shade { @apply absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500; }
@@ -749,16 +761,25 @@
   .idx-card { @apply bg-white rounded-xl overflow-hidden border border-neutral-200 flex flex-col transition-all duration-300 hover:shadow-md; }
   .idx-card2 { @apply bg-white rounded-xl border border-neutral-200 overflow-hidden flex flex-col transition-all duration-300 hover:shadow-md; }
   .arrow-go { @apply w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1; }
-  .sc-frame { @apply relative aspect-[4/3] sm:aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-elevated sm:shadow-float; }
+  /* Home's showcase photo: 16:9 on phones, 4:3 from sm. */
+  .sc-frame { @apply relative aspect-video sm:aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-elevated sm:shadow-float; }
   .rel-card { @apply block bg-white rounded-xl overflow-hidden border border-neutral-200 transition-all duration-300 hover:shadow-md; }
   .sc-title { @apply text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-forest-900 mb-3 sm:mb-4 leading-tight; }
+  /* Home's "More to Explore": an h3 that heads its grid like a section h2, and is sized as one. */
+  .sc-more { @apply text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-3 sm:mb-4; }
   .cat-title { @apply font-playfair text-sm sm:text-base font-semibold text-neutral-900 group-hover:text-primary transition-colors; }
   .faq-q { @apply font-poppins font-medium text-neutral-900 cursor-pointer list-none flex justify-between items-center gap-4; }
-  .why-title { @apply text-base sm:text-lg lg:text-xl font-display font-semibold text-forest-900 mb-2 sm:mb-3; }
+  .why-title { @apply text-base sm:text-lg lg:text-xl font-display font-semibold text-forest-900 mb-1 sm:mb-3; }
+  .why-icon { @apply row-span-2 w-11 h-11 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center sm:mb-5 lg:mb-6 transition-transform duration-300 group-hover:scale-110; }
   .stat-num { @apply text-2xl sm:text-3xl lg:text-4xl font-display font-bold text-forest-900 mb-0.5 sm:mb-1; }
-  .ft-contact { @apply flex items-center gap-2 text-sm text-gray-600 hover:text-forest-900 transition-colors; }
+  .ft-contact { @apply flex min-h-11 items-center gap-2 text-sm text-gray-600 hover:text-forest-900 transition-colors md:min-h-0; }
   .sc-text { @apply text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-lg; }
-  .nav-link { @apply relative px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-full; }
+  /* The desktop header row. From 1024 it is the row from before the redesign, link for
+     link (the quote button: .nav-cta). At 768 that row wrapped, so between 768 and 1024
+     the logo stands without its wordmark (Navbar.tsx) and the links are 16px narrower.
+     Measured in both languages; Arabic is the wider. */
+  .nav-link { @apply relative px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-full md:max-lg:px-2; }
+  .nav-switch { @apply px-3 py-2 text-sm font-medium text-gray-600 hover:text-forest-900 transition-colors duration-200 rounded-full; }
   .more-img { @apply w-full h-full object-cover transition-transform duration-700 group-hover:scale-110; }
   .sc-img { @apply w-full h-full object-cover transition-transform duration-700 group-hover:scale-105; }
   .rel-img { @apply w-full h-full object-cover transition-transform duration-500 group-hover:scale-105; }
@@ -773,22 +794,36 @@
   .h1-band { @apply font-playfair text-3xl md:text-4xl lg:text-5xl font-bold mb-4; }
   .faq-a { @apply font-poppins text-sm text-neutral-600 mt-3 leading-relaxed; }
   .idx-title { @apply font-playfair text-lg font-semibold text-neutral-900 mb-2; }
+  .idx-h2 { @apply font-playfair text-xl font-semibold text-neutral-900 mb-2; }
+  .idx-more { @apply font-poppins text-sm font-medium text-primary mt-4 hover:underline; }
 }
 
 @layer components {
-  .sc-cta { @apply inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3 text-white text-sm font-medium rounded-full transition-all duration-300 hover:shadow-float active:scale-[0.98]; }
-  .hero-dark { @apply inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-forest-900 text-white text-base font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-float active:scale-[0.98]; }
-  .hero-light { @apply inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-white text-forest-900 text-base font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-gray-50 hover:border-gray-300 active:scale-[0.98]; }
-  .ct-primary { @apply inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-gold-500 text-forest-900 text-base sm:text-lg font-semibold rounded-full transition-all duration-300 hover:bg-gold-400 hover:shadow-float active:scale-[0.98] w-full sm:w-auto max-w-sm sm:max-w-none; }
-  .all-cta { @apply inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-forest-900 text-white text-sm sm:text-base font-medium rounded-full transition-all duration-300 hover:bg-forest-700 hover:shadow-float active:scale-[0.98] w-full sm:w-auto max-w-xs sm:max-w-none mx-auto; }
   .more-label { @apply absolute inset-0 flex items-end p-3 sm:p-4 lg:p-5; }
   .pc-play { @apply relative block w-full h-full; }
   .pc-play-badge { @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white; }
-  .ct-skel { @apply min-h-[420px] space-y-4 sm:space-y-5; }
+  /* The hydrated form's height, so the card doesn't jump: fields, Send, and the margin
+     before the (usually invisible) Turnstile container. */
+  .ct-skel { @apply min-h-[380px] sm:min-h-[430px] space-y-4 sm:space-y-5; }
   .ct-skel-label { @apply text-xs sm:text-sm text-white/60 mb-1.5 sm:mb-2; }
   .ct-skel-field { @apply h-11 sm:h-12 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
-  .ct-skel-area { @apply h-[98px] sm:h-[114px] rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
-  .ct-skel-btn { @apply w-full py-3.5 sm:py-4 bg-white text-forest-900 text-sm sm:text-base font-semibold rounded-lg sm:rounded-xl text-center opacity-50; }
+  .ct-skel-area { @apply h-[114px] rounded-lg sm:rounded-xl bg-white/5 border border-white/10 animate-pulse; }
+  /* Send's stand-in: the same size and fill as the hydrated button (.cta-dark .cta-l). */
+  .ct-skel-btn { @apply flex min-h-12 w-full items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-forest-900 opacity-50 md:py-4 md:text-base; }
+  .ct-error { @apply mt-1.5 text-sm text-red-300; }
+  /* The form's stand-in without JavaScript: Call and email, each a 44px tap, side by side
+     where they fit and stacked where they don't, so no separator is left at a line end.
+     The gap keeps "Call" apart from the number, which the flex layout would join. */
+  .ct-noscript { @apply mt-4 flex flex-wrap gap-x-6 text-white; }
+  .ct-noscript a { @apply inline-flex min-h-11 items-center gap-1; }
+  /* What a press of Send scrolls into view (a form state, the Turnstile box) stops clear
+     of what is fixed at the bottom, so it never covers their buttons. Below md that is
+     the action bar, which html's scroll-padding-bottom already clears (end of this
+     file), so this adds only a gap; at md and up, the WhatsApp pill, 68px from the bottom. */
+  .ct-reveal { scroll-margin-bottom: 0.5rem; }
+  @media (min-width: 768px) {
+    .ct-reveal { scroll-margin-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+  }
   .cat-price { @apply absolute bottom-2 start-2 max-w-[calc(100%-1rem)] rounded-lg bg-primary px-2 py-1 font-poppins text-[11px] font-medium leading-tight text-white sm:text-xs; }
   /* Guide answer box and tables. Logical properties only, so both mirror in Arabic. */
   .guide-answer { @apply mb-8 rounded-xl border-s-4 border-gold-500 bg-neutral-50 px-5 py-4; }
@@ -799,6 +834,171 @@
   .guide-table th { @apply bg-neutral-100 px-4 py-2.5 text-start font-semibold text-neutral-900; }
   .guide-table td, .guide-table tbody th { @apply border-t border-neutral-200 px-4 py-2.5 align-top; }
   .guide-table tbody th { @apply bg-transparent font-medium text-neutral-900; }
+}
+
+/* The contact page (ContactView.tsx, ContactSection layout="page"): one h1, four contact
+   tiles and an hours line beside the form, and the showroom, quote and FAQ text in closed
+   panels. The panels stay closed at every width (unlike .fold), so from lg the page fits
+   one screen; their text is in the HTML either way. */
+@layer components {
+  .ct-h1 { @apply font-playfair text-3xl sm:text-4xl lg:text-[2.5rem] font-bold leading-tight text-white; }
+  .ct-intro { @apply mt-2 font-poppins text-sm sm:text-base text-white/70; }
+  .ct-tiles { @apply mt-5 grid grid-cols-2 gap-3; }
+  .ct-tile { @apply flex h-full min-h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 sm:px-4 text-white transition-colors duration-200 hover:bg-white/10 active:scale-[0.98]; }
+  .ct-tile:focus-visible { @apply outline outline-2 outline-offset-2 outline-gold-500; }
+  .ct-tile-main { @apply border-gold-500 bg-gold-500 text-forest-900 hover:bg-gold-400; }
+  .ct-tile-icon { @apply h-5 w-5 flex-shrink-0 text-gold-400; }
+  .ct-tile-main .ct-tile-icon { @apply text-forest-900; }
+  .ct-tile-text { @apply flex min-w-0 flex-col; }
+  .ct-tile-label { @apply font-poppins text-sm font-semibold leading-snug; }
+  /* Below sm a value wraps rather than being cut, and email and directions take a row each. */
+  .ct-tile-value { @apply font-poppins text-xs opacity-75 [overflow-wrap:anywhere] sm:truncate; }
+  .ct-wide { @apply max-sm:col-span-2; }
+  .ct-hours { @apply mt-4 font-poppins text-xs sm:text-sm leading-relaxed text-white/70; }
+  .ct-skel-page { @apply min-h-[300px] sm:min-h-[300px]; }
+  .ct-skel-page .ct-skel-area { @apply h-[90px]; }
+  .ct-folds { @apply border-t border-white/10; }
+  .ct-fold { @apply border-b border-white/10; }
+  /* The toggle is FoldHead's (.fold-all, after the .fold rules); these only colour it. */
+  .ct-fold-h { @apply font-playfair text-base sm:text-lg font-semibold text-white text-balance; }
+  .ct-fold-body { @apply space-y-3 pb-4 font-poppins text-sm leading-relaxed text-white/75; }
+  .ct-fold-body h3 { @apply font-playfair text-base font-semibold text-white; }
+  .ct-fold-body a { @apply text-gold-400 hover:underline; }
+  /* FaqList, made for light pages, on the forest. */
+  .ct-fold-body .faq-q { @apply text-white; }
+  .ct-fold-body .faq-a { @apply text-white/70; }
+  /* Each question's sign under the panel's (inset-inline-end 0.5rem in .fold-all), and no
+     second line after the last question: the panel's own border ends the list. */
+  .ct-fold-body .faq-toggle { @apply me-2 text-gold-400; }
+  .ct-fold-body .divide-y, .ct-fold-body .divide-y > * { @apply border-white/10; }
+  .ct-fold-body > .divide-y { @apply border-b-0; }
+}
+
+@layer components {
+  /* The site's buttons, one family: .cta forest on light, .cta-dark gold on the forest
+     bands, .cta-2 outlined. 48px tall, full radius, 14px semibold. They replace .pc-cta,
+     .sc-cta, .hero-dark, .hero-light, .ct-primary, .all-cta, .btn-outline and the inline
+     button strings; scripts/check-consistency.mjs holds their labels to the plan's CTA
+     vocabulary. A WhatsApp button carries WhatsAppIcon and no other icon. */
+  .cta { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-forest-900 px-4 py-3 md:px-6 text-center text-sm font-semibold text-white transition-colors duration-200 hover:bg-forest-700 active:scale-[0.98]; }
+  .cta-dark { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-gold-500 px-4 py-3 md:px-6 text-center text-sm font-semibold text-forest-900 transition-colors duration-200 hover:bg-gold-400 active:scale-[0.98]; }
+  .cta-2 { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-forest-900/30 bg-white px-4 py-3 md:px-6 text-center text-sm font-semibold text-forest-900 transition-colors duration-200 hover:bg-neutral-50 active:scale-[0.98]; }
+  /* The focus ring takes the colour that holds 3:1 on the surface the button sits on:
+     forest on light (gold there is 2.3:1), gold on the forest bands. */
+  .cta:focus-visible, .cta-2:focus-visible { @apply outline outline-2 outline-offset-2 outline-forest-900; }
+  .cta-dark:focus-visible { @apply outline outline-2 outline-offset-2 outline-gold-500; }
+  .cta svg, .cta-dark svg, .cta-2 svg { @apply h-4 w-4 flex-shrink-0; }
+  /* The long Arabic quote label needs 287px: on a 320px phone it may take two even lines. */
+  .cta, .cta-dark, .cta-2 { text-wrap: balance; }
+  /* At md and up a button keeps the size its predecessor had there, so desktop layouts
+     don't move: -s 40px (header, footer, hero bands), -m 44px (cards, showcase, closing
+     sections; 46 for .cta-2 with its border), -l 56px (home hero, View All, form Send).
+     Phones always get the 48px above. */
+  .cta-s { @apply md:min-h-10 md:px-5 md:py-2.5; }
+  .cta-m { @apply md:min-h-11; }
+  .cta-l { @apply md:px-8 md:py-4 md:text-base; }
+  /* Two buttons in a row (Home's hero and showcases): below sm side by side when both
+     labels fit, each growing to share the line, else stacked full width; from sm in a row
+     at their own widths, as before. */
+  .cta-pair { @apply flex flex-wrap gap-3 sm:flex-nowrap sm:gap-4; }
+  .cta-pair > * { @apply max-sm:flex-auto; }
+  /* Full width on phones, up to 320px, and its own width from md. */
+  .cta-wide { @apply w-full max-w-xs md:w-auto md:max-w-none; }
+  /* ContactSection's primary: 60px with a 24px icon from md, as .ct-primary was. */
+  .ct-go { @apply w-full max-w-sm md:w-auto md:max-w-none md:gap-3 md:px-8 md:py-4 md:text-lg; }
+  .ct-go svg { @apply md:h-6 md:w-6; }
+  /* The footer's button, in a column 154px wide at 1024 and 189px at 1280: one line, so
+     from lg without its icon and narrower, and between lg and xl in 12px type. */
+  .ft-cta { @apply whitespace-nowrap md:px-4 lg:max-xl:px-3 lg:max-xl:text-xs; }
+  .ft-cta svg { @apply lg:hidden; }
+  /* The desktop header's button (Navbar.tsx, md and up). The owner's decision of 2026-11-09:
+     it keeps its old label (nav.getQuote) and its old 500 weight, so the header's links
+     stay where they were before the redesign. After .cta, so the weight wins. */
+  .nav-cta { @apply whitespace-nowrap font-medium; }
+  /* A product card's button: the card's last row, one line. */
+  .pc-act { @apply mt-auto w-full whitespace-nowrap md:min-h-11; }
+  /* HeroQuoteCta: the starting price beside the band's button. */
+  .hq { @apply mt-6 flex flex-wrap items-center gap-3 font-poppins; }
+  .price-chip { @apply rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white; }
+
+  /* StatePanel. The overlay sits at the right on desktop in both languages, where the
+     toast it replaced was, because the WhatsApp pill holds the left in both. Its only
+     callers today are the tap feedback panels (S1-S4, lib/feedback.ts), which show below
+     md only and are cleared when the screen widens past it. Below md it spans the width,
+     over the action bar, until it is closed or answered. */
+  .sp { @apply relative bg-white text-start text-neutral-800; }
+  .sp-overlay { @apply fixed inset-x-0 bottom-0 z-[100] max-h-[85vh] overflow-y-auto rounded-t-2xl border-t border-neutral-200 p-5 shadow-float md:inset-x-auto md:bottom-6 md:right-6 md:w-[420px] md:rounded-2xl md:border; padding-bottom: calc(1.25rem + env(safe-area-inset-bottom)); animation: sp-up 240ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .sp-inline { @apply rounded-2xl p-5; }
+  .sp-page { @apply w-full max-w-md rounded-2xl border border-neutral-200 p-6 shadow-elevated; }
+  .sp-close { @apply absolute end-1 top-1 inline-flex h-11 w-11 items-center justify-center rounded-full text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900; }
+  .sp-badge { @apply mb-2 inline-block rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-forest-900; }
+  .sp-badge-fail { @apply bg-red-100 text-red-800; }
+  .sp-title { @apply text-lg font-semibold leading-snug text-forest-900 outline-none; }
+  /* break-words: a long email or name wraps inside the panel instead of running out of it. */
+  .sp-facts { @apply mt-2 space-y-2 break-words text-sm leading-relaxed text-neutral-700; }
+  .sp-actions { @apply mt-4 flex flex-col gap-2; }
+  .sp-actions > * { @apply w-full; }
+}
+@keyframes sp-up {
+  from { transform: translateY(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sp-overlay { animation: none; }
+}
+
+/* NavProgress: a 2px gold line across the top while a tapped link loads, above the header
+   and the open menu. It grows from the start edge, so Arabic mirrors it, and slows as it
+   goes rather than claiming to finish. Phones only, and never with reduced motion. */
+@layer components {
+  .np { @apply pointer-events-none fixed inset-x-0 top-0 z-[70] h-0.5 origin-left bg-gold-500 rtl:origin-right md:hidden motion-reduce:hidden; animation: np-grow 10s cubic-bezier(0.1, 0.7, 0.2, 1) both; }
+}
+@keyframes np-grow {
+  from { transform: scaleX(0.1); }
+  to { transform: scaleX(0.9); }
+}
+
+/* ImageFallback (S16): a catalog photo that failed becomes this tile, placed over the
+   image's own box (the script sets its position and size), with the alt text and "Image
+   unavailable". The image stays in the page for its alt text, transparent. A video keeps
+   its poster and gets the words as a band across its top, above the controls. No
+   z-index, so a card's own overlays (shade, label, count badge) still come above it. A
+   small tile clamps the name to two lines, a smaller one to one. */
+@layer components {
+  .imgx { @apply pointer-events-none absolute flex flex-col items-center justify-center gap-1 overflow-hidden bg-neutral-100 p-3 text-center font-poppins leading-snug text-neutral-600; container-type: size; }
+  .imgx-n { @apply line-clamp-3 text-sm font-medium text-neutral-700; }
+  .imgx-u { @apply text-xs; }
+  .imgx-v { @apply justify-start bg-black/70 px-4 py-2 text-white/90; container-type: normal; }
+  .imgx-v .imgx-n { @apply line-clamp-1 text-white; }
+  img[data-imgx] { opacity: 0; }
+  [data-imgx-host] { position: relative; }
+  @container (max-height: 7.5rem) {
+    .imgx-n { -webkit-line-clamp: 2; }
+  }
+  /* Under the 59px a two-line name and the note take. */
+  @container (max-height: 3.6875rem) {
+    .imgx-n { -webkit-line-clamp: 1; }
+  }
+  /* The two overlays that would cover the words. A category card's price chip holds the
+     bottom, two lines on a narrow phone, so the words centre in the space above it, with
+     side padding that keeps the note on one line in a 136px tile. A video card's play
+     badge sat on the poster, which is gone: the card still plays on a tap, and its count
+     badge still shows the video icon. */
+  .cat-media .imgx { padding: 0.5rem 0.5rem 3.25rem; }
+  .pc-play:has(> img[data-imgx]) .pc-play-badge { display: none; }
+  /* A video's band runs under the count badge ("1/2", top end, z-10) where one shows: in
+     the product page's gallery below md, on the cards from sm. The words keep clear of it
+     on both sides, so they stay centred (MB-01). */
+  @media not all and (min-width: 768px) {
+    .pd-slide .imgx-v { padding-inline: 4.75rem; }
+  }
+  @media (min-width: 640px) {
+    .pc-count ~ .pc-track .imgx-v { padding-inline: 4.75rem; }
+  }
+}
+
+/* S17: a service with no price says what the free quote takes, above the band's button. */
+@layer components {
+  .no-price { @apply mt-3 max-w-2xl font-poppins text-sm font-medium text-gold-300 md:text-base; }
 }
 
 /* Hero entrance. CSS only, so it runs from the first paint and never waits for
@@ -836,4 +1036,293 @@
       animation-range: entry 0% entry 75%;
     }
   }
+}
+
+/* The header (Navbar): solid white below md, so it reads the same on every page; at md
+   and up clear over the page until it scrolls, then frosted, as before. */
+@layer components {
+  .site-header { @apply fixed inset-x-0 top-0 z-40 border-b border-gray-200/50 bg-white transition-all duration-300 ease-out-expo md:border-b-0 md:bg-transparent; }
+  .site-header.is-scrolled { @apply border-b bg-white/80 shadow-subtle backdrop-blur-xl max-md:bg-white max-md:backdrop-blur-none; }
+  .nav-burger { @apply relative flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-200 hover:bg-gray-100; }
+  .nav-line { @apply absolute left-0 h-0.5 w-5 bg-forest-900 transition-all duration-300; }
+  /* The phone header's language switch, beside the menu button. */
+  .nav-lang { @apply flex h-11 min-w-11 items-center justify-center rounded-full px-2 text-sm font-semibold text-forest-900; }
+  /* "EN" on an Arabic page is set in Tajawal, which puts Latin capitals 3.5px above the
+     middle of the line: this lines it up with the menu icon and leaves the 44px box where
+     it is. The Arabic letter on an English page comes from each phone's own Arabic font,
+     so it is left alone. */
+  .nav-lang:lang(en) { padding-top: 7px; }
+}
+
+/* The action bar (WhatsAppFloat). Below md: Call (a third) and Get a Free Quote (two
+   thirds) across the bottom, 64px plus the safe area; the grid mirrors it in Arabic.
+   Stacking below md: bar 30, header 40, menu 60, status 100. At md and up the same
+   markup is the green WhatsApp pill, bottom left in both languages, exactly as before.
+   global-not-found.tsx copies the phone look in its own CSS: change both together. */
+@layer components {
+  /* A grid, not flex: 1fr 2fr splits the whole width, where flex would leave each
+     button's padding out of the split. */
+  .ab { @apply fixed inset-x-0 bottom-0 z-30 grid grid-cols-[1fr_2fr] gap-2 bg-white px-4 pt-2; padding-bottom: calc(0.5rem + env(safe-area-inset-bottom)); box-shadow: 0 -1px 0 #E5E5E5, 0 -4px 12px rgba(0, 0, 0, 0.06); }
+  .ab-call, .ab-wa { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold transition-colors duration-200 active:scale-[0.98]; }
+  .ab-call { @apply border border-forest-900/30 bg-white text-forest-900 hover:bg-neutral-50; }
+  .ab-wa { @apply bg-forest-900 text-white hover:bg-forest-700; }
+  .ab-ico { @apply h-5 w-5 flex-shrink-0; }
+  .ab-p { @apply hidden; }
+  /* At 320 the Arabic label needs 144px of the quote button's 187, so the narrowest
+     phones get less padding and a 13px Arabic label, and it stays on one line. */
+  @media (max-width: 359.98px) {
+    .ab-call, .ab-wa { @apply gap-1.5 px-2; }
+    [dir="rtl"] .ab-q { font-size: 13px; }
+  }
+  @media (min-width: 768px) {
+    .ab { @apply z-50 block bg-transparent p-0 shadow-none; left: 1.25rem; right: auto; bottom: 1.25rem; }
+    .ab-call, .ab-q { @apply hidden; }
+    /* Only what the hover changes animates: a layout switch (a window resized across md,
+       a full-page screenshot) must not tween the padding between bar and pill. */
+    .ab-wa { @apply flex min-h-0 rounded-full bg-[#25D366] px-5 py-3 text-white shadow-lg transition-[background-color,box-shadow,transform] duration-300 hover:bg-[#1ebe5b] hover:shadow-xl active:scale-95; }
+    .ab-wa .ab-ico { @apply h-6 w-6; }
+    .ab-p { @apply inline; }
+  }
+}
+
+/* Below md the page ends above the action bar, and anything scrolled into view (an
+   anchor, a focused field, a form state) stops clear of the header and the bar. */
+@media not all and (min-width: 768px) {
+  html {
+    scroll-padding-top: 3.5rem;
+    scroll-padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
+  body { padding-bottom: calc(4rem + env(safe-area-inset-bottom)); }
+}
+
+/* The keyboard is up: the bar would sit on top of it. A rule of its own, so a browser
+   without :has() drops only this. */
+@media not all and (min-width: 768px) {
+  body:has(input:focus, textarea:focus) .ab { display: none; }
+}
+
+/* Breadcrumb (components/Breadcrumb.tsx). At md and up it wraps, with "/" between the
+   items, as the hand-written trails did. Below md it is one line: the links keep their
+   width and the current page ends in an ellipsis, each link is a 44px tap (the negative
+   margin keeps the text where it was), and the separator is a chevron pointing the way
+   the page reads, mirrored in Arabic. Separators are CSS, so they aren't page text. */
+@layer components {
+  .bc { @apply mb-5 font-poppins text-sm text-neutral-500; }
+  .bc ol { @apply flex flex-wrap items-center gap-2; }
+  .bc a:hover { @apply text-primary; }
+  .bc [aria-current] { @apply font-medium text-neutral-800; }
+  .bc-dark { @apply text-white/70; }
+  .bc-dark a:hover { @apply text-white; }
+  .bc-dark [aria-current] { @apply font-normal text-white; }
+  .bc li + li::before { content: "/"; content: "/" / ""; margin-inline-end: 0.5rem; }
+  /* The separator before the current page keeps the trail's colour and weight. */
+  .bc [aria-current]::before { @apply font-normal text-neutral-500; }
+  .bc-dark [aria-current]::before { @apply text-white/70; }
+  .bc-cur-m li:last-child { @apply md:hidden; }
+}
+@media not all and (min-width: 768px) {
+  .bc { margin-top: -0.75rem; margin-bottom: 0.5rem; }
+  .bc ol { flex-wrap: nowrap; white-space: nowrap; }
+  .bc li { display: flex; flex-shrink: 0; align-items: center; }
+  .bc li:last-child { display: block; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .bc a { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }
+  .bc li + li::before {
+    content: ""; content: "" / "";
+    display: inline-block; flex-shrink: 0; width: 0.375rem; height: 0.375rem; margin-inline-end: 0.625rem;
+    border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor;
+    transform: translateY(-1px) rotate(45deg);
+  }
+  [dir="rtl"] .bc li + li::before { transform: translateY(-1px) scaleX(-1) rotate(45deg); }
+}
+
+/* Type on phones (below md only): h1 30px (every interior h1 already is; Home's hero is
+   its own), h2 24, h3 18, body text 15px at 1.7 (14px paragraphs too), Arabic 1.9.
+   Section headings only: the titles of grid tiles keep their own sizes. The :not()
+   raises these above the single utility classes on the headings, and leaves desktop to
+   them. */
+@media not all and (min-width: 768px) {
+  body { font-size: 15px; line-height: 1.7; }
+  [dir="rtl"] body { line-height: 1.9; }
+  main p:not(.x) { line-height: 1.7; }
+  [dir="rtl"] main p:not(.x) { line-height: 1.9; }
+  main h2:not(.sr-only, .idx-title, .idx-h2, .sp-title), main h3.sc-more { font-size: 1.5rem; line-height: 2rem; }
+  main h3:not(.pc-title, .rel-title, .cat-title, .sp-title, .sc-more) { font-size: 1.125rem; line-height: 1.75rem; }
+  /* One FAQ heading: every "Frequently Asked Questions" h2 (and Home's) the same. */
+  .faq-h { font-weight: 700; color: #171717; margin-bottom: 1.5rem; }
+  /* Paragraphs set in 14px (summaries, excerpts, FAQ answers, the S17 line) are body
+     text too. One whose sm: size is already larger keeps it from sm (rule below); a
+     truncated value in a contact row keeps 14px. Captions are text-xs and stay so. */
+  main p.text-sm:not([class*="sm:text-"], .truncate), main p:is(.idx-text, .faq-a, .hero-p, .no-price) { font-size: 0.9375rem; }
+}
+@media not all and (min-width: 640px) {
+  main p.text-sm:not(.truncate), main p.sc-text { font-size: 0.9375rem; }
+}
+
+/* The /products grid below sm (ProductsGrid, ProductCard): two columns of tiles, each one
+   photo, the name in two lines, the price line and two lines of description, all of it in
+   the HTML. The title link is stretched over the tile, so a tap anywhere on it opens the
+   product, before hydration too, and the photo track no longer swipes: the gallery is on
+   the product page. The card's quote button stays in the HTML for sm and up; here the
+   action bar has it, and the count and play badges go with the swipe. A failed photo's
+   ImageFallback tile sits in the slide, under the link. After the type rules above, so the
+   tile's small print keeps a tight line (the category tiles' .rel-text with it). */
+@media not all and (min-width: 640px) {
+  .pc-card { position: relative; border-radius: 0.75rem; }
+  .pc-media { border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem; }
+  /* The cards' track only: the product page's gallery (ProductGallery) swipes on phones. */
+  .pc-card .pc-track { overflow: hidden; }
+  .pc-body { padding: 0.625rem; }
+  .pc-title { margin-bottom: 0; font-size: 0.875rem; line-height: 1.25rem; -webkit-line-clamp: 2; }
+  .pc-title a::after { content: ""; position: absolute; inset: 0; }
+  .pc-title a:focus-visible { outline: none; }
+  .pc-title a:focus-visible::after { border-radius: 0.75rem; outline: 2px solid #0A2A1F; outline-offset: -2px; }
+  /* Not grown to the row's height: a clamped box taller than its lines shows the next one. */
+  .pc-text { flex-grow: 0; margin: 0.25rem 0 0; }
+  .pc-act, .pc-play-badge { display: none; }
+  /* A video tile's play button lies under the link, so it leaves the tab order and the
+     accessibility tree; its poster (and an ImageFallback tile) still shows. */
+  .pc-card .pc-play { visibility: hidden; }
+  .pc-card .pc-play > * { visibility: visible; }
+  main p:is(.pc-price, .pc-text, .rel-text):not(.x) { line-height: 1.5; }
+  [dir="rtl"] main p:is(.pc-price, .pc-text, .rel-text):not(.x) { line-height: 1.6; }
+}
+
+/* The product page (ProductDetailView, ProductMedia, ProductGallery). From sm these are the
+   classes the card had before. Below sm, on a phone held upright, the card runs edge to
+   edge, its text lines up with the page's gutter and the photo box is 4:3. Between sm and
+   md the card stays inset, because the header's container is 640px wide there and an
+   edge-to-edge card would not line up with it. Below md the photo box holds a swipe strip:
+   the server-rendered hero, then the product's other photos once hydrated. */
+@layer components {
+  .pd-card { @apply grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg shadow-md overflow-hidden max-sm:-mx-4 max-sm:gap-0 max-sm:rounded-none max-sm:shadow-none; }
+  .pd-body { @apply px-4 py-6 sm:p-6 md:p-8 flex flex-col justify-between; }
+  /* The photo box: 300px, 500px from md, as before; 4:3 across a phone below sm. */
+  .pd-media { @apply relative h-[300px] overflow-hidden bg-gray-100 md:h-[500px] max-sm:h-auto max-sm:aspect-[4/3]; }
+  .pd-slide { @apply relative h-full w-full flex-shrink-0 snap-center; }
+}
+
+/* Folds (.fold): text that is folded on phones and open from md, in every browser, with no
+   script and nothing moving. The <details> holds only its <summary>; the text is the next
+   element, .fold-body, which a closed fold hides below md. The text is in the HTML either
+   way, so crawlers and the SEO snapshot read it. (The plan put the text inside the
+   <details> and opened it at md with ::details-content: a browser without that, such as
+   Safari before 18.4 or an older Firefox, would have shown desktop folded.) Because the
+   text is outside the <details>, find in page and a search result's #:~:text= link can't
+   open a closed fold on a phone: accepted. hidden="until-found" would fix that, but the
+   hidden attribute in the HTML reads as hidden text to tools that don't apply CSS.
+   A summary that is only a label (.fold-l) leaves with its fold at md (md:hidden on the
+   <details>). A heading's fold (FoldHead, .fold-h) keeps the heading out of the summary,
+   because a summary is a button and a heading inside it stops being a heading: the empty
+   summary is named by the heading and laid over it below md, and gone from md. */
+@layer components {
+  .fold > summary { list-style: none; }
+  .fold > summary::-webkit-details-marker { display: none; }
+  .fold-l { @apply font-poppins font-medium text-primary; }
+}
+@media not all and (min-width: 768px) {
+  /* A block with the sign placed absolutely, not flex: older browsers ignored flex on a
+     summary. At least 44px: 10px above and below a line of 25px or more. */
+  .fold > summary {
+    display: block; position: relative; min-height: 2.75rem; padding-block: 0.625rem; padding-inline-end: 2rem;
+    cursor: pointer; border-radius: 0.25rem;
+  }
+  .fold > summary:focus-visible { outline: 2px solid #0A2A1F; outline-offset: 2px; }
+  /* The FAQ's sign (.faq-toggle): a + that turns to × when open, so every <details> on a
+     phone has the same one. CSS, so it isn't page text. */
+  .fold > summary::after {
+    content: "+"; content: "+" / "";
+    @apply font-poppins font-medium text-primary text-xl leading-none;
+    position: absolute; top: 50%; inset-inline-end: 0.5rem;
+    transform: translateY(-50%); transition: transform 200ms;
+  }
+  .fold[open] > summary::after { transform: translateY(-50%) rotate(45deg); }
+  .fold:not([open]) + .fold-body { display: none; }
+  /* A heading's fold: the heading takes the 44px row, the summary covers it. */
+  .fold-h { position: relative; }
+  .fold-h > :first-child { margin: 0; min-height: 2.75rem; padding-block: 0.625rem; padding-inline-end: 2rem; }
+  .fold-h > .fold > summary { position: absolute; inset: 0; min-height: 0; padding: 0; }
+}
+/* Rules of their own: a browser without :has() drops them and leaves the text open. The
+   second opens a fold whose heading a link lands on: the menu button before hydration
+   links to the footer's Products (Navbar), so without JavaScript the links show at once. */
+@media not all and (min-width: 768px) {
+  .fold-h:has(> .fold:not([open])) + .fold-body { display: none; }
+  .fold-h:has(> [id]:target) + .fold-body { display: block; }
+  /* A paragraph that stays open between a heading and its fold (.fold-lead): Home's about
+     intro, with the price list and showroom paragraphs folded under it. */
+  .fold-h:has(> .fold:not([open])) + .fold-lead + .fold-body { display: none; }
+  .fold-h:has(> [id]:target) + .fold-lead + .fold-body { display: block; }
+  .fold-h:has(> [id]:target) > .fold > summary::after { transform: translateY(-50%) rotate(45deg); }
+}
+@media (min-width: 768px) {
+  .fold-h > .fold { display: none; }
+}
+/* A fold that is a toggle at every width (FoldHead always, .fold-all): the /contact panels,
+   closed on desktop too so that page fits one screen. The same rules as a heading's fold
+   below md, without the media query; they come after the md rule above so they win there.
+   Without :has() the text stays open, as with .fold-h. */
+.fold-all { position: relative; }
+.fold-all > :first-child { margin: 0; min-height: 2.75rem; padding-block: 0.625rem; padding-inline-end: 2rem; }
+.fold-all > .fold { display: block; }
+.fold-all > .fold > summary {
+  display: block; position: absolute; inset: 0; min-height: 0; padding: 0;
+  cursor: pointer; border-radius: 0.25rem;
+}
+.fold-all > .fold > summary:focus-visible { outline: 2px solid #0A2A1F; outline-offset: 2px; }
+.fold-all > .fold > summary::after {
+  content: "+"; content: "+" / "";
+  @apply font-poppins font-medium text-primary text-xl leading-none;
+  position: absolute; top: 50%; inset-inline-end: 0.5rem;
+  transform: translateY(-50%); transition: transform 200ms;
+}
+.fold-all > .fold[open] > summary::after { transform: translateY(-50%) rotate(45deg); }
+.fold-all:has(> .fold:not([open])) + .fold-body { display: none; }
+.fold-all:has(> .fold:not([open])) + .fold-lead + .fold-body { display: none; }
+/* On the forest (/contact): the sign and the focus ring in gold. */
+.ct-fold .fold-all > .fold > summary::after { color: #C5A572; }
+.ct-fold .fold-all > .fold > summary:focus-visible { outline-color: #C5A572; }
+@media (prefers-reduced-motion: reduce) {
+  .fold > summary::after, .fold-all > .fold > summary::after { transition: none; }
+}
+
+/* An FAQ question (FaqList) is a 44px tap below md, on every page that lists them: the
+   summary reaches 8px into its <details>' padding above and below, so the question, the
+   answer and the rows stay where they were. */
+@media not all and (min-width: 768px) {
+  .faq-q { min-height: 2.75rem; margin-block: -0.5rem; padding-block: 0.5rem; }
+  /* A chip link (42px) gains a pixel of padding above and below, taken back by its
+     margin, so it is a 44px tap and its row of chips keeps its place. */
+  .chip-link { padding-block: 0.6875rem; margin-block: -1px; }
+}
+
+/* The last links under 44px on phones, each made a 44px tap without moving anything:
+   - a link that is a whole heading ("More in …" over related products, a guide's or a
+     service's title on the index pages) stays inline, and padding on an inline box grows
+     what you can tap but not the line;
+   - "Read the guide", "View … details" and "View all …" get a 44px box whose extra
+     height their margins give back. */
+@layer components {
+  .rel-all { @apply font-poppins text-sm font-medium text-primary hover:underline; }
+  .cat-links { @apply flex flex-wrap gap-x-4 gap-y-2; }
+}
+@media not all and (min-width: 768px) {
+  main :is(.h2-sec, .idx-title, .idx-h2) > a { padding-block: 0.625rem; }
+  .idx-more { padding-block: 0.75rem; margin-top: 0.25rem; margin-bottom: -0.75rem; }
+  .rel-all { display: inline-block; padding-block: 0.75rem; margin-block: -0.75rem; }
+  /* The contact page's category links: rows of 44px taps, wrapping as before. */
+  .cat-links { row-gap: 0; }
+  .cat-links a { display: inline-flex; min-height: 2.75rem; align-items: center; }
+}
+
+/* The footer (Footer.tsx). From md the columns are as they were. Below md it is one column:
+   the brand, then Products and Company folded (.fold above) with their headings as the
+   toggles, then Get Started, with a rule between them; the logo, the contact rows, the
+   social icons and every link are 44px taps. The folded links are in the HTML. */
+@layer components {
+  .ft-grid { @apply grid grid-cols-2 gap-x-8 md:gap-y-8 lg:grid-cols-5 lg:gap-12; }
+  .ft-logo { @apply inline-flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6 max-md:min-h-11; }
+  .ft-h { @apply font-semibold text-forest-900 mb-3 sm:mb-4 text-sm sm:text-base; }
+  .ft-col { @apply max-md:col-span-2 max-md:border-t max-md:border-gray-100; }
+  .ft-col > ul { @apply max-md:pb-2; }
+  .ft-go { @apply max-md:pt-6; }
 }

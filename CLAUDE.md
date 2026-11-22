@@ -12,7 +12,7 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 - **Email:** Resend API
 - **Bot protection:** Cloudflare Turnstile
 - **Analytics:** Google Analytics (G-256YMYE1WP) + Google Ads conversion tracking
-- **Chat:** Tawk.to widget
+- **Chat:** Tawk.to widget (from md: loads on first interaction or after 10 s; below md: only from the menu's Live chat row, `src/lib/tawk.ts`)
 - **Hosting:** Cloudflare Pages
 
 ## Key Directories
@@ -31,7 +31,7 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 | `src/components/` | Reusable components (Navbar, Footer, HeroSection, ProductCard, etc.) |
 | `src/components/ui/` | shadcn/ui primitives (Button, Card, Input, etc.) |
 | `src/data/products.ts` | Product catalog — `Product` interface + `products` array |
-| `src/hooks/` | Custom hooks (use-toast, use-hydrated) |
+| `src/hooks/` | Custom hooks (use-hydrated, use-online) |
 | `src/lib/utils.ts` | Utility functions (cn helper) |
 | `functions/api/` | Cloudflare Workers API endpoints |
 | `functions/email-templates/` | HTML email template generators |
@@ -41,6 +41,24 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 | `src/lib/site.ts` | Phone, WhatsApp and email constants with no imports, for client components |
 | `src/lib/card-image.ts` | Sized copies of catalog photos (`cardImage`, `fullImage`). Server only |
 | `src/lib/analytics.ts` | GA4 + Google Ads events — all tracking goes through here |
+| `src/lib/status.ts` | The overlay status (the plan's S1-S4 tap feedback): `showStatus` puts one `StatePanel` on screen through `StatusRegion` in `providers.tsx`. Its caller is `src/lib/feedback.ts`, installed by `TapFeedback`. The contact form's states are inline in `ContactSection`, not here. No lazy chunks: a failure has to report itself offline |
+| `src/lib/feedback.ts` | When a phone says S1-S4 after a WhatsApp or Call tap (timings, once-per-session S1, priority). `TapFeedback.tsx` supplies the words and installs it |
+| `src/lib/tap.ts` | Import-free hand-off: `WhatsAppLink` and `CallLink` report taps here, `lib/feedback.ts` listens |
+| `src/lib/bar-intent.ts` | What the action bar's prefill names (product, service or category), registered by `BarIntent.tsx` in those views; name, type and slug only |
+| `src/lib/tawk.ts` | Opens Tawk from the phone menu's Live chat row (S18): loads it, maximizes it, hides the bubble on minimize; 8 s limit |
+| `src/lib/draft.ts` | The contact form's draft in this tab's sessionStorage (`contact-draft`): text, submission id, sent time and REF. Import-free (`global-error.tsx` reads it) |
+| `src/components/StatePanel.tsx`, `StatusRegion.tsx` | The one panel every state uses (badge, headline, facts, primary button last) and the overlay region that shows `lib/status.ts`. Specs in `design.md` |
+| `src/components/WhatsAppFloat.tsx` | The phone action bar ([Call][Get a Free Quote]) below md, the WhatsApp pill from md. Mounted by both layouts through `client.ts` |
+| `src/components/CallLink.tsx`, `WhatsAppLink.tsx` | Every `tel:` and WhatsApp CTA: tracking (`source`), tap reporting, and WhatsApp's `/contact` stand-in before hydration |
+| `src/components/TapFeedback.tsx`, `NavProgress.tsx`, `ImageFallback.tsx`, `RegisterSW.tsx` | Site-wide client pieces mounted in `src/app/providers.tsx`, none with static HTML: tap feedback, the 2px progress line on slow page changes, the tile for a failed photo or video (S16), the service worker switch |
+| `src/components/Breadcrumb.tsx` | The visible trail on every interior page; takes the same `trail` as `buildBreadcrumb` so it matches the BreadcrumbList (`check-consistency`) |
+| `src/components/FoldHead.tsx` | A section heading that folds the next `.fold-body` on phones (see Conventions) |
+| `src/components/ProductGallery.tsx` | The product page's phone swipe gallery; extra slides only after hydration |
+| `src/components/PageError.tsx`, `src/app/(en)/error.tsx`, `src/app/(ar)/error.tsx` | A page that throws: Navbar plus a page `StatePanel` (S15) |
+| `src/app/global-error.tsx`, `src/app/global-not-found.tsx` | A root layout that throws, and the bilingual 404 (`out/404.html`, real 404 status). Both are complete documents with inline styles (see Conventions) |
+| `public/sw.js`, `scripts/sw-kill.js` | The offline page's service worker (S14), switched by `SERVICE_WORKER`, and its kill switch template (see Service worker) |
+| `scripts/audit-mobile.mjs`, `scripts/snapshot-seo.mjs`, `scripts/lib/` | Dev-only headless-Chrome tools: tap targets, bar, page heights and every form outcome with a fake Turnstile and a mocked `/api/contact`; the SEO snapshot and its `--diff` |
+| `docs/mobile-audit/`, `docs/mobile-states/` | The mobile redesign's baseline, owner decisions, core flows, backlog, acceptance and state screenshots |
 
 ## Commands
 
@@ -50,10 +68,26 @@ npm run build        # Static export → out/
 npm run pages:dev    # Full-stack local dev (build + Workers + static)
 npm run typecheck    # TypeScript type check: the site, then functions/ (its own tsconfig)
 npm run llms         # Regenerate public/llms.txt from out/ (run after a build)
-npm run check        # Text-to-HTML ratio, Arabic, page-weight and internal-link checks against out/ (run after a build)
+npm run check        # Text-to-HTML ratio, Arabic, page-weight, internal-link and consistency checks against out/ (run after a build)
 npm run perf         # Lighthouse on a simulated slow phone against out/ (needs Chrome; not a deploy gate)
 npm run deploy       # Build, stage on a case-sensitive image, deploy (prod only on main)
+
+node scripts/snapshot-seo.mjs --diff     # titles, descriptions, h1s, headings and main text vs docs/mobile-audit/baseline
+node scripts/audit-mobile.mjs --strict   # tap targets, inputs, bar and heights at 320/360/390, EN and AR
+node scripts/audit-mobile.mjs --form     # every contact form outcome, mocked (no real send)
 ```
+
+`check-consistency` (`scripts/check-consistency.mjs`) fails on a retired CTA label (in
+`out/`, or in `src/` written out or as `nav.getQuote` outside the `.nav-cta` element), a
+desktop header button (`.nav-cta`) that doesn't say `nav.getQuote`, a wrong icon on a CTA,
+a breadcrumb that differs from its BreadcrumbList, a phone number, hours or saved-message
+line in `global-error.tsx`, `global-not-found.tsx`, `out/404.html` or `public/sw.js` that
+differs from `src/lib/site.ts` and the dictionaries (`global-error.tsx` must have the saved
+line in both languages), a `/contact` hours line (`pages.contact.hoursLine`) whose days and
+hours differ from `formStates.open`, a draft key or version in `sw.js` that differs from
+`src/lib/draft.ts`, and a missing `sw.js`. The audit
+and snapshot scripts need Chrome (`CHROME_PATH` if it isn't in `/Applications`) and serve
+`out/` themselves.
 
 Never run `wrangler pages deploy out` by hand from the Mac. The repo volume is
 case-insensitive, so `public/Products` merges with the `products/` route pages
@@ -116,7 +150,7 @@ Use logical Tailwind classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-` over
 
 - All pages wrap content in `<Navbar />` + `<main className="flex-grow">` + `<Footer locale={locale} />`
 - Every `page.tsx` stays a **server component** exporting `metadata` or `generateMetadata`;
-  push interactivity into `"use client"` leaf components (see `ProductCard`, `ProductMedia`)
+  push interactivity into `"use client"` leaf components (see `ProductCard`)
 - A client component's props are serialised into the page's hydration data. Pass the few
   fields it shows, never a whole product, service or category record (`ProductsGrid` is a
   server component for this reason). Client components must not import `@/data/*`,
@@ -127,6 +161,38 @@ Use logical Tailwind classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-` over
   both layouts render gets them as props (`ThirdPartyScripts`). Next files both root layouts
   under one group, so a client file both import directly is tied to one layout's script and
   every page of the other language downloads it too (`check-page-weight` fails on this)
+- `src/app/global-error.tsx` is loaded by every page of both languages and replaces the whole
+  document, so it stays self-contained: no context, no dictionaries, inline styles. `check-page-weight`
+  can't see a dictionary imported there. It imports `src/lib/draft.ts` (to say a typed message is
+  saved), so that file must stay free of imports
+- `src/app/global-not-found.tsx` becomes `out/404.html`, served with a 404 status for every
+  unknown URL in both languages, so it is one bilingual document with its own inline CSS: no
+  providers, no Navbar, no analytics, and the plain `wa.me` and `tel:` links. Its phone
+  number goes through `check-consistency`
+- Site-wide client pieces mount inside `src/app/providers.tsx` (`StatusRegion`, `TapFeedback`,
+  `NavProgress`, `ImageFallback`, `RegisterSW`), never as a new import in a root layout
+- Every state the visitor is told about is a `StatePanel` (specs in `design.md`): inline next
+  to what it is about, an overlay through `lib/status.ts`, or a page. There are no toasts.
+  Nothing that reports a failure may load from a lazy chunk: offline, the chunk fails too and
+  the page goes with it
+- CTA labels come from the vocabulary in `design.md` (`common.heroQuote`, `nav.getFreeQuote`,
+  `statePanel.call`, `common.askOnWhatsApp` on guides; `nav.getQuote` only on the desktop
+  header's `.nav-cta`). Buttons use the `.cta` family. WhatsApp CTAs go through
+  `WhatsAppLink` with a `source`, calls through `CallLink`
+- The action bar (`WhatsAppFloat`, below md) is about 64px plus the safe area. The page
+  clears it with body padding and `html` `scroll-padding-bottom` of
+  `4rem + env(safe-area-inset-bottom)` (end of `src/index.css`); change the bar and those
+  together. It hides while a field has focus. Nothing else may float on phones: no chat
+  bubble, no second button. Stack: bar 30, header 40, menu 60, progress line 70, status 100
+- Folds: text folded on phones and open from md is a `<details class="fold">` holding only an
+  empty or label `<summary>`, followed by the text as `.fold-body`, so the text stays in the
+  HTML and desktop never sees a fold. When the toggle is a section heading, use `FoldHead`:
+  the heading stays outside the summary (a heading inside a summary stops being a heading),
+  and the summary is named by the heading's id. `always` (`.fold-all`) folds at every width
+  (the `/contact` panels only). Only a `.fold-lead` paragraph may sit between `.fold-h` and
+  `.fold-body`
+- Every control outside running text is at least 44px both ways on phones, and inputs are
+  16px; `node scripts/audit-mobile.mjs --strict` checks it
 - New routes are new directories under `src/app/` — there is no central route table
 - Dynamic routes need `generateStaticParams()`; `params` is a Promise and must be awaited
 - Never use `useSearchParams` without a Suspense boundary — it hard-fails under static export
@@ -185,7 +251,68 @@ that page, not a sibling. `npm run check` fails if one has fewer than 4 linking 
 
 Facts the owner confirmed on 2026-11-07: event carpet is sold and laid, not rented (never
 write "hire" or تأجير as an offer); "C-board" covers both gypsum and cement board; real wood
-parquet, wallpaper supply and sofa reupholstery and repair are all offered.
+parquet, wallpaper supply and sofa reupholstery and repair are all offered; the quote is free
+on every job, including floor mats and ceramic tiles. Confirmed on 2026-11-09: the site survey
+and measurement is offered on floor mats, ceramic tiles and sofa upholstery too, so every job
+without a price shows the one line "Free measurement and quote" (`price.noPrice`).
+
+## Service worker
+
+`public/sw.js` shows a page of its own (S14, EN or AR by path) when a page can't load
+offline. It ships after the rest of the mobile redesign, in its own release.
+
+- The switch is `SERVICE_WORKER` in `src/lib/site.ts`, `false` until that release.
+  `RegisterSW` registers `/sw.js` after the load event when it is `true`, and unregisters
+  any copy a browser has when it is `false`, which is also the quick rollback. Never commit
+  it `true` outside that release.
+- Navigation requests only, and no Cache API: every page comes from the network and the
+  response is returned untouched, so 301, 308, 404 and 5xx pass through and nothing goes
+  stale. Don't add caching, precaching or `/offline.html` (Pages would 308 it to `/offline`,
+  and Qatar's redirect rule would send that to `/ar/offline`, a 404).
+- Its phone, hours and saved-message line are copies; `check-consistency` holds them to
+  `src/lib/site.ts` and the dictionaries, and its draft key and version to `src/lib/draft.ts`.
+- Never delete or rename `sw.js`: a 404 on the browser's update check keeps the old worker
+  running. `public/_headers` serves it `no-cache`; keep that.
+- Kill switch, if `sw.js` itself breaks pages: copy `scripts/sw-kill.js` over
+  `public/sw.js` (same name), set `SERVICE_WORKER = false`, `npm run deploy`, and leave the
+  kill version deployed for months. It unregisters itself and reloads the tabs it controlled.
+- A first-ever visit made offline still gets the browser's own error page.
+
+## Analytics
+
+All tracking goes through `src/lib/analytics.ts`. Each WhatsApp tap fires the Ads
+`whatsappClick` conversion and GA4 `whatsapp_click {source}`; `conversion={false}` on
+`WhatsAppLink` (the Sent panel's follow-up) sends GA4 only. `BAR_SENDS_ADS` (true) decides
+whether the action bar's and the pill's taps count for Ads; the owner reviews `sticky_bar:*`
+against real chats for 28 days after release. Calls fire GA4 `phone_click {source}` only
+(`CONVERSION_LABELS.phoneClick` is null until an Ads call conversion exists). A sent form
+fires `formLead` and GA4 `generate_lead` once; a correction fires `form_correction` and no
+second lead; a failure fires `form_failed {code}`. S1's "Back to WhatsApp" fires
+`whatsapp_reopen` and no conversion. No personal data in any event.
+
+The `source` values in use (`:` parts are the page's type and slug or id):
+
+| Source | Where |
+|--------|-------|
+| `sticky_bar:{type}:{slug}`, `sticky_bar_call:{type}:{slug}` | Phone action bar, WhatsApp and Call. `type` is product, service or category from `BarIntent`; elsewhere `page` and the path, e.g. `sticky_bar:page:home` |
+| `floating_button` | The WhatsApp pill from md |
+| `navbar_desktop`, `navbar_mobile` | Desktop header button, phone menu |
+| `footer_get_quote`, `footer_contact`, `footer_social` | Footer |
+| `category:{slug}:hero`, `category:{slug}` | Category page hero and closing CTA |
+| `service:{slug}:hero`, `service:{slug}` | Service page hero and closing CTA |
+| `product_detail:{id}`, `product_detail_bottom:{id}` | Product page |
+| `product_card:{name}`, `showcase:{id}` | Product cards, Home showcase |
+| `products_page`, `services_section`, `about_page`, `guide:{slug}` | Other page CTAs |
+| `contact_page_whatsapp`, `contact_page_call` | `/contact` tiles |
+| `contact_section_primary`, `contact_section_methods`, `contact_section_call` | The contact section (Home, `/contact`) |
+| `contact_sent_followup` | Sent panel's "Continue on WhatsApp" (no Ads conversion) |
+| `contact_form_failed` | A failed send's "Send this on WhatsApp" and Call |
+| `feedback_s2`, `feedback_s4` (Call), `feedback_s3` (WhatsApp, counted like the bar) | Tap feedback panels |
+| `page_error` | `error.tsx`'s Call |
+
+GA4 needs `source` registered as an event-scoped custom dimension to report on it, and
+dimensions don't fill in retroactively (see `docs/mobile-audit/backlog.md`). The 404,
+`global-error` and the offline page send nothing.
 
 ## Agent Skills
 

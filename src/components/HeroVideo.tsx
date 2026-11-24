@@ -75,15 +75,34 @@ export default function HeroVideo() {
   const [playing, setPlaying] = useState(false);
   const [shown, setShown] = useState(false);
 
-  useEffect(
-    () =>
-      afterLoadAndIdle(() => {
-        if (!motionAndDataAllowed()) return;
-        setUserPaused(readPaused());
-        setSources(window.matchMedia(HERO_WIDE_QUERY).matches ? HERO_VIDEO.wide : HERO_VIDEO.phone);
-      }),
-    []
-  );
+  useEffect(() => {
+    const wide = window.matchMedia(HERO_WIDE_QUERY);
+    const pick = () => setSources(wide.matches ? HERO_VIDEO.wide : HERO_VIDEO.phone);
+    let started = false;
+    const cancel = afterLoadAndIdle(() => {
+      if (!motionAndDataAllowed()) return;
+      setUserPaused(readPaused());
+      pick();
+      started = true;
+    });
+    // A phone turned to landscape, or a window resized across md, gets the other cut, as the
+    // poster's <picture> does.
+    const onChange = () => {
+      if (started) pick();
+    };
+    wide.addEventListener("change", onChange);
+    return () => {
+      cancel();
+      wide.removeEventListener("change", onChange);
+    };
+  }, []);
+
+  // <source> children only take effect on load(): run it when the cut changes.
+  useEffect(() => {
+    const element = video.current;
+    if (!sources || !element) return;
+    if (!sources.some((src) => element.currentSrc.endsWith(src))) element.load();
+  }, [sources]);
 
   // Pause while the hero is scrolled away or the tab is hidden; resume on return.
   useEffect(() => {

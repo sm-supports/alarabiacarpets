@@ -1,11 +1,11 @@
 "use client";
 
+import HeroVideo from "@/components/HeroVideo";
 import { ArrowRight, Play } from "@/components/icons";
 import { useI18n } from "@/i18n/LocaleProvider";
-import { useHydrated } from "@/hooks/use-hydrated";
+import { HERO_POSTER, HERO_WIDE_QUERY } from "@/lib/hero-media";
 
 export default function HeroSection() {
-  const hydrated = useHydrated();
   const { t } = useI18n();
 
   // The buttons are links to the sections, so they work before hydration (a jump, and
@@ -23,28 +23,26 @@ export default function HeroSection() {
       id="home"
       className="relative md:min-h-[100svh] flex items-center justify-center overflow-hidden bg-gradient-subtle"
     >
-      {/* Ambient background, from md only: below md the hero is as tall as its content,
-          with no blurred orbs to paint. */}
-      <div className="absolute inset-0 overflow-hidden max-md:hidden">
-        {hydrated && (
-          <>
-        {/* Gradient orbs - reduced size on mobile for performance */}
-        <div className="absolute top-1/4 -left-16 md:-left-32 w-48 h-48 md:w-96 md:h-96 bg-gold-200/40 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 -right-16 md:-right-32 w-64 h-64 md:w-[500px] md:h-[500px] bg-teal-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[800px] md:h-[800px] bg-forest-100/20 rounded-full blur-3xl" />
-
-        {/* Subtle grid pattern - hidden on mobile for performance */}
-        <div
-          className="absolute inset-0 opacity-[0.015] hidden md:block"
-          style={{
-            backgroundImage: `linear-gradient(rgba(10, 42, 31, 0.5) 1px, transparent 1px),
-                             linear-gradient(90deg, rgba(10, 42, 31, 0.5) 1px, transparent 1px)`,
-            backgroundSize: '60px 60px'
-          }}
+      {/* Background, in paint order: the loop's first frame as a poster, the loop itself once
+          the page has loaded (HeroVideo), then the cream veil that keeps the text's contrast.
+          The poster is the page's LCP element, so it stays in the static HTML. It must never
+          fill the whole viewport: Chrome ignores a full-viewport image for LCP, and the later
+          video frame would take its place. The hero starts below the header's spacer, which
+          prevents that. */}
+      <picture>
+        <source media={HERO_WIDE_QUERY} srcSet={HERO_POSTER.wide} type="image/webp" />
+        <img
+          src={HERO_POSTER.phone}
+          alt=""
+          aria-hidden="true"
+          width={540}
+          height={720}
+          fetchPriority="high"
+          className="hero-poster"
         />
-          </>
-        )}
-      </div>
+      </picture>
+      <HeroVideo />
+      <div className="hero-veil" aria-hidden="true" />
 
       {/* Main Content */}
       <div className="relative z-10 container mx-auto px-4 sm:px-5 lg:px-8 py-8 md:py-0">

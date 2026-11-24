@@ -80,6 +80,9 @@ export const enClient = {
     freeInstall: "Free Installation",
     proTeam: "Professional Team",
     happyCustomers: "1000+ Happy",
+    // The background video's button (HeroVideo), read by screen readers.
+    pauseVideo: "Pause background video",
+    playVideo: "Play background video",
   },
   trusted: {
     eyebrow: "Trusted Partners",

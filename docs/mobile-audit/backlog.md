@@ -68,6 +68,7 @@ right address, so after its release this only affects visitors without the worke
 | MB-27 | phone | Wi-Fi off at browse, mid-form and at send (acceptance item 5) on both phones, after a first visit | No browser or Next error page except MB-05's, which is known |
 | MB-28 | phone | One screen reader pass (VoiceOver and TalkBack): the bar's two buttons are named, S1 to S4 are read when they appear, focus goes to the headline on S7 to S9 and Sent, and to the first field in error on S10, the folds are read as the heading plus a collapsed button | As described |
 | MB-29 | phone | A fold tap on Android keeps the bar where it was (emulated: it does) | Bar doesn't move |
+| MB-58 | phone | **Home hero video** (added 2026-11-24) on an iPhone and an Android phone: it starts by itself after the page loads, loops without a jump, the pause button stops it and the choice holds on the next visit; on an iPhone in Low Power Mode the still frame stays and the button offers Play, which starts it | As described |
 
 ## Needs the owner
 
@@ -117,6 +118,8 @@ type, slug or id.
 Events: `whatsapp_click`, `whatsapp_reopen`, `phone_click`, `generate_lead`,
 `form_correction`, `form_failed {code}`, and the web vitals (`LCP`, `CLS`, `INP`, ...).
 
+| MB-57 | watch | **Home's LCP in Search Console** (Core Web Vitals, mobile and desktop) for 28 days after the hero video ships. The hero's poster is now the LCP element instead of the h1 (`HeroSection`, `HeroVideo`); the lab runs at release showed no regression, the field data is what decides | Remove `<HeroVideo />` and the `<picture>` from `HeroSection.tsx` |
+
 ## Arabic reader list (MB-30)
 
 Collected with `git diff main -- src/i18n functions public/sw.js`, plus the two
@@ -152,6 +155,7 @@ the offline page's draft line is S15's "رسالتك محفوظة.".
 | `pages.contact.hoursLine` | مفتوحين يوميًا من 8:00 صباحًا إلى 10:00 مساءً · الدوحة والريان والوكرة والخور ولوسيل وكل مناطق قطر | Open every day … · Doha, Al Rayyan, Al Wakrah, Al Khor, Lusail and all of Qatar | `/contact` |
 | acknowledgment email `ref` | المرجع | Your reference | The customer's email |
 | `global-error.tsx` | سجاد العربية / الصفحة ما انفتحت. / رسالتك محفوظة. / اتصل / أعد التحميل | | A root layout failure (copies of catalogue lines) |
+| `hero.pauseVideo`, `hero.playVideo` | إيقاف فيديو الخلفية / تشغيل فيديو الخلفية | Pause background video / Play background video | Home hero video button, read by screen readers (added 2026-11-24) |
 | `public/sw.js` | بدون إنترنت / ما فيه اتصال حاليًا. / شغّل الواي فاي أو البيانات، والصفحة ترجع أول ما يرجع الاتصال. / رسالتك محفوظة. / المكالمات ما تحتاج إنترنت. / نفتح يوميًا من 8:00 صباحًا إلى 10:00 مساءً. / حاول مرة ثانية / اتصل | | The offline page (S14, split from the catalogue row) |
 
 **3. Older strings the redesign now shows far more often**, worth the same read:

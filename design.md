@@ -506,7 +506,14 @@ give back (`.bc a`, `.rel-all`, `.idx-more`, `.chip-link`, `.faq-q`). `scripts/a
 - Min height: 100vh
 - Center-aligned content
 - Large typography
-- Subtle background effects
+- Background (Home, 2026-11-24): a looping furnishing video under a cream veil
+  (`.hero-veil`, a radial gradient about 88% behind the text and 50% at the edges), so the
+  text keeps the contrast it has on the plain background. Layers in paint order: the poster
+  (the loop's first frame, `.hero-poster`), the video (`.hero-video`, fades in once playing),
+  the veil, then the content. Wide cut from md, a 3:4 phone cut below.
+- Pause button `.hero-pause`: 44px round, white with a hairline border, forest icon (Pause /
+  Play from the sprite). It sits bottom-end on phones and top-end from md, clear of the
+  WhatsApp pill and the Tawk bubble, and only shows while there is a video.
 
 #### Product Showcase
 - Full-width images

@@ -31,6 +31,7 @@ export const Instagram = sprite("instagram");
 export const Mail = sprite("mail");
 export const MapPin = sprite("map-pin");
 export const MessageCircle = sprite("message-circle");
+export const Pause = sprite("pause");
 export const Phone = sprite("phone");
 export const Play = sprite("play");
 export const Shield = sprite("shield");

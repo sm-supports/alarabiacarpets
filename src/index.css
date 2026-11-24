@@ -1326,3 +1326,29 @@
   .ft-col > ul { @apply max-md:pb-2; }
   .ft-go { @apply max-md:pt-6; }
 }
+
+/* Home hero background (HeroSection, HeroVideo): the poster, the loop over it once the page
+   has loaded, and a cream veil over both, strongest behind the text, so the headline and the
+   small text keep the contrast they have on the plain background. The video has the poster's
+   box, never a larger one (see HeroVideo). The pause button sits at the hero's bottom-end on
+   phones and its top-end from md, clear of the WhatsApp pill and the Tawk bubble. */
+@layer components {
+  .hero-poster, .hero-video { @apply absolute inset-0 h-full w-full object-cover; }
+  .hero-video { opacity: 0; transition: opacity 700ms ease-out; }
+  .hero-video.is-on { opacity: 1; }
+  .hero-veil {
+    @apply absolute inset-0;
+    background: radial-gradient(ellipse 75% 70% at 50% 48%,
+      rgb(250 250 250 / 0.88) 0%, rgb(250 250 250 / 0.8) 55%, rgb(250 250 250 / 0.5) 100%);
+  }
+  .hero-pause {
+    @apply absolute z-20 bottom-3 end-3 md:bottom-auto md:top-4 md:end-5 flex h-11 w-11 items-center
+      justify-center rounded-full border border-gray-200/70 bg-white/85 text-forest-900 shadow-subtle
+      transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2
+      focus-visible:ring-gold-500 focus-visible:ring-offset-2;
+  }
+  .hero-pause svg { @apply h-4 w-4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-video { transition: none; }
+}

@@ -7,6 +7,11 @@
 /img/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Home's hero loop and its posters. Each name carries the first 8 hex characters of the
+# source clip's sha256, so immutable is safe: a new clip must get new names.
+/video/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # The four folders below hold files under plain names, so they must NOT be immutable:
 # a photo replaced under the same name would keep serving the old copy for a year.
 # A day in the browser, then served stale for up to a week while it revalidates.

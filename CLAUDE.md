@@ -54,6 +54,7 @@ Premium home furnishing e-commerce site serving Qatar. Doha-based, showcases car
 | `src/components/Breadcrumb.tsx` | The visible trail on every interior page; takes the same `trail` as `buildBreadcrumb` so it matches the BreadcrumbList (`check-consistency`) |
 | `src/components/FoldHead.tsx` | A section heading that folds the next `.fold-body` on phones (see Conventions) |
 | `src/components/ProductGallery.tsx` | The product page's phone swipe gallery; extra slides only after hydration |
+| `src/components/HeroVideo.tsx`, `src/lib/hero-media.ts`, `public/video/` | Home hero's background loop over its poster (see Conventions). Files made by `scripts/encode-hero-video.sh`; source and licence in `docs/media-credits.md` |
 | `src/components/PageError.tsx`, `src/app/(en)/error.tsx`, `src/app/(ar)/error.tsx` | A page that throws: Navbar plus a page `StatePanel` (S15) |
 | `src/app/global-error.tsx`, `src/app/global-not-found.tsx` | A root layout that throws, and the bilingual 404 (`out/404.html`, real 404 status). Both are complete documents with inline styles (see Conventions) |
 | `public/sw.js`, `scripts/sw-kill.js` | The offline page's service worker (S14), switched by `SERVICE_WORKER`, and its kill switch template (see Service worker) |
@@ -210,6 +211,13 @@ Use logical Tailwind classes (`ms-`, `pe-`, `start-`, `text-start`, `gap-` over
   and `/lovable-uploads` hold plain names and are cached for a day: give a replaced file a new
   name anyway, and never mark those folders `immutable` again
 - Container pattern: `<div className="container mx-auto px-4 sm:px-5 lg:px-8">`
+- Home hero video: the poster (`<picture>` in `HeroSection`, `fetchpriority="high"`) is in
+  the static HTML and is the page's LCP element; `HeroVideo` creates the `<video>` only after
+  the load event and an idle moment, in the poster's box and never a larger one, so its first
+  frame can't become a later LCP. The poster must not fill the whole viewport (the hero starts
+  below the header's spacer): Chrome ignores a full-viewport image for LCP. No video for reduced
+  motion, Save-Data or a slow connection; the 44px pause button is required (WCAG 2.2.2) and
+  remembered in `localStorage`. `/video/*` is immutable: a new clip gets new hashed names
 - Scroll-reveal: add the CSS class `reveal` (end of `src/index.css`). Never render `opacity-0`
   and remove it from JavaScript: the content then stays invisible until the page hydrates.
   Not inside an `overflow-hidden` ancestor, and not on content above the fold

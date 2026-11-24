@@ -64,6 +64,8 @@ export const arClient: ClientDict = {
     freeInstall: "تركيب مجاني",
     proTeam: "فريق محترف",
     happyCustomers: "+1000 سعيد",
+    pauseVideo: "إيقاف فيديو الخلفية",
+    playVideo: "تشغيل فيديو الخلفية",
   },
   trusted: {
     eyebrow: "شركاء نعتز بهم",

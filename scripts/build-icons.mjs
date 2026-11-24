@@ -12,7 +12,7 @@ import path from "node:path";
 const ICONS = [
   "arrow-left", "arrow-right", "arrow-up-right", "check", "chevron-left", "chevron-right",
   "external-link", "facebook", "headphones", "image", "instagram", "mail", "map-pin",
-  "message-circle", "phone", "play", "shield", "shopping-cart", "truck", "video", "wrench", "x",
+  "message-circle", "pause", "phone", "play", "shield", "shopping-cart", "truck", "video", "wrench", "x",
 ];
 
 const WHATSAPP =

@@ -1,7 +1,10 @@
 /**
- * Icons from the shared sprite public/icons.svg (scripts/build-icons.mjs), with the
- * same names and props as lucide-react. A new icon needs adding to that script too.
+ * Icons from the shared sprite (scripts/build-icons.mjs, named by its hash in
+ * src/lib/icon-sprite.ts), with the same names and props as lucide-react. A new icon needs
+ * adding to that script too.
  */
+import { ICON_SPRITE } from "@/lib/icon-sprite";
+
 interface IconProps {
   size?: number;
   className?: string;
@@ -11,7 +14,7 @@ function sprite(id: string) {
   return function Icon({ size = 24, className }: IconProps) {
     return (
       <svg width={size} height={size} className={className} aria-hidden="true">
-        <use href={`/icons.svg#${id}`} />
+        <use href={`${ICON_SPRITE}#${id}`} />
       </svg>
     );
   };

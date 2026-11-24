@@ -149,7 +149,7 @@ for (const { url, file } of pages) {
     // The md+ pill's own word ("WhatsApp", .ab-p) is today's desktop pill, kept by WP5;
     // the bar's label is the rest.
     const label = textOf(inner.replace(/<span class="ab-p">[\s\S]*?<\/span>/g, "")) || decode(attr(attrs, "aria-label"));
-    const icons = new Set([...inner.matchAll(/icons\.svg#([\w-]+)"/g)].map((m) => m[1]));
+    const icons = new Set([...inner.matchAll(/\/icons\/[0-9a-f]{8}\.svg#([\w-]+)"/g)].map((m) => m[1]));
     const where = `${url} <${tag}${cls ? ` class="${cls}"` : ""}> "${label}"`;
 
     if (HEADER_BUTTON.test(cls)) {

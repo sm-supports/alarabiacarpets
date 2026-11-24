@@ -29,8 +29,9 @@
 /sw.js
   Cache-Control: no-cache
 
-/icons.svg
-  Cache-Control: public, max-age=86400
+# The icon sprite, named by its content hash (scripts/build-icons.mjs), so immutable is safe.
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
 
 /lovable-uploads/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800

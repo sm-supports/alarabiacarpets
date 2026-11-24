@@ -533,7 +533,7 @@ give back (`.bc a`, `.rel-all`, `.idx-more`, `.chip-link`, `.faq-q`). `scripts/a
 - Line weight: 1.5px
 - Size scale: 16px, 20px, 24px, 32px
 - Color: Inherit from text or `#86868B`
-- Style: Lucide shapes, served from the sprite (`@/components/icons`, `public/icons.svg`), not `lucide-react`
+- Style: Lucide shapes, served from the sprite (`@/components/icons`, `public/icons/<hash>.svg`), not `lucide-react`
 
 ---
 
